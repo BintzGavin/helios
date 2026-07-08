@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.859	150	25.60	490.1	keep	Buffer.from optimization
+2	5.860	150	25.59	490.0	keep	Buffer.from optimization
+3	5.855	150	25.61	490.5	keep	Buffer.from optimization

@@ -173,17 +173,7 @@ export class CaptureLoop {
 
       // A standard 1080p frame is ~300KB to 2MB in base64. A 600x600 canvas frame base64 decode needs ~200KB.
       // We pre-allocate with a conservative 512KB to cover most initial frame dimensions without realloc.
-      const POOL_SIZE = 64;
-      const INITIAL_BUFFER_SIZE = Math.max(
-        512 * 1024,
-        this.options.width * this.options.height * 4,
-      );
-      const freePool = { head: null as PooledBuffer | null };
-      for (let i = 0; i < POOL_SIZE; i++) {
-        const node = new PooledBuffer(INITIAL_BUFFER_SIZE, freePool);
-        node.next = freePool.head;
-        freePool.head = node;
-      }
+
 
       const isDomStrategy = !!(strategy as any).cdpSession;
       const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
@@ -256,16 +246,9 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isString) {
               const str = buffer as string;
-              const maxBytes = (str.length * 3) >>> 2;
-              let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-              const written = pooled.buffer.write(str, "base64");
-              const chunk = pooled.buffer.subarray(0, written);
-              pendingBytes += written;
-              writeSuccess = stream.write(chunk, pooled.freeCb);
+              const chunk = Buffer.from(str, "base64");
+              pendingBytes += chunk.length;
+              writeSuccess = stream.write(chunk);
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -300,17 +283,10 @@ export class CaptureLoop {
                     );
                     nextCapturePromise = domBeginFrame!();
 
-                    const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                    const written = pooled.buffer.write(buf, "base64");
-                    const chunk = pooled.buffer.subarray(0, written);
+                    const chunk = Buffer.from(buf, "base64");
 
-                    pendingBytes += written;
-                    const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                    pendingBytes += chunk.length;
+                    const writeSuccessStr = stream.write(chunk);
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -341,16 +317,9 @@ export class CaptureLoop {
                   }
                   buf = domLastFrameData as string;
 
-                  const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                  const written = pooled.buffer.write(buf, "base64");
-                  const chunk = pooled.buffer.subarray(0, written);
-                  pendingBytes += written;
-                  const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                  const chunk = Buffer.from(buf, "base64");
+                  pendingBytes += chunk.length;
+                  const writeSuccessStr = stream.write(chunk);
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -386,14 +355,7 @@ export class CaptureLoop {
                     let buf;
                     buf = strategy.processCaptureResult!(rawResult) as string;
 
-                    const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                    const written = pooled.buffer.write(buf, "base64");
-                    const chunk = pooled.buffer.subarray(0, written);
+                    const chunk = Buffer.from(buf, "base64");
 
                     if (timePromise) await timePromise;
                     nextCapturePromise = strategy.capture(
@@ -401,8 +363,8 @@ export class CaptureLoop {
                       (i + 1) * timeStep,
                     );
 
-                    pendingBytes += written;
-                    const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                    pendingBytes += chunk.length;
+                    const writeSuccessStr = stream.write(chunk);
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -429,16 +391,9 @@ export class CaptureLoop {
                   let buf;
                   buf = strategy.processCaptureResult!(rawResult) as string;
 
-                  const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                  const written = pooled.buffer.write(buf, "base64");
-                  const chunk = pooled.buffer.subarray(0, written);
-                  pendingBytes += written;
-                  const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                  const chunk = Buffer.from(buf, "base64");
+                  pendingBytes += chunk.length;
+                  const writeSuccessStr = stream.write(chunk);
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -570,16 +525,9 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isString) {
               const str = buffer as string;
-              const maxBytes = (str.length * 3) >>> 2;
-              let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-              const written = pooled.buffer.write(str, "base64");
-              const chunk = pooled.buffer.subarray(0, written);
-              pendingBytes += written;
-              writeSuccess = stream.write(chunk, pooled.freeCb);
+              const chunk = Buffer.from(str, "base64");
+              pendingBytes += chunk.length;
+              writeSuccess = stream.write(chunk);
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -609,17 +557,10 @@ export class CaptureLoop {
                     );
                     nextCapturePromise = domBeginFrame!();
 
-                    const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                    const written = pooled.buffer.write(buf, "base64");
-                    const chunk = pooled.buffer.subarray(0, written);
+                    const chunk = Buffer.from(buf, "base64");
 
-                    pendingBytes += written;
-                    const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                    pendingBytes += chunk.length;
+                    const writeSuccessStr = stream.write(chunk);
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -645,16 +586,9 @@ export class CaptureLoop {
 
                   const buf = rawResult as unknown as string;
 
-                  const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                  const written = pooled.buffer.write(buf, "base64");
-                  const chunk = pooled.buffer.subarray(0, written);
-                  pendingBytes += written;
-                  const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                  const chunk = Buffer.from(buf, "base64");
+                  pendingBytes += chunk.length;
+                  const writeSuccessStr = stream.write(chunk);
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -689,14 +623,7 @@ export class CaptureLoop {
 
                     const buf = rawResult as unknown as string;
 
-                    const maxBytes = (buf.length * 3) >>> 2;
-                    let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                    const written = pooled.buffer.write(buf, "base64");
-                    const chunk = pooled.buffer.subarray(0, written);
+                    const chunk = Buffer.from(buf, "base64");
 
                     if (timePromise) await timePromise;
 
@@ -705,8 +632,8 @@ export class CaptureLoop {
                       (i + 1) * timeStep,
                     );
 
-                    pendingBytes += written;
-                    const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                    pendingBytes += chunk.length;
+                    const writeSuccessStr = stream.write(chunk);
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -732,16 +659,9 @@ export class CaptureLoop {
 
                   const buf = rawResult as unknown as string;
 
-                  const maxBytes = (buf.length * 3) >>> 2;
-                  let pooled = freePool.head;
-              if (pooled) freePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), freePool);
-              }
-                  const written = pooled.buffer.write(buf, "base64");
-                  const chunk = pooled.buffer.subarray(0, written);
-                  pendingBytes += written;
-                  const writeSuccessStr = stream.write(chunk, pooled.freeCb);
+                  const chunk = Buffer.from(buf, "base64");
+                  pendingBytes += chunk.length;
+                  const writeSuccessStr = stream.write(chunk);
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -854,17 +774,7 @@ export class CaptureLoop {
       const frameReadyRing = null; // removed in PERF-891 // 0 = not ready, 1 = ready
       let fatalError: any = null;
 
-      const MULTI_POOL_SIZE = 64;
-      const MULTI_INITIAL_BUFFER_SIZE = Math.max(
-        512 * 1024,
-        this.options.width * this.options.height * 4,
-      );
-      const multiFreePool = { head: null as PooledBuffer | null };
-      for (let i = 0; i < MULTI_POOL_SIZE; i++) {
-        const node = new PooledBuffer(MULTI_INITIAL_BUFFER_SIZE, multiFreePool);
-        node.next = multiFreePool.head;
-        multiFreePool.head = node;
-      }
+
       const writerWaiterPromise = new ReusableThenable();
 
       // Multi-worker ACTOR MODEL with backpressure
@@ -1147,16 +1057,9 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isDomStrategyWriter) {
               const str = buffer as string;
-              const maxBytes = (str.length * 3) >>> 2;
-              let pooled = multiFreePool.head;
-              if (pooled) multiFreePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
-              }
-              const written = pooled.buffer.write(str, "base64");
-              const chunk = pooled.buffer.subarray(0, written);
-              pendingBytes += written;
-              writeSuccess = stream.write(chunk, pooled.freeCb);
+              const chunk = Buffer.from(str, "base64");
+              pendingBytes += chunk.length;
+              writeSuccess = stream.write(chunk);
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -1236,16 +1139,9 @@ export class CaptureLoop {
 
                 const buffer = frameBufferRing[ringIndex]! as string;
 
-                const maxBytes = (buffer.length * 3) >>> 2;
-                let pooled = multiFreePool.head;
-              if (pooled) multiFreePool.head = pooled.next;
-              if (!pooled || pooled.size < maxBytes) {
-                pooled = new PooledBuffer(maxBytes + (maxBytes >> 1), multiFreePool);
-              }
-                const written = pooled.buffer.write(buffer, "base64");
-                const chunk = pooled.buffer.subarray(0, written);
-                pendingBytes += written;
-                const writeSuccess = stream.write(chunk, pooled.freeCb);
+                const chunk = Buffer.from(buffer, "base64");
+                pendingBytes += chunk.length;
+                const writeSuccess = stream.write(chunk);
 
                 if (!writeSuccess && pendingBytes >= 16777216) {
                   await this.drainPromise;
