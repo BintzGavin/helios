@@ -1,11 +1,11 @@
 ---
 id: PERF-942
 slug: unroll-is-string-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2025-02-23
 completed: ""
-result: ""
+result: improved
 ---
 
 # PERF-942: Unroll isString in Single-Worker Capture Loops

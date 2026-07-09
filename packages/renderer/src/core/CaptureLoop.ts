@@ -192,7 +192,7 @@ export class CaptureLoop {
         : null;
 
       try {
-        let isString: boolean | null = null;
+
         let nextProgress = progressInterval;
         if (hasProcessFn) {
           let nextCapturePromise = null;
@@ -241,10 +241,8 @@ export class CaptureLoop {
             if (onProgress) {
               onProgress(0 / totalFrames);
             }
-            isString = isDomStrategy || typeof buffer === "string";
-
             let writeSuccess = false;
-            if (isString) {
+            if (isDomStrategy) {
               const str = buffer as string;
               const chunk = Buffer.from(str, "base64");
               pendingBytes += chunk.length;
@@ -259,7 +257,7 @@ export class CaptureLoop {
               pendingBytes = 0;
             }
 
-            if (isString) {
+            if (isDomStrategy) {
               if (isDomStrategy) {
 
                 let i = 1;
@@ -520,10 +518,8 @@ export class CaptureLoop {
               onProgress(0 / totalFrames);
             }
             const buffer = bufRaw;
-            isString = isDomStrategy || typeof buffer === "string";
-
             let writeSuccess = false;
-            if (isString) {
+            if (isDomStrategy) {
               const str = buffer as string;
               const chunk = Buffer.from(str, "base64");
               pendingBytes += chunk.length;
@@ -538,7 +534,7 @@ export class CaptureLoop {
               pendingBytes = 0;
             }
 
-            if (isString) {
+            if (isDomStrategy) {
               if (isDomStrategy) {
 
                 let i = 1;
