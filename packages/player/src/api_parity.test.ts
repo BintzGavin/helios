@@ -422,17 +422,6 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.defaultMuted).toBe(false);
   });
 
-  it('should support mediaKeys property and setMediaKeys method', async () => {
-    expect(player.mediaKeys).toBeNull();
-
-    const mockMediaKeys = {} as MediaKeys;
-    await player.setMediaKeys(mockMediaKeys);
-    expect(player.mediaKeys).toBe(mockMediaKeys);
-
-    await player.setMediaKeys(null);
-    expect(player.mediaKeys).toBeNull();
-  });
-
   it('should support defaultPlaybackRate property', () => {
     const rateSpy = vi.fn();
     player.addEventListener('ratechange', rateSpy);

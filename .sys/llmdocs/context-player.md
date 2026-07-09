@@ -61,7 +61,6 @@ The element observes the following attributes for state reflection:
 - `setPlaybackRange(startFrame: number, endFrame: number): void;`
 - `clearPlaybackRange(): void;`
 - `setSinkId(sinkId: string): Promise<void>;`
-- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>;`
 
 ## Properties (HTMLMediaElement Subset & API Parity)
 - `src`, `autoplay`, `loop`, `controls`, `poster`, `preload`, `sandbox`, `interactive`
@@ -89,7 +88,6 @@ The element observes the following attributes for state reflection:
 - `disableRemotePlayback`: Reflected disableremoteplayback attribute.
 - `mediaGroup`: Reflected mediagroup attribute.
 - `sinkId`: Current audio sink id (read-only).
-- `mediaKeys`: MediaKeys object (read-only).
 
 ## Custom Helios Methods
 - `getController(): HeliosController | null;`

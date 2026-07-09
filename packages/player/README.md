@@ -155,7 +155,6 @@ Both class-level and instance-level properties are provided for standard media s
 - `setSize(width: number, height: number): void` - Updates the composition dimensions dynamically.
 - `setMarkers(markers: Marker[]): void` - Updates the timeline markers dynamically.
 - `setSinkId(sinkId: string): Promise<void>` - Sets the audio sink id.
-- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>` - Sets the MediaKeys object to use for decrypting media.
 
 - `play(): Promise<void>` - Starts playback.
 - `getController(): HeliosController | null` - Retrieves the underlying HeliosController instance, if connected.
@@ -182,7 +181,6 @@ Both class-level and instance-level properties are provided for standard media s
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
 - `mediaGroup` (string): Reflected mediagroup attribute.
 - `sinkId` (string, read-only): Returns the current audio sink id.
-- `mediaKeys` (MediaKeys | null, read-only): The MediaKeys object associated with the media element.
 
 - `src` (string): URL of the composition page to load in the iframe.
 - `autoplay` (boolean): Reflected autoplay attribute.
