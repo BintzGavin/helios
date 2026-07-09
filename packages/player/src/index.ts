@@ -1347,15 +1347,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     return Promise.resolve();
   }
 
-  private _mediaKeys: MediaKeys | null = null;
-  public get mediaKeys(): MediaKeys | null {
-    return this._mediaKeys;
-  }
-
-  public async setMediaKeys(mediaKeys: MediaKeys | null): Promise<void> {
-    this._mediaKeys = mediaKeys;
-    return Promise.resolve();
-  }
 
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
