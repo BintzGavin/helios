@@ -251,7 +251,7 @@ export class CaptureLoop {
               writeSuccess = stream.write(buffer as any);
             }
 
-            if (!writeSuccess && pendingBytes >= 16777216) {
+            if (writeSuccess) {} else if (pendingBytes >= 16777216) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -521,7 +521,7 @@ export class CaptureLoop {
               writeSuccess = stream.write(buffer as any);
             }
 
-            if (!writeSuccess && pendingBytes >= 16777216) {
+            if (writeSuccess) {} else if (pendingBytes >= 16777216) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -1045,7 +1045,7 @@ export class CaptureLoop {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
             }
-            if (!writeSuccess && pendingBytes >= 16777216) {
+            if (writeSuccess) {} else if (pendingBytes >= 16777216) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -1123,7 +1123,7 @@ export class CaptureLoop {
                 pendingBytes += (buffer.length * 3) >>> 2;
                 const writeSuccess = stream.write(Buffer.from(buffer, "base64"));
 
-                if (!writeSuccess && pendingBytes >= 16777216) {
+                if (writeSuccess) {} else if (pendingBytes >= 16777216) {
                   await this.drainPromise;
                   pendingBytes = 0;
                 }
@@ -1192,7 +1192,7 @@ export class CaptureLoop {
                 pendingBytes += (buffer as any).length;
                 const writeSuccess = stream.write(buffer as any);
 
-                if (!writeSuccess && pendingBytes >= 16777216) {
+                if (writeSuccess) {} else if (pendingBytes >= 16777216) {
                   await this.drainPromise;
                   pendingBytes = 0;
                 }
