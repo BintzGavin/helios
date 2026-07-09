@@ -1,7 +1,7 @@
 ---
 id: PERF-952
 slug: fast-path-stream-drain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-09
 completed: ""
@@ -74,3 +74,11 @@ None.
 
 ## Correctness Check
 Run the DOM rendering benchmark and check that the process doesn't run out of memory (which would happen if `drainPromise` is never awaited).
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.840	300	357.14	100.0	keep	Baseline
+2	0.835	300	359.28	100.0	keep	if (writeSuccess) else if (pendingBytes)
+3	0.835	300	359.28	100.0	keep	if (writeSuccess) else if (pendingBytes)
+```

@@ -4,6 +4,9 @@ Last updated by: PERF-941
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-952**: Unrolled the stream backpressure check (`if (!writeSuccess && pendingBytes >= 16777216)`) in `CaptureLoop.ts` hot paths.
+  - **Improvement**: Explicitly prioritizing the fast-path condition via `if (writeSuccess) {} else if (...)` eliminated boolean coercion (`!writeSuccess`) and combined branch evaluation overhead. Microbenchmarks showed a positive speedup in tight writer loops.
+  - **Plan ID**: PERF-952
 
 - **PERF-949**: Replaced user-space `PooledBuffer` linked-list string pooling with native `Buffer.from(str, "base64")` in `CaptureLoop.ts`.
   - **Improvement**: Eliminating JS-level object pooling closures and logic yielded an improvement while mitigating major safety concerns with Node.js stream reference handling during `child_process` IPC.
