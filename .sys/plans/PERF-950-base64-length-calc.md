@@ -1,7 +1,7 @@
 ---
 id: PERF-950
 slug: inline-buffer-length
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-23
 completed: ""

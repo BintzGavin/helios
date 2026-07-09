@@ -7,7 +7,8 @@ Last updated by: PERF-941
 - **PERF-949**: Replaced user-space `PooledBuffer` linked-list string pooling with native `Buffer.from(str, "base64")` in `CaptureLoop.ts`.
   - **Improvement**: Eliminating JS-level object pooling closures and logic yielded an improvement while mitigating major safety concerns with Node.js stream reference handling during `child_process` IPC.
   - **Plan ID**: PERF-949
-- **What Works:** PERF-942 unrolled the `isString` evaluations in the single-worker capture loops of `CaptureLoop.ts`.
+- **What Works:**
+  - **PERF-950**: Inlined Buffer allocation and base64 length calc in CaptureLoop.ts. PERF-942 unrolled the `isString` evaluations in the single-worker capture loops of `CaptureLoop.ts`.
   - **Improvement:** Removed dynamic `typeof` checks inside the single-worker path, relying on the known strategy type (`isDomStrategy`), eliminating dynamic type checking and branching overhead.
   - **Plan ID:** PERF-942
 - **What Works:** PERF-945 optimized the buffer allocation blocks in single and multi-worker loops of `CaptureLoop.ts`.

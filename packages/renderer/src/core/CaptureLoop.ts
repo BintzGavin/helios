@@ -244,9 +244,8 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isDomStrategy) {
               const str = buffer as string;
-              const chunk = Buffer.from(str, "base64");
-              pendingBytes += chunk.length;
-              writeSuccess = stream.write(chunk);
+              pendingBytes += (str.length * 3) >>> 2;
+              writeSuccess = stream.write(Buffer.from(str, "base64"));
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -281,10 +280,8 @@ export class CaptureLoop {
                     );
                     nextCapturePromise = domBeginFrame!();
 
-                    const chunk = Buffer.from(buf, "base64");
-
-                    pendingBytes += chunk.length;
-                    const writeSuccessStr = stream.write(chunk);
+                    pendingBytes += (buf.length * 3) >>> 2;
+                    const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -315,9 +312,8 @@ export class CaptureLoop {
                   }
                   buf = domLastFrameData as string;
 
-                  const chunk = Buffer.from(buf, "base64");
-                  pendingBytes += chunk.length;
-                  const writeSuccessStr = stream.write(chunk);
+                  pendingBytes += (buf.length * 3) >>> 2;
+                  const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -353,16 +349,14 @@ export class CaptureLoop {
                     let buf;
                     buf = strategy.processCaptureResult!(rawResult) as string;
 
-                    const chunk = Buffer.from(buf, "base64");
-
                     if (timePromise) await timePromise;
                     nextCapturePromise = strategy.capture(
                       page,
                       (i + 1) * timeStep,
                     );
 
-                    pendingBytes += chunk.length;
-                    const writeSuccessStr = stream.write(chunk);
+                    pendingBytes += (buf.length * 3) >>> 2;
+                    const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -389,9 +383,8 @@ export class CaptureLoop {
                   let buf;
                   buf = strategy.processCaptureResult!(rawResult) as string;
 
-                  const chunk = Buffer.from(buf, "base64");
-                  pendingBytes += chunk.length;
-                  const writeSuccessStr = stream.write(chunk);
+                  pendingBytes += (buf.length * 3) >>> 2;
+                  const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -521,9 +514,8 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isDomStrategy) {
               const str = buffer as string;
-              const chunk = Buffer.from(str, "base64");
-              pendingBytes += chunk.length;
-              writeSuccess = stream.write(chunk);
+              pendingBytes += (str.length * 3) >>> 2;
+              writeSuccess = stream.write(Buffer.from(str, "base64"));
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -553,10 +545,8 @@ export class CaptureLoop {
                     );
                     nextCapturePromise = domBeginFrame!();
 
-                    const chunk = Buffer.from(buf, "base64");
-
-                    pendingBytes += chunk.length;
-                    const writeSuccessStr = stream.write(chunk);
+                    pendingBytes += (buf.length * 3) >>> 2;
+                    const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -582,9 +572,8 @@ export class CaptureLoop {
 
                   const buf = rawResult as unknown as string;
 
-                  const chunk = Buffer.from(buf, "base64");
-                  pendingBytes += chunk.length;
-                  const writeSuccessStr = stream.write(chunk);
+                  pendingBytes += (buf.length * 3) >>> 2;
+                  const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -619,8 +608,6 @@ export class CaptureLoop {
 
                     const buf = rawResult as unknown as string;
 
-                    const chunk = Buffer.from(buf, "base64");
-
                     if (timePromise) await timePromise;
 
                     nextCapturePromise = strategy.capture(
@@ -628,8 +615,8 @@ export class CaptureLoop {
                       (i + 1) * timeStep,
                     );
 
-                    pendingBytes += chunk.length;
-                    const writeSuccessStr = stream.write(chunk);
+                    pendingBytes += (buf.length * 3) >>> 2;
+                    const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                     if (!writeSuccessStr && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -655,9 +642,8 @@ export class CaptureLoop {
 
                   const buf = rawResult as unknown as string;
 
-                  const chunk = Buffer.from(buf, "base64");
-                  pendingBytes += chunk.length;
-                  const writeSuccessStr = stream.write(chunk);
+                  pendingBytes += (buf.length * 3) >>> 2;
+                  const writeSuccessStr = stream.write(Buffer.from(buf, "base64"));
 
                   if (!writeSuccessStr && pendingBytes >= 16777216) {
                     await this.drainPromise;
@@ -1053,9 +1039,8 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isDomStrategyWriter) {
               const str = buffer as string;
-              const chunk = Buffer.from(str, "base64");
-              pendingBytes += chunk.length;
-              writeSuccess = stream.write(chunk);
+              pendingBytes += (str.length * 3) >>> 2;
+              writeSuccess = stream.write(Buffer.from(str, "base64"));
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -1135,9 +1120,8 @@ export class CaptureLoop {
 
                 const buffer = frameBufferRing[ringIndex]! as string;
 
-                const chunk = Buffer.from(buffer, "base64");
-                pendingBytes += chunk.length;
-                const writeSuccess = stream.write(chunk);
+                pendingBytes += (buffer.length * 3) >>> 2;
+                const writeSuccess = stream.write(Buffer.from(buffer, "base64"));
 
                 if (!writeSuccess && pendingBytes >= 16777216) {
                   await this.drainPromise;
