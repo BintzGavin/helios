@@ -1,7 +1,7 @@
 ---
 id: PERF-953
 slug: decode-base64-earlier-single-worker
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-09
 completed: ""
@@ -130,3 +130,9 @@ Ensure Canvas renders successfully to verify non-DOM strategies are unaffected.
 
 ## Correctness Check
 Run tests to confirm stream output writes perfectly without base64 decoding corruptions.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	54.670	150	2.74	37.2	keep	baseline
+2	53.167	150	2.78	37.1	keep	baseline
+3	52.068	150	2.65	37.2	keep	Decode Base64 earlier in single worker loop

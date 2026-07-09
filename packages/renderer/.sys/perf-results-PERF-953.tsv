@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	54.770	150	2.74	37.2	keep	baseline
+2	53.867	150	2.78	37.1	keep	baseline
+3	52.068	150	2.65	37.2	keep	Decode Base64 earlier in single worker loop
