@@ -16,7 +16,7 @@ async function main() {
   // Target the built artifact
   const compositionPath = path.resolve(
     process.cwd(),
-    '../../output/example-build/examples/dom-benchmark/composition.html'
+    'output/example-build/examples/dom-benchmark/composition.html'
   );
   const compositionUrl = `file://${compositionPath}`;
 

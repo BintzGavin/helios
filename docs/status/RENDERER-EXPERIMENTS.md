@@ -2,6 +2,7 @@
 Current best: 19.800s (baseline was 21.500s, -7.9%)
 Last updated by: PERF-941
 
+- **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
 
 - **PERF-949**: Replaced user-space `PooledBuffer` linked-list string pooling with native `Buffer.from(str, "base64")` in `CaptureLoop.ts`.
