@@ -1,0 +1,2 @@
+1	32.918	10000000	0.00	0.0	keep	PERF-958 explicit fast path stream drain single worker (baseline: 33.712ms)
+1	0.032	10000000	0.00	0.0	keep	PERF-958 explicit fast path stream drain single worker (baseline: 0.034s)

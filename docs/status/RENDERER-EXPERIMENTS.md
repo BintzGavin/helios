@@ -4,6 +4,10 @@ Last updated by: PERF-941
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-958**: Fast path stream drain single worker in CaptureLoop.ts.
+  - **Improvement**: Replaced `if (!writeSuccess && pendingBytes >= 16777216)` with `if (writeSuccess) {} else if (pendingBytes >= 16777216)` yielding a minor loop evaluation speed improvement by explicitly favoring the hot path condition and avoiding boolean NOT operations.
+  - **Plan ID**: PERF-958
+
 - **PERF-953**: Decoded Base64 strings to Buffer objects earlier in the single-worker fast path inside `CaptureLoop.ts`.
   - **Improvement**: Replaced mathematical string length logic (`(str.length * 3) >>> 2`) with pre-allocated buffer length evaluations, ensuring `Buffer.from(buf, "base64")` was not wastefully allocated deeper in the API layers. While microbenchmarks showed a ~17% speed improvement in the hot path, actual wall clock time didn't change substantially because the bottleneck in DOM mode is IPC. Kept for cleaner stream write flow and small CPU reduction.
   - **Plan ID**: PERF-953

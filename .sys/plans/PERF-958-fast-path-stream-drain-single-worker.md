@@ -1,7 +1,7 @@
 ---
 id: PERF-958
 slug: fast-path-stream-drain
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-09
 completed: ""
