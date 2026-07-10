@@ -868,3 +868,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 - ✅ Completed: Remove Unsupported EME - Removed the unsupported setMediaKeys method and mediaKeys property from both the codebase and documentation.
 
 - Completed PERF-961: Removed redundant `isDomStrategy` check in CaptureLoop.ts
+
+## 2026-06-25 - Improve AudioMixerPanel Coverage
+- Created plan `.sys/plans/2026-06-25-STUDIO-Improve-AudioMixerPanel-Coverage-V3.md` to properly address state update warnings during `AudioMixerPanel` tests.
