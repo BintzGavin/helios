@@ -1,4 +1,5 @@
-**Version**: 0.122.8
+- [v0.122.9] ✅ Completed: STUDIO-Improve-Stage-Coverage - Achieved 100% test coverage for Stage by adding tests for missing branches in HMR restoration, empty props, middle click interactions, and toolbar callback actions.
+**Version**: 0.122.9
 
 - [v0.121.28] ✅ Completed: Improve AssistantModal Coverage - Reached 90%+ test coverage for AssistantModal.
 

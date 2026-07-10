@@ -30,6 +30,9 @@
 ### PLAYER v0.77.48
 - ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled).
 
+### STUDIO v0.122.9
+- ✅ Completed: STUDIO-Improve-Stage-Coverage - Achieved 100% test coverage for Stage by adding tests for missing branches in HMR restoration, empty props, middle click interactions, and toolbar callback actions.
+
 ## PLAYER v0.77.43
 - ✅ Completed: Document Event Handlers - Updated README.md to include standard event handler properties to match the actual implementation in packages/player/src/index.ts.
 
