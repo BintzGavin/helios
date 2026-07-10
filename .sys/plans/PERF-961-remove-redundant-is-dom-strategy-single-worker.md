@@ -1,11 +1,11 @@
 ---
 id: PERF-961
 slug: remove-redundant-is-dom-strategy-single-worker
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2025-03-05
-completed: ""
-result: ""
+completed: "2025-03-05"
+result: "Removed redundant isDomStrategy checks and dead else blocks in CaptureLoop.ts"
 ---
 
 # PERF-961: Remove Redundant `isDomStrategy` Checks in Single-Worker Loop
