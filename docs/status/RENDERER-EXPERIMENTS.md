@@ -1,4 +1,5 @@
 ## Performance Trajectory
+- **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 19.800s (baseline was 21.500s, -7.9%)
 Last updated by: PERF-941
 
