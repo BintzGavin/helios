@@ -225,3 +225,6 @@ Last updated by: PERF-941
 - **PERF-947**: Inlined `Math.min` limit calculations directly in multi-worker assignment blocks in `CaptureLoop.ts`.
   - **WHY it didn't work**: When creating performance optimization plans for Node.js/V8 environments, proposing micro-optimizations such as unrolling local block-scoped variable assignments (e.g., changing `const limit = a + b; Math.min(limit)` to `Math.min(a + b)`) is a scientifically invalid optimization. The JIT compiler instantly inlines these bindings, resulting in zero measurable wall-clock improvement (observed ~1% noise variance in microbenchmarks). The experiment was discarded because it provided no actual reduction in work.
   - **Plan ID**: PERF-947
+- **PERF-951**: Caching decoded base64 frame buffers in multi-worker paths.
+  - **WHY it didn't work**: This optimization was already covered and successfully completed by PERF-966.
+  - **Plan ID**: PERF-951
