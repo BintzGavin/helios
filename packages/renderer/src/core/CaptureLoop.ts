@@ -190,6 +190,7 @@ export class CaptureLoop {
       let domLastFrameData: any = isDomStrategy
         ? (strategy as any).lastFrameData
         : null;
+      let domLastFrameBuffer: Buffer | null = null;
 
       try {
 
@@ -243,7 +244,10 @@ export class CaptureLoop {
             }
             let writeSuccess = false;
             if (isDomStrategy) {
-              const buf = Buffer.from(buffer as string, "base64");
+              if ((rawResult as any).screenshotData || !domLastFrameBuffer) {
+                domLastFrameBuffer = Buffer.from(buffer as string, "base64");
+              }
+              const buf = domLastFrameBuffer;
               pendingBytes += buf.length;
               writeSuccess = stream.write(buf);
             } else {
@@ -267,10 +271,14 @@ export class CaptureLoop {
                     const rawResult = await nextCapturePromise;
 
                     const data = rawResult.screenshotData;
-                    if (data) {
-                      domLastFrameData = data;
+                    let buf: Buffer;
+                    if (data || !domLastFrameBuffer) {
+                      if (data) domLastFrameData = data;
+                      buf = Buffer.from(domLastFrameData as string, "base64");
+                      domLastFrameBuffer = buf;
+                    } else {
+                      buf = domLastFrameBuffer;
                     }
-                    const buf = Buffer.from(domLastFrameData as string, "base64");
 
                     timeDriver.setTime(
                       page,
@@ -304,10 +312,14 @@ export class CaptureLoop {
                   const rawResult = await nextCapturePromise;
 
                   const data = rawResult.screenshotData;
-                  if (data) {
-                    domLastFrameData = data;
+                  let buf: Buffer;
+                  if (data || !domLastFrameBuffer) {
+                    if (data) domLastFrameData = data;
+                    buf = Buffer.from(domLastFrameData as string, "base64");
+                    domLastFrameBuffer = buf;
+                  } else {
+                    buf = domLastFrameBuffer;
                   }
-                  const buf = Buffer.from(domLastFrameData as string, "base64");
 
                   pendingBytes += buf.length;
                   const writeSuccessStr = stream.write(buf);
