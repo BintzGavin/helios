@@ -1,4 +1,0 @@
-💡 What: Eliminate redundant if (timePromise) checks inside unswitched isDomStrategy fast path loops.
-🎯 Why: In the DOM rendering hot path, timePromise is guaranteed to be truthy. Eliminating the per-iteration branch evaluation yields ~37% faster execution in tight wait loops (from ~30ms down to ~19ms for 10M loops) according to microbenchmarks.
-🔬 Approach: Remove the if branch and strictly await timePromise within the isDomStrategy blocks.
-📎 Plan: /.sys/plans/PERF-870-hoist-timepromise.md

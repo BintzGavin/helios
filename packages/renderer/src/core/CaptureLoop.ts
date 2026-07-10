@@ -708,6 +708,7 @@ export class CaptureLoop {
         let domLastFrameData: any = isDomStrategy
           ? (strategy as any).lastFrameData
           : null;
+        let domLastFrameBuffer: Buffer | null = null;
 
         if (hasProcessFn) {
           if (isDomStrategy) {
@@ -737,10 +738,15 @@ export class CaptureLoop {
                 let buffer: any;
                 const rawResult = await domBeginFrame!();
                 const data = rawResult.screenshotData;
-                if (data) {
-                  domLastFrameData = data;
+                let buf: Buffer;
+                if (data || !domLastFrameBuffer) {
+                  if (data) domLastFrameData = data;
+                  buf = Buffer.from(domLastFrameData as string, "base64");
+                  domLastFrameBuffer = buf;
+                } else {
+                  buf = domLastFrameBuffer;
                 }
-                buffer = domLastFrameData;
+                buffer = buf;
                 frameBufferRing[ringIndex] = buffer;
 
               } catch (e) {
@@ -817,7 +823,17 @@ export class CaptureLoop {
                   (startFrame + i) * compTimeStep,
                 );
                 let buffer: any;
-                buffer = await domBeginFrame!();
+                const rawResult = await domBeginFrame!();
+                const data = (rawResult as any).screenshotData;
+                let buf: Buffer;
+                if (data || !domLastFrameBuffer) {
+                  if (data) domLastFrameData = data;
+                  buf = Buffer.from(domLastFrameData as string, "base64");
+                  domLastFrameBuffer = buf;
+                } else {
+                  buf = domLastFrameBuffer;
+                }
+                buffer = buf;
                 frameBufferRing[ringIndex] = buffer;
 
               } catch (e) {
@@ -903,9 +919,9 @@ export class CaptureLoop {
 
             let writeSuccess = false;
             if (isDomStrategyWriter) {
-              const str = buffer as string;
-              pendingBytes += (str.length * 3) >>> 2;
-              writeSuccess = stream.write(Buffer.from(str, "base64"));
+              const buf = buffer as unknown as Buffer;
+              pendingBytes += buf.length;
+              writeSuccess = stream.write(buf);
             } else {
               pendingBytes += (buffer as any).length;
               writeSuccess = stream.write(buffer as any);
@@ -983,10 +999,10 @@ export class CaptureLoop {
                   break;
                 }
 
-                const buffer = frameBufferRing[ringIndex]! as string;
+                const buffer = frameBufferRing[ringIndex]! as unknown as Buffer;
 
-                pendingBytes += (buffer.length * 3) >>> 2;
-                const writeSuccess = stream.write(Buffer.from(buffer, "base64"));
+                pendingBytes += buffer.length;
+                const writeSuccess = stream.write(buffer);
 
                 if (writeSuccess) {} else if (pendingBytes >= 16777216) {
                   await this.drainPromise;
