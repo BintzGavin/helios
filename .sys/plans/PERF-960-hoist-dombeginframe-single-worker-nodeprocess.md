@@ -1,8 +1,8 @@
 ---
 id: PERF-960
 slug: overlap-dombeginframe-with-base64-decode-nodeprocess
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-09
 completed: ""
 result: ""
@@ -98,3 +98,9 @@ Run `npm run test -w packages/renderer` to ensure no syntax errors.
 
 ## Correctness Check
 Run tests to confirm standard DOM rendering output hasn't been corrupted or misaligned.
+
+
+## Results Summary
+- **Improvement**: Minor CPU improvement in Single-Worker Loop (hasProcessFn = false) by overlapping decoding time with browser capture
+- **Kept experiments**: PERF-960
+- **Discarded experiments**: []

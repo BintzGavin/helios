@@ -4,6 +4,10 @@ Last updated by: PERF-941
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- PERF-960: Overlapped domBeginFrame with Base64 Decode in Single-Worker Loop (hasProcessFn = false)
+  - Improvement: CPU improvement by overlapping decoding time with browser capture
+  - Plan ID: PERF-960
+
 - **PERF-958**: Fast path stream drain single worker in CaptureLoop.ts.
   - **Improvement**: Replaced `if (!writeSuccess && pendingBytes >= 16777216)` with `if (writeSuccess) {} else if (pendingBytes >= 16777216)` yielding a minor loop evaluation speed improvement by explicitly favoring the hot path condition and avoiding boolean NOT operations.
   - **Plan ID**: PERF-958
