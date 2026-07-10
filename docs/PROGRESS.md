@@ -863,3 +863,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.5
 - ✅ Completed: Remove Unsupported EME - Removed the unsupported setMediaKeys method and mediaKeys property from both the codebase and documentation.
+
+- Completed PERF-961: Removed redundant `isDomStrategy` check in CaptureLoop.ts

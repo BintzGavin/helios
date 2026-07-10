@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.882	150	170.06	50.0	keep	remove redundant isDomStrategy
+2	1.029	150	145.77	50.0	keep	remove redundant isDomStrategy
+3	0.903	150	166.11	50.0	keep	remove redundant isDomStrategy
