@@ -533,13 +533,13 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
-                    const buf = Buffer.from(rawResult as unknown as string, "base64");
-
                     timeDriver.setTime(
                       page,
                       (startFrame + i + 1) * compTimeStep,
                     );
                     nextCapturePromise = domBeginFrame!();
+
+                    const buf = Buffer.from(rawResult as unknown as string, "base64");
 
                     pendingBytes += buf.length;
                     const writeSuccessStr = stream.write(buf);
