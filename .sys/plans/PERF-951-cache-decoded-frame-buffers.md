@@ -1,11 +1,11 @@
 ---
 id: PERF-951
 slug: cache-decoded-frame-buffers
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-07-09
-completed: ""
-result: ""
+completed: "2024-07-10"
+result: "Skipped - Duplicate of PERF-966"
 ---
 
 # PERF-951: Decode Base64 to Buffers Earlier in Multi-Worker Loop
