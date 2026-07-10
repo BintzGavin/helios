@@ -1,11 +1,12 @@
 ---
 id: PERF-965
 slug: cache-decoded-buffer-unchanged-frames
-status: unclaimed
+status: complete
+claimed_by: "jules"
 claimed_by: ""
 created: 2024-07-10
-completed: ""
-result: ""
+completed: "2024-07-10"
+result: "keep"
 ---
 
 # PERF-965: Cache Decoded Base64 Buffers for Unchanged Frames in Single-Worker Loop

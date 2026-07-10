@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	9.521	600	63.02	190.2	keep	baseline (PERF-964 output)
+2	8.845	600	67.83	195.1	keep	Cache decoded buffers for unchanged frames
+3	8.790	600	68.26	194.8	keep	Cache decoded buffers for unchanged frames
+4	8.812	600	68.08	196.3	keep	Cache decoded buffers for unchanged frames
