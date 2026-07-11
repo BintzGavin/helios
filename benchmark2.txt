@@ -1,0 +1,2 @@
+Sequential capture time (round robin 4 pages): 3323.839454 ms
+Concurrent capture time (4 pages): 800.745557 ms

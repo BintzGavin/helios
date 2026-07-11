@@ -1,7 +1,8 @@
 ---
 id: PERF-968
 slug: cache-decoded-buffer-unchanged-frames-single-worker-no-processfn
-status: unclaimed
+status: complete
+result: improved
 claimed_by: ""
 created: 2024-07-10
 completed: ""
