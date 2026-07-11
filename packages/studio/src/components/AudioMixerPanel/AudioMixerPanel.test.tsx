@@ -45,7 +45,7 @@ describe('AudioMixerPanel', () => {
   };
 
   it('renders tracks fetched from controller', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
 
     await waitFor(() => {
       expect(screen.getByText('track-1')).toBeInTheDocument();
@@ -55,14 +55,14 @@ describe('AudioMixerPanel', () => {
   });
 
   it('activates audio metering on mount', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     expect(mockController.startAudioMetering).toHaveBeenCalled();
     expect(mockController.onAudioMetering).toHaveBeenCalled();
     expect(screen.getByTitle('Master Levels')).toBeInTheDocument();
   });
 
   it('updates meter when levels are received', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => expect(mockController.onAudioMetering).toHaveBeenCalled());
 
     // Simulate levels update
@@ -77,44 +77,102 @@ describe('AudioMixerPanel', () => {
     expect(meter).toBeInTheDocument();
   });
 
+
+  it('updates meter to clipping levels', async () => {
+    await act(async () => { renderComponent(); });
+    await waitFor(() => expect(mockController.onAudioMetering).toHaveBeenCalled());
+
+    act(() => {
+        if (meteringCallback) {
+            meteringCallback({ left: 1.0, right: 1.0, peakLeft: 1.0, peakRight: 1.0 });
+        }
+    });
+
+    const meter = screen.getByTitle('Master Levels');
+    expect(meter).toBeInTheDocument();
+  });
+
+  it('updates meter to warning levels', async () => {
+    await act(async () => { renderComponent(); });
+    await waitFor(() => expect(mockController.onAudioMetering).toHaveBeenCalled());
+
+    act(() => {
+        if (meteringCallback) {
+            meteringCallback({ left: 0.9, right: 0.9, peakLeft: 0.9, peakRight: 0.9 });
+        }
+    });
+
+    const meter = screen.getByTitle('Master Levels');
+    expect(meter).toBeInTheDocument();
+  });
+
+  it('tests undefined volume branch', async () => {
+    mockController.getAudioTracks.mockResolvedValue([
+      { id: 'track-4' } // no volume, no muted
+    ]);
+    await act(async () => { renderComponent(); });
+    await waitFor(() => screen.getByText('track-4'));
+    const sliders = screen.getAllByRole('slider');
+    expect(sliders[0]).toHaveValue('1');
+  });
+
+  it('switches solo target when another track is soloed', async () => {
+    mockController.getAudioTracks.mockResolvedValue([
+      { id: 'track-A', volume: 1, muted: false },
+      { id: 'track-B', volume: 1, muted: false }
+    ]);
+    await act(async () => { renderComponent(); });
+    await waitFor(() => screen.getByText('track-A'));
+
+    const soloBtns = screen.getAllByTitle('Solo');
+
+    await act(async () => { fireEvent.click(soloBtns[0]); });
+    expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-B', true);
+    mockController.setAudioTrackMuted.mockClear();
+
+    await act(async () => { fireEvent.click(soloBtns[1]); });
+    expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-A', true);
+    expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-B', false);
+  });
+
   it('cleans up audio metering on unmount', async () => {
-    const { unmount } = renderComponent();
+    const { unmount } = render(<StudioContext.Provider value={mockContextValue}><AudioMixerPanel /></StudioContext.Provider>);
     unmount();
     expect(mockController.stopAudioMetering).toHaveBeenCalled();
     expect(unsubscribeMetering).toHaveBeenCalled();
   });
 
   it('toggles mute calls controller', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => screen.getByText('track-1'));
 
     const muteBtns = screen.getAllByTitle(/Mute|Unmute/);
-    fireEvent.click(muteBtns[0]);
+    await act(async () => { fireEvent.click(muteBtns[0]); });
 
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-1', true);
   });
 
   it('toggles solo correctly', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => screen.getByText('track-1'));
 
     const soloBtns = screen.getAllByTitle('Solo');
 
-    fireEvent.click(soloBtns[0]);
+    await act(async () => { fireEvent.click(soloBtns[0]); });
 
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-3', true);
 
-    fireEvent.click(soloBtns[0]);
+    await act(async () => { fireEvent.click(soloBtns[0]); });
 
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-3', false);
   });
 
   it('changes volume correctly', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => screen.getByText('track-1'));
 
     const sliders = screen.getAllByRole('slider');
-    fireEvent.change(sliders[0], { target: { value: '0.5' } });
+    await act(async () => { fireEvent.change(sliders[0], { target: { value: '0.5' } }); });
 
     expect(mockController.setAudioTrackVolume).toHaveBeenCalledWith('track-1', 0.5);
   });
@@ -123,7 +181,7 @@ describe('AudioMixerPanel', () => {
     mockController.getAudioTracks.mockRejectedValue(new Error('Fetch Error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch audio tracks", expect.any(Error));
     });
@@ -132,38 +190,38 @@ describe('AudioMixerPanel', () => {
   });
 
   it('refreshes tracks on button click', async () => {
-     renderComponent();
+     await act(async () => { renderComponent(); });
      await waitFor(() => screen.getByText('track-1'));
 
      const refreshBtn = screen.getByTitle('Refresh Tracks');
-     fireEvent.click(refreshBtn);
+     await act(async () => { fireEvent.click(refreshBtn); });
 
      expect(mockController.getAudioTracks).toHaveBeenCalledTimes(2);
   });
 
   it('toggles solo correctly with snapshot restoration', async () => {
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => screen.getByText('track-1'));
 
     const soloBtns = screen.getAllByTitle('Solo');
 
-    fireEvent.click(soloBtns[1]); // track-2 (initially muted)
+    await act(async () => { fireEvent.click(soloBtns[1]); }); // track-2 (initially muted)
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-1', true);
 
     // Deactivate solo
-    fireEvent.click(soloBtns[1]);
+    await act(async () => { fireEvent.click(soloBtns[1]); });
     expect(mockController.setAudioTrackMuted).toHaveBeenCalledWith('track-2', true);
   });
 
-  it('renders empty state when no controller', () => {
+  it('renders empty state when no controller', async () => {
     mockContextValue.controller = null;
-    renderComponent();
+    await act(async () => { renderComponent(); });
     expect(screen.getByText('Connect to player...')).toBeInTheDocument();
   });
 
   it('renders empty state when no tracks', async () => {
     mockController.getAudioTracks.mockResolvedValue([]);
-    renderComponent();
+    await act(async () => { renderComponent(); });
     await waitFor(() => expect(screen.getByText('No audio tracks found.')).toBeInTheDocument());
   });
 
