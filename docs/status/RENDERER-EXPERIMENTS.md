@@ -1,10 +1,14 @@
-## Performance Trajectory
+- **PERF-969**: Cached decoded Base64 buffers for unchanged frames in the initial block of the single-worker `!hasProcessFn` loop of `CaptureLoop.ts`.
+  - **Improvement**: Avoided redundant synchronous CPU-bound string decoding during static periods.
+  - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 19.800s (baseline was 21.500s, -7.9%)
 Last updated by: PERF-941
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+$entry
+
 - Caching decoded base64 buffers for unchanged frames (PERF-968) in single worker no-process-fn loop (0.8008259379999999s vs baseline)
 - **What Works:** PERF-966 cached decoded Base64 buffers alongside string CDP responses for unchanged frames in the multi-worker DOM strategy chunked loops in `CaptureLoop.ts`.
   - **Improvement:** Prevented redundant synchronous CPU-bound `Buffer.from(..., "base64")` operations on duplicate frames during static periods, allowing concurrent multi-worker capture loops to avoid decode jitter. It maintained consistent performance and eliminated redundant decoding.

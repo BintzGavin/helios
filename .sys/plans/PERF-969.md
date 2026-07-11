@@ -1,11 +1,11 @@
 ---
 id: PERF-969
 slug: cache-decoded-buffer-unchanged-frames-single-worker-no-processfn
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "perf-969-executor"
 created: 2024-07-11
-completed: ""
-result: ""
+completed: "2024-07-11"
+result: "improved"
 ---
 
 # PERF-969: Cache Decoded Base64 Buffers for Unchanged Frames in Single-Worker Loop (!hasProcessFn)

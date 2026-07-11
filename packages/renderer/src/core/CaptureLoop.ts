@@ -451,9 +451,11 @@ export class CaptureLoop {
             let writeSuccess = false;
             if (isDomStrategy) {
               const data = (bufRaw as any).screenshotData;
+              if (data) {
+                domLastFrameData = data;
+              }
               if (data || !domLastFrameBuffer) {
-                if (data) domLastFrameData = data;
-                domLastFrameBuffer = Buffer.from(domLastFrameData as string, "base64");
+                domLastFrameBuffer = Buffer.from((data || domLastFrameData) as string, "base64");
               }
               const buf = domLastFrameBuffer;
               pendingBytes += buf.length;
