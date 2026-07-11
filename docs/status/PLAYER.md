@@ -1,4 +1,4 @@
-**Version**: 0.79.6
+**Version**: 0.79.7
 
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
@@ -294,3 +294,4 @@
 [v0.79.5] ✅ Completed: Remove Unsupported EME - Removed the unsupported setMediaKeys method and mediaKeys property from both the codebase and documentation.
 
 [v0.79.6] ✅ Completed: Discovered that 2027-03-05-PLAYER-Remove-preservesPitch-Documentation.md and 2027-03-06-PLAYER-Remove-preservesPitch-Docs.md are IMPOSSIBLE: DUPLICATION plans. The preservesPitch documentation is already removed. Documented as impossible and discarded.
+[v0.79.7] ✅ Completed: Discovered that .sys/plans/2027-03-05-PLAYER-Remove-Unsupported-EME.md is an IMPOSSIBLE: DUPLICATION plan. The mediaKeys removal is already fully implemented. Documented as impossible and discarded.
