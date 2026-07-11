@@ -1,5 +1,5 @@
 ---
-id: PERF-972
+id: PERF-973
 slug: remove-dead-has-process-fn-matrix
 status: unclaimed
 claimed_by: ""
@@ -8,7 +8,7 @@ completed: ""
 result: ""
 ---
 
-# PERF-972: Eliminate dead code matrix from CaptureLoop hot paths
+# PERF-973: Eliminate dead code matrix from CaptureLoop hot paths
 
 ## Focus Area
 The single-worker and multi-worker `runWorker` fast loops in `packages/renderer/src/core/CaptureLoop.ts`. Specifically, the nested `if (hasProcessFn)` and `if (isDomStrategy)` branches.
@@ -43,20 +43,20 @@ This forces V8 to parse, compile, and maintain hidden classes for nearly 400 lin
 ### Step 1: Unroll and eliminate dead code in single-worker path
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In the `if (poolLen === 1)` block (around line 195):
+In the single worker loop (around line 198):
 1. Replace the massive `if (hasProcessFn) { ... } else { ... }` block with a single `if (isDomStrategy) { ... } else { ... }`.
-3. The new `if (isDomStrategy)` block should contain ONLY the code from the previous `hasProcessFn = true` -> `isDomStrategy = true` path.
-4. The new `else` block should contain ONLY the code from the previous `hasProcessFn = false` -> `else (!isDomStrategy)` path (the Canvas path).
-5. Delete the unreachable code blocks.
+2. The new `if (isDomStrategy)` block should contain ONLY the code from the previous `hasProcessFn = true` -> `isDomStrategy = true` path.
+3. The new `else` block should contain ONLY the code from the previous `hasProcessFn = false` -> `else (!isDomStrategy)` path (the Canvas path).
+4. Delete the unreachable code blocks.
 
 ### Step 2: Unroll and eliminate dead code in multi-worker path
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In the `const workerPromises = this.pool.map...` multi-worker `runWorker` block (around line 736):
+In the `runWorker` block (around line 736):
 1. Replace the `if (hasProcessFn) { ... } else { ... }` matrix with `if (isDomStrategy) { ... } else { ... }`.
-3. The new `if (isDomStrategy)` block should contain ONLY the code from the previous `hasProcessFn = true` -> `isDomStrategy = true` path.
-4. The new `else` block should contain ONLY the code from the previous `hasProcessFn = false` -> `else (!isDomStrategy)` path (the Canvas path).
-5. Delete the unreachable code blocks.
+2. The new `if (isDomStrategy)` block should contain ONLY the code from the previous `hasProcessFn = true` -> `isDomStrategy = true` path.
+3. The new `else` block should contain ONLY the code from the previous `hasProcessFn = false` -> `else (!isDomStrategy)` path (the Canvas path).
+4. Delete the unreachable code blocks.
 
 **Why**: By eliminating this dead code, we reduce V8 AST and bytecode size, allowing the JIT compiler to optimize the hot loops faster and more efficiently without maintaining bailout paths for unreachable type evaluations.
 
