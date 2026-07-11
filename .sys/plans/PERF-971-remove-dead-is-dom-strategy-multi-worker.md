@@ -1,11 +1,11 @@
 ---
 id: PERF-971
 slug: remove-dead-is-dom-strategy-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-10
-completed: ""
-result: ""
+completed: 2024-07-11
+result: improved
 ---
 
 # PERF-971: Remove dead isDomStrategy branch in multi-worker hasProcessFn path
@@ -71,3 +71,9 @@ Remove the `if (isDomStrategy) { ... } else {` wrapper, unconditionally executin
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure `run-all.ts` still passes.
+
+## Results Summary
+- **Best render time**: N/A (micro-optimization, logic improvement)
+- **Improvement**: N/A
+- **Kept experiments**: Removed dead isDomStrategy branch in multi-worker hasProcessFn
+- **Discarded experiments**: []

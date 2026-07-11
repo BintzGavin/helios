@@ -7,6 +7,7 @@ Last updated by: PERF-941
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- Removed mathematically unreachable `if (isDomStrategy)` branch in multi-worker `hasProcessFn` path, shrinking AST and improving JIT parser efficiency (PERF-971).
 $entry
 
 - Caching decoded base64 buffers for unchanged frames (PERF-968) in single worker no-process-fn loop (0.8008259379999999s vs baseline)
