@@ -734,52 +734,6 @@ export class CaptureLoop {
         let domLastFrameBuffer: Buffer | null = null;
 
         if (hasProcessFn) {
-          if (isDomStrategy) {
-            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
-            while (!aborted && nextFrameToSubmit < totalFrames) {
-              let i: number;
-              if (nextFrameToSubmit < maxSubmits) {
-                i = nextFrameToSubmit++;
-                const ringIndex = i & ringMask;
-
-                frameBufferRing[ringIndex] = null;
-              } else {
-                freeWorkers[freeWorkersHead++] = workerIndex;
-                i = (await workerThenables[workerIndex]) as any as number;
-                maxSubmits = nextFrameToWrite + maxPipelineDepth;
-              }
-
-              if (i === -1) break;
-
-              const ringIndex = i & ringMask;
-
-              try {
-                timeDriver.setTime(
-                  page,
-                  (startFrame + i) * compTimeStep,
-                );
-                let buffer: any;
-                const rawResult = await domBeginFrame!();
-                const data = rawResult.screenshotData;
-                let buf: Buffer;
-                if (data || !domLastFrameBuffer) {
-                  if (data) domLastFrameData = data;
-                  buf = Buffer.from(domLastFrameData as string, "base64");
-                  domLastFrameBuffer = buf;
-                } else {
-                  buf = domLastFrameBuffer;
-                }
-                buffer = buf;
-                frameBufferRing[ringIndex] = buffer;
-
-              } catch (e) {
-                fatalError = e;
-                aborted = true;
-                checkState();
-              }
-              writerWaiterPromise.resolve();
-            }
-          } else {
             let maxSubmits = nextFrameToWrite + maxPipelineDepth;
             while (!aborted && nextFrameToSubmit < totalFrames) {
               let i: number;
@@ -819,7 +773,6 @@ export class CaptureLoop {
               }
               writerWaiterPromise.resolve();
             }
-          }
         } else {
           if (isDomStrategy) {
             let maxSubmits = nextFrameToWrite + maxPipelineDepth;
