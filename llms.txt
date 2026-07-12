@@ -136,10 +136,10 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: AssistantModal Coverage, RenderManager Test Coverage, Expand Reverse Speeds)
-- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9, Registry Types Regression Tests, Docker Adapter Tests)
+- **Studio**: v0.107.1+ (Completed: AudioMixerPanel Coverage, AssetsPanel Coverage, PlaybackControls Coverage)
+- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V10, CLI Deploy Command Coverage, CLI Registry Types Regression Tests)
 - **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Composition Schema)
-- **Player**: v0.78.1+ (Completed: Expose Composition Setters, Expose Playback Range Methods, Missing Events)
+- **Player**: v0.78.1+ (Completed: Remove Unsupported EME, Document getController, Document HTMLMediaElement Constants)
 - **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
 - **Infrastructure**: v0.25.0+ (Completed: Optimize S3 Uploads, Optimize GCS Uploads, FfmpegStitcher Coverage)
 
