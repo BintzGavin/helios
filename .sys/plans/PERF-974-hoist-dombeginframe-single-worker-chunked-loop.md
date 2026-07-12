@@ -1,14 +1,14 @@
 ---
-id: PERF-970
-slug: hoist-dombeginframe-single-worker-nodeprocess-true
+id: PERF-974
+slug: hoist-dombeginframe-single-worker-chunked-loop
 status: unclaimed
 claimed_by: ""
-created: 2024-07-10
+created: 2024-07-12
 completed: ""
 result: ""
 ---
 
-# PERF-970: Hoist domBeginFrame before Base64 Decode in Single-Worker Loop (hasProcessFn = true)
+# PERF-974: Hoist domBeginFrame before Base64 Decode in Single-Worker Loop
 
 ## Focus Area
 The single-worker DOM strategy chunked loop in `packages/renderer/src/core/CaptureLoop.ts` when `hasProcessFn` is true (around lines 260-330).
@@ -37,10 +37,11 @@ In the `hasProcessFn = true` path, the chunk loop currently reads:
                     );
                     nextCapturePromise = domBeginFrame!();
 
-                    // ... Stream Write ...
+                    pendingBytes += buf.length;
+                    const writeSuccessStr = stream.write(buf);
 ```
 
-Here, `Buffer.from()` (CPU-bound decoding) is executed *before* `timeDriver.setTime()` and `domBeginFrame!()`. We can hoist the `timeDriver.setTime()` and `domBeginFrame!()` calls above the `Buffer.from()` logic.
+Here, `Buffer.from()` (CPU-bound decoding) is executed *before* `timeDriver.setTime()` and `domBeginFrame!()`. This means the Node.js event loop blocks on string decoding for several milliseconds while the browser sits idle. We can hoist the `timeDriver.setTime()` and `domBeginFrame!()` calls above the `Buffer.from()` logic.
 
 ## Benchmark Configuration
 - **Composition URL**: Standard DOM benchmark
@@ -50,14 +51,14 @@ Here, `Buffer.from()` (CPU-bound decoding) is executed *before* `timeDriver.setT
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Bottleneck analysis**: The browser sits idle while Node.js performs Base64 string decoding on the main thread.
+- **Bottleneck analysis**: The browser sits idle while Node.js performs Base64 string decoding on the main thread, resulting in sequential execution of inherently parallel tasks.
 
 ## Implementation Spec
 
 ### Step 1: Hoist `domBeginFrame` in Chunked Loop (`hasProcessFn = true`)
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In the `if (hasProcessFn) { if (isDomStrategy) {` block (single worker), locate the inner `for (; i < chunkEnd; i++) {` loop.
+In the `if (hasProcessFn) { if (isDomStrategy) {` block (single worker), locate the inner `for (; i < chunkEnd; i++) {` loop (around line 269).
 Change:
 ```typescript
                     const rawResult = await nextCapturePromise;
@@ -97,17 +98,6 @@ To:
                     } else {
                       buf = domLastFrameBuffer;
                     }
-```
-
-Do the same hoisting for the final frame block immediately following the chunked loop:
-```typescript
-                if (!aborted && totalFrames > 1) {
-                  const rawResult = await nextCapturePromise;
-
-                  const data = (rawResult as any).screenshotData;
-                  let buf: Buffer;
-                  // ... Buffer logic ...
-                  // (Wait, the final frame doesn't dispatch nextCapturePromise, so no hoisting needed here! Just leave it.)
 ```
 
 **Why**: By dispatching the asynchronous frame capture command before synchronously blocking the CPU for Base64 decoding, we pipeline the Chromium IPC and browser rendering with Node's CPU work.
