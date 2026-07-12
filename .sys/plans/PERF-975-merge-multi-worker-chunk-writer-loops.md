@@ -1,11 +1,11 @@
 ---
 id: PERF-975
 slug: merge-multi-worker-chunk-writer-loops
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-12
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-975: Merge duplicated multi-worker chunk writer loops

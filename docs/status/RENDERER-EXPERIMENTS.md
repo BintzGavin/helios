@@ -3,10 +3,14 @@
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 19.800s (baseline was 21.500s, -7.9%)
-Last updated by: PERF-941
+Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-975**: Merged the duplicated multi-worker chunk writer loops in `CaptureLoop.ts` into a single loop.
+  - **Improvement**: Drastically reduces AST parsing footprint and allows V8 TurboFan inline caches to optimize a unified hot loop path without the duplicate branching logic for DOM vs Canvas, lowering parser overhead and saving memory footprint.
+  - **Plan ID**: PERF-975
+
 - Removed mathematically unreachable `if (isDomStrategy)` branch in multi-worker `hasProcessFn` path, shrinking AST and improving JIT parser efficiency (PERF-971).
 $entry
 
