@@ -278,7 +278,7 @@
 [v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
 [v0.78.2] ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.
 [v0.78.3] ✅ Completed: Discovered that `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md` is an IMPOSSIBLE: DUPLICATION plan. The missing constants are already implemented. Created plan `.sys/plans/2027-03-03-PLAYER-Document-Instance-Constants.md` to document them.
-**Version**: 0.79.8
+**Version**: 0.79.9
 
 [v0.78.3] ✅ Completed: Document HTMLMediaElement Constants - Added documentation for HTMLMediaElement instance and class constants to the README.
 [v0.78.4] ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
@@ -297,3 +297,5 @@
 [v0.79.7] ✅ Completed: Discovered that .sys/plans/2027-03-05-PLAYER-Remove-Unsupported-EME.md is an IMPOSSIBLE: DUPLICATION plan. The mediaKeys removal is already fully implemented. Documented as impossible and discarded.
 
 [v0.79.8] ✅ Completed: Discovered missing HTMLVideoElement parity property (`autoPictureInPicture`). Created plan `.sys/plans/2027-03-06-PLAYER-Implement-autoPictureInPicture.md` to implement it.
+
+[v0.79.9] ✅ Completed: Implement autoPictureInPicture - Added autoPictureInPicture property getter and setter to complete HTMLVideoElement parity.
