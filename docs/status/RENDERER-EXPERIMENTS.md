@@ -7,6 +7,9 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-976**: Pipelined single-worker Canvas strategy capture and processing loops in `CaptureLoop.ts`.
+  - **Improvement**: Moving synchronous `processCaptureResult` and stream write into the `timePromise` asynchronous overlap block allowed Node.js CPU execution to overlap maximally with Chromium capture execution.
+  - **Plan ID**: PERF-976
 - **What Works:** PERF-974 hoisted `domBeginFrame!()` before Base64 decoding in the single-worker `hasProcessFn=true` chunk loop of `CaptureLoop.ts`.
   - **Improvement:** Reduced loop execution time by ~47% in microbenchmarks by overlapping asynchronous Chromium frame rendering with synchronous CPU-bound string decoding on the main thread.
   - **Plan ID:** PERF-974
