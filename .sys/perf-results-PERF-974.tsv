@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.498	300	200.00	100.0	keep	baseline
+2	0.778	300	385.00	100.0	keep	hoist domBeginFrame before Base64 decode (microbench)

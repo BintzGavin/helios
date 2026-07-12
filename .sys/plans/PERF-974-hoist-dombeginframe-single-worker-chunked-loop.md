@@ -1,11 +1,11 @@
 ---
 id: PERF-974
 slug: hoist-dombeginframe-single-worker-chunked-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "perf-974-executor"
 created: 2024-07-12
-completed: ""
-result: ""
+completed: "2026-07-12"
+result: "kept"
 ---
 
 # PERF-974: Hoist domBeginFrame before Base64 Decode in Single-Worker Loop
