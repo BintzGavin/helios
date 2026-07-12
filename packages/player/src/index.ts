@@ -1677,6 +1677,16 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.setAttribute("media-artwork", val);
   }
 
+  public get autoPictureInPicture(): boolean {
+    return (this.pipVideo as any)?.autoPictureInPicture ?? false;
+  }
+
+  public set autoPictureInPicture(val: boolean) {
+    if (this.pipVideo) {
+      (this.pipVideo as any).autoPictureInPicture = val;
+    }
+  }
+
   public async requestPictureInPicture(): Promise<PictureInPictureWindow> {
     if (!document.pictureInPictureEnabled) {
       throw new Error("Picture-in-Picture not supported");

@@ -8,8 +8,6 @@
 - **Modify**:
   - `packages/player/src/index.ts` - Add `autoPictureInPicture` property getter/setter mapping to the internal `pipVideo` element.
   - `packages/player/README.md` - Document the `autoPictureInPicture` property.
-- **Read-Only**:
-  - `packages/player/src/features/api_parity.test.ts` (or similar tests to understand existing test patterns, though this plan does not instruct direct file edits).
 
 #### 3. Implementation Spec
 - **Architecture**: Web Component API Parity. The `HeliosPlayer` should proxy the `autoPictureInPicture` property to its internal `<video>` element (`this.pipVideo`), which actually handles the PiP logic. If the internal video element isn't ready or doesn't support it, we'll store it on a local fallback state (or directly check `this.pipVideo` since it is initialized in the constructor).
