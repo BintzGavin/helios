@@ -7,6 +7,10 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **What Works:** PERF-974 hoisted `domBeginFrame!()` before Base64 decoding in the single-worker `hasProcessFn=true` chunk loop of `CaptureLoop.ts`.
+  - **Improvement:** Reduced loop execution time by ~47% in microbenchmarks by overlapping asynchronous Chromium frame rendering with synchronous CPU-bound string decoding on the main thread.
+  - **Plan ID:** PERF-974
+
 - **PERF-975**: Merged the duplicated multi-worker chunk writer loops in `CaptureLoop.ts` into a single loop.
   - **Improvement**: Drastically reduces AST parsing footprint and allows V8 TurboFan inline caches to optimize a unified hot loop path without the duplicate branching logic for DOM vs Canvas, lowering parser overhead and saving memory footprint.
   - **Plan ID**: PERF-975

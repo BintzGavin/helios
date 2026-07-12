@@ -270,6 +270,12 @@ export class CaptureLoop {
                   for (; i < chunkEnd; i++) {
                     const rawResult = await nextCapturePromise;
 
+                    timeDriver.setTime(
+                      page,
+                      (startFrame + i + 1) * compTimeStep,
+                    );
+                    nextCapturePromise = domBeginFrame!();
+
                     const data = rawResult.screenshotData;
                     let buf: Buffer;
                     if (data || !domLastFrameBuffer) {
@@ -279,12 +285,6 @@ export class CaptureLoop {
                     } else {
                       buf = domLastFrameBuffer;
                     }
-
-                    timeDriver.setTime(
-                      page,
-                      (startFrame + i + 1) * compTimeStep,
-                    );
-                    nextCapturePromise = domBeginFrame!();
 
                     pendingBytes += buf.length;
                     const writeSuccessStr = stream.write(buf);
