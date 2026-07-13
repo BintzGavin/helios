@@ -169,6 +169,7 @@ Both class-level and instance-level properties are provided for standard media s
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 - `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
+- `getStartDate(): number` - Returns NaN since the player does not support a specific start date timeline.
 - `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type (e.g., `'probably'`, `'maybe'`, or `''`).
 - `captureStream(): Promise<MediaStream>` - Returns a MediaStream capturing the player's canvas (if same-origin).
 - `startAudioMetering(): void` - Starts audio metering calculation.

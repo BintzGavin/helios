@@ -19,6 +19,10 @@ describe('HeliosPlayer API Parity', () => {
     document.body.appendChild(player);
   });
 
+  it('should support getStartDate', () => {
+    expect(player.getStartDate()).toBeNaN();
+  });
+
   it('should support standard media constants on instances', () => {
     expect(player.HAVE_NOTHING).toBe(0);
     expect(player.HAVE_METADATA).toBe(1);
