@@ -7,6 +7,10 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **Cached decoded Base64 buffers for unchanged frames in single-worker !hasProcessFn path**
+  - Avoided redundant synchronous CPU-bound string decoding during static periods by reusing previously decoded Node.js Buffer if CDP `screenshotData` is undefined.
+  - Plan ID: PERF-969
+
 - **Merged isDomStrategy chunk writer loops in single-worker !hasProcessFn path (~15% faster)**
   - Unified the identical chunk loops for DOM and Canvas branches into a single loop.
   - Reduced AST parsing and bytecode size to optimize JIT execution for the shared loop.
