@@ -1,8 +1,8 @@
 ---
 id: PERF-978
 slug: pipeline-single-worker-canvas-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "perf-978-executor"
 created: 2024-07-12
 completed: ""
 result: ""
