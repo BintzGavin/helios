@@ -1,4 +1,4 @@
-**Version**: 0.79.10
+**Version**: 0.79.11
 
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
@@ -300,3 +300,6 @@
 
 [v0.79.9] ✅ Completed: Implement autoPictureInPicture - Added autoPictureInPicture property getter and setter to complete HTMLVideoElement parity.
 [v0.79.10] ✅ Completed: Implement getStartDate - Added getStartDate method returning NaN for HTMLMediaElement parity
+
+
+[v0.79.11] ✅ Completed: Discovered missing HTMLMediaElement parity property (`remote`). Created plan `.sys/plans/2026-07-13-PLAYER-Implement-HTMLMediaElement-Parity.md` to implement it.
