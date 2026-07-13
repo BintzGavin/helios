@@ -246,3 +246,6 @@ $entry
 - **PERF-951**: Caching decoded base64 frame buffers in multi-worker paths.
   - **WHY it didn't work**: This optimization was already covered and successfully completed by PERF-966.
   - **Plan ID**: PERF-951
+- [PERF-985] Optimized DOM strategy closures by replacing `.bind` with native arrow functions, and simplified redundant `!domLastFrameBuffer` cache validations inside `CaptureLoop.ts` fast loops.
+  - **Improvement:** Reduced V8 exotic object invocation penalties and allowed branch prediction optimization within DOM processing.
+  - **Plan ID:** PERF-985
