@@ -10,3 +10,7 @@
 ## v0.79.3 - preservesPitch gap
 **Learning:** Found that `preservesPitch` is exposed in `HeliosPlayer` and documented in `README.md`, but it requires core architectural changes in `packages/core/src/drivers/DomDriver.ts` to actually function. As a PLAYER domain planner, I cannot modify `packages/core`.
 **Action:** When an API property requires core logic that isn't implemented, it must be removed from the README to avoid misleading users until a core task can be scheduled.
+
+## [0.79.10] - Implement getStartDate
+**Learning:** Implementing missing API parity methods improves standard compliance.
+**Action:** Always check the HTMLMediaElement specification for missing methods.

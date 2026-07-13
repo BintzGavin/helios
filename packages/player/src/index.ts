@@ -1183,6 +1183,10 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   // --- Standard Media API ---
 
+  public getStartDate(): number {
+    return NaN;
+  }
+
   public canPlayType(type: string): CanPlayTypeResult {
     // We strictly play Helios compositions, not standard video MIME types.
     // Return empty string to be spec-compliant for video/mp4 etc.
