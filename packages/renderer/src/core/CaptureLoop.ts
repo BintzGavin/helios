@@ -351,16 +351,16 @@ export class CaptureLoop {
                       (startFrame + i + 1) * compTimeStep,
                     );
 
-                    let buf;
-                    buf = strategy.processCaptureResult!(rawResult);
-                    pendingBytes += (buf as any).length;
-                    const writeSuccessBuf = stream.write(buf as any);
-
                     if (timePromise) await timePromise;
                     nextCapturePromise = strategy.capture(
                       page,
                       (i + 1) * timeStep,
                     );
+
+                    let buf;
+                    buf = strategy.processCaptureResult!(rawResult);
+                    pendingBytes += (buf as any).length;
+                    const writeSuccessBuf = stream.write(buf as any);
 
                     if (!writeSuccessBuf && pendingBytes >= 16777216) {
                       await this.drainPromise;
@@ -556,15 +556,15 @@ export class CaptureLoop {
                   (startFrame + i + 1) * compTimeStep,
                 );
 
-                pendingBytes += (buf as any).length;
-                const writeSuccessBuf = stream.write(buf as any);
-
                 if (timePromise) await timePromise;
 
                 nextCapturePromise = strategy.capture(
                   page,
                   (i + 1) * timeStep,
                 );
+
+                pendingBytes += (buf as any).length;
+                const writeSuccessBuf = stream.write(buf as any);
 
                 if (!writeSuccessBuf && pendingBytes >= 16777216) {
                   await this.drainPromise;
