@@ -14,3 +14,7 @@
 ## [0.79.10] - Implement getStartDate
 **Learning:** Implementing missing API parity methods improves standard compliance.
 **Action:** Always check the HTMLMediaElement specification for missing methods.
+
+## [0.79.11] - Implement remote property
+**Learning:** Implementing missing API parity properties like `remote` improves standard compliance even if they are stubbed.
+**Action:** Always check the HTMLMediaElement specification for missing properties.
