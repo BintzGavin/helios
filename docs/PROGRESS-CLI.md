@@ -379,3 +379,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.62
 - 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
+
+### CLI v0.46.64
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
