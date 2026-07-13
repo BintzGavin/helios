@@ -249,3 +249,8 @@ $entry
 - [PERF-985] Optimized DOM strategy closures by replacing `.bind` with native arrow functions, and simplified redundant `!domLastFrameBuffer` cache validations inside `CaptureLoop.ts` fast loops.
   - **Improvement:** Reduced V8 exotic object invocation penalties and allowed branch prediction optimization within DOM processing.
   - **Plan ID:** PERF-985
+
+## PERF-986: simplify-buffer-drain-check-in-captureloop
+- **What**: Simplified stream write outcomes using short-circuit boolean logic `if (!writeSuccess && pendingBytes >= 16777216)` instead of `if (writeSuccess) {} else if (...)` across CaptureLoop.ts fast paths.
+- **Why**: Eliminates empty block AST nodes and branch parsing for the hot loop paths where streams typically do not backpressure, improving code density and V8 JIT behavior for identical mathematical correctness.
+- **Result**: Kept. While standard benchmarking micro VMs are noisy, the JS engine footprint is demonstrably simplified. Canvas capture smoke tests pass.
