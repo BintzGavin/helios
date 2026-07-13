@@ -445,11 +445,11 @@ export class CaptureLoop {
               const data = (rawResult as any).screenshotData;
               if (data) {
                 domLastFrameData = data;
-                domLastFrameBuffer = Buffer.from(data as string, "base64");
-              } else if (!domLastFrameBuffer) {
-                domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
               }
-              buf = domLastFrameBuffer!;
+              if (data || !domLastFrameBuffer) {
+                domLastFrameBuffer = Buffer.from((data || rawResult) as string, "base64");
+              }
+              buf = domLastFrameBuffer;
             } else {
               buf = rawResult;
             }
@@ -479,12 +479,12 @@ export class CaptureLoop {
               if (isDomStrategy) {
                 nextCapturePromise = domBeginFrame!();
                 const data = (rawResult as any).screenshotData;
-                if (data) {
-                  domLastFrameData = data;
-                  buf = Buffer.from(data as string, "base64");
+                if (data || !domLastFrameBuffer) {
+                  if (data) domLastFrameData = data;
+                  buf = Buffer.from((domLastFrameData || rawResult) as string, "base64");
                   domLastFrameBuffer = buf;
                 } else {
-                  buf = domLastFrameBuffer!;
+                  buf = domLastFrameBuffer;
                 }
               } else {
                 if (timePromise) await timePromise;
@@ -523,12 +523,12 @@ export class CaptureLoop {
             let buf: any;
             if (isDomStrategy) {
               const data = (rawResult as any).screenshotData;
-              if (data) {
-                domLastFrameData = data;
-                buf = Buffer.from(data as string, "base64");
+              if (data || !domLastFrameBuffer) {
+                if (data) domLastFrameData = data;
+                buf = Buffer.from((domLastFrameData || rawResult) as string, "base64");
                 domLastFrameBuffer = buf;
               } else {
-                buf = domLastFrameBuffer!;
+                buf = domLastFrameBuffer;
               }
             } else {
               buf = rawResult;

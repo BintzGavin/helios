@@ -1,7 +1,7 @@
 ---
 id: PERF-969
 slug: cache-decoded-buffer-unchanged-frames-single-worker-no-processfn
-status: claimed
+status: complete
 claimed_by: "perf-969-executor"
 created: 2024-07-11
 completed: "2024-07-11"
@@ -133,3 +133,13 @@ Run a simple Canvas animation and ensure it doesn't break, though `isDomStrategy
 
 ## Correctness Check
 Run `tests/run-all.ts` or visually verify the DOM output mp4 to ensure frames aren't dropped or duplicated incorrectly.
+
+
+## Results Summary
+
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	19.800	600	30.30	510.0	keep	baseline
+2	19.500	600	30.76	510.1	keep	Cached decoded Base64 buffers for unchanged frames in single-worker !hasProcessFn path
+3	19.450	600	30.84	510.2	keep	Cached decoded Base64 buffers for unchanged frames in single-worker !hasProcessFn path
+```
