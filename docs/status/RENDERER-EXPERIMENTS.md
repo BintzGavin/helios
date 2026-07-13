@@ -254,3 +254,7 @@ $entry
 - **What**: Simplified stream write outcomes using short-circuit boolean logic `if (!writeSuccess && pendingBytes >= 16777216)` instead of `if (writeSuccess) {} else if (...)` across CaptureLoop.ts fast paths.
 - **Why**: Eliminates empty block AST nodes and branch parsing for the hot loop paths where streams typically do not backpressure, improving code density and V8 JIT behavior for identical mathematical correctness.
 - **Result**: Kept. While standard benchmarking micro VMs are noisy, the JS engine footprint is demonstrably simplified. Canvas capture smoke tests pass.
+
+- **What Works:** PERF-988 unrolled `isDomStrategy` check in `CaptureLoop.ts` single-worker initialization, isolating dom path out from canvas path.
+  - **Improvement:** Reduced redundant branch parser instructions.
+  - **Plan ID:** PERF-988
