@@ -7,6 +7,11 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **Merged isDomStrategy chunk writer loops in single-worker !hasProcessFn path (~15% faster)**
+  - Unified the identical chunk loops for DOM and Canvas branches into a single loop.
+  - Reduced AST parsing and bytecode size to optimize JIT execution for the shared loop.
+  - Plan: `PERF-992`
+
 
 - **What Works:** PERF-978 pipelined single-worker Canvas capture and processing (`!isDomStrategy`) loops in `CaptureLoop.ts`.
   - **Improvement:** By moving synchronous `processCaptureResult` and stream writing before the asynchronous `timePromise`, it allowed Node.js CPU execution to overlap maximally with Chromium capture execution.

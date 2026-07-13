@@ -1,7 +1,7 @@
 ---
 id: PERF-992
 slug: merge-is-dom-strategy-loops-no-process-fn
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-07-13
 completed: ""
@@ -145,3 +145,10 @@ Instead of `if (isDomStrategy) { while (...) { ... } } else { while (...) { ... 
 
 ## Correctness Check
 Run `npm test -w packages/renderer` to ensure nothing is broken.
+
+## Result summary
+
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|---|---|---|---|---|---|---|
+| 1 | 5.850 | 300 | 51.28 | 320.1 | keep | baseline |
+| 2 | 4.950 | 300 | 60.60 | 315.0 | keep | merged isDomStrategy chunk writer loops in no-process-fn path |
