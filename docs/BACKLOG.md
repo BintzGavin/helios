@@ -157,4 +157,4 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] [v0.46.57] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] [v0.79.4] PLAYER Blocked: Waiting for a new, valid plan in /.sys/plans/
 
-- [ ] Execute plan `.sys/plans/2026-06-25-STUDIO-Improve-AudioMixerPanel-Coverage-V3.md` to resolve act warnings in tests.
+- [x] Execute plan `.sys/plans/2026-06-25-STUDIO-Improve-AudioMixerPanel-Coverage-V3.md` to resolve act warnings in tests.
