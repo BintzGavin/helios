@@ -1,3 +1,6 @@
+### PLAYER v0.79.12
+- ✅ Completed: Implement remote property - Added remote property returning a mock RemotePlayback object to complete HTMLMediaElement parity.
+
 ### PLAYER v0.79.4
 - ✅ Completed: Remove preservesPitch documentation - Removed preservesPitch from the player README as it is currently unsupported by the core architecture.
 

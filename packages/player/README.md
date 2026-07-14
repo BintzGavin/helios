@@ -180,6 +180,7 @@ Both class-level and instance-level properties are provided for standard media s
 
 ### Properties
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
+- `remote` (RemotePlayback): Returns a mock RemotePlayback object to complete HTMLMediaElement parity.
 - `mediaGroup` (string): Reflected mediagroup attribute.
 - `sinkId` (string, read-only): Returns the current audio sink id.
 
