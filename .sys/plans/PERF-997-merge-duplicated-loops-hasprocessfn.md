@@ -3,152 +3,51 @@ id: PERF-997
 slug: merge-duplicated-loops-hasprocessfn
 status: unclaimed
 claimed_by: ""
-created: 2024-07-26
+created: 2026-07-13
 completed: ""
 result: ""
 ---
 
-# PERF-997: Merge duplicated single-worker hasProcessFn loops into a unified loop
+# PERF-997: Merge duplicated chunk writer loops in single-worker paths
 
 ## Focus Area
-The single-worker fast loops inside `packages/renderer/src/core/CaptureLoop.ts`, specifically where `hasProcessFn` is evaluated to loop frames.
+The single-worker `hasProcessFn` path in `packages/renderer/src/core/CaptureLoop.ts` has completely duplicated while loops for `if (isDomStrategy)` and its `else` branch (Canvas strategy).
 
 ## Background Research
-In the single-worker path for `CaptureLoop.ts` (around line 240), there is a block of code conditionally handling chunk loops for frames where `isDomStrategy` is true or false.
-
-The logic and structure for handling chunk iterations, limits (`chunkEnd`), calculating `pendingBytes`, calling `writeSuccess`, handling stream backpressure with `drainPromise`, aborting checks, and computing `nextProgress` for `hasProcessFn` path's `isDomStrategy = true` branch and `isDomStrategy = false` branch are highly duplicated, just as they were for `!hasProcessFn` (which was successfully optimized in PERF-992).
-
-Currently, this looks like:
-
-```typescript
+Currently, inside the `hasProcessFn` block of the single-worker capture loop, there is a large branch structure:
+\`\`\`typescript
 if (isDomStrategy) {
-    let i = 1;
-    while (i < totalFrames - 1 && !aborted) {
-        // chunkEnd calculation
-        // for loop
-        // progress and abort logic
-    }
-    if (!aborted && totalFrames > 1) {
-        // Final frame unrolled
-    }
+  let i = 1;
+  while (i < totalFrames - 1 && !aborted) { ... }
 } else {
-    let i = 1;
-    while (i < totalFrames - 1 && !aborted) {
-        // EXACT same loop structure and condition
-        // EXACT same chunkEnd calculation
-        // EXACT same progress and abort logic
-    }
-    if (!aborted && totalFrames > 1) {
-        // Final frame unrolled
-    }
+  let i = 1;
+  while (i < totalFrames - 1 && !aborted) { ... }
 }
-```
+\`\`\`
 
-The loops can be unified by moving the `if (isDomStrategy)` check *inside* the single combined loop structure, reducing AST footprint, code size, and improving V8 instruction caching. We saw a ~15% performance boost when doing this for the `!hasProcessFn` loops (PERF-992), so doing it for the `hasProcessFn` path should provide comparable benefits.
+The chunk loop logic is practically identical between the DOM and Canvas strategies.
+
+We can merge these two loops into a single unified chunk loop that handles both. By doing so, we significantly reduce the size of the AST nodes that V8 has to parse and JIT compile, which can allow TurboFan to better optimize the hot loop path. This same optimization (merging chunk loops) was previously done in PERF-975 and PERF-992 and provided a solid improvement.
 
 ## Benchmark Configuration
 - **Composition URL**: Standard DOM benchmark
-- **Render Settings**: Standard single-worker settings
-- **Mode**: `dom` and `canvas`
-- **Metric**: CPU instruction footprint, render wall clock time.
-- **Minimum runs**: 3 per experiment, report median.
+- **Render Settings**: Standard
+- **Mode**: \`dom\` (single worker)
+- **Metric**: Wall-clock render time in seconds
+- **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Bottleneck analysis**: The V8 parser processes, compiles, and optimizes two identically structured large `while` loops for `hasProcessFn`, increasing AST footprint and JIT burden. Unifying them reduces engine overhead.
+- **Bottleneck analysis**: Duplicated hot while loops increase V8 parsing time and instruction cache footprint.
 
 ## Implementation Spec
 
-### Step 1: Merge `while` loops in `hasProcessFn` block
-**File**: `packages/renderer/src/core/CaptureLoop.ts`
+### Step 1: Merge the chunk loops in the \`hasProcessFn\` path
+**File**: \`packages/renderer/src/core/CaptureLoop.ts\`
 **What to change**:
-In the single-worker `if (hasProcessFn)` block (around lines 240-377), replace the entire `if (isDomStrategy) { ... } else { ... }` that holds the separate `let i = 1; while (...)` loops with a unified loop structure.
+Instead of \`if (isDomStrategy) { while (...) { ... } } else { while (...) { ... } }\` in the \`hasProcessFn\` branch, merge them into a single loop. Ensure the \`domBeginFrame\` and \`strategy.processCaptureResult\` logic is correctly conditioned inside the shared \`for\` and \`while\` loop blocks.
 
-The combined structure will look exactly like:
-```typescript
-let i = 1;
-while (i < totalFrames - 1 && !aborted) {
-  const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
-  for (; i < chunkEnd; i++) {
-    const rawResult = await nextCapturePromise;
-
-    const timePromise = timeDriver.setTime(page, (startFrame + i + 1) * compTimeStep);
-
-    let buf;
-    if (isDomStrategy) {
-      nextCapturePromise = domBeginFrame!();
-      const data = rawResult.screenshotData;
-      if (data) {
-        domLastFrameData = data;
-        buf = Buffer.from(data as string, "base64");
-        domLastFrameBuffer = buf;
-      } else {
-        buf = domLastFrameBuffer!;
-      }
-    } else {
-      if (timePromise) await timePromise;
-      nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
-      buf = strategy.processCaptureResult!(rawResult);
-    }
-
-    pendingBytes += buf.length;
-    const writeSuccessStr = stream.write(buf as any);
-
-    if (!writeSuccessStr && pendingBytes >= 16777216) {
-      await this.drainPromise;
-      pendingBytes = 0;
-    }
-  }
-
-  if (aborted) break;
-
-  if (i - 1 === nextProgress) {
-    nextProgress += progressInterval;
-    console.log(`Progress: Rendered ${i - 1} / ${totalFrames} frames`);
-    if (onProgress) {
-      onProgress((i - 1) / totalFrames);
-    }
-  }
-}
-
-if (!aborted && totalFrames > 1) {
-  const rawResult = await nextCapturePromise;
-
-  let buf;
-  if (isDomStrategy) {
-    const data = rawResult.screenshotData;
-    if (data) {
-      domLastFrameData = data;
-      buf = Buffer.from(data as string, "base64");
-      domLastFrameBuffer = buf;
-    } else {
-      buf = domLastFrameBuffer!;
-    }
-  } else {
-    buf = strategy.processCaptureResult!(rawResult);
-  }
-
-  pendingBytes += buf.length;
-  const writeSuccessStr = stream.write(buf as any);
-
-  if (!writeSuccessStr && pendingBytes >= 16777216) {
-    await this.drainPromise;
-    pendingBytes = 0;
-  }
-
-  i++;
-  if (i - 1 === nextProgress || i === totalFrames) {
-    if (i - 1 === nextProgress) nextProgress += progressInterval;
-    console.log(`Progress: Rendered ${i - 1} / ${totalFrames} frames`);
-    if (onProgress) {
-      onProgress((i - 1) / totalFrames);
-    }
-  }
-}
-```
-**Why**: Reduces AST parsing and instruction size in V8.
-
-## Canvas Smoke Test
-Run `npx tsx packages/renderer/tests/verify-canvas-strategy.ts` to ensure Canvas mode is fully operational.
+**Why**: Consolidating identical looping constructs shrinks the JavaScript AST and bytecode size. It allows the V8 JIT engine to optimize a single hot path rather than dividing its inline cache budget across two functionally identical loops, leading to more aggressive optimizations for the shared instructions.
 
 ## Correctness Check
-Run `npx tsx packages/renderer/tests/verify-dom-strategy-capture.ts` to verify DOM still writes streams correctly.
+1.  Run \`npm test -w packages/renderer\` to ensure nothing is broken.
+2.  Run \`npm run build -w packages/core && npm run build -w packages/player\` to ensure the project builds correctly.
