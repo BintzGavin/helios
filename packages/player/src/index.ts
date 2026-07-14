@@ -12,6 +12,13 @@ import { HeliosMediaSession } from "./features/media-session";
 export { ClientSideExporter };
 export type { HeliosController };
 
+class MockRemotePlayback extends EventTarget {
+  state = 'disconnected';
+  watchAvailability() { return Promise.resolve(-1); }
+  cancelWatchAvailability() { return Promise.resolve(); }
+  prompt() { return Promise.reject(new DOMException('Not supported', 'NotSupportedError')); }
+}
+
 export interface HeliosExportOptions {
   format?: 'mp4' | 'webm' | 'png' | 'jpeg';
   filename?: string;
@@ -1349,6 +1356,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   public async setSinkId(sinkId: string): Promise<void> {
     this._sinkId = sinkId;
     return Promise.resolve();
+  }
+
+  private _remote: any = new MockRemotePlayback();
+  public get remote(): any {
+    return this._remote;
   }
 
 

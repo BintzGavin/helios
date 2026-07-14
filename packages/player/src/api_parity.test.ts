@@ -79,6 +79,15 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.hasAttribute('disableremoteplayback')).toBe(false);
   });
 
+  it('should implement remote property for RemotePlayback API parity', () => {
+    expect(player.remote).toBeDefined();
+    expect(player.remote.state).toBe('disconnected');
+    expect(typeof player.remote.watchAvailability).toBe('function');
+    expect(typeof player.remote.cancelWatchAvailability).toBe('function');
+    expect(typeof player.remote.prompt).toBe('function');
+  });
+
+
   it('should reflect mediagroup attribute as string property', () => {
     expect(player.mediaGroup).toBe('');
 
