@@ -1,11 +1,11 @@
 ---
 id: PERF-998
 slug: unroll-isdomstrategy-hasprocessfn-initial
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-26
 completed: ""
-result: ""
+result: "kept"
 ---
 
 # PERF-998: Unroll isDomStrategy checks in single-worker hasProcessFn path

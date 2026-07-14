@@ -193,68 +193,83 @@ export class CaptureLoop {
         let nextProgress = progressInterval;
         if (hasProcessFn) {
           let nextCapturePromise = null;
-          if (totalFrames > 0) {
-            const timePromise = timeDriver.setTime(
-              page,
-              startFrame * compTimeStep,
-            );
-            if (isDomStrategy) {
-              nextCapturePromise = domBeginFrame!();
-            } else {
-              if (timePromise) {
-                await timePromise;
-              }
-              nextCapturePromise = strategy.capture(page, 0);
-            }
-          }
-
-          if (totalFrames > 0) {
-            const rawResult = await nextCapturePromise;
-            if (1 < totalFrames) {
-              const timePromise = timeDriver.setTime(
+          if (isDomStrategy) {
+            if (totalFrames > 0) {
+              timeDriver.setTime(
                 page,
-                (startFrame + 1) * compTimeStep,
+                startFrame * compTimeStep,
               );
-              if (isDomStrategy) {
-                nextCapturePromise = domBeginFrame!();
-              } else {
-                if (timePromise) {
-                  await timePromise;
-                }
-                nextCapturePromise = strategy.capture(page, timeStep);
-              }
+              nextCapturePromise = domBeginFrame!();
             }
-            let buffer;
-            if (isDomStrategy) {
+
+            if (totalFrames > 0) {
+              const rawResult = await nextCapturePromise;
+              if (1 < totalFrames) {
+                timeDriver.setTime(
+                  page,
+                  (startFrame + 1) * compTimeStep,
+                );
+                nextCapturePromise = domBeginFrame!();
+              }
               const data = (rawResult as any).screenshotData;
               if (data) {
                 domLastFrameData = data;
               }
-              buffer = domLastFrameData;
-            } else {
-              buffer = strategy.processCaptureResult!(rawResult);
-            }
-            console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
-            if (onProgress) {
-              onProgress(0 / totalFrames);
-            }
-            let writeSuccess = false;
-            if (isDomStrategy) {
+              let buffer = domLastFrameData;
+              console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
+              if (onProgress) {
+                onProgress(0 / totalFrames);
+              }
               if ((rawResult as any).screenshotData || !domLastFrameBuffer) {
                 domLastFrameBuffer = Buffer.from(buffer as string, "base64");
               }
               const buf = domLastFrameBuffer;
               pendingBytes += buf.length;
-              writeSuccess = stream.write(buf);
-            } else {
-              pendingBytes += (buffer as any).length;
-              writeSuccess = stream.write(buffer as any);
+              let writeSuccess = stream.write(buf);
+
+              if (!writeSuccess && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
+              }
+            }
+          } else {
+            if (totalFrames > 0) {
+              const timePromise = timeDriver.setTime(
+                page,
+                startFrame * compTimeStep,
+              );
+              if (timePromise) {
+                await timePromise;
+              }
+              nextCapturePromise = strategy.capture(page, 0);
             }
 
-            if (!writeSuccess && pendingBytes >= 16777216) {
-              await this.drainPromise;
-              pendingBytes = 0;
+            if (totalFrames > 0) {
+              const rawResult = await nextCapturePromise;
+              if (1 < totalFrames) {
+                const timePromise = timeDriver.setTime(
+                  page,
+                  (startFrame + 1) * compTimeStep,
+                );
+                if (timePromise) {
+                  await timePromise;
+                }
+                nextCapturePromise = strategy.capture(page, timeStep);
+              }
+              let buffer = strategy.processCaptureResult!(rawResult);
+              console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
+              if (onProgress) {
+                onProgress(0 / totalFrames);
+              }
+              pendingBytes += (buffer as any).length;
+              let writeSuccess = stream.write(buffer as any);
+
+              if (!writeSuccess && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
+              }
             }
+          }
 
             if (isDomStrategy) {
 
