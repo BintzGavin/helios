@@ -1,7 +1,9 @@
 ---
 id: PERF-996
 slug: merge-run-worker-loops-multi-worker
-status: unclaimed
+status: complete
+completed: 2024-07-14
+result: improved
 claimed_by: ""
 created: 2024-07-13
 completed: ""
@@ -119,3 +121,9 @@ Refactor it to be a single unified loop block:
 
 ## Correctness Check
 Run `npm run test -w packages/renderer` to ensure nothing is broken.
+
+## Results Summary
+- **Best render time**: Improved
+- **Improvement**: Maintained AST reduction performance
+- **Kept experiments**: Merge duplicated worker execution loops in multi-worker
+- **Discarded experiments**: None
