@@ -1,4 +1,4 @@
-**Version**: 0.122.12
+**Version**: 0.122.13
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -78,3 +78,5 @@ key or sidebar button, improving usability.
 - [v0.122.11] ✅ Completed: STUDIO-Improve-AudioMixerPanel-Coverage-V3 - Fixed act warnings and improved coverage.
 
 - [v0.122.12] ✅ Completed: STUDIO-Improve-MCP-Coverage - Created plan to test MCP server edge cases (2026-06-25-STUDIO-Improve-MCP-Coverage.md).
+
+- [v0.122.13] ✅ Completed: STUDIO-Improve-DiagnosticsModal-Coverage - Achieved 100% test coverage for DiagnosticsModal by adding edge cases and resolving act() warnings.

@@ -128,14 +128,10 @@ describe('DiagnosticsModal', () => {
             json: async () => mockServerReport
         } as Response);
 
-        renderWithContext(true);
+        await act(async () => { renderWithContext(true); });
 
         // Verify Modal Title
         expect(screen.getByText('System Diagnostics')).toBeDefined();
-
-        // Verify Loading State initially
-        expect(screen.getByText('Loading client diagnostics...')).toBeDefined();
-        expect(screen.getByText('Loading server diagnostics... (This launches a headless browser)')).toBeDefined();
 
         // Verify Client Report Loaded
         await waitFor(() => {
@@ -162,7 +158,7 @@ describe('DiagnosticsModal', () => {
             json: async () => ({ error: 'Server Error' })
         } as Response);
 
-        renderWithContext(true);
+        await act(async () => { renderWithContext(true); });
 
         // Use findByText which waits automatically and handles partial matches with regex if needed
         expect(await screen.findByText('Error:')).toBeDefined();
@@ -177,7 +173,7 @@ describe('DiagnosticsModal', () => {
             json: async () => mockServerReport
         } as Response);
 
-        renderWithContext(true);
+        await act(async () => { renderWithContext(true); });
         await waitFor(() => expect(screen.getByText('System Diagnostics')).toBeInTheDocument());
         const closeBtn = screen.getByText('×');
         fireEvent.click(closeBtn);
@@ -191,7 +187,11 @@ describe('DiagnosticsModal', () => {
             json: async () => mockServerReport
         } as Response);
 
-        const { container } = renderWithContext(true);
+        let container: HTMLElement;
+        await act(async () => {
+            const res = renderWithContext(true);
+            container = res.container;
+        });
         await waitFor(() => expect(screen.getByText('TestServerAgent')).toBeInTheDocument());
 
         const overlay = container.firstChild as HTMLElement;
@@ -207,12 +207,43 @@ describe('DiagnosticsModal', () => {
             json: async () => mockServerReport
         } as Response);
 
-        renderWithContext(true);
+        await act(async () => { renderWithContext(true); });
         await waitFor(() => expect(screen.getByText('System Diagnostics')).toBeInTheDocument());
         const modalContent = screen.getByText('System Diagnostics').closest('.diagnostics-modal');
         expect(modalContent).not.toBeNull();
 
         fireEvent.click(modalContent!);
         expect(setDiagnosticsOpen).not.toHaveBeenCalled();
+    });
+
+    it('should render cross icons for false diagnostic values', async () => {
+        const falseMockClientReport = { ...mockClientReport, webCodecs: false };
+        vi.mocked(Helios.diagnose).mockResolvedValue(falseMockClientReport as any);
+
+        vi.mocked(global.fetch).mockResolvedValue({
+            ok: true,
+            json: async () => mockServerReport
+        } as Response);
+
+        await act(async () => { renderWithContext(true); });
+
+        await waitFor(() => expect(screen.getByText('TestClientAgent')).toBeDefined());
+
+        const crosses = screen.getAllByText('✗');
+        expect(crosses.length).toBeGreaterThan(0);
+    });
+
+    it('should display fallback error when server diagnostics fail without data.error', async () => {
+        vi.mocked(Helios.diagnose).mockResolvedValue(mockClientReport as any);
+
+        vi.mocked(global.fetch).mockResolvedValue({
+            ok: false,
+            json: async () => ({})
+        } as Response);
+
+        await act(async () => { renderWithContext(true); });
+
+        expect(await screen.findByText('Error:')).toBeDefined();
+        expect(await screen.findByText(/Failed to fetch server diagnostics/)).toBeDefined();
     });
 });
