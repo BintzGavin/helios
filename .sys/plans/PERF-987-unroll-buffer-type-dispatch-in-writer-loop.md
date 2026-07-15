@@ -1,11 +1,11 @@
 ---
 id: PERF-987
 slug: unroll-buffer-type-dispatch-in-writer-loop
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-13
-completed: ""
-result: ""
+completed: 2024-07-15
+result: discard
 ---
 
 # PERF-987: Unroll buffer type dispatch in multi-worker writer chunk loops
