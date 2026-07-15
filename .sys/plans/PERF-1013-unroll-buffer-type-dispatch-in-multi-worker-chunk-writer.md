@@ -1,8 +1,8 @@
 ---
 id: PERF-1013
 slug: unroll-buffer-type-dispatch-in-multi-worker-chunk-writer
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2024-10-18
 completed: ""
 result: ""
