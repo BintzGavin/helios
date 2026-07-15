@@ -286,3 +286,7 @@ $entry
 - **What Works:** PERF-988 unrolled `isDomStrategy` check in `CaptureLoop.ts` single-worker initialization, isolating dom path out from canvas path.
   - **Improvement:** Reduced redundant branch parser instructions.
   - **Plan ID:** PERF-988
+
+- **PERF-987**: Unroll buffer type dispatch in multi-worker writer chunk loops in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The renderer had a syntax error that was introduced by previous commits making it impossible to evaluate this performance improvement properly. We marked it as discard to continue to the next plan.
+  - **Plan ID**: PERF-987
