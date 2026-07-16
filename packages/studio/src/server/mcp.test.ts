@@ -156,4 +156,156 @@ describe('createMcpServer', () => {
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Feature not available');
   });
+
+  it('should handle compositions resource', async () => {
+    const server = createMcpServer(getPort) as any;
+    (findCompositions as any).mockResolvedValue([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
+
+    const handler = server.resources['compositions'].handler;
+    const result = await handler({ href: 'helios://compositions' });
+
+    expect(findCompositions).toHaveBeenCalled();
+    expect(JSON.parse(result.contents[0].text)).toEqual([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
+  });
+
+  it('should handle components resource without onCheckInstalled', async () => {
+    const components = [{ name: 'comp1', type: 'ui', files: [] }];
+    const options: StudioPluginOptions = {
+      components
+    };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.resources['components'].handler;
+    const result = await handler({ href: 'helios://components' });
+
+    expect(JSON.parse(result.contents[0].text)).toEqual([{ ...components[0], installed: false }]);
+  });
+
+  it('should handle components resource with no options components', async () => {
+    const options: StudioPluginOptions = {};
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.resources['components'].handler;
+    const result = await handler({ href: 'helios://components' });
+
+    expect(JSON.parse(result.contents[0].text)).toEqual([]);
+  });
+
+  it('should return error if install_component throws an error', async () => {
+    const onInstallComponent = vi.fn().mockRejectedValue(new Error('Install failed'));
+    const options = { onInstallComponent };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.tools['install_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Error: Install failed');
+  });
+
+  it('should return error if render_composition throws an error', async () => {
+    const server = createMcpServer(getPort) as any;
+    (findCompositions as any).mockResolvedValue([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
+    (startRender as any).mockRejectedValue(new Error('Render failed'));
+
+    const handler = server.tools['render_composition'].handler;
+    const result = await handler({
+      compositionId: 'comp-1'
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Error: Render failed');
+  });
+
+  it('should handle uninstall_component tool success', async () => {
+    const onRemoveComponent = vi.fn().mockResolvedValue(undefined);
+    const options = { onRemoveComponent };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.tools['uninstall_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(onRemoveComponent).toHaveBeenCalledWith('comp1');
+    expect(result.content[0].text).toContain('Uninstalled comp1');
+  });
+
+  it('should return error if uninstall_component not supported', async () => {
+    const server = createMcpServer(getPort, {}) as any;
+    const handler = server.tools['uninstall_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Feature not available');
+  });
+
+  it('should return error if uninstall_component throws an error', async () => {
+    const onRemoveComponent = vi.fn().mockRejectedValue(new Error('Uninstall failed'));
+    const options = { onRemoveComponent };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.tools['uninstall_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Error: Uninstall failed');
+  });
+
+  it('should handle update_component tool success', async () => {
+    const onUpdateComponent = vi.fn().mockResolvedValue(undefined);
+    const options = { onUpdateComponent };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.tools['update_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(onUpdateComponent).toHaveBeenCalledWith('comp1');
+    expect(result.content[0].text).toContain('Updated comp1');
+  });
+
+  it('should return error if update_component not supported', async () => {
+    const server = createMcpServer(getPort, {}) as any;
+    const handler = server.tools['update_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Feature not available');
+  });
+
+  it('should return error if update_component throws an error', async () => {
+    const onUpdateComponent = vi.fn().mockRejectedValue(new Error('Update failed'));
+    const options = { onUpdateComponent };
+
+    const server = createMcpServer(getPort, options) as any;
+    const handler = server.tools['update_component'].handler;
+    const result = await handler({ name: 'comp1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Error: Update failed');
+  });
+
+  it('should return error if render_composition compositionId not found', async () => {
+    const server = createMcpServer(getPort) as any;
+    (findCompositions as any).mockResolvedValue([{ id: 'comp-1', url: '/@fs/path/to/comp' }]);
+
+    const handler = server.tools['render_composition'].handler;
+    const result = await handler({
+      compositionId: 'comp-2'
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Composition not found: comp-2');
+  });
+
+  it('should handle create_composition tool error', async () => {
+    const server = createMcpServer(getPort) as any;
+    (createComposition as any).mockRejectedValue(new Error('Create failed'));
+
+    const handler = server.tools['create_composition'].handler;
+    const result = await handler({
+      name: 'test-comp'
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Error: Create failed');
+  });
 });

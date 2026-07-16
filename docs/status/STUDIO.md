@@ -1,4 +1,4 @@
-**Version**: 0.122.13
+**Version**: 0.122.14
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -80,3 +80,7 @@ key or sidebar button, improving usability.
 - [v0.122.12] ✅ Completed: STUDIO-Improve-MCP-Coverage - Created plan to test MCP server edge cases (2026-06-25-STUDIO-Improve-MCP-Coverage.md).
 
 - [v0.122.13] ✅ Completed: STUDIO-Improve-DiagnosticsModal-Coverage - Achieved 100% test coverage for DiagnosticsModal by adding edge cases and resolving act() warnings.
+
+- [v0.122.14] ✅ Completed: STUDIO-Improve-MCP-Coverage - Added test cases for missing branches in mcp.ts to reach 100% coverage.
+
+- [v0.122.14] ✅ Completed: STUDIO-Improve-MCP-Coverage - Added test cases for missing branches in mcp.ts to reach 100% coverage.
