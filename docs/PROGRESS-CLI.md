@@ -382,3 +382,6 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.64
 - 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
+
+### CLI v0.46.61
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
