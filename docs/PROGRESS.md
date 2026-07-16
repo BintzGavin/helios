@@ -33,7 +33,10 @@
 ### PLAYER v0.77.48
 - ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled).
 
-### STUDIO v0.122.9
+#### STUDIO v0.122.14
+- ✅ Completed: STUDIO-Improve-MCP-Coverage - Added test cases for missing branches in mcp.ts to reach 100% coverage.
+
+## STUDIO v0.122.9
 - ✅ Completed: STUDIO-Improve-Stage-Coverage - Achieved 100% test coverage for Stage by adding tests for missing branches in HMR restoration, empty props, middle click interactions, and toolbar callback actions.
 
 ## PLAYER v0.77.43
