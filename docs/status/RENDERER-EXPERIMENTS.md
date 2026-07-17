@@ -148,6 +148,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1013**: Unroll buffer type dispatch in multi-worker chunk writer.
+  - **WHY it didn't work**: Marked as a DUPLICATION. The buffer type dispatch unrolling in the multi-worker chunk writer loop was already implemented in `CaptureLoop.ts`.
+  - **Plan ID**: PERF-1013
 - **What Doesn't Work**: PERF-889 hoisted the `drainPromise` condition check out of the innermost fast chunk loops in the multi-worker writer path of `CaptureLoop.ts`.
   - **WHY it didn't work**: While it reduced pure microbenchmark overhead slightly (from 871ms to 858ms), pulling the check entirely outside the chunk loop broke the stream's memory backpressure. If a large burst of frames is written synchronously without the inline check, the 16MB threshold is bypassed, leading to unbounded memory spikes and OOM risks during the chunk interval.
   - **Plan ID:** PERF-889
