@@ -1,4 +1,4 @@
-**Version**: 0.79.13
+**Version**: 0.79.14
 
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
@@ -306,3 +306,4 @@
 
 [v0.79.12] ✅ Completed: Implement remote property - Added remote property returning a mock RemotePlayback object to complete HTMLMediaElement parity.
 [v0.79.13] ✅ Completed: Discovered that plans 2026-07-13, 2027-03-06, and 2027-03-07 for remote, autoPictureInPicture, and getStartDate are IMPOSSIBLE: DUPLICATION plans. They are already fully implemented in packages/player/src/index.ts and documented in README.md. Documented as impossible and discarded.
+[v0.79.14] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.

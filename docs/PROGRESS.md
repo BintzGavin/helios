@@ -900,3 +900,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.13
 - ✅ Completed: Discarded duplicate plans for remote, autoPictureInPicture, and getStartDate as they are already implemented and documented.
+
+### PLAYER v0.79.14
+- 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
