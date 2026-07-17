@@ -398,39 +398,28 @@ export class CaptureLoop {
           }
         } else {
           let nextCapturePromise: any = null;
-          if (totalFrames > 0) {
-            const timePromise = timeDriver.setTime(
-              page,
-              startFrame * compTimeStep,
-            );
-            if (isDomStrategy) {
-              nextCapturePromise = domBeginFrame!();
-            } else {
-              if (timePromise) await timePromise;
-              nextCapturePromise = strategy.capture(page, 0);
-            }
-          }
-
-          if (totalFrames > 0) {
-            const rawResult = await nextCapturePromise;
-
-            if (1 < totalFrames) {
-              const timePromise = timeDriver.setTime(
+          if (isDomStrategy) {
+            if (totalFrames > 0) {
+              timeDriver.setTime(
                 page,
-                (startFrame + 1) * compTimeStep,
+                startFrame * compTimeStep,
               );
-              if (isDomStrategy) {
-                nextCapturePromise = domBeginFrame!();
-              } else {
-                if (timePromise) await timePromise;
-                nextCapturePromise = strategy.capture(page, timeStep);
-              }
+              nextCapturePromise = domBeginFrame!();
             }
-            console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
-            if (onProgress) onProgress(0 / totalFrames);
 
-            let buf: any;
-            if (isDomStrategy) {
+            if (totalFrames > 0) {
+              const rawResult = await nextCapturePromise;
+
+              if (1 < totalFrames) {
+                timeDriver.setTime(
+                  page,
+                  (startFrame + 1) * compTimeStep,
+                );
+                nextCapturePromise = domBeginFrame!();
+              }
+              console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
+              if (onProgress) onProgress(0 / totalFrames);
+
               const data = (rawResult as any).screenshotData;
               if (data) {
                 domLastFrameData = data;
@@ -438,17 +427,49 @@ export class CaptureLoop {
               if (data || !domLastFrameBuffer) {
                 domLastFrameBuffer = Buffer.from((data || rawResult) as string, "base64");
               }
-              buf = domLastFrameBuffer;
-            } else {
-              buf = rawResult;
+              const buf = domLastFrameBuffer;
+
+              pendingBytes += buf.length;
+              const writeSuccess = stream.write(buf);
+
+              if (!writeSuccess && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
+              }
+            }
+          } else {
+            if (totalFrames > 0) {
+              const timePromise = timeDriver.setTime(
+                page,
+                startFrame * compTimeStep,
+              );
+              if (timePromise) await timePromise;
+              nextCapturePromise = strategy.capture(page, 0);
             }
 
-            pendingBytes += buf.length;
-            const writeSuccess = stream.write(buf);
+            if (totalFrames > 0) {
+              const rawResult = await nextCapturePromise;
 
-            if (!writeSuccess && pendingBytes >= 16777216) {
-              await this.drainPromise;
-              pendingBytes = 0;
+              if (1 < totalFrames) {
+                const timePromise = timeDriver.setTime(
+                  page,
+                  (startFrame + 1) * compTimeStep,
+                );
+                if (timePromise) await timePromise;
+                nextCapturePromise = strategy.capture(page, timeStep);
+              }
+              console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
+              if (onProgress) onProgress(0 / totalFrames);
+
+              const buf = rawResult;
+
+              pendingBytes += buf.length;
+              const writeSuccess = stream.write(buf);
+
+              if (!writeSuccess && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
+              }
             }
           }
 

@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.542	300	35.12	485.2	keep	baseline
+3	8.356	300	35.90	485.2	keep	unroll isDomStrategy in single worker !hasProcessFn initial block
+4	8.369	300	35.85	485.2	keep	unroll isDomStrategy in single worker !hasProcessFn initial block
+2	8.408	300	35.68	485.2	keep	unroll isDomStrategy in single worker !hasProcessFn initial block
