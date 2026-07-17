@@ -272,10 +272,10 @@ export class CaptureLoop {
           }
 
             let i = 1;
-            while (i < totalFrames - 1 && !aborted) {
-              const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+            if (isDomStrategy) {
+              while (i < totalFrames - 1 && !aborted) {
+                const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
 
-              if (isDomStrategy) {
                 for (; i < chunkEnd; i++) {
                   const rawResult = await nextCapturePromise;
 
@@ -303,7 +303,23 @@ export class CaptureLoop {
                     pendingBytes = 0;
                   }
                 }
-              } else {
+
+                if (aborted) break;
+
+                if (i - 1 === nextProgress) {
+                  nextProgress += progressInterval;
+                  console.log(
+                    `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                  );
+                  if (onProgress) {
+                    onProgress((i - 1) / totalFrames);
+                  }
+                }
+              }
+            } else {
+              while (i < totalFrames - 1 && !aborted) {
+                const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+
                 for (; i < chunkEnd; i++) {
                   const rawResult = await nextCapturePromise;
 
@@ -328,17 +344,17 @@ export class CaptureLoop {
                     pendingBytes = 0;
                   }
                 }
-              }
 
-              if (aborted) break;
+                if (aborted) break;
 
-              if (i - 1 === nextProgress) {
-                nextProgress += progressInterval;
-                console.log(
-                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                );
-                if (onProgress) {
-                  onProgress((i - 1) / totalFrames);
+                if (i - 1 === nextProgress) {
+                  nextProgress += progressInterval;
+                  console.log(
+                    `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                  );
+                  if (onProgress) {
+                    onProgress((i - 1) / totalFrames);
+                  }
                 }
               }
             }
@@ -437,10 +453,10 @@ export class CaptureLoop {
           }
 
           let i = 1;
-          while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+          if (isDomStrategy) {
+            while (i < totalFrames - 1 && !aborted) {
+              const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
 
-            if (isDomStrategy) {
               for (; i < chunkEnd; i++) {
                 const rawResult = await nextCapturePromise;
 
@@ -468,7 +484,23 @@ export class CaptureLoop {
                   pendingBytes = 0;
                 }
               }
-            } else {
+
+              if (aborted) break;
+
+              if (i - 1 === nextProgress) {
+                nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                );
+                if (onProgress) {
+                  onProgress((i - 1) / totalFrames);
+                }
+              }
+            }
+          } else {
+            while (i < totalFrames - 1 && !aborted) {
+              const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+
               for (; i < chunkEnd; i++) {
                 const rawResult = await nextCapturePromise;
 
@@ -493,17 +525,17 @@ export class CaptureLoop {
                   pendingBytes = 0;
                 }
               }
-            }
 
-            if (aborted) break;
+              if (aborted) break;
 
-            if (i - 1 === nextProgress) {
-              nextProgress += progressInterval;
-              console.log(
-                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-              );
-              if (onProgress) {
-                onProgress((i - 1) / totalFrames);
+              if (i - 1 === nextProgress) {
+                nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                );
+                if (onProgress) {
+                  onProgress((i - 1) / totalFrames);
+                }
               }
             }
           }
