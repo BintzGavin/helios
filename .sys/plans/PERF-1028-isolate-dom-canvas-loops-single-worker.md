@@ -1,11 +1,11 @@
 ---
 id: PERF-1028
 slug: isolate-dom-canvas-loops-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-18
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1028: Isolate DOM and Canvas processing loops in `CaptureLoop.ts` (`hasProcessFn` true and false)
