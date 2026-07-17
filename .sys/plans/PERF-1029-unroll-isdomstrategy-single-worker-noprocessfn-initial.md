@@ -1,8 +1,9 @@
 ---
 id: PERF-1029
 slug: unroll-isdomstrategy-single-worker-noprocessfn-initial
-status: unclaimed
-claimed_by: ""
+status: complete
+result: "kept"
+claimed_by: "executor-session"
 created: 2024-10-18
 completed: ""
 result: ""
@@ -44,3 +45,9 @@ Run `npm run build -w packages/core && npx tsx packages/renderer/tests/verify-do
 
 ## Prior Art
 Prior optimizations like PERF-1025 and PERF-1028 successfully eliminated branch evaluation overhead by unrolling `isDomStrategy` loops.
+
+## Results Summary
+- **Best render time**: 8.369s (vs baseline 8.542s)
+- **Improvement**: 2.0%
+- **Kept experiments**: Unrolled `isDomStrategy` check in single worker `!hasProcessFn` initial block.
+- **Discarded experiments**: none
