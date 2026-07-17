@@ -1,11 +1,11 @@
 ---
 id: PERF-1027
 slug: unroll-isdomstrategy-multi-worker-runworker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-18
-completed: ""
-result: ""
+completed: "2024-10-18"
+result: "improved"
 ---
 
 # PERF-1027: Unroll `isDomStrategy` check in multi-worker `runWorker` actor loop (`!hasProcessFn` path)

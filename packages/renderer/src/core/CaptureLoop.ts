@@ -697,25 +697,25 @@ export class CaptureLoop {
               writerWaiterPromise.resolve();
             }
         } else {
-          let maxSubmits = nextFrameToWrite + maxPipelineDepth;
-          while (!aborted && nextFrameToSubmit < totalFrames) {
-            let i: number;
-            if (nextFrameToSubmit < maxSubmits) {
-              i = nextFrameToSubmit++;
+          if (isDomStrategy) {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
+            while (!aborted && nextFrameToSubmit < totalFrames) {
+              let i: number;
+              if (nextFrameToSubmit < maxSubmits) {
+                i = nextFrameToSubmit++;
+                const ringIndex = i & ringMask;
+                frameBufferRing[ringIndex] = null;
+              } else {
+                freeWorkers[freeWorkersHead++] = workerIndex;
+                i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
+              }
+
+              if (i === -1) break;
               const ringIndex = i & ringMask;
-              frameBufferRing[ringIndex] = null;
-            } else {
-              freeWorkers[freeWorkersHead++] = workerIndex;
-              i = (await workerThenables[workerIndex]) as any as number;
-              maxSubmits = nextFrameToWrite + maxPipelineDepth;
-            }
 
-            if (i === -1) break;
-            const ringIndex = i & ringMask;
-
-            try {
-              let buffer: any;
-              if (isDomStrategy) {
+              try {
+                let buffer: any;
                 timeDriver.setTime(page, (startFrame + i) * compTimeStep);
                 const rawResult = await domBeginFrame!();
                 const data = (rawResult as any).screenshotData;
@@ -728,20 +728,46 @@ export class CaptureLoop {
                   buf = domLastFrameBuffer!;
                 }
                 buffer = buf;
+                frameBufferRing[ringIndex] = buffer;
+              } catch (e) {
+                fatalError = e;
+                aborted = true;
+                checkState();
+              }
+              writerWaiterPromise.resolve();
+            }
+          } else {
+            let maxSubmits = nextFrameToWrite + maxPipelineDepth;
+            while (!aborted && nextFrameToSubmit < totalFrames) {
+              let i: number;
+              if (nextFrameToSubmit < maxSubmits) {
+                i = nextFrameToSubmit++;
+                const ringIndex = i & ringMask;
+                frameBufferRing[ringIndex] = null;
               } else {
+                freeWorkers[freeWorkersHead++] = workerIndex;
+                i = (await workerThenables[workerIndex]) as any as number;
+                maxSubmits = nextFrameToWrite + maxPipelineDepth;
+              }
+
+              if (i === -1) break;
+              const ringIndex = i & ringMask;
+
+              try {
+                let buffer: any;
                 const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
                 if (timePromise) {
                   await timePromise;
                 }
                 buffer = await strategy.capture(page, i * timeStep);
+                frameBufferRing[ringIndex] = buffer;
+              } catch (e) {
+                fatalError = e;
+                aborted = true;
+                checkState();
               }
-              frameBufferRing[ringIndex] = buffer;
-            } catch (e) {
-              fatalError = e;
-              aborted = true;
-              checkState();
+              writerWaiterPromise.resolve();
             }
-            writerWaiterPromise.resolve();
           }
         }
       };
