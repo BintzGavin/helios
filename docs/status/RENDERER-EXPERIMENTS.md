@@ -319,3 +319,7 @@ $entry
 - **PERF-1041**: Isolate multi-worker writer loops completely based on strategy in `CaptureLoop.ts`.
   - **Improvement:** Reduced AST size and V8 TurboFan pipeline processing inside the main multi-worker writer loops by hoisting `isDomStrategyWriter` out of the monolithic wait loops. Benchmarks show a modest ~3% improvement in render times due to reduced parser/branch overhead inside the tight loop.
   - **Plan ID**: PERF-1041
+
+- **PERF-1045**: Inline loop bound evaluation for `Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames)` in multi-worker writer loops of `CaptureLoop.ts`.
+  - **Improvement**: Slightly reduced V8 AST complexity by eliminating the intermediate variable `maxSubmits`. Yielded a ~1% microbenchmark improvement (0.754s -> 0.746s for 100M iterations) when dynamically calculating bounds. This complements PERF-1044's dynamic depth approach.
+  - **Plan ID**: PERF-1045
