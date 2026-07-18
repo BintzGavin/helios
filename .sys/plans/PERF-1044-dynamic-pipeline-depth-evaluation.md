@@ -1,7 +1,7 @@
 ---
 id: PERF-1044
 slug: dynamic-pipeline-depth-evaluation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-18
 completed: ""

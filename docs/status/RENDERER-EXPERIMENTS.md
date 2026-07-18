@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1044**: Eliminated stale pipeline depth caching in multi-worker ACTOR loops in `CaptureLoop.ts`.
+  - **Improvement:** Removed V8 Promise resolution overhead and prevented pipeline stalls by dynamically evaluating capacity. Replaced `maxSubmits` caching with dynamic evaluation. Improved render times by ~15.9%.
+  - **Plan ID:** PERF-1044
+
 - **What Works:** PERF-1043 eliminated the mathematically unreachable `hasProcessFn` matrix blocks inside `CaptureLoop.ts` for both single and multi-worker paths.
   - **Improvement:** Substantially shrank the AST size by removing dead branch combinations. Benchmarks show improved V8 parsing and compilation times in the hot paths, resulting in slightly more stable render speeds.
   - **Plan ID:** PERF-1043
