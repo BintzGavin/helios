@@ -3,10 +3,14 @@
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 19.500s (baseline was 21.500s, -7.9%)
-Last updated by: PERF-975
+Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **What Works:** PERF-1043 eliminated the mathematically unreachable `hasProcessFn` matrix blocks inside `CaptureLoop.ts` for both single and multi-worker paths.
+  - **Improvement:** Substantially shrank the AST size by removing dead branch combinations. Benchmarks show improved V8 parsing and compilation times in the hot paths, resulting in slightly more stable render speeds.
+  - **Plan ID:** PERF-1043
+
 - Removed dead isDomStrategy check in multi-worker runWorker loop (~0% faster, hoisted) - PERF-1042
 - Hoisted `isDomStrategy` check out of single-worker initial and final frame setups to ensure fully independent DOM and Canvas code paths (`PERF-1040`)
 
