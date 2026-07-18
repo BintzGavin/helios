@@ -1506,14 +1506,27 @@ describe('Input Props', () => {
 
         const iframe = player.shadowRoot!.querySelector('iframe');
 
-        // Call play
-        await player.play();
+        // Mock the play event dispatch to avoid hanging the promise
+        const playPromise = player.play();
+        setTimeout(() => player.dispatchEvent(new Event('play')), 10);
+        await playPromise;
 
         // Should load iframe
         expect(iframe!.src).toContain('test.html');
 
         // Should set autoplay
         expect(player.hasAttribute('autoplay')).toBe(true);
+    });
+
+    it('should reject play() promise if pause() is called before it resolves', async () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('src', 'test.html');
+
+        const playPromise = player.play();
+        player.pause(); // trigger pause
+        player.dispatchEvent(new Event('pause')); // send event
+
+        await expect(playPromise).rejects.toThrow('The play() request was interrupted by a call to pause().');
     });
 
     it('should hide poster when playing starts', () => {

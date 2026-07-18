@@ -278,7 +278,7 @@
 [v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
 [v0.78.2] ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.
 [v0.78.3] ✅ Completed: Discovered that `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md` is an IMPOSSIBLE: DUPLICATION plan. The missing constants are already implemented. Created plan `.sys/plans/2027-03-03-PLAYER-Document-Instance-Constants.md` to document them.
-**Version**: 0.79.9
+**Version**: 0.79.15
 
 [v0.78.3] ✅ Completed: Document HTMLMediaElement Constants - Added documentation for HTMLMediaElement instance and class constants to the README.
 [v0.78.4] ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
@@ -307,3 +307,5 @@
 [v0.79.12] ✅ Completed: Implement remote property - Added remote property returning a mock RemotePlayback object to complete HTMLMediaElement parity.
 [v0.79.13] ✅ Completed: Discovered that plans 2026-07-13, 2027-03-06, and 2027-03-07 for remote, autoPictureInPicture, and getStartDate are IMPOSSIBLE: DUPLICATION plans. They are already fully implemented in packages/player/src/index.ts and documented in README.md. Documented as impossible and discarded.
 [v0.79.14] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
+
+[v0.79.15] ✅ Completed: Implement Promise for play() - Modified play() to return a Promise that resolves when playback begins or rejects if it fails, matching HTMLMediaElement parity.
