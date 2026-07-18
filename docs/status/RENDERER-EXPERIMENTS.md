@@ -7,6 +7,7 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1046**: Simplify final buffer dispatch. Replaced the inline ternary operator with an if-else block. Reduces branch parsing and yielded a slight improvement ~2% in nodejs microbenchmark performance for processing final string and native buffers (from 438-479ms to 430-440ms over 1M iterations). Kept.
 - **PERF-1044**: Eliminated stale pipeline depth caching in multi-worker ACTOR loops in `CaptureLoop.ts`.
   - **Improvement:** Removed V8 Promise resolution overhead and prevented pipeline stalls by dynamically evaluating capacity. Replaced `maxSubmits` caching with dynamic evaluation. Improved render times by ~15.9%.
   - **Plan ID:** PERF-1044

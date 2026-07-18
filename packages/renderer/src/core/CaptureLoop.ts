@@ -759,11 +759,14 @@ export class CaptureLoop {
     ) {
       console.log(`Writing final buffer...`);
       const isString = typeof finalBuffer === "string";
-      if (
-        !(isString
-          ? stdin!.write(finalBuffer as any, "base64")
-          : stdin!.write(finalBuffer as any))
-      ) {
+      let writeSuccess;
+      if (isString) {
+        writeSuccess = stdin!.write(finalBuffer as any, "base64");
+      } else {
+        writeSuccess = stdin!.write(finalBuffer as any);
+      }
+
+      if (!writeSuccess) {
         await this.drainPromise;
       }
     }
