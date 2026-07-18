@@ -515,40 +515,34 @@ export class CaptureLoop {
           const domCdpSession = (strategy as any).cdpSession;
           const domBeginFrameParams = (strategy as any).beginFrameParams;
           const domBeginFrame = () => domCdpSession!.send("HeadlessExperimental.beginFrame", domBeginFrameParams);
-          let domLastFrameData: any = (strategy as any).lastFrameData;
           let domLastFrameBuffer: Buffer | null = null;
 
-          let maxSubmits = nextFrameToWrite + maxPipelineDepth;
           while (!aborted && nextFrameToSubmit < totalFrames) {
             let i: number;
-            if (nextFrameToSubmit < maxSubmits) {
+            if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
               i = nextFrameToSubmit++;
               const ringIndex = i & ringMask;
               frameBufferRing[ringIndex] = null;
             } else {
               freeWorkers[freeWorkersHead++] = workerIndex;
               i = (await workerThenables[workerIndex]) as any as number;
-              maxSubmits = nextFrameToWrite + maxPipelineDepth;
             }
 
             if (i === -1) break;
             const ringIndex = i & ringMask;
 
             try {
-              let buffer: any;
               timeDriver.setTime(page, (startFrame + i) * compTimeStep);
               const rawResult = await domBeginFrame!();
               const data = (rawResult as any).screenshotData;
               let buf: Buffer;
               if (data) {
-                domLastFrameData = data;
                 buf = Buffer.from(data as string, "base64");
                 domLastFrameBuffer = buf;
               } else {
                 buf = domLastFrameBuffer!;
               }
-              buffer = buf;
-              frameBufferRing[ringIndex] = buffer;
+              frameBufferRing[ringIndex] = buf;
             } catch (e) {
               fatalError = e;
               aborted = true;
@@ -557,30 +551,26 @@ export class CaptureLoop {
             writerWaiterPromise.resolve();
           }
         } else {
-          let maxSubmits = nextFrameToWrite + maxPipelineDepth;
           while (!aborted && nextFrameToSubmit < totalFrames) {
             let i: number;
-            if (nextFrameToSubmit < maxSubmits) {
+            if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
               i = nextFrameToSubmit++;
               const ringIndex = i & ringMask;
               frameBufferRing[ringIndex] = null;
             } else {
               freeWorkers[freeWorkersHead++] = workerIndex;
               i = (await workerThenables[workerIndex]) as any as number;
-              maxSubmits = nextFrameToWrite + maxPipelineDepth;
             }
 
             if (i === -1) break;
             const ringIndex = i & ringMask;
 
             try {
-              let buffer: any;
               const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
               if (timePromise) {
                 await timePromise;
               }
-              buffer = await strategy.capture(page, i * timeStep);
-              frameBufferRing[ringIndex] = buffer;
+              frameBufferRing[ringIndex] = await strategy.capture(page, i * timeStep);
             } catch (e) {
               fatalError = e;
               aborted = true;
