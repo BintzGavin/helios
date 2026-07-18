@@ -99,6 +99,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `.agents/skills/helios-skills/skills/studio/SKILL.md` - Studio usage and extensions
 - `.agents/skills/helios-skills/skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
 - `.agents/skills/helios-skills/skills/workflows/*.md`, `.agents/skills/helios-skills/skills/examples/*.md` & `.agents/skills/helios-skills/skills/guided/*.md` - Task-specific workflows, examples, and guided skills
+- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills
 
 ## Key Files for Agents
 - `README.md` - Vision document
@@ -136,7 +137,7 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (Completed: Improve Omnibar Test Coverage, Refine CLI Component Removal, Asset Drag and Drop)
+- **Studio**: v0.107.1+ (Completed: Improve Omnibar Test Coverage, Asset Drag and Drop, Export Job Spec)
 - **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests)
 - **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Composition Schema)
 - **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Bridge Coverage Expansion)
