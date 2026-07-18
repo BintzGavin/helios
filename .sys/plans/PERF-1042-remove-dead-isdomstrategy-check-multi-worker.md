@@ -1,11 +1,11 @@
 ---
 id: PERF-1042
 slug: remove-dead-isdomstrategy-check-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-18
 completed: ""
-result: ""
+result: improved
 ---
 
 # PERF-1042: Remove dead isDomStrategy checks in multi-worker runWorker loop

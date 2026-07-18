@@ -7,6 +7,7 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- Removed dead isDomStrategy check in multi-worker runWorker loop (~0% faster, hoisted) - PERF-1042
 - Hoisted `isDomStrategy` check out of single-worker initial and final frame setups to ensure fully independent DOM and Canvas code paths (`PERF-1040`)
 
 - **PERF-1029**: Unrolled `isDomStrategy` checks in single worker `!hasProcessFn` initial block.
