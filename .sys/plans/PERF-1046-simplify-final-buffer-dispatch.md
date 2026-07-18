@@ -1,7 +1,7 @@
 ---
 id: PERF-1046
 slug: simplify-final-buffer-dispatch
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-18
 completed: ""
