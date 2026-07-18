@@ -183,9 +183,6 @@ export class CaptureLoop {
       const domBeginFrame = isDomStrategy
         ? () => domCdpSession!.send("HeadlessExperimental.beginFrame", domBeginFrameParams)
         : null;
-      let domLastFrameData: any = isDomStrategy
-        ? (strategy as any).lastFrameData
-        : null;
       let domLastFrameBuffer: Buffer | null = null;
 
       try {
@@ -212,16 +209,12 @@ export class CaptureLoop {
               nextCapturePromise = domBeginFrame!();
             }
             const data = (rawResult as any).screenshotData;
-            if (data) {
-              domLastFrameData = data;
-            }
-            let buffer = domLastFrameData;
             console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
             if (onProgress) {
               onProgress(0 / totalFrames);
             }
-            if ((rawResult as any).screenshotData || !domLastFrameBuffer) {
-              domLastFrameBuffer = Buffer.from(buffer as string, "base64");
+            if (data || !domLastFrameBuffer) {
+              domLastFrameBuffer = Buffer.from((data || (strategy as any).lastFrameData) as string, "base64");
             }
             const buf = domLastFrameBuffer;
             pendingBytes += buf.length;
@@ -249,7 +242,6 @@ export class CaptureLoop {
               nextCapturePromise = domBeginFrame!();
               const data = rawResult.screenshotData;
               if (data) {
-                domLastFrameData = data;
                 buf = Buffer.from(data as string, "base64");
                 domLastFrameBuffer = buf;
               } else {
@@ -284,7 +276,6 @@ export class CaptureLoop {
             let buf: any;
             const data = rawResult.screenshotData;
             if (data) {
-              domLastFrameData = data;
               buf = Buffer.from(data as string, "base64");
               domLastFrameBuffer = buf;
             } else {
