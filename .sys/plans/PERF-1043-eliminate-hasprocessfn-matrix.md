@@ -1,11 +1,11 @@
 ---
 id: PERF-1043
 slug: eliminate-hasprocessfn-matrix
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-18
-completed: ""
-result: ""
+completed: "2024-10-18"
+result: "improved"
 ---
 
 # PERF-1043: Eliminate hasProcessFn matrix completely
