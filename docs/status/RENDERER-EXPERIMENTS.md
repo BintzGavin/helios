@@ -7,6 +7,9 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1048**: Inlined worker loop bounds (`limit = nextFrameToWrite + maxPipelineDepth`) in the multi-worker ACTOR dispatch paths in `CaptureLoop.ts`.
+  - **Improvement**: Slightly reduced V8 AST complexity during hot loop evaluation. Yielded a ~0.81% microbenchmark improvement.
+  - **Plan ID**: PERF-1048
 - **PERF-1047**: Eliminated dead `domLastFrameData` variable assignments in `CaptureLoop.ts` single-worker hot paths. Reduced closure writes for minor execution improvements.
 - **PERF-1046**: Simplify final buffer dispatch. Replaced the inline ternary operator with an if-else block. Reduces branch parsing and yielded a slight improvement ~2% in nodejs microbenchmark performance for processing final string and native buffers (from 438-479ms to 430-440ms over 1M iterations). Kept.
 - **PERF-1044**: Eliminated stale pipeline depth caching in multi-worker ACTOR loops in `CaptureLoop.ts`.
