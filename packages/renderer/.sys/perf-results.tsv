@@ -295,3 +295,4 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 2	0.318	300	944.06	49.0	keep	removed redundant dynamic abort checks
 295	0.8008259379999999	150	187.31	0.0	keep	Cache Decoded Base64 Buffers for Unchanged Frames in Single-Worker Loop
 1	0.000	150	0.00	0.0	keep	PERF-971 remove dead branch multi-worker
+1042	0.000	0	0.00	0.0	keep	PERF-1042 remove dead isDomStrategy branch multi-worker
