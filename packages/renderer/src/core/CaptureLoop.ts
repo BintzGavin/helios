@@ -510,7 +510,8 @@ export class CaptureLoop {
 
           while (!aborted && nextFrameToSubmit < totalFrames) {
             let i: number;
-            if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
+            const limit = nextFrameToWrite + maxPipelineDepth;
+            if (nextFrameToSubmit < limit) {
               i = nextFrameToSubmit++;
               const ringIndex = i & ringMask;
               frameBufferRing[ringIndex] = null;
@@ -544,7 +545,8 @@ export class CaptureLoop {
         } else {
           while (!aborted && nextFrameToSubmit < totalFrames) {
             let i: number;
-            if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
+            const limit = nextFrameToWrite + maxPipelineDepth;
+            if (nextFrameToSubmit < limit) {
               i = nextFrameToSubmit++;
               const ringIndex = i & ringMask;
               frameBufferRing[ringIndex] = null;

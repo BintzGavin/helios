@@ -1,7 +1,7 @@
 ---
 id: PERF-1048
 slug: inline-worker-loop-bound
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-05-17
 completed: ""
