@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.719	10000000	13903263.74	3.9	keep	Eliminate dead domLastFrameData variable
