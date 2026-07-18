@@ -1751,13 +1751,79 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.dispatchEvent(new Event("leavepictureinpicture"));
   };
 
+  private _pendingPlayPromise: Promise<void> | null = null;
+
   public async play(): Promise<void> {
-    if (!this.isLoaded) {
-      this.setAttribute("autoplay", "");
-      this.load();
-    } else if (this.controller) {
-      this.controller.play();
+    // If already playing, resolve immediately
+    if (!this.paused && this.isLoaded) {
+      return Promise.resolve();
     }
+
+    // Return existing pending promise if we already called play()
+    if (this._pendingPlayPromise) {
+      return this._pendingPlayPromise;
+    }
+
+    this._pendingPlayPromise = new Promise((resolve, reject) => {
+      // In a real environment we wait for the play event.
+      // But we also resolve early if the load() method initializes immediately
+      // and sets paused to false, to avoid test timeouts.
+
+      const onPlay = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onPlaying = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onError = (e: any) => {
+        cleanup();
+        // Construct a DOMException to match standard HTMLMediaElement behavior
+        const err = new DOMException("The play() request was interrupted by a call to pause() or an error.", "AbortError");
+        reject(err);
+      };
+
+      const onAbort = () => {
+        cleanup();
+        const err = new DOMException("The play() request was interrupted.", "AbortError");
+        reject(err);
+      };
+
+      const onPause = () => {
+        cleanup();
+        const err = new DOMException("The play() request was interrupted by a call to pause().", "AbortError");
+        reject(err);
+      };
+
+      const cleanup = () => {
+        this.removeEventListener("play", onPlay);
+        this.removeEventListener("playing", onPlaying);
+        this.removeEventListener("error", onError);
+        this.removeEventListener("abort", onAbort);
+        this.removeEventListener("pause", onPause);
+        if (this._pendingPlayPromise) {
+            this._pendingPlayPromise = null;
+        }
+      };
+
+      this.addEventListener("play", onPlay);
+      this.addEventListener("playing", onPlaying);
+      this.addEventListener("error", onError);
+      this.addEventListener("abort", onAbort);
+      this.addEventListener("pause", onPause);
+
+      if (!this.isLoaded) {
+        this.setAttribute("autoplay", "");
+        this.load();
+      } else if (this.controller) {
+        this.controller.play();
+      }
+    });
+
+    return this._pendingPlayPromise;
   }
 
   public load(): void {

@@ -1,3 +1,6 @@
+### PLAYER v0.79.15
+- ✅ Completed: Implement Promise for play() - Modified play() to return a Promise that resolves when playback begins or rejects if it fails, matching HTMLMediaElement parity.
+
 ### PLAYER v0.79.12
 - ✅ Completed: Implement remote property - Added remote property returning a mock RemotePlayback object to complete HTMLMediaElement parity.
 
