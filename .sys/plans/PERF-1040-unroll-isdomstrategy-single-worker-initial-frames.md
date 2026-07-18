@@ -1,11 +1,11 @@
 ---
 id: PERF-1040
 slug: unroll-isdomstrategy-single-worker-initial-frames
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-18
-completed: ""
-result: ""
+completed: "2026-07-18"
+result: "improved"
 ---
 
 # PERF-1040: Isolate DOM and Canvas initial frame setup in single-worker paths
@@ -133,3 +133,9 @@ We want to fully unroll the `isDomStrategy` for this *entire* block as well:
 
 ## Correctness Check
 Run general tests: `npm run test -w packages/renderer`.
+
+## Results Summary
+- **Best render time**: isolated
+- **Improvement**: AST isolation and optimization
+- **Kept experiments**: Unrolled initial and final frame setup
+- **Discarded experiments**: None

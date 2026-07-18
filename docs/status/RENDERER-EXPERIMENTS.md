@@ -7,6 +7,7 @@ Last updated by: PERF-975
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- Hoisted `isDomStrategy` check out of single-worker initial and final frame setups to ensure fully independent DOM and Canvas code paths (`PERF-1040`)
 
 - **PERF-1029**: Unrolled `isDomStrategy` checks in single worker `!hasProcessFn` initial block.
   - **Improvement:** Removed V8 branch evaluation overhead by replacing sequential polymorphic property checks with a single hoisted check around the initialization block. This yielded a ~2.0% microbenchmark improvement in setup speed.
