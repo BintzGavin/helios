@@ -306,3 +306,7 @@ $entry
 - **PERF-987**: Unroll buffer type dispatch in multi-worker writer chunk loops in `CaptureLoop.ts`.
   - **WHY it didn't work**: The renderer had a syntax error that was introduced by previous commits making it impossible to evaluate this performance improvement properly. We marked it as discard to continue to the next plan.
   - **Plan ID**: PERF-987
+
+- **PERF-1041**: Isolate multi-worker writer loops completely based on strategy in `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST size and V8 TurboFan pipeline processing inside the main multi-worker writer loops by hoisting `isDomStrategyWriter` out of the monolithic wait loops. Benchmarks show a modest ~3% improvement in render times due to reduced parser/branch overhead inside the tight loop.
+  - **Plan ID**: PERF-1041

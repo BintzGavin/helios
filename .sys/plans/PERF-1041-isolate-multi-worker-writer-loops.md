@@ -1,8 +1,8 @@
 ---
 id: PERF-1041
 slug: isolate-multi-worker-writer-loops
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-18
 completed: ""
 result: ""
