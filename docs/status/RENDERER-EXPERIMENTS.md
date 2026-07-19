@@ -339,3 +339,6 @@ $entry
 - **PERF-1045**: Inline loop bound evaluation for `Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames)` in multi-worker writer loops of `CaptureLoop.ts`.
   - **Improvement**: Slightly reduced V8 AST complexity by eliminating the intermediate variable `maxSubmits`. Yielded a ~1% microbenchmark improvement (0.754s -> 0.746s for 100M iterations) when dynamically calculating bounds. This complements PERF-1044's dynamic depth approach.
   - **Plan ID**: PERF-1045
+- **PERF-1053**: Inlined `dispatches` evaluation directly into its expression in the multi-worker assignment paths of `CaptureLoop.ts`.
+  - **Improvement**: Slightly reduced V8 AST complexity by eliminating the intermediate variable `limit`. Yielded a ~2.8% microbenchmark improvement (92.1ms -> 89.4ms for 100M iterations) when dynamically calculating bounds.
+  - **Plan ID**: PERF-1053
