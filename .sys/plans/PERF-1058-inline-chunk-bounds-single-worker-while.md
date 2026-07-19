@@ -1,11 +1,11 @@
 ---
 id: PERF-1058
 slug: inline-chunk-bounds-single-worker-while
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-19
-completed: ""
-result: ""
+completed: 2026-07-19
+result: no-improvement
 ---
 
 # PERF-1058: Inline chunk bounds in single-worker !hasProcessFn paths
@@ -42,3 +42,12 @@ Run `npm run test -w packages/renderer` to execute all existing Jest snapshot sm
 
 ## Correctness Check
 Since `chunkEnd = Math.min(i + progressInterval, totalFrames - 1)` ensures `i` resolves exactly to `totalFrames - 1` at the very end, strict equality is fully type and bounds safe.
+
+
+## Results Summary
+- **Best render time**: 1.210s (vs baseline 1.180s)
+- **Improvement**: 2.5% regression
+- **Kept experiments**:
+  None
+- **Discarded experiments**:
+  - Inline chunk bounds in single-worker paths

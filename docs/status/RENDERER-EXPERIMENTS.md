@@ -179,6 +179,10 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1058**: Replaced relational loop boundary check (`i < totalFrames - 1`) with strict equality (`i !== totalFrames - 1`) in single-worker `!hasProcessFn` paths of `CaptureLoop.ts`.
+  - **WHY it didn't work**: Microbenchmarks showed no improvement or a slight regression (1.180s -> 1.210s) for strict equality bounds checks on single-worker paths. We will discard this change.
+  - **Plan ID**: PERF-1058
+
 - **PERF-1057**: Replaced `Math.min` with an intermediate variable and a ternary operator for the `chunkEnd` loop boundary in `CaptureLoop.ts` chunk generation paths.
   - **WHY it didn't work**: Microbenchmarking showed that using an intermediate variable and a ternary operator resulted in a ~108.58% performance regression compared to the baseline V8 `Math.min` optimization.
   - **Plan ID**: PERF-1057
