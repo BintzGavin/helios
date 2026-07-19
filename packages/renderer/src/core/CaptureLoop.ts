@@ -513,15 +513,13 @@ export class CaptureLoop {
             const limit = nextFrameToWrite + maxPipelineDepth;
             if (nextFrameToSubmit < limit) {
               i = nextFrameToSubmit++;
-              const ringIndex = i & ringMask;
-              frameBufferRing[ringIndex] = null;
+              frameBufferRing[i & ringMask] = null;
             } else {
               freeWorkers[freeWorkersHead++] = workerIndex;
               i = (await workerThenables[workerIndex]) as any as number;
             }
 
             if (i === -1) break;
-            const ringIndex = i & ringMask;
 
             try {
               timeDriver.setTime(page, (startFrame + i) * compTimeStep);
@@ -534,7 +532,7 @@ export class CaptureLoop {
               } else {
                 buf = domLastFrameBuffer!;
               }
-              frameBufferRing[ringIndex] = buf;
+              frameBufferRing[i & ringMask] = buf;
             } catch (e) {
               fatalError = e;
               aborted = true;
@@ -548,22 +546,20 @@ export class CaptureLoop {
             const limit = nextFrameToWrite + maxPipelineDepth;
             if (nextFrameToSubmit < limit) {
               i = nextFrameToSubmit++;
-              const ringIndex = i & ringMask;
-              frameBufferRing[ringIndex] = null;
+              frameBufferRing[i & ringMask] = null;
             } else {
               freeWorkers[freeWorkersHead++] = workerIndex;
               i = (await workerThenables[workerIndex]) as any as number;
             }
 
             if (i === -1) break;
-            const ringIndex = i & ringMask;
 
             try {
               const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
               if (timePromise) {
                 await timePromise;
               }
-              frameBufferRing[ringIndex] = await strategy.capture(page, i * timeStep);
+              frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
             } catch (e) {
               fatalError = e;
               aborted = true;
@@ -615,12 +611,11 @@ export class CaptureLoop {
               }
 
               while (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
+                if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
+                const buffer = frameBufferRing[nextFrameToWrite & ringMask] as unknown as Buffer;
                 pendingBytes += buffer.length;
                 const writeSuccess = stream.write(buffer);
 
@@ -633,8 +628,7 @@ export class CaptureLoop {
               }
 
               if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
+                while (frameBufferRing[nextFrameToWrite & ringMask] === null && !aborted) {
                   await writerWaiterPromise;
                 }
                 if (aborted) break;
@@ -682,12 +676,11 @@ export class CaptureLoop {
               }
 
               while (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
+                if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[ringIndex]!;
+                const buffer = frameBufferRing[nextFrameToWrite & ringMask]!;
                 pendingBytes += (buffer as any).length;
                 const writeSuccess = stream.write(buffer as any);
 
@@ -700,8 +693,7 @@ export class CaptureLoop {
               }
 
               if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
+                while (frameBufferRing[nextFrameToWrite & ringMask] === null && !aborted) {
                   await writerWaiterPromise;
                 }
                 if (aborted) break;

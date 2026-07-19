@@ -1,10 +1,11 @@
 ---
 id: PERF-1049
 slug: inline-ring-mask-evaluation
-status: unclaimed
+status: complete
+result: improved
+completed: 2026-07-19
 claimed_by: ""
 created: 2024-05-17
-completed: ""
 result: ""
 ---
 
@@ -149,3 +150,9 @@ Verify DOM outputs using a standard render test.
 
 ## Prior Art
 PERF-1045 and PERF-1048 demonstrated AST node simplification logic is highly effective in Node.js JIT paths.
+
+## Results Summary
+- **Best microbenchmark time**: ~21ms (vs baseline ~23ms)
+- **Improvement**: ~9%
+- **Kept experiments**: Inline ring buffer bitwise mask evaluation
+- **Discarded experiments**: None
