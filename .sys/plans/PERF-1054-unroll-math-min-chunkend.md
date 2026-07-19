@@ -1,8 +1,8 @@
 ---
 id: PERF-1054
 slug: unroll-math-min-chunkend
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-07-21
 completed: ""
 result: ""
@@ -125,3 +125,11 @@ Run canvas smoke testing to ensure accurate canvas rendering output paths.
 
 ## Correctness Check
 Verify standard DOM renders generate expected valid output and sizes.
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.375	300	218.12	0.0	discard	unroll math min chunkEnd (baseline: 156.18ms, exp: 1375.40ms, -780.65%)
+
+```
