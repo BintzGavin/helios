@@ -898,6 +898,9 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.10
 - ✅ Completed: Implement getStartDate - Added getStartDate method returning NaN for HTMLMediaElement parity
+### STUDIO v0.123.0
+- ✅ Completed: STUDIO-Add-Hot-Reload-Indicator - Implemented a visual Hot Reload Indicator toast for when composition reloads.
+
 ### STUDIO v0.122.13
 - ✅ Completed: STUDIO-Improve-DiagnosticsModal-Coverage - Achieved 100% test coverage for DiagnosticsModal by adding edge cases and resolving act() warnings.
 
