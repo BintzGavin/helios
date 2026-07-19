@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.375	300	218.12	0.0	discard	unroll math min chunkEnd (baseline: 156.18ms, exp: 1375.40ms, -780.65%)

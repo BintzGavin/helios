@@ -178,6 +178,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1054**: Unroll Math.min chunkEnd loop bound logic in CaptureLoop.ts chunk generation paths.
+  - **WHY it didn't work**: Microbenchmarking showed that manually unrolling `Math.min` for `chunkEnd` boundaries using a ternary operator actually resulted in drastically worse performance (-780%) compared to the baseline V8 `Math.min` optimization, indicating V8 handles the native builtin much more efficiently than manual JS branching in this specific loop constraint scenario.
+  - **Plan ID**: PERF-1054
 - **PERF-1013**: Unroll buffer type dispatch in multi-worker chunk writer.
   - **WHY it didn't work**: Marked as a DUPLICATION. The buffer type dispatch unrolling in the multi-worker chunk writer loop was already implemented in `CaptureLoop.ts`.
   - **Plan ID**: PERF-1013
