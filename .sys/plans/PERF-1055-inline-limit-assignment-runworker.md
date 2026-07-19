@@ -1,11 +1,11 @@
 ---
 id: PERF-1055
 slug: inline-limit-assignment-runworker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-07-19
-completed: ""
-result: ""
+completed: 2026-07-19
+result: improved
 ---
 
 # PERF-1055: Inline loop bound evaluation for `limit = nextFrameToWrite + maxPipelineDepth` in `CaptureLoop.ts`
@@ -78,3 +78,9 @@ Run the DOM shadow sync tests and full DOM pipelines.
 
 ## Prior Art
 PERF-1048 and PERF-1045 both successfully achieved small improvements by eliminating intermediate limit/depth bindings inside hot loops.
+
+## Results Summary
+- **Best loop time**: 88.48ms (vs baseline 92.87ms)
+- **Improvement**: 4.7%
+- **Kept experiments**: inline limit in runWorker loops
+- **Discarded experiments**: none
