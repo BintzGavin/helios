@@ -1,4 +1,4 @@
-**Version**: 0.46.61
+**Version**: 0.46.65
 
 [v0.46.61] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
 
@@ -8,7 +8,7 @@
 
 [v0.46.51] 🟢 Completed: CLI Command Coverage Tests Spec V9 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V9.md for covering missing exit prompt branches in deploy subcommands.
 
-**Version**: 0.46.64
+**Version**: 0.46.65
 
 [v0.46.63] ✅ Completed: CLI Registry Client Coverage Tests - Implemented unit tests for caching logic and fallback handlers in RegistryClient, achieving 100% branch and line coverage.
 
@@ -208,3 +208,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.46.62] 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
 [v0.46.64] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
+
+- [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/

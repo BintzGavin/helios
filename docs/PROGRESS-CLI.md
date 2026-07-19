@@ -1,3 +1,6 @@
+### CLI v0.46.65
+- 🛑 Blocked: Waiting for a new, valid plan in /.sys/plans/
+
 ### CLI v0.46.53
 - ✅ Completed: CLI Command Coverage Tests V9 - Implemented tests to achieve 100% line coverage for the render command.
 
