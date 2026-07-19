@@ -179,6 +179,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1057**: Replaced `Math.min` with an intermediate variable and a ternary operator for the `chunkEnd` loop boundary in `CaptureLoop.ts` chunk generation paths.
+  - **WHY it didn't work**: Microbenchmarking showed that using an intermediate variable and a ternary operator resulted in a ~108.58% performance regression compared to the baseline V8 `Math.min` optimization.
+  - **Plan ID**: PERF-1057
 - **PERF-1054**: Unroll Math.min chunkEnd loop bound logic in CaptureLoop.ts chunk generation paths.
   - **WHY it didn't work**: Microbenchmarking showed that manually unrolling `Math.min` for `chunkEnd` boundaries using a ternary operator actually resulted in drastically worse performance (-780%) compared to the baseline V8 `Math.min` optimization, indicating V8 handles the native builtin much more efficiently than manual JS branching in this specific loop constraint scenario.
   - **Plan ID**: PERF-1054
