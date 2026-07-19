@@ -203,6 +203,7 @@ Key features include:
 Options typically configured via `HELIOS_PROJECT_ROOT` env var for external integration.
 
 ## Section D: UI Components
+- **HotReloadToast**: Visual indicator for HMR updates.
 - **Stage**: The main canvas preview (Pan, Zoom, Snapshot).
 - **Timeline**: Track layers and keyframes.
 - **PropsEditor**: JSON-based schema-aware editor for composition inputs.
