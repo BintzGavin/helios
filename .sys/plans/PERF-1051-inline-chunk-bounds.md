@@ -1,11 +1,11 @@
 ---
 id: PERF-1051
 slug: inline-chunk-bounds
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "PERF-1051"
 created: 2026-07-19
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1051: Inline loop bound evaluation for chunk end condition in CaptureLoop.ts
