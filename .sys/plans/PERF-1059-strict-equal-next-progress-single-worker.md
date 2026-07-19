@@ -1,11 +1,11 @@
 ---
 id: PERF-1059
 slug: strict-equal-next-progress-single-worker
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-19
-completed: ""
-result: ""
+completed: "2026-07-19"
+result: "improved"
 ---
 
 # PERF-1059: Unroll progress check calculation in single-worker loops
@@ -143,3 +143,10 @@ Around line 397:
 
 ## Correctness Check
 Run `npm run test -w packages/renderer` to ensure no single-worker renders fail or hang. Output logs will still log `i - 1` correctly.
+
+
+## Results Summary
+- **Best render time**: 0.0054s (vs baseline 0.0080s)
+- **Improvement**: 32.98%
+- **Kept experiments**: PERF-1059-strict-equal-next-progress-single-worker
+- **Discarded experiments**: None

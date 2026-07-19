@@ -187,7 +187,7 @@ export class CaptureLoop {
 
       try {
 
-        let nextProgress = progressInterval;
+        let nextProgress = progressInterval + 1;
 
         if (isDomStrategy) {
           let nextCapturePromise = null;
@@ -259,7 +259,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            if (i - 1 === nextProgress) {
+            if (i === nextProgress) {
               nextProgress += progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
@@ -291,8 +291,8 @@ export class CaptureLoop {
             }
 
             i++;
-            if (i - 1 === nextProgress || i === totalFrames) {
-              if (i - 1 === nextProgress) nextProgress += progressInterval;
+            if (i === nextProgress || i === totalFrames) {
+              if (i === nextProgress) nextProgress += progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
               );
@@ -368,7 +368,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            if (i - 1 === nextProgress) {
+            if (i === nextProgress) {
               nextProgress += progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
@@ -394,8 +394,8 @@ export class CaptureLoop {
             }
 
             i++;
-            if (i - 1 === nextProgress || i === totalFrames) {
-              if (i - 1 === nextProgress) nextProgress += progressInterval;
+            if (i === nextProgress || i === totalFrames) {
+              if (i === nextProgress) nextProgress += progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
               );
