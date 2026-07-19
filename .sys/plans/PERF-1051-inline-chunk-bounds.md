@@ -1,7 +1,7 @@
 ---
 id: PERF-1051
 slug: inline-chunk-bounds
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-07-19
 completed: ""
@@ -85,3 +85,7 @@ Verify DOM outputs using a standard render test.
 
 ## Prior Art
 PERF-1050, PERF-911, and PERF-937 successfully replaced relational boundary checks with strict equality checks in `CaptureLoop.ts`.
+
+## Results Summary
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	7.848	0	0.00	0.0	keep	inline-chunk-bounds

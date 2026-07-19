@@ -7,6 +7,9 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1051**: Inlined chunk loop bounds using strict equality `!==` instead of `<` in `CaptureLoop.ts` multi-worker chunk dispatch.
+  - **Improvement**: Maintained performance while reducing V8 AST complexity by avoiding relational operators in the loop header.
+  - **Plan ID**: PERF-1051
 - **PERF-1050**: Simplified array bounds tracking variables `nextFrameToWrite` vs `totalFrames` using strict equality in CaptureLoop.ts.
   - **Improvement**: Slightly reduced V8 AST complexity during hot loop evaluation. Yielded a ~0.32% microbenchmark improvement.
   - **Plan ID**: PERF-1050

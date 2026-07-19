@@ -610,7 +610,7 @@ export class CaptureLoop {
                 }
               }
 
-              while (nextFrameToWrite < chunkEnd) {
+              while (nextFrameToWrite !== chunkEnd) {
                 if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
                   break;
                 }
@@ -627,7 +627,7 @@ export class CaptureLoop {
                 nextFrameToWrite++;
               }
 
-              if (nextFrameToWrite < chunkEnd) {
+              if (nextFrameToWrite !== chunkEnd) {
                 while (frameBufferRing[nextFrameToWrite & ringMask] === null && !aborted) {
                   await writerWaiterPromise;
                 }
@@ -675,7 +675,7 @@ export class CaptureLoop {
                 }
               }
 
-              while (nextFrameToWrite < chunkEnd) {
+              while (nextFrameToWrite !== chunkEnd) {
                 if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
                   break;
                 }
@@ -692,7 +692,7 @@ export class CaptureLoop {
                 nextFrameToWrite++;
               }
 
-              if (nextFrameToWrite < chunkEnd) {
+              if (nextFrameToWrite !== chunkEnd) {
                 while (frameBufferRing[nextFrameToWrite & ringMask] === null && !aborted) {
                   await writerWaiterPromise;
                 }
