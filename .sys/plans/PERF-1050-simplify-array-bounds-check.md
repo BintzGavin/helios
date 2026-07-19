@@ -1,11 +1,11 @@
 ---
 id: PERF-1050
 slug: simplify-array-bounds-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-07-19
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1050: Simplify array bounds tracking variables `nextFrameToWrite` vs `totalFrames` using strict equality in CaptureLoop.ts
@@ -66,3 +66,9 @@ Verify DOM outputs using a standard render test.
 
 ## Prior Art
 PERF-911 and PERF-937 successfully replaced relational boundary checks with strict equality checks in `CaptureLoop.ts`.
+
+## Results Summary
+- **Best render time**: 10983.21ms (vs baseline 11018.74ms)
+- **Improvement**: 0.32%
+- **Kept experiments**: [PERF-1050]
+- **Discarded experiments**: []

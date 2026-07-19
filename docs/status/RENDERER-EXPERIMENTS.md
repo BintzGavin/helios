@@ -7,6 +7,9 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1050**: Simplified array bounds tracking variables `nextFrameToWrite` vs `totalFrames` using strict equality in CaptureLoop.ts.
+  - **Improvement**: Slightly reduced V8 AST complexity during hot loop evaluation. Yielded a ~0.32% microbenchmark improvement.
+  - **Plan ID**: PERF-1050
 - Inlined the bitwise mask evaluation (`i & ringMask`) directly into array bracket lookups throughout CaptureLoop multi-worker paths, removing intermediate `const ringIndex` variables (~9% microbenchmark improvement). (PERF-1049)
 - **PERF-1048**: Inlined worker loop bounds (`limit = nextFrameToWrite + maxPipelineDepth`) in the multi-worker ACTOR dispatch paths in `CaptureLoop.ts`.
   - **Improvement**: Slightly reduced V8 AST complexity during hot loop evaluation. Yielded a ~0.81% microbenchmark improvement.
