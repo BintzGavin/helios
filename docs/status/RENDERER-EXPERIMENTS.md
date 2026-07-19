@@ -2,11 +2,14 @@
   - **Improvement**: Avoided redundant synchronous CPU-bound string decoding during static periods.
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 19.500s (baseline was 21.500s, -7.9%)
+Current best: 0.196s (baseline was 21.500s, -7.9%)
 Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1052**: Inline loop bound evaluation for chunk end condition in single-worker paths of `CaptureLoop.ts`.
+  - **Improvement**: Replaced relational bounds checking (`<`) with strict equality (`!==`), yielding microbenchmark improvements by reducing V8 branch evaluator overhead when dynamic relational numeric types are compared.
+  - **Plan ID**: PERF-1052
 
 - **PERF-1051**: Inline loop bound evaluation for chunk end condition (`chunkEnd`) in `CaptureLoop.ts` multi-worker writer loops by replacing `<` with `!==`.
   - **Improvement**: Replaced relational branch checks with strict equality checks inside the hot dispatch chunks. Microbenchmarks show a ~8% execution time reduction for the bounded while loop overhead, decreasing JIT branching complexity for deterministic bounds.

@@ -230,7 +230,7 @@ export class CaptureLoop {
           while (i < totalFrames - 1 && !aborted) {
             const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
 
-            for (; i < chunkEnd; i++) {
+            for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
 
               timeDriver.setTime(
@@ -341,7 +341,7 @@ export class CaptureLoop {
           while (i < totalFrames - 1 && !aborted) {
             const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
 
-            for (; i < chunkEnd; i++) {
+            for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
 
               const timePromise = timeDriver.setTime(
