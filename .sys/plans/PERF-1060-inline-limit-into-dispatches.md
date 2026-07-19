@@ -1,7 +1,7 @@
 ---
 id: PERF-1060
 slug: inline-limit-into-dispatches
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-20
 completed: ""
