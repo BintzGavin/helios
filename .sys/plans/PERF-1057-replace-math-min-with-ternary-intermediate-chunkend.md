@@ -1,7 +1,8 @@
 ---
 id: PERF-1057
 slug: replace-math-min-with-ternary-intermediate-chunkend
-status: unclaimed
+status: complete
+result: discarded
 claimed_by: ""
 created: 2024-07-19
 completed: ""
