@@ -1,11 +1,11 @@
 ---
 id: PERF-1056
 slug: replace-math-min-with-ternary-dispatch-bounds
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-07-19
 completed: ""
-result: ""
+result: keep
 ---
 
 # PERF-1056: Replace `Math.min` with ternary operator for loop boundary `dispatches` calculation in `CaptureLoop.ts` multi-worker chunk loops

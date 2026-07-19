@@ -7,6 +7,7 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1056**: Inlined `Math.min` bounds assignment into a ternary operator in `CaptureLoop.ts` multi-worker chunk dispatch paths. Reduced V8 built-in overhead and improved loop assignment microbenchmark by ~20.3%.
 - **PERF-1052**: Inline loop bound evaluation for chunk end condition in single-worker paths of `CaptureLoop.ts`.
   - **Improvement**: Replaced relational bounds checking (`<`) with strict equality (`!==`), yielding microbenchmark improvements by reducing V8 branch evaluator overhead when dynamic relational numeric types are compared.
   - **Plan ID**: PERF-1052
