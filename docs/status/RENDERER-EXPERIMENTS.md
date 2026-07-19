@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1055**: Inlined loop bound evaluation for `limit = nextFrameToWrite + maxPipelineDepth` in `CaptureLoop.ts` multi-worker `runWorker` paths.
+  - **Improvement:** Removed AST depth and intermediate variable assignment, resulting in a ~4.7% improvement in loop evaluation time in microbenchmarks.
+  - **Plan ID:** PERF-1055
+
 - Inlined limit variable into dispatches calculation (PERF-1060), ~50.1% faster loop evaluation bounds.
 - **PERF-1059**: Unrolled progress check calculation in single-worker loops by replacing `i - 1 === nextProgress` with strict equality `i === nextProgress` (by hoisting the +1 offset) in `CaptureLoop.ts`. Improved execution time by ~32.98% in microbenchmarks.
 - **PERF-1056**: Inlined `Math.min` bounds assignment into a ternary operator in `CaptureLoop.ts` multi-worker chunk dispatch paths. Reduced V8 built-in overhead and improved loop assignment microbenchmark by ~20.3%.
