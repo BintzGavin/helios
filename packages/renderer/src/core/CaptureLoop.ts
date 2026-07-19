@@ -461,9 +461,10 @@ export class CaptureLoop {
 
         // See if we can assign tasks to waiting workers
 
-                  let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - nextFrameToSubmit;
+                  const limit = nextFrameToWrite + maxPipelineDepth;
+                  let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                   if (dispatches > 0) {
-                    dispatches = Math.min(dispatches, freeWorkersHead);
+                    dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                     for (let d = 0; d < dispatches; d++) {
                       freeWorkersHead--;
                       const w = freeWorkers[freeWorkersHead];
@@ -584,9 +585,10 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
 
-                let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - nextFrameToSubmit;
+                const limit = nextFrameToWrite + maxPipelineDepth;
+                let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                 if (dispatches > 0) {
-                  dispatches = Math.min(dispatches, freeWorkersHead);
+                  dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
                   for (let d = 0; d < dispatches; d++) {
@@ -648,9 +650,10 @@ export class CaptureLoop {
 
               if (freeWorkersHead > 0) {
 
-                let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - nextFrameToSubmit;
+                const limit = nextFrameToWrite + maxPipelineDepth;
+                let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                 if (dispatches > 0) {
-                  dispatches = Math.min(dispatches, freeWorkersHead);
+                  dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
                   for (let d = 0; d < dispatches; d++) {
