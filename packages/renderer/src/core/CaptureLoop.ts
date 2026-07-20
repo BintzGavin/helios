@@ -467,14 +467,17 @@ export class CaptureLoop {
                   let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
+                    let h = freeWorkersHead;
+                    let n = nextFrameToSubmit;
                     for (let d = 0; d < dispatches; d++) {
-                      freeWorkersHead--;
-                      const w = freeWorkers[freeWorkersHead];
-                      const i = nextFrameToSubmit;
-                      nextFrameToSubmit++;
-                      frameBufferRing[i & ringMask] = null;
-                      workerThenables[w].resolve(i);
+                      h--;
+                      const w = freeWorkers[h];
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                      n++;
                     }
+                    freeWorkersHead = h;
+                    nextFrameToSubmit = n;
                   }
 
         // If we still have waiting workers but are at totalFrames, tell them to stop

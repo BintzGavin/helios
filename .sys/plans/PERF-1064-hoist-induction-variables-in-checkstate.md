@@ -1,11 +1,11 @@
 ---
 id: PERF-1064
 slug: hoist-induction-variables-in-checkstate
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-07-20
-completed: ""
-result: ""
+completed: "2026-07-20"
+result: "~626ms for 10M chunk runs"
 ---
 
 # PERF-1064: Hoist induction variables in checkState dispatch loop
