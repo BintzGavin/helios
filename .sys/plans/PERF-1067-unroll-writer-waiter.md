@@ -1,11 +1,11 @@
 ---
 id: PERF-1067
 slug: unroll-writer-waiter-loop
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-07-20
-completed: ""
-result: ""
+completed: "2026-07-20"
+result: "improved"
 ---
 
 # PERF-1067: Unroll writer waiter loop by checking condition before awaiting
