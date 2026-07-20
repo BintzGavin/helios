@@ -1,3 +1,7 @@
+## LLMS v1.122.5
+- ✅ Completed: Daily llms.txt Review
+  - Verified packages/studio/src/index.ts was already correctly absent from Key Files for Agents.
+
 ### LLMS v1.122.3
 - ✅ Completed: Daily llms.txt Review
   - Verified all package versions perfectly match package.json.
