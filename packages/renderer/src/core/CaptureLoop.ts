@@ -451,10 +451,13 @@ export class CaptureLoop {
         }
 
         if (aborted) {
-          while (freeWorkersHead > 0) {
-            const w = freeWorkers[--freeWorkersHead];
+          let head = freeWorkersHead;
+          while (head !== 0) {
+            head--;
+            const w = freeWorkers[head];
             workerThenables[w].resolve(-1);
           }
+          freeWorkersHead = 0;
           writerWaiterPromise.resolve();
           return;
         }
@@ -476,8 +479,10 @@ export class CaptureLoop {
 
         // If we still have waiting workers but are at totalFrames, tell them to stop
         if (nextFrameToSubmit === totalFrames) {
-          for (let j = 0; j < freeWorkersHead; j++) {
-            const w = freeWorkers[j];
+          let head = freeWorkersHead;
+          while (head !== 0) {
+            head--;
+            const w = freeWorkers[head];
             workerThenables[w].resolve(-1);
           }
           freeWorkersHead = 0;
@@ -598,8 +603,10 @@ export class CaptureLoop {
                   nextFrameToSubmit = n;
                 }
                 if (nextFrameToSubmit === totalFrames) {
-                  for (let j = 0; j < freeWorkersHead; j++) {
-                    const w = freeWorkers[j];
+                  let head = freeWorkersHead;
+                  while (head !== 0) {
+                    head--;
+                    const w = freeWorkers[head];
                     workerThenables[w].resolve(-1);
                   }
                   freeWorkersHead = 0;
@@ -663,8 +670,10 @@ export class CaptureLoop {
                   nextFrameToSubmit = n;
                 }
                 if (nextFrameToSubmit === totalFrames) {
-                  for (let j = 0; j < freeWorkersHead; j++) {
-                    const w = freeWorkers[j];
+                  let head = freeWorkersHead;
+                  while (head !== 0) {
+                    head--;
+                    const w = freeWorkers[head];
                     workerThenables[w].resolve(-1);
                   }
                   freeWorkersHead = 0;
