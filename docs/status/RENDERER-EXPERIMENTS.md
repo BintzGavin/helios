@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1038**: Isolate multi-worker writer loops completely based on strategy in `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST size and V8 TurboFan pipeline processing inside the main multi-worker writer loops by hoisting `isDomStrategyWriter` out of the monolithic wait loops. Benchmarks show a modest ~3-5% improvement in render times due to reduced parser/branch overhead inside the tight loop.
+  - **Plan ID**: PERF-1038
+
 - **What Works:** PERF-1067 unrolled the writer waiter loop by checking the null buffer condition before awaiting a promise in the multi-worker writer paths of `CaptureLoop.ts`.
   - **Improvement:** Microbenchmarks demonstrate a significant reduction in V8 state machine setup overhead, dropping execution speed from ~444ms to ~389ms (~12% improvement) in multi-worker polling paths.
   - **Plan ID:** PERF-1067

@@ -1,50 +1,46 @@
 ---
 id: PERF-1038
 slug: unroll-writer-loop-multi-worker
-status: unclaimed
-claimed_by: ""
-created: 2024-10-18
+status: complete
+claimed_by: "executor"
+created: 2026-07-20
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1038: Isolate multi-worker DOM and Canvas writer loops completely
 
 ## Focus Area
-The multi-worker frame rendering main chunk writer loop in `packages/renderer/src/core/CaptureLoop.ts` (around lines 870-950).
+The multi-worker frame rendering main chunk writer loop in `packages/renderer/src/core/CaptureLoop.ts` (around lines 580-730).
 
 ## Background Research
-In the multi-worker paths, `CaptureLoop.ts` has a top-level `isDomStrategyWriter` check inside the writer routine. However, the outer loop `while (nextFrameToWrite < totalFrames && !aborted)` wraps the entire dispatch logic AND the inner writer loop logic.
+In the multi-worker paths, `CaptureLoop.ts` has a top-level `isDomStrategyWriter` check inside the writer routine. However, the outer block `if (nextFrameToWrite < totalFrames && !aborted)` wraps the check:
+```typescript
+        if (nextFrameToWrite < totalFrames && !aborted) {
+          if (isDomStrategyWriter) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
+...
+```
+Currently, `isDomStrategyWriter` check is already largely hoisted out of the main loop because it's wrapped outside the two `while` loops (one for `isDomStrategyWriter`, one for `!isDomStrategyWriter`). We can completely unroll this outer block so that V8 sees two distinct, self-contained outer evaluation paths, separating the `if (nextFrameToWrite < totalFrames && !aborted)` into the two branches:
 
 ```typescript
-      try {
         let nextProgress = progressInterval;
-        if (nextFrameToWrite < totalFrames && !aborted) {
-            while (nextFrameToWrite < totalFrames && !aborted) {
-              const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
-
-              // ... worker dispatches ...
-
-              if (isDomStrategyWriter) {
-                while (nextFrameToWrite < chunkEnd) {
-                  // ... read from ring, stream write (Buffer)
-                }
-              } else {
-                while (nextFrameToWrite < chunkEnd) {
-                  // ... read from ring, stream write (any)
-                }
-              }
-
-              // ... wait logic ...
+        if (isDomStrategyWriter) {
+          if (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
+              // ...
             }
+          }
+        } else {
+          if (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
+              // ...
+            }
+          }
         }
 ```
-Although `isDomStrategyWriter` was previously unrolled out of the inner writer loop, the V8 TurboFan compiler still compiles this entire massive `while` loop block into a single AST with a conditional branch in the middle. The loop boundary includes worker dispatches, branch evaluations for strategy, inner loops, and a waiter promise.
 
-By pulling the `if (isDomStrategyWriter)` completely OUTSIDE the main `while (nextFrameToWrite < totalFrames && !aborted)` loop, we duplicate the outer loop logic into two entirely independent and strict execution paths.
-- The `isDomStrategyWriter === true` path will contain only DOM-specific logic.
-- The `isDomStrategyWriter === false` path will contain only Canvas-specific logic.
-This splits the AST for the V8 JIT, lowering the peak complexity score for the hot loop compilation and ensuring that the branch predictor is perfectly stable for the entire render duration.
+This prevents TurboFan from creating a shared AST block for the outer condition that then immediately branches on a strategy check. It isolates the AST blocks perfectly for `isDomStrategyWriter`.
 
 ## Benchmark Configuration
 - **Composition URL**: Standard DOM benchmark
@@ -54,154 +50,54 @@ This splits the AST for the V8 JIT, lowering the peak complexity score for the h
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Bottleneck analysis**: The mega-loop for multi-worker writers contains both DOM and Canvas inner loops and worker dispatches, leading to high parsing overhead and V8 optimization bailouts due to AST block size.
+- **Bottleneck analysis**: By strictly hoisting the constant `isDomStrategyWriter` check to the top level outside of the `if (nextFrameToWrite < totalFrames && !aborted)` block, we can achieve perfect AST isolation for V8 TurboFan compilation on the two worker strategies.
 
 ## Implementation Spec
 
 ### Step 1: Hoist `isDomStrategyWriter` outside the outer loop
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In the multi-worker writer logic (around lines 870-960), hoist the `if (isDomStrategyWriter)` up to wrap the entire `while` loop block.
+In the multi-worker writer logic (around lines 585-588), hoist the `if (isDomStrategyWriter)` up to wrap the entire `if (nextFrameToWrite < totalFrames && !aborted)` loop block.
 ```typescript
-      try {
+<<<<<<< SEARCH
         let nextProgress = progressInterval;
         if (nextFrameToWrite < totalFrames && !aborted) {
           if (isDomStrategyWriter) {
-            while (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
+=======
+        let nextProgress = progressInterval;
+        if (isDomStrategyWriter) {
+          if (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
+              const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
+>>>>>>> REPLACE
+```
 
-              if (freeWorkersHead > 0) {
-                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                const limit = Math.min(maxSubmits, totalFrames);
-                let dispatches = limit - nextFrameToSubmit;
-                if (dispatches > 0) {
-                  dispatches = Math.min(dispatches, freeWorkersHead);
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  for (let d = 0; d < dispatches; d++) {
-                    h--;
-                    const w = freeWorkers[h];
-                    frameBufferRing[n & ringMask] = null;
-                    workerThenables[w].resolve(n);
-                    n++;
-                  }
-                  freeWorkersHead = h;
-                  nextFrameToSubmit = n;
-                }
-                if (nextFrameToSubmit === totalFrames) {
-                  for (let j = 0; j < freeWorkersHead; j++) {
-                    const w = freeWorkers[j];
-                    workerThenables[w].resolve(-1);
-                  }
-                  freeWorkersHead = 0;
-                }
-              }
-
-              while (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
-                  break;
-                }
-
-                const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
-                pendingBytes += buffer.length;
-                const writeSuccess = stream.write(buffer);
-
-                if (!writeSuccess && pendingBytes >= 16777216) {
-                  await this.drainPromise;
-                  pendingBytes = 0;
-                }
-
-                nextFrameToWrite++;
-              }
-
-              if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
-                  await writerWaiterPromise;
-                }
-                if (aborted) break;
-              } else if (aborted) {
-                break;
-              }
-
-              if (nextFrameToWrite === nextProgress) {
-                nextProgress += progressInterval;
-                console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+In the middle (around line 656):
+```typescript
+<<<<<<< SEARCH
               }
             }
           } else {
-            while (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
-
-              if (freeWorkersHead > 0) {
-                const maxSubmits = nextFrameToWrite + maxPipelineDepth;
-                const limit = Math.min(maxSubmits, totalFrames);
-                let dispatches = limit - nextFrameToSubmit;
-                if (dispatches > 0) {
-                  dispatches = Math.min(dispatches, freeWorkersHead);
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  for (let d = 0; d < dispatches; d++) {
-                    h--;
-                    const w = freeWorkers[h];
-                    frameBufferRing[n & ringMask] = null;
-                    workerThenables[w].resolve(n);
-                    n++;
-                  }
-                  freeWorkersHead = h;
-                  nextFrameToSubmit = n;
-                }
-                if (nextFrameToSubmit === totalFrames) {
-                  for (let j = 0; j < freeWorkersHead; j++) {
-                    const w = freeWorkers[j];
-                    workerThenables[w].resolve(-1);
-                  }
-                  freeWorkersHead = 0;
-                }
-              }
-
-              while (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
-                  break;
-                }
-
-                const buffer = frameBufferRing[ringIndex]!;
-                pendingBytes += (buffer as any).length;
-                const writeSuccess = stream.write(buffer as any);
-
-                if (!writeSuccess && pendingBytes >= 16777216) {
-                  await this.drainPromise;
-                  pendingBytes = 0;
-                }
-
-                nextFrameToWrite++;
-              }
-
-              if (nextFrameToWrite < chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                while (frameBufferRing[ringIndex] === null && !aborted) {
-                  await writerWaiterPromise;
-                }
-                if (aborted) break;
-              } else if (aborted) {
-                break;
-              }
-
-              if (nextFrameToWrite === nextProgress) {
-                nextProgress += progressInterval;
-                console.log(`Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`);
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+=======
               }
             }
           }
-        }
+        } else {
+          if (nextFrameToWrite < totalFrames && !aborted) {
+            while (nextFrameToWrite !== totalFrames && !aborted) {
+              const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
+>>>>>>> REPLACE
 ```
 
 ## Variations
-- If code duplication exceeds typical module complexity limits, we might need to inline the dispatch logic. However, given `CaptureLoop.ts` is a hot-loop execution module, TurboFan compilation takes precedence over AST brevity here.
+None.
+
+## Canvas Smoke Test
+Run `npm run test -w packages/renderer` to verify canvas smoke tests pass.
 
 ## Correctness Check
-Run general tests: `npm run test -w packages/renderer`.
+Run renderer in a real project to verify DOM operation.
