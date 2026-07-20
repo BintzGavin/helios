@@ -1,7 +1,8 @@
 ---
 id: PERF-1062
 slug: strict-runworker-bounds
-status: unclaimed
+status: complete
+result: keep
 claimed_by: ""
 created: 2026-07-20
 completed: ""
@@ -66,3 +67,11 @@ Run `npm run test -w packages/renderer` to verify Canvas path still works.
 
 ## Correctness Check
 Run renderer in a real project to verify DOM strategy works properly.
+
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.117	100000000	852864040.69	0.0	keep	strict runworker bounds
+```
