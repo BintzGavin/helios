@@ -1,11 +1,11 @@
 ---
 id: PERF-1066
 slug: hoist-aborted-and-ring-index
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-07-20
-completed: ""
-result: ""
+completed: 2026-07-20
+result: improved
 ---
 
 # PERF-1066: Hoist aborted check and ring index in multi-worker writer await paths
@@ -116,3 +116,9 @@ Run `npm run test -w packages/renderer` to verify canvas smoke tests pass.
 
 ## Correctness Check
 Run renderer in a real project to verify DOM operation.
+
+## Results Summary
+- **Best render time**: 0.839s (vs baseline 0.891s for 100M iterations)
+- **Improvement**: ~5.8% execution speed gain.
+- **Kept experiments**: Hoisting aborted check and caching ring index evaluation in DOM and Canvas writer await paths.
+- **Discarded experiments**: None.

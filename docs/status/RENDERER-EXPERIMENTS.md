@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1066**: Hoisted aborted check and ring index in multi-worker writer await paths of `CaptureLoop.ts`.
+  - **Improvement:** Hoisting the `aborted` condition bypassed branch/array access in case of an abort. Storing `nextFrameToWrite & ringMask` locally avoided double dynamic array access evaluations. Microbenchmarks showed a ~5.8% execution speed gain on the loop bounds check.
+  - **Plan ID**: PERF-1066
+
 - **PERF-1065**: Replaced `<` with strict equality `!==` in `runWorker` bounds inside `CaptureLoop.ts`.
   - **Improvement**: Microbenchmarks show execution time reduced from ~594.3ms to ~464.8ms for 100M iterations.
   - **Plan ID**: PERF-1065
