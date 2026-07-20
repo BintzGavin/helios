@@ -1,7 +1,7 @@
 ---
 id: PERF-1065
 slug: strict-runworker-bounds-depth
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2026-07-20
 completed: ""
@@ -66,3 +66,10 @@ Run `npm run test -w packages/renderer` to verify canvas smoke tests pass.
 
 ## Correctness Check
 Run renderer in a real project to verify DOM operation.
+
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.465	100000000	215168373.22	0.0	keep	Strict equality runworker bounds (kept)
+```

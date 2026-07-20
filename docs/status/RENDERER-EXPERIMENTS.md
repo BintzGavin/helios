@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1065**: Replaced `<` with strict equality `!==` in `runWorker` bounds inside `CaptureLoop.ts`.
+  - **Improvement**: Microbenchmarks show execution time reduced from ~594.3ms to ~464.8ms for 100M iterations.
+  - **Plan ID**: PERF-1065
+
 
 - **PERF-1064**: Hoisted induction variables (`freeWorkersHead` and `nextFrameToSubmit`) inside the `checkState` dispatch loop in `CaptureLoop.ts`.
   - **Improvement:** Microbenchmarks show execution overhead dropped to ~626ms for 10M chunk dispatch operations, due to allowing V8 to keep mutations in registers during tight loop execution.
