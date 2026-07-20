@@ -160,3 +160,5 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 
 - [ ] [v0.79.15] PLAYER Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+
+- [ ] [v0.79.16] PLAYER Blocked: Waiting for a new, valid plan in /.sys/plans/
