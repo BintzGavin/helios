@@ -607,11 +607,12 @@ export class CaptureLoop {
               }
 
               while (nextFrameToWrite !== chunkEnd) {
-                if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameBufferRing[ringIndex] === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[nextFrameToWrite & ringMask] as unknown as Buffer;
+                const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
                 pendingBytes += buffer.length;
                 const writeSuccess = stream.write(buffer);
 
@@ -671,11 +672,12 @@ export class CaptureLoop {
               }
 
               while (nextFrameToWrite !== chunkEnd) {
-                if (frameBufferRing[nextFrameToWrite & ringMask] === null) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameBufferRing[ringIndex] === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[nextFrameToWrite & ringMask]!;
+                const buffer = frameBufferRing[ringIndex]!;
                 pendingBytes += (buffer as any).length;
                 const writeSuccess = stream.write(buffer as any);
 
