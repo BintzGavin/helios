@@ -1,4 +1,4 @@
-**Version**: 0.123.0
+**Version**: 0.123.1
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -85,3 +85,5 @@ key or sidebar button, improving usability.
 - [v0.123.0] ✅ Completed: STUDIO-Add-Hot-Reload-Indicator - Implemented a visual Hot Reload Indicator toast for when composition reloads.
 
 - [v0.122.14] ✅ Completed: STUDIO-Improve-MCP-Coverage - Added test cases for missing branches in mcp.ts to reach 100% coverage.
+
+- [v0.123.1] ✅ Completed: STUDIO-Improve-AssetsPanel-Coverage - Achieved 100% test coverage for AssetsPanel by adding missing drag-and-drop edge cases.
