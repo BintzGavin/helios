@@ -507,7 +507,7 @@ export class CaptureLoop {
           const domBeginFrame = () => domCdpSession!.send("HeadlessExperimental.beginFrame", domBeginFrameParams);
           let domLastFrameBuffer: Buffer | null = null;
 
-          while (!aborted && nextFrameToSubmit < totalFrames) {
+          while (nextFrameToSubmit !== totalFrames && !aborted) {
             let i: number;
             if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
               i = nextFrameToSubmit++;
@@ -539,7 +539,7 @@ export class CaptureLoop {
             writerWaiterPromise.resolve();
           }
         } else {
-          while (!aborted && nextFrameToSubmit < totalFrames) {
+          while (nextFrameToSubmit !== totalFrames && !aborted) {
             let i: number;
             if (nextFrameToSubmit < nextFrameToWrite + maxPipelineDepth) {
               i = nextFrameToSubmit++;
