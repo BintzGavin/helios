@@ -1,4 +1,4 @@
-**Version**: 0.79.15
+**Version**: 0.79.16
 
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
@@ -311,3 +311,4 @@
 [v0.79.15] ✅ Completed: Implement Promise for play() - Modified play() to return a Promise that resolves when playback begins or rejects if it fails, matching HTMLMediaElement parity.
 
 [v0.79.15] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
+[v0.79.16] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
