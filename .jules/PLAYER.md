@@ -18,3 +18,7 @@
 ## [0.79.11] - Implement remote property
 **Learning:** Implementing missing API parity properties like `remote` improves standard compliance even if they are stubbed.
 **Action:** Always check the HTMLMediaElement specification for missing properties.
+
+## [v0.79.16] - Implement encrypted Event
+**Learning:** Found that standard events like `encrypted` should be included for HTMLMediaElement parity even if the underlying feature (EME/DRM) is not explicitly supported by the core, in order to complete the standard API surface and pass standard compliance checkers.
+**Action:** Include all standard HTMLMediaElement event handlers and document them for API parity.
