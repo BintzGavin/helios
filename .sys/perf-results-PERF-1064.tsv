@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.626	100000000	159637551.50	50.0	keep	PERF-1064 Hoist induction variables in checkState dispatch loop

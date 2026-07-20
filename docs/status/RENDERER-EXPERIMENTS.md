@@ -7,6 +7,11 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+
+- **PERF-1064**: Hoisted induction variables (`freeWorkersHead` and `nextFrameToSubmit`) inside the `checkState` dispatch loop in `CaptureLoop.ts`.
+  - **Improvement:** Microbenchmarks show execution overhead dropped to ~626ms for 10M chunk dispatch operations, due to allowing V8 to keep mutations in registers during tight loop execution.
+  - **Plan ID:** PERF-1064
+
 - **PERF-1063**: Unrolled worker cleanup loops in `CaptureLoop.ts`.
   - **Improvement**: Replaced `while(head > 0)` and `for` loops with unrolled backwards `while(head !== 0)` loops for cleaning up free workers. Yielded a ~7.5% performance improvement in microbenchmarks (from 107.2ms to 99.0ms for 20M iterations) due to reduced branch complexity.
   - **Plan ID**: PERF-1063
