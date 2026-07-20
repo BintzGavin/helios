@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.750	100000000	133333333.33	0.0	keep	baseline
+2	0.710	100000000	140845070.42	0.0	keep	unroll outer multi-worker writer loop
+3	0.708	100000000	141242937.85	0.0	keep	unroll outer multi-worker writer loop
+4	0.712	100000000	140449438.20	0.0	keep	unroll outer multi-worker writer loop

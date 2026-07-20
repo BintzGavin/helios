@@ -583,8 +583,8 @@ export class CaptureLoop {
 
       try {
         let nextProgress = progressInterval;
-        if (nextFrameToWrite < totalFrames && !aborted) {
-          if (isDomStrategyWriter) {
+        if (isDomStrategyWriter) {
+          if (nextFrameToWrite < totalFrames && !aborted) {
             while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
 
@@ -653,7 +653,9 @@ export class CaptureLoop {
                 if (onProgress) onProgress(nextFrameToWrite / totalFrames);
               }
             }
-          } else {
+          }
+        } else {
+          if (nextFrameToWrite < totalFrames && !aborted) {
             while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = Math.min(nextFrameToWrite + progressInterval, totalFrames);
 
