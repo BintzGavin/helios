@@ -1,8 +1,8 @@
 ---
 id: PERF-1061
 slug: hoist-ring-index-multi-worker-writer
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-07-20
 completed: ""
 result: ""
@@ -93,3 +93,8 @@ Run `npm run test -w packages/renderer` to verify Canvas path still works.
 
 ## Correctness Check
 Verify DOM outputs using a standard render test.
+
+
+## Results Summary
+
+1	0.045	10000000	0.00	0.0	keep	PERF-1061 hoist ring index
