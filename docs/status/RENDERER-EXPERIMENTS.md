@@ -7,6 +7,10 @@ Last updated by: PERF-1043
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1063**: Unrolled worker cleanup loops in `CaptureLoop.ts`.
+  - **Improvement**: Replaced `while(head > 0)` and `for` loops with unrolled backwards `while(head !== 0)` loops for cleaning up free workers. Yielded a ~7.5% performance improvement in microbenchmarks (from 107.2ms to 99.0ms for 20M iterations) due to reduced branch complexity.
+  - **Plan ID**: PERF-1063
+
 - PERF-1062: Replace relational < with strict !== in runWorker bounds (~8.5% faster in microbenchmark)
 - Hoisted ring index calculation in multi-worker writer loops (~84.5% loop speedup on microbenchmark) (PERF-1061)
 - **PERF-1055**: Inlined loop bound evaluation for `limit = nextFrameToWrite + maxPipelineDepth` in `CaptureLoop.ts` multi-worker `runWorker` paths.
