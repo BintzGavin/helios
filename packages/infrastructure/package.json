@@ -5,6 +5,9 @@
   "description": "Distributed rendering orchestration and cloud execution adapters.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BintzGavin/helios.git"
@@ -22,7 +25,8 @@
     "dev": "tsc -w",
     "test": "vitest",
     "bench": "vitest bench",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.1.0",

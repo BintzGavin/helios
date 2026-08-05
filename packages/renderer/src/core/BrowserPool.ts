@@ -108,45 +108,53 @@ export class BrowserPool {
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
       const browser = await chromium.launch(this.getLaunchOptions());
-      const context = await browser.newContext({
-        viewport: {
-          width: this.options.width,
-          height: this.options.height,
-        },
-      });
+      try {
+        const context = await browser.newContext({
+          viewport: {
+            width: this.options.width,
+            height: this.options.height,
+          },
+        });
 
-      if (index === 0 && jobOptions?.tracePath) {
-        console.log(`Enabling Playwright tracing for worker 0 context...`);
-        await context.tracing.start({ screenshots: true, snapshots: true });
+        if (index === 0 && jobOptions?.tracePath) {
+          console.log(`Enabling Playwright tracing for worker 0 context...`);
+          await context.tracing.start({ screenshots: true, snapshots: true });
+        }
+
+        const page = await context.newPage();
+        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        // Both capture strategies advance through CDP virtual time. DOM capture
+        // uses Page.captureScreenshot rather than the platform-limited
+        // HeadlessExperimental.beginFrame API.
+        const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
+
+        page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
+        page.on('pageerror', (err: Error) => {
+          console.error(`PAGE ERROR [${index}]: ${err.message}`);
+          this.capturedErrors.push(err);
+        });
+        page.on('crash', () => {
+          const err = new Error(`Page ${index} crashed!`);
+          console.error(err.message);
+          this.capturedErrors.push(err);
+        });
+
+        if (this.options.inputProps) {
+          const serializedProps = JSON.stringify(this.options.inputProps);
+          await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+        }
+
+        await timeDriver.init(page, this.options.randomSeed);
+        await page.goto(compositionUrl, { waitUntil: 'commit' });
+
+        await strategy.prepare(page);
+        await timeDriver.prepare(page);
+
+        return { browser, context, page, strategy, timeDriver };
+      } catch (error) {
+        await browser.close().catch(() => {});
+        throw error;
       }
-
-      const page = await context.newPage();
-      const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout, this.options.mode);
-
-      page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
-      page.on('pageerror', (err: Error) => {
-        console.error(`PAGE ERROR [${index}]: ${err.message}`);
-        this.capturedErrors.push(err);
-      });
-      page.on('crash', () => {
-        const err = new Error(`Page ${index} crashed!`);
-        console.error(err.message);
-        this.capturedErrors.push(err);
-      });
-
-      if (this.options.inputProps) {
-        const serializedProps = JSON.stringify(this.options.inputProps);
-        await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
-      }
-
-      await timeDriver.init(page, this.options.randomSeed);
-      await page.goto(compositionUrl, { waitUntil: 'commit' });
-
-      await strategy.prepare(page);
-      await timeDriver.prepare(page);
-
-      return { browser, context, page, strategy, timeDriver };
     };
 
     const poolPromises = [];

@@ -136,7 +136,9 @@ export class CanvasStrategy implements RenderStrategy {
     // We use a string-based script to avoid transpiler artifacts (like esbuild's __name)
     const selector = this.options.canvasSelector || 'canvas';
 
-    const handle = await page.waitForSelector(selector, { state: 'attached', timeout: 5000 });
+    const handle = await page
+      .waitForSelector(selector, { state: 'attached', timeout: 5000 })
+      .catch(() => null);
     if (!handle) {
       throw new Error(`Canvas not found matching selector: ${selector}`);
     }
@@ -464,7 +466,7 @@ export class CanvasStrategy implements RenderStrategy {
     }
   }
 
-  private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer | string> {
+  private async captureWebCodecs(page: Page, frameTime: number): Promise<Buffer> {
     const selector = this.options.canvasSelector || 'canvas';
 
     // Calculate if this frame should be a keyframe
@@ -520,7 +522,7 @@ export class CanvasStrategy implements RenderStrategy {
     }, { time: frameTime, selector, isKeyFrame });
 
     if (chunkData && chunkData.length > 0) {
-        return chunkData;
+        return Buffer.from(chunkData, 'base64');
     }
     return Buffer.alloc(0);
   }
@@ -552,7 +554,7 @@ export class CanvasStrategy implements RenderStrategy {
     return Buffer.from(dataUrl.split(',')[1], 'base64');
   }
 
-  async finish(page: Page): Promise<Buffer | string | void> {
+  async finish(page: Page): Promise<Buffer | void> {
     if (this.useWebCodecs) {
       const chunkData = await page.evaluate<string>(async function() {
         const context = (window as any).heliosWebCodecs;
@@ -581,7 +583,7 @@ export class CanvasStrategy implements RenderStrategy {
       });
 
       if (chunkData && chunkData.length > 0) {
-        return chunkData;
+        return Buffer.from(chunkData, 'base64');
       }
     }
     return Promise.resolve();

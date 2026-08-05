@@ -51,7 +51,7 @@ describe('CLI Entry Point (index.ts)', () => {
     expect(Command).toHaveBeenCalled();
     expect(mockName).toHaveBeenCalledWith('helios');
     expect(mockDescription).toHaveBeenCalledWith('Helios CLI');
-    expect(mockVersion).toHaveBeenCalled();
+    expect(mockVersion).toHaveBeenCalledWith('0.45.2');
 
     // Verify that all commands were registered with the program instance
     const { registerStudioCommand } = await import('../commands/studio.js');

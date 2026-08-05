@@ -9,32 +9,40 @@ export { Helios } from './Helios.js';
 export type { HeliosState, HeliosSubscriber, HeliosOptions, DiagnosticReport, StabilityCheck } from './Helios.js';
 
 // Types
-export type { HeliosConfig, AudioTrackState, HeliosTimeline, HeliosClip, HeliosTrack } from './types.js';
+export type {
+  HeliosConfig,
+  AudioTrackState,
+  HeliosTimeline,
+  HeliosClip,
+  HeliosTrack,
+  HeliosComposition,
+} from './types.js';
 
 // Drivers
-export { TimeDriver, DomDriver, NoopDriver, RafTicker, TimeoutTicker } from './drivers/index.js';
-export type { Ticker, AudioTrackMetadata } from './drivers/index.js';
+export { TimeDriver, DomDriver, NoopDriver, RafTicker, TimeoutTicker, ManualTicker } from './drivers/index.js';
+export type { Ticker, TickCallback, AudioTrackMetadata, DriverMetadata } from './drivers/index.js';
 
 // Animation Utilities
-export { interpolate, spring, calculateSpringDuration } from './animation.js';
+export { interpolate, spring, calculateSpringDuration, DEFAULT_SPRING_CONFIG } from './animation.js';
 export type { SpringConfig, InterpolateOptions, SpringOptions, ExtrapolateType } from './animation.js';
 
 // Easing Functions
 export { Easing } from './easing.js';
+export type { EasingFunction } from './easing.js';
 
 // Sequencing
 export { sequence, series, stagger, shift } from './sequencing.js';
 export type { SequenceOptions, SequenceResult, SeriesItem } from './sequencing.js';
 
 // Signals (public reactive primitives)
-export { signal, computed, effect } from './signals.js';
-export type { Signal, ReadonlySignal } from './signals.js';
+export { signal, computed, effect, untracked } from './signals.js';
+export type { Signal, ReadonlySignal, Subscription } from './signals.js';
 
 // Errors
 export { HeliosError, HeliosErrorCode } from './errors.js';
 
 // Captions
-export { parseSrt, parseCaptions, findActiveCues } from './captions.js';
+export { parseSrt, parseWebVTT, parseCaptions, stringifySrt, findActiveCues, areCuesEqual } from './captions.js';
 export type { CaptionCue } from './captions.js';
 
 // Schema & Validation
@@ -45,7 +53,7 @@ export type { HeliosSchema, PropDefinition, PropType } from './schema.js';
 export { random } from './random.js';
 export { parseColor, interpolateColors } from './color.js';
 export type { RgbaColor } from './color.js';
-export { framesToTimecode, timecodeToFrames } from './timecode.js';
+export { framesToTimecode, timecodeToFrames, framesToTimestamp } from './timecode.js';
 
 // Markers
 export { validateMarker, validateMarkers } from './markers.js';
@@ -60,6 +68,7 @@ export { createSystemPrompt, HELIOS_BASE_PROMPT } from './ai.js';
 
 // Render Session (for renderer integration)
 export { RenderSession } from './render-session.js';
+export type { RenderSessionOptions } from './render-session.js';
 
 // Version
-export const VERSION = '5.13.0';
+export const VERSION = '5.13.2';
