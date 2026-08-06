@@ -84,7 +84,6 @@ export class DomStrategy implements RenderStrategy {
       this.cdpSession = await page.context().newCDPSession(page);
       (page as any)._sharedCdpSession = this.cdpSession;
     }
-    await this.cdpSession!.send('HeadlessExperimental.enable');
     await this.cdpSession!.send('Runtime.enable');
 
     // Check if the requested pixel format supports alpha
@@ -176,8 +175,18 @@ export class DomStrategy implements RenderStrategy {
     return this.lastFrameData as string | Buffer;
   }
 
-  capture(page: Page, frameTime: number): Promise<any> {
-    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams);
+  async capture(page: Page, frameTime: number): Promise<any> {
+    const result = await this.cdpSession!.send('Page.captureScreenshot', {
+      ...this.cdpScreenshotParams,
+      fromSurface: true,
+      ...(this.beginFrameParams.screenshot?.clip
+        ? { clip: this.beginFrameParams.screenshot.clip }
+        : {}),
+    });
+    return {
+      hasDamage: true,
+      screenshotData: result.data,
+    };
   }
 
   async finish(page: Page): Promise<void> {

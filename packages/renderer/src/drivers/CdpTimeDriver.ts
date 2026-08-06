@@ -45,7 +45,7 @@ export class CdpTimeDriver implements TimeDriver {
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
   private hasMedia: boolean = true;
-  private syncMediaFn: () => void = () => {};
+  private syncMediaFn: (timeInSeconds: number) => Promise<void> = () => RESOLVED_PROMISE;
   private mode: string;
 
 
@@ -57,6 +57,47 @@ export class CdpTimeDriver implements TimeDriver {
   private handleVirtualTimeBudgetExpired = () => {
     this.timePromise.resolve();
   };
+
+  private async waitUntilStable(): Promise<void> {
+    if (!this.client) return;
+
+    const stabilityPromise = this.client.send('Runtime.evaluate', {
+      expression: "(() => typeof window.__helios_wait_until_stable === 'function' ? window.__helios_wait_until_stable() : undefined)()",
+      awaitPromise: true,
+      returnByValue: false,
+    }).then(() => undefined).catch(() => undefined);
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeoutPromise = new Promise<void>((resolve) => {
+      timeoutId = setTimeout(resolve, this.timeout);
+    });
+
+    await Promise.race([stabilityPromise, timeoutPromise]);
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+
+  private async setCanvasTime(
+    previousTime: number,
+    timeInSeconds: number,
+    syncPromise: Promise<void>,
+  ): Promise<void> {
+    // Media must reach the target before virtual time advances, otherwise an
+    // animation frame can observe the previous media time.
+    await syncPromise;
+
+    const delta = timeInSeconds - previousTime;
+    this.setVirtualTimePolicyParams.budget = delta * 1000;
+    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
+    await (this.timePromise as any as Promise<void>);
+    await this.waitUntilStable();
+  }
+
+  private async setDomTime(
+    syncPromise: Promise<void>,
+  ): Promise<void> {
+    await syncPromise;
+    await this.waitUntilStable();
+  }
 
 
   constructor(timeout: number = 30000, mode: string = 'canvas') {
@@ -94,6 +135,8 @@ export class CdpTimeDriver implements TimeDriver {
 
     this.executionContextIds = [];
     this.multiFrameSyncMediaParams = [];
+    this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    await this.client!.send('Runtime.enable');
 
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
@@ -122,8 +165,10 @@ export class CdpTimeDriver implements TimeDriver {
           cachedMediaElements = null;
         };
 
-        window.__helios_sync_media = () => {
-          const t = performance.now() / 1000;
+        window.__helios_sync_media = (requestedTime) => {
+          const t = typeof requestedTime === 'number'
+            ? requestedTime
+            : performance.now() / 1000;
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
@@ -177,30 +222,33 @@ export class CdpTimeDriver implements TimeDriver {
       }
     }).catch(noopCatch);
 
-    if (this.hasMedia) {
-      this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
-      // Enable Runtime so we actually receive executionContextCreated events
-      // Catch errors in case another driver instance sharing this session already enabled it.
-      // Runtime is enabled in DomStrategy
-    }
-
-
     const len = this.executionContextIds.length;
     if (len === 0) {
-      this.syncMediaFn = () => {
-        this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
+      this.syncMediaFn = (timeInSeconds) => {
+        this.singleFrameSyncMediaParams.expression = `window.__helios_sync_media(${timeInSeconds});`;
+        return this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
       };
     } else if (len === 1) {
       const param = this.multiFrameSyncMediaParams[0];
-      this.syncMediaFn = () => {
-        this.client!.send('Runtime.evaluate', param);
+      this.syncMediaFn = (timeInSeconds) => {
+        param.expression = `window.__helios_sync_media(${timeInSeconds});`;
+        return this.client!.send('Runtime.evaluate', param)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
       };
     } else {
       const params = this.multiFrameSyncMediaParams;
-      this.syncMediaFn = () => {
+      this.syncMediaFn = (timeInSeconds) => {
+        const promises = new Array(params.length);
         for (let i = 0; i < len; i++) {
-          this.client!.send('Runtime.evaluate', params[i]);
+          params[i].expression = `window.__helios_sync_media(${timeInSeconds});`;
+          promises[i] = this.client!.send('Runtime.evaluate', params[i]);
         }
+        return Promise.all(promises)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
       };
     }
 
@@ -214,10 +262,11 @@ export class CdpTimeDriver implements TimeDriver {
         return;
     }
 
-// 1. Synchronize media elements
-    if (this.hasMedia) {
-      this.syncMediaFn();
-    }
+    // Synchronize media to the requested render time directly. Using the
+    // previous virtual-clock value here leaves media one frame behind.
+    const syncPromise = this.hasMedia
+      ? this.syncMediaFn(timeInSeconds)
+      : RESOLVED_PROMISE;
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
@@ -226,13 +275,9 @@ export class CdpTimeDriver implements TimeDriver {
 
     if (this.mode === 'dom') {
       // DomStrategy's beginFrame will advance the virtual time via its 'interval' parameter
-      return;
+      return this.setDomTime(syncPromise);
     }
 
-    // Convert to milliseconds for CDP
-    const delta = timeInSeconds - previousTime;
-    this.setVirtualTimePolicyParams.budget = delta * 1000;
-    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
-    return this.timePromise as any as Promise<void>;
+    return this.setCanvasTime(previousTime, timeInSeconds, syncPromise);
   }
 }

@@ -49,7 +49,7 @@ export class SeekTimeDriver implements TimeDriver {
   private aggregator = new ReusableAggregator();
   private cdpSession: CDPSession | null = null;
   private multiFrameCallParams: any[] = [];
-    private executionContextIds: number[] = [];
+  private executionContextIds: number[] = [];
   private callFunctionOnParams: any = {
     functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
     arguments: [{ value: 0 }, { value: 0 }],
@@ -57,6 +57,23 @@ export class SeekTimeDriver implements TimeDriver {
   };
   private evaluateArgs: [number, number] = [0, 0];
   private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
+  private handleExecutionContextCreated = (event: any) => {
+    if (event.context.name === '' && !this.executionContextIds.includes(event.context.id)) {
+      this.executionContextIds.push(event.context.id);
+      this.multiFrameCallParams.length = 0;
+    }
+  };
+  private handleExecutionContextDestroyed = (event: any) => {
+    const index = this.executionContextIds.indexOf(event.executionContextId);
+    if (index !== -1) {
+      this.executionContextIds.splice(index, 1);
+      this.multiFrameCallParams.length = 0;
+    }
+  };
+  private handleExecutionContextsCleared = () => {
+    this.executionContextIds = [];
+    this.multiFrameCallParams.length = 0;
+  };
 
   constructor(private timeout: number = 30000) {
     this.evaluateArgs[1] = timeout;
@@ -99,12 +116,14 @@ export class SeekTimeDriver implements TimeDriver {
     }
 
     this.executionContextIds = [];
+    this.multiFrameCallParams.length = 0;
+    this.cdpSession!.removeListener('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    this.cdpSession!.removeListener('Runtime.executionContextDestroyed', this.handleExecutionContextDestroyed);
+    this.cdpSession!.removeListener('Runtime.executionContextsCleared', this.handleExecutionContextsCleared);
+    this.cdpSession!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    this.cdpSession!.on('Runtime.executionContextDestroyed', this.handleExecutionContextDestroyed);
+    this.cdpSession!.on('Runtime.executionContextsCleared', this.handleExecutionContextsCleared);
     await this.cdpSession!.send('Runtime.enable');
-    this.cdpSession!.on('Runtime.executionContextCreated', (event) => {
-      if (event.context.name === '') {
-        this.executionContextIds.push(event.context.id);
-      }
-    });
 
     // Inject the seek script once during initialization
     // We wrap it in an IIFE to avoid polluting the global namespace with helper functions
@@ -213,7 +232,12 @@ export class SeekTimeDriver implements TimeDriver {
               const el = cachedMediaElements[i];
               syncMedia(el, t);
 
-              if (el.seeking || el.readyState < 2) {
+              const hasSource = Boolean(
+                el.currentSrc ||
+                el.src ||
+                el.querySelector('source[src]')
+              );
+              if (hasSource && (el.seeking || el.readyState < 2)) {
                 if (!el.__helios_sync_promise) {
                   el.__helios_sync_promise = new Promise((resolve) => {
                     let resolved = false;

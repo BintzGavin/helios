@@ -46,8 +46,13 @@ async function main() {
     const strategy = new CanvasStrategy(options);
 
     // Mock page to simulate WebCodecs NOT supported
+    const mockCanvasHandle = {};
     const mockPage = {
+        waitForSelector: async () => mockCanvasHandle,
         evaluate: async (fn: any, args: any) => {
+            if (args === mockCanvasHandle) {
+                return true;
+            }
             // Return structure that satisfies WebCodecs check (supported: false)
             return { supported: false, reason: 'Mocked unsupported' };
         },

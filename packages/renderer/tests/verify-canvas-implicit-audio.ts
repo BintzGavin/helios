@@ -16,8 +16,10 @@ async function runTests() {
   const strategy = new CanvasStrategy(options);
 
   // Mock Page
+  const mockCanvasHandle = {};
   const mockPage: any = {
     viewportSize: () => ({ width: 1920, height: 1080 }),
+    waitForSelector: async () => mockCanvasHandle,
     frames: () => [{
         evaluate: async (script: string) => {
             // This mock intercepts the script sent to frames.

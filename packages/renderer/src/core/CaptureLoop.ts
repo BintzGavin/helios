@@ -176,12 +176,8 @@ export class CaptureLoop {
 
 
       const isDomStrategy = !!(strategy as any).cdpSession;
-      const domCdpSession = isDomStrategy ? (strategy as any).cdpSession : null;
-      const domBeginFrameParams = isDomStrategy
-        ? (strategy as any).beginFrameParams
-        : null;
       const domBeginFrame = isDomStrategy
-        ? () => domCdpSession!.send("HeadlessExperimental.beginFrame", domBeginFrameParams)
+        ? (frameTime: number) => strategy.capture(page, frameTime)
         : null;
       let domLastFrameBuffer: Buffer | null = null;
 
@@ -192,21 +188,23 @@ export class CaptureLoop {
         if (isDomStrategy) {
           let nextCapturePromise = null;
           if (totalFrames > 0) {
-            timeDriver.setTime(
+            const timePromise = timeDriver.setTime(
               page,
               startFrame * compTimeStep,
             );
-            nextCapturePromise = domBeginFrame!();
+            if (timePromise) await timePromise;
+            nextCapturePromise = domBeginFrame!(0);
           }
 
           if (totalFrames > 0) {
             const rawResult = await nextCapturePromise;
             if (1 < totalFrames) {
-              timeDriver.setTime(
+              const timePromise = timeDriver.setTime(
                 page,
                 (startFrame + 1) * compTimeStep,
               );
-              nextCapturePromise = domBeginFrame!();
+              if (timePromise) await timePromise;
+              nextCapturePromise = domBeginFrame!(timeStep);
             }
             const data = (rawResult as any).screenshotData;
             console.log(`Progress: Rendered ${0} / ${totalFrames} frames`);
@@ -233,13 +231,14 @@ export class CaptureLoop {
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
 
-              timeDriver.setTime(
+              const timePromise = timeDriver.setTime(
                 page,
                 (startFrame + i + 1) * compTimeStep,
               );
+              if (timePromise) await timePromise;
 
               let buf: Buffer;
-              nextCapturePromise = domBeginFrame!();
+              nextCapturePromise = domBeginFrame!((i + 1) * timeStep);
               const data = rawResult.screenshotData;
               if (data) {
                 buf = Buffer.from(data as string, "base64");
@@ -510,9 +509,7 @@ export class CaptureLoop {
         const isDomStrategy = !!(strategy as any).beginFrameParams;
 
         if (isDomStrategy) {
-          const domCdpSession = (strategy as any).cdpSession;
-          const domBeginFrameParams = (strategy as any).beginFrameParams;
-          const domBeginFrame = () => domCdpSession!.send("HeadlessExperimental.beginFrame", domBeginFrameParams);
+          const domBeginFrame = (frameTime: number) => strategy.capture(page, frameTime);
           let domLastFrameBuffer: Buffer | null = null;
 
           while (nextFrameToSubmit !== totalFrames && !aborted) {
@@ -528,8 +525,11 @@ export class CaptureLoop {
             if (i === -1) break;
 
             try {
-              timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              const rawResult = await domBeginFrame!();
+              const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+              if (timePromise) {
+                await timePromise;
+              }
+              const rawResult = await domBeginFrame!(i * timeStep);
               const data = (rawResult as any).screenshotData;
               let buf: Buffer;
               if (data) {

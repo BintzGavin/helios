@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
@@ -35,52 +36,52 @@ export async function concatenateVideos(inputPaths: string[], outputPath: string
   // We use absolute paths and replace backslashes with forward slashes for cross-platform compatibility.
   const listContent = inputPaths.map(p => {
     const absolutePath = path.resolve(p).replace(/\\/g, '/');
-    return `file '${absolutePath}'`;
+    const escapedPath = absolutePath.replace(/'/g, "'\\''");
+    return `file '${escapedPath}'`;
   }).join('\n');
+
+  // A concat manifest read from stdin has a `pipe:` base URL, which causes
+  // FFmpeg to reinterpret even absolute file paths as pipe resources. Give
+  // the manifest a real file URL base instead.
+  const manifestDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'helios-concat-'));
+  const manifestPath = path.join(manifestDir, 'inputs.txt');
+  await fs.promises.writeFile(manifestPath, listContent, 'utf8');
 
   const ffmpegPath = options?.ffmpegPath || ffmpeg.path;
   const args = [
     '-f', 'concat',
     '-safe', '0',
-    '-protocol_whitelist', 'file,pipe', // Allow reading files from disk via pipe list
-    '-i', '-', // Read list from stdin
+    '-protocol_whitelist', 'file,pipe',
+    '-i', manifestPath,
     '-c', 'copy',
     '-y', // Overwrite output file
     outputPath
   ];
 
-  console.log(`Spawning FFmpeg for concat (piping list to stdin): ${ffmpegPath} ${args.join(' ')}`);
+  console.log(`Spawning FFmpeg for concat: ${ffmpegPath} ${args.join(' ')}`);
 
-  return new Promise((resolve, reject) => {
-    const process = spawn(ffmpegPath, args);
-    let stderr = '';
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const process = spawn(ffmpegPath, args, { stdio: ['ignore', 'ignore', 'pipe'] });
+      let stderr = '';
 
-    process.stderr.on('data', (data) => {
-      stderr += data.toString();
-    });
+      process.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
 
-    process.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`FFmpeg concat failed with code ${code}: ${stderr}`));
-      }
-    });
+      process.on('close', (code) => {
+        if (code === 0) {
+          resolve();
+        } else {
+          reject(new Error(`FFmpeg concat failed with code ${code}: ${stderr}`));
+        }
+      });
 
-    process.on('error', (err) => {
-      reject(err);
-    });
-
-    process.stdin.on('error', (err: any) => {
-      if (err && err.code === 'EPIPE') {
-        console.warn('FFmpeg stdin closed prematurely (EPIPE). Ignoring error to allow graceful exit.');
-      } else {
+      process.on('error', (err) => {
         reject(err);
-      }
+      });
     });
-
-    // Write file list to stdin
-    process.stdin.write(listContent);
-    process.stdin.end();
-  });
+  } finally {
+    await fs.promises.rm(manifestDir, { recursive: true, force: true });
+  }
 }
