@@ -34,10 +34,13 @@ Stop reinventing animation in JavaScript. Use the platform.
 </div>
 
 
-https://github.com/user-attachments/assets/89ee2a20-77c5-4440-ad68-9f9180d969bd
+<div align="center">
 
+[![Helios — Video is Light Over Time](./docs/assets/helios-hero-poster.png)](./docs/assets/helios-hero.mp4)
 
-(Video created with Helios)
+**[▶ Watch the intro](./docs/assets/helios-hero.mp4)** — 15s, rendered by Helios itself.
+
+</div>
 
 
 ---
