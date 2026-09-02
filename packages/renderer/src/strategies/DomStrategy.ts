@@ -176,17 +176,34 @@ export class DomStrategy implements RenderStrategy {
   }
 
   async capture(page: Page, frameTime: number): Promise<any> {
-    const result = await this.cdpSession!.send('Page.captureScreenshot', {
-      ...this.cdpScreenshotParams,
-      fromSurface: true,
-      ...(this.beginFrameParams.screenshot?.clip
-        ? { clip: this.beginFrameParams.screenshot.clip }
-        : {}),
-    });
-    return {
-      hasDamage: true,
-      screenshotData: result.data,
-    };
+    const timeoutMs = this.options.stabilityTimeout ?? 30000;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+      const result = await Promise.race([
+        this.cdpSession!.send('Page.captureScreenshot', {
+          ...this.cdpScreenshotParams,
+          fromSurface: true,
+          ...(this.beginFrameParams.screenshot?.clip
+            ? { clip: this.beginFrameParams.screenshot.clip }
+            : {}),
+        }),
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error(
+              `DomStrategy.capture watchdog: Page.captureScreenshot exceeded ${timeoutMs}ms (frameTime=${frameTime})`
+            ));
+          }, timeoutMs);
+        }),
+      ]);
+
+      return {
+        hasDamage: true,
+        screenshotData: result.data,
+      };
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   }
 
   async finish(page: Page): Promise<void> {

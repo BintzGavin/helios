@@ -223,7 +223,8 @@ export interface RendererOptions {
   ffmpegPath?: string;
 
   /**
-   * Timeout in milliseconds to wait for the frame to stabilize (e.g., loading fonts, images, custom hooks).
+   * Timeout in milliseconds to wait for frame stability and DOM screenshot capture.
+   * This covers assets, custom hooks, and compositor stalls.
    * Defaults to 30000ms.
    */
   stabilityTimeout?: number;
