@@ -6,6 +6,7 @@ import { CanvasStrategy } from '../strategies/CanvasStrategy.js';
 import { DomStrategy } from '../strategies/DomStrategy.js';
 import { TimeDriver } from '../drivers/TimeDriver.js';
 import { CdpTimeDriver } from '../drivers/CdpTimeDriver.js';
+import { SeekTimeDriver } from '../drivers/SeekTimeDriver.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
 
 const DEFAULT_BROWSER_ARGS = [
@@ -60,6 +61,12 @@ export class BrowserPool {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
     const gpuArgs = config.gpu !== true ? GPU_DISABLED_ARGS : [];
+    const defaultArgs = this.options.mode === 'dom'
+      ? DEFAULT_BROWSER_ARGS.filter(arg =>
+          arg !== '--enable-begin-frame-control' &&
+          arg !== '--run-all-compositor-stages-before-draw'
+        )
+      : DEFAULT_BROWSER_ARGS;
 
     let executablePath = config.executablePath;
 
@@ -95,7 +102,7 @@ export class BrowserPool {
     return {
       headless: config.headless ?? true,
       executablePath: executablePath,
-      args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
+      args: [...defaultArgs, ...gpuArgs, ...userArgs],
       pipe: true,
     };
   }
@@ -123,10 +130,9 @@ export class BrowserPool {
 
         const page = await context.newPage();
         const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-        // Both capture strategies advance through CDP virtual time. DOM capture
-        // uses Page.captureScreenshot rather than the platform-limited
-        // HeadlessExperimental.beginFrame API.
-        const timeDriver = new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
+        const timeDriver = this.options.mode === 'dom'
+          ? new SeekTimeDriver(this.options.stabilityTimeout)
+          : new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
 
         page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
         page.on('pageerror', (err: Error) => {
