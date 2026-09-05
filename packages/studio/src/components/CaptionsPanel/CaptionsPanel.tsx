@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from 'react';
-import { parseSrt, CaptionCue } from '@helios-project/core';
+import { parseSrt, stringifySrt, CaptionCue } from '@helios-project/core';
 import { useStudio } from '../../context/StudioContext';
-import { stringifySrt } from '../../utils/srt';
 import './CaptionsPanel.css';
 
 const formatTime = (ms: number) => {

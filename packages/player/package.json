@@ -38,7 +38,7 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "tsc -w",
-    "test": "vitest",
+    "test": "vitest run",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

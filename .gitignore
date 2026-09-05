@@ -55,3 +55,10 @@ verify_*.py
 verify_*.ts
 dom-animation.mp4
 lickstep_videos/coverage/
+
+# Generated coverage reports and disposable root render outputs
+/coverage/
+/coverage.json
+/output-perf-*.mp4
+/test-output*.mp4
+/test_output_*.mp4

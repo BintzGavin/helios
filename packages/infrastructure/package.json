@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "vitest",
+    "test": "vitest run",
     "bench": "vitest bench",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"

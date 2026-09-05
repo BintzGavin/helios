@@ -38,7 +38,7 @@
     "build": "tsc && vite build && npm run build:cli && npm run build:types",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest run",
     "verify": "npx tsx scripts/verify-ui.ts",
     "prepublishOnly": "npm run build"
   },

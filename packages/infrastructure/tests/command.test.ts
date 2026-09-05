@@ -37,6 +37,13 @@ describe('parseCommand', () => {
     expect(args).toEqual(['-i', 'input.mp4', '-metadata', "title=My Render's Title", 'output.mp4']);
   });
 
+  it('handles apostrophes inside an unquoted key and double-quoted value', () => {
+    expect(parseCommand('ffmpeg -metadata title="My \'Awesome\' Video"')).toEqual({
+      command: 'ffmpeg',
+      args: ['-metadata', "title=My 'Awesome' Video"],
+    });
+  });
+
   it('should handle escaped quotes', () => {
     const { command, args } = parseCommand('echo "He said \\"Hello\\""');
     expect(command).toBe('echo');
