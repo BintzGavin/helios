@@ -16,8 +16,14 @@ export function registerStudioCommand(program: Command) {
     .command('studio')
     .description('Launch the Helios Studio')
     .option('-p, --port <number>', 'Port to listen on', '5173')
+    .option('--mcp-public-url <origin>', 'HTTPS origin for the separate authenticated MCP listener')
+    .option('--mcp-secret-service <name>', 'OS secret-store service (account: helios-mcp)')
+    .option('--mcp-port <number>', 'Loopback port for the authenticated MCP listener', '5174')
     .action(async (options) => {
       try {
+        if (Boolean(options.mcpPublicUrl) !== Boolean(options.mcpSecretService)) {
+          throw new Error('Use --mcp-public-url and --mcp-secret-service together.');
+        }
         console.log(chalk.blue('Starting Studio...'));
 
         const config = loadConfig(process.cwd());
@@ -48,11 +54,18 @@ export function registerStudioCommand(program: Command) {
           // configFile: false, // Removed to allow loading user config (crucial for framework plugins)
           root: process.cwd(),
           server: {
+            host: '127.0.0.1',
             port: parseInt(options.port, 10),
             strictPort: false
           },
           plugins: [
             studioApiPlugin({
+              projectRoot: process.cwd(),
+              remoteMcp: options.mcpPublicUrl ? {
+                publicUrl: options.mcpPublicUrl,
+                secretService: options.mcpSecretService,
+                port: Number(options.mcpPort),
+              } : undefined,
               studioRoot: studioDist,
               skillsRoot: skillsRoot,
               components: components,

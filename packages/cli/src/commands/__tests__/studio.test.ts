@@ -5,6 +5,7 @@ import { createServer } from 'vite';
 import fs from 'fs';
 import { loadConfig } from '../../utils/config.js';
 import { RegistryClient } from '../../registry/client.js';
+import { studioApiPlugin } from '@helios-project/studio/cli';
 
 vi.mock('vite', () => ({
   createServer: vi.fn(),
@@ -90,6 +91,20 @@ describe('studio command', () => {
     expect(loadConfig).toHaveBeenCalled();
     expect(RegistryClient).toHaveBeenCalledWith(undefined);
     expect(createServer).toHaveBeenCalled();
+  });
+
+  it('starts the local listener with an explicit project and separate remote configuration', async () => {
+    vi.mocked(createServer).mockResolvedValue({ listen: vi.fn(), printUrls: vi.fn() } as any);
+    await program.parseAsync(['node', 'test', 'studio', '--mcp-public-url', 'https://video.example.com', '--mcp-secret-service', 'helios-owner']);
+    expect(createServer).toHaveBeenCalledWith(expect.objectContaining({ server: expect.objectContaining({ host: '127.0.0.1' }) }));
+    expect(studioApiPlugin).toHaveBeenCalledWith(expect.objectContaining({ projectRoot: process.cwd(), remoteMcp: { publicUrl: 'https://video.example.com', secretService: 'helios-owner', port: 5174 } }));
+  });
+
+  it('rejects incomplete remote configuration before starting a server', async () => {
+    vi.mocked(createServer).mockClear();
+    await program.parseAsync(['node', 'test', 'studio', '--mcp-public-url', 'https://video.example.com']);
+    expect(createServer).not.toHaveBeenCalled();
+    expect(exitMock).toHaveBeenCalledWith(1);
   });
 
   it('should error when server fails to start', async () => {

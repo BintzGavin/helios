@@ -1,0 +1,8 @@
+# Replace video.example.com with the DNS name you operate. Point its DNS at
+# this host. Caddy owns TLS; Helios authenticates every request before routing.
+# Keep both local ports private. Never proxy the Studio/Vite port (5173).
+video.example.com {
+    reverse_proxy 127.0.0.1:5174 {
+        flush_interval -1
+    }
+}

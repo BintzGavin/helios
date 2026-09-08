@@ -2,12 +2,13 @@ import { Plugin, ViteDevServer, PreviewServer } from 'vite';
 import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
-import { createMcpServer } from './mcp';
-import { findCompositions, findAssets, getProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, deleteAsset, createDirectory, moveAsset } from './discovery';
+import { createMcpHttpHandler } from './mcp-http';
+import { startRemoteMcp } from './remote-startup';
+import { RenderAccessError, serveRenderOutput } from './render-access';
+import { findCompositions, findAssets, getProjectRoot, configureProjectRoot, createComposition, deleteComposition, updateCompositionMetadata, duplicateComposition, renameComposition, renameAsset, deleteAsset, createDirectory, moveAsset } from './discovery';
 import { templates } from './templates';
 import { findDocumentation, resolveDocumentationPath } from './documentation';
-import { startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
+import { initializeRenderManager, startRender, getRenderJobSpec, getJob, getJobs, cancelJob, deleteJob, diagnoseServer } from './render-manager';
 import { StudioPluginOptions } from './types';
 
 export type { StudioPluginOptions, StudioComponentDefinition } from './types';
@@ -82,51 +83,39 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
           });
       }
 
-      // MCP Server Setup
-      const mcpServer = createMcpServer(() => {
+      // Local Studio and remote MCP are separate network surfaces.
+      const projectRoot = options.projectRoot ?? getProjectRoot(process.cwd());
+      configureProjectRoot(projectRoot);
+      void initializeRenderManager(projectRoot);
+      const getPort = () => {
           const address = server.httpServer?.address();
-          return (typeof address === 'object' && address !== null) ? address.port : 5173;
-      }, options);
-      const mcpTransports = new Map<string, SSEServerTransport>();
-
-      server.middlewares.use('/mcp/sse', async (req, res, next) => {
-          const transport = new SSEServerTransport("/mcp/messages", res);
-          const sessionId = transport.sessionId;
-          mcpTransports.set(sessionId, transport);
-
-          transport.onclose = () => {
-              mcpTransports.delete(sessionId);
-          };
-
-          await mcpServer.connect(transport);
+          return typeof address === 'object' && address !== null ? address.port : 5173;
+      };
+      const localMcp = createMcpHttpHandler(getPort, {
+          ...options, projectRoot,
+          allowedHosts: ['localhost', '127.0.0.1', '[::1]'],
+          allowedOrigins: () => [`http://localhost:${getPort()}`, `http://127.0.0.1:${getPort()}`, `http://[::1]:${getPort()}`],
+          authenticate: async req => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '') ? 'local-owner' : undefined,
       });
-
-      server.middlewares.use('/mcp/messages', async (req, res, next) => {
-          if (req.method !== 'POST') return next();
-
-          const urlStr = req.url || '/';
-          const qIndex = urlStr.indexOf('?');
-          let sessionId: string | null = null;
-          if (qIndex !== -1) {
-              const params = new URLSearchParams(urlStr.substring(qIndex));
-              sessionId = params.get('sessionId');
-          }
-
-          if (!sessionId) {
-              res.statusCode = 400;
-              res.end("Missing sessionId");
-              return;
-          }
-
-          const transport = mcpTransports.get(sessionId);
-          if (!transport) {
-              res.statusCode = 404;
-              res.end("Session not found");
-              return;
-          }
-
-          await transport.handlePostMessage(req, res);
+      server.middlewares.use((req, res, next) => {
+          if (req.url?.split('?')[0].startsWith('/mcp')) { void localMcp.handle(req, res); return; }
+          next();
       });
+      server.httpServer?.once('close', () => { void localMcp.close(); });
+      if (options.remoteMcp) {
+          // Vite calls configureServer before binding. Start the gateway only
+          // after the renderer's loopback origin is available.
+          server.httpServer?.once('listening', () => {
+              void startRemoteMcp(getPort, { ...options, projectRoot }, options.remoteMcp!).then(remote => {
+                  server.httpServer?.once('close', () => { void remote.close(); });
+                  console.log(`Authenticated MCP: ${options.remoteMcp!.publicUrl}/mcp (loopback gateway port ${options.remoteMcp!.port})`);
+              }).catch(() => {
+                  console.error('Remote MCP startup failed. Check the dedicated OS secret-store entry and listener port.');
+                  void server.close();
+                  process.exitCode = 1;
+              });
+          });
+      }
 
       server.middlewares.use('/api/components', async (req, res, next) => {
         if (req.url === '/' || req.url === '') {
@@ -750,32 +739,23 @@ function configureMiddlewares(server: ViteDevServer | PreviewServer, isPreview: 
         next();
       });
 
-      server.middlewares.use('/api/renders', async (req, res, next) => {
-        const match = req.url!.match(/^\/([^\/]+)$/);
-        if (match) {
-            const filename = match[1];
-            // Security check: simple basename check to avoid traversal
-            if (filename.includes('/') || filename.includes('\\') || filename.includes('..')) {
-                res.statusCode = 400;
-                res.end('Invalid filename');
-                return;
-            }
-
-            const projectRoot = getProjectRoot(process.cwd());
-            const rendersDir = path.resolve(projectRoot, 'renders');
-            const filePath = path.join(rendersDir, filename);
-
-            if (fs.existsSync(filePath)) {
-                res.setHeader('Content-Type', 'video/mp4');
-                const stream = fs.createReadStream(filePath);
-                stream.pipe(res);
-            } else {
-                res.statusCode = 404;
-                res.end('File not found');
-            }
-            return;
+      server.middlewares.use('/api/renders', async (req, res) => {
+        // Legacy browser URL shares the managed-output validation. Remote
+        // access uses /mcp/outputs exclusively on the authenticated listener.
+        const local = ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '');
+        let host: string;
+        try { host = new URL(`http://${req.headers.host}`).hostname; }
+        catch { res.statusCode = 403; res.end(); return; }
+        const allowedOrigin = !req.headers.origin || [`http://localhost:${getPort()}`, `http://127.0.0.1:${getPort()}`].includes(req.headers.origin);
+        if (!local || !['localhost', '127.0.0.1', '[::1]'].includes(host) || !allowedOrigin) { res.statusCode = 403; res.end(); return; }
+        const match = /^\/render-([a-zA-Z0-9-]{1,100})\.mp4$/.exec((req.url ?? '').split('?')[0]);
+        if (!match) { res.statusCode = 404; res.end(); return; }
+        try { await serveRenderOutput(match[1], projectRoot, req, res); }
+        catch (error) {
+          if (res.headersSent) { res.destroy(); return; }
+          res.statusCode = error instanceof RenderAccessError ? error.status : 500;
+          res.end(error instanceof RenderAccessError ? error.code : 'OUTPUT_ERROR');
         }
-        next();
       });
 
       server.middlewares.use('/api/jobs', async (req, res, next) => {

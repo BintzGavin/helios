@@ -5,8 +5,10 @@ import { svelteTemplate } from './svelte';
 import { solidTemplate } from './solid';
 import { threejsTemplate } from './threejs';
 import { Template } from './types';
+import { titleExplainerTemplate } from './title-explainer';
 
 export const templates: Record<string, Template> = {
+  'title-explainer': titleExplainerTemplate,
   vanilla: vanillaTemplate,
   react: reactTemplate,
   vue: vueTemplate,
