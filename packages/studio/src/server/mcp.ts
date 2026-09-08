@@ -1,12 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { z } from "zod";
 import { findCompositions, createComposition, findAssets } from './discovery';
-import { startRender } from './render-manager';
+import { startRender, cancelJob } from './render-manager';
+import { getRenderStatus, getRenderOutput, readRenderOutput, requireJob, RenderAccessError, MAX_CHUNK_BYTES } from './render-access';
+import { getProjectRoot } from './discovery';
 import { StudioPluginOptions } from './types';
 import { findDocumentation } from './documentation';
 
 export function createMcpServer(getPort: () => number, options: StudioPluginOptions = {}) {
+  const root = () => options.projectRoot ?? getProjectRoot(process.cwd());
+  const json = (value: unknown) => ({ content: [{ type: 'text' as const, text: JSON.stringify(value) }] });
+  const guarded = async (fn: () => Promise<unknown>) => {
+    try { return json(await fn()); }
+    catch (error) {
+      return { ...json({ code: error instanceof RenderAccessError ? error.code : 'RENDER_ERROR', error: error instanceof RenderAccessError ? error.message : 'Render operation failed. Check Studio diagnostics.' }), isError: true };
+    }
+  };
   const server = new McpServer({
     name: "Helios Studio",
     version: "0.72.1"
@@ -76,11 +85,11 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
     "create_composition",
     {
       name: z.string(),
-      template: z.enum(['vanilla', 'react', 'vue', 'svelte', 'solid', 'threejs']).optional(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-      fps: z.number().optional(),
-      duration: z.number().optional(),
+      template: z.enum(['vanilla', 'react', 'vue', 'svelte', 'solid', 'threejs', 'title-explainer']).optional(),
+      width: z.number().int().min(16).max(3840).optional(),
+      height: z.number().int().min(16).max(2160).optional(),
+      fps: z.number().int().min(1).max(60).optional(),
+      duration: z.number().positive().max(300).optional(),
       defaultProps: z.record(z.string(), z.any()).optional()
     },
     async (args) => {
@@ -118,10 +127,11 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
     "render_composition",
     {
       compositionId: z.string(),
-      width: z.number().optional(),
-      height: z.number().optional(),
-      fps: z.number().optional(),
-      duration: z.number().optional(),
+      width: z.number().int().min(16).max(3840).optional(),
+      height: z.number().int().min(16).max(2160).optional(),
+      fps: z.number().int().min(1).max(60).optional(),
+      duration: z.number().positive().max(300).optional(),
+      mode: z.enum(['canvas', 'dom']).optional(),
       inputProps: z.record(z.string(), z.any()).optional(),
       videoBitrate: z.string().optional(),
       videoCodec: z.string().optional()
@@ -140,11 +150,17 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
 
            const port = getPort();
            const jobId = await startRender({
-               compositionUrl: comp.url,
-               width: args.width,
-               height: args.height,
-               fps: args.fps,
-               duration: args.duration,
+               // User-project HTML must pass through Vite's HTML transform;
+               // /@fs serves raw HTML and leaves bare module imports unresolved.
+               compositionUrl: options.projectRoot ? `/${[...comp.id.split('/').filter(Boolean), 'composition.html'].map(encodeURIComponent).join('/')}` : comp.url,
+               compositionId: comp.id,
+               width: args.width ?? comp.metadata?.width,
+               height: args.height ?? comp.metadata?.height,
+               fps: args.fps ?? comp.metadata?.fps,
+               duration: args.duration ?? comp.metadata?.duration,
+               mode: args.mode,
+               // Image capture keeps the requested frame rate across platforms.
+               webCodecsPreference: 'disabled',
                inputProps: args.inputProps,
                videoBitrate: args.videoBitrate,
                videoCodec: args.videoCodec
@@ -161,6 +177,27 @@ export function createMcpServer(getPort: () => number, options: StudioPluginOpti
        }
     }
   );
+
+  server.tool('list_compositions', 'Discover composition IDs and render metadata in this project.', {}, async () => {
+    const compositions = await findCompositions(process.cwd());
+    return json({ compositions: compositions.map(({ id, name, metadata }) => ({ id, name, metadata })) });
+  });
+  server.tool('get_render_status', 'Inspect progress or wait up to 30 seconds. Wait expiry does not cancel the render.', {
+    jobId: z.string(), waitMs: z.number().int().min(0).max(30000).optional(),
+  }, (args, extra) => guarded(() => getRenderStatus(args.jobId, args.waitMs, extra.signal)));
+  server.tool('cancel_render', 'Cancel a queued or running render. Terminal jobs retain their final state.', {
+    jobId: z.string(),
+  }, args => guarded(async () => {
+    requireJob(args.jobId);
+    const cancelled = await cancelJob(args.jobId);
+    return { ...await getRenderStatus(args.jobId), cancelled };
+  }));
+  server.tool('get_render_output', 'Get completed MP4 metadata. The output path requires the same authentication as MCP.', {
+    jobId: z.string(),
+  }, args => guarded(() => getRenderOutput(args.jobId, root())));
+  server.tool('read_render_output', 'Read a bounded base64 MP4 chunk over the authenticated MCP connection.', {
+    jobId: z.string(), offset: z.number().int().min(0).optional(), length: z.number().int().min(1).max(MAX_CHUNK_BYTES).optional(),
+  }, args => guarded(() => readRenderOutput(args.jobId, root(), args.offset, args.length)));
 
   server.tool(
     "install_component",

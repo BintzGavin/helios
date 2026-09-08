@@ -1,6 +1,7 @@
 import { Renderer, RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
 import path from 'path';
 import fs from 'fs';
+import { randomUUID } from 'node:crypto';
 import { pathToFileURL } from 'url';
 import { getProjectRoot } from './discovery';
 
@@ -43,9 +44,18 @@ const jobs = new Map<string, RenderJob>();
 const jobControllers = new Map<string, AbortController>();
 
 const JOBS_FILE = 'jobs.json';
+let activeProjectRoot: string | undefined;
+const projectRootForJobs = () => activeProjectRoot ?? getProjectRoot(process.cwd());
+
+/** A process is an owner boundary. Never mix another project's history into it. */
+export async function initializeRenderManager(root: string) {
+  const resolved = path.resolve(root);
+  if (activeProjectRoot && activeProjectRoot !== resolved) throw new Error('Studio is already bound to another project. Start a separate process.');
+  if (!activeProjectRoot) { activeProjectRoot = resolved; loadJobs(); }
+}
 
 function getJobsFilePath() {
-  const projectRoot = getProjectRoot(process.cwd());
+  const projectRoot = projectRootForJobs();
   return path.resolve(projectRoot, 'renders', JOBS_FILE);
 }
 
@@ -110,10 +120,10 @@ function loadJobs() {
   }
 }
 
-// Initialize jobs from disk
-loadJobs();
+// Load explicitly at startup, after the project root has been pinned.
 
 export interface StartRenderOptions {
+  compositionId?: string;
   compositionUrl: string; // The URL to visit (e.g. /@fs/...)
   width?: number;
   height?: number;
@@ -238,9 +248,9 @@ export function getRenderJobSpec(options: StartRenderOptions): JobSpec {
 }
 
 export async function startRender(options: StartRenderOptions, serverPort: number): Promise<string> {
-  const jobId = Date.now().toString();
+  const jobId = randomUUID();
   // Save to project root 'renders' directory
-  const projectRoot = getProjectRoot(process.cwd());
+  const projectRoot = projectRootForJobs();
   const rendersDir = path.resolve(projectRoot, 'renders');
   if (!fs.existsSync(rendersDir)) {
     fs.mkdirSync(rendersDir, { recursive: true });
@@ -253,7 +263,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
     id: jobId,
     status: 'queued',
     progress: 0,
-    compositionId: options.compositionUrl,
+    compositionId: options.compositionId ?? options.compositionUrl,
     outputPath,
     outputUrl,
     createdAt: Date.now(),
@@ -262,14 +272,14 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
   };
 
   jobs.set(jobId, job);
-  await saveJobs();
-
   const controller = new AbortController();
   jobControllers.set(jobId, controller);
+  await saveJobs();
 
   // Run in background
   (async () => {
     try {
+      controller.signal.throwIfAborted();
       job.status = 'rendering';
       await saveJobs();
 
@@ -297,7 +307,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         videoCodec: options.videoCodec,
         pixelFormat: options.pixelFormat,
         inputProps: options.inputProps,
-        concurrency: options.concurrency,
+        concurrency: options.concurrency ?? 1,
         hwAccel: options.hwAccel,
         webCodecsPreference: options.webCodecsPreference
       };
@@ -308,6 +318,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
         },
         signal: controller.signal
       });
+      controller.signal.throwIfAborted();
 
       // Verify file exists and has size
       if (fs.existsSync(outputPath)) {
@@ -324,7 +335,7 @@ export async function startRender(options: StartRenderOptions, serverPort: numbe
       await saveJobs();
       console.log(`[RenderManager] Job ${jobId} completed: ${outputPath}`);
     } catch (e: any) {
-      if (e.message === 'Aborted') {
+      if (controller.signal.aborted || e.message === 'Aborted') {
         console.log(`[RenderManager] Job ${jobId} was cancelled.`);
         job.status = 'cancelled';
       } else {

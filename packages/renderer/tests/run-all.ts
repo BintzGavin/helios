@@ -2,6 +2,7 @@ import { spawnSync } from 'child_process';
 import * as path from 'path';
 
 const tests = [
+  'tests/seek-shared-session.test.ts',
   'tests/verify-asset-timeout.ts',
   'tests/verify-audio-codecs.ts',
   'tests/verify-audio-fades.ts',

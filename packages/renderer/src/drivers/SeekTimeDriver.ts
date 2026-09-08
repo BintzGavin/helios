@@ -123,6 +123,10 @@ export class SeekTimeDriver implements TimeDriver {
     this.cdpSession!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
     this.cdpSession!.on('Runtime.executionContextDestroyed', this.handleExecutionContextDestroyed);
     this.cdpSession!.on('Runtime.executionContextsCleared', this.handleExecutionContextsCleared);
+    // DomStrategy may already have enabled Runtime on this shared session.
+    // Re-enable from a disabled state so Chrome reports existing contexts to
+    // our newly attached listeners; otherwise every seek silently becomes a no-op.
+    await this.cdpSession!.send('Runtime.disable');
     await this.cdpSession!.send('Runtime.enable');
 
     // Inject the seek script once during initialization
@@ -194,7 +198,7 @@ export class SeekTimeDriver implements TimeDriver {
             try {
               const helios = window.helios;
               const fps = helios.fps ? helios.fps.value : 30;
-              const frame = Math.floor(t * fps);
+              const frame = Math.round(t * fps);
 
               helios.seek(frame);
               heliosSeeked = true;
@@ -287,7 +291,7 @@ export class SeekTimeDriver implements TimeDriver {
                   try {
                     const helios = window.helios;
                     const fps = helios.fps ? helios.fps.value : 30;
-                    const frame = Math.floor(t * fps);
+                    const frame = Math.round(t * fps);
                     helios.seek(frame);
                   } catch (e) {
                     console.warn('[SeekTimeDriver] Error seeking Helios:', e);

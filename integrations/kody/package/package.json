@@ -1,0 +1,16 @@
+{
+  "name": "@owner/helios-video",
+  "type": "module",
+  "exports": {
+    ".": "./start.js",
+    "./status": "./status.js",
+    "./cancel": "./cancel.js",
+    "./configure": "./configure.js"
+  },
+  "kody": {
+    "description": "Turn a short brief into a rendered title video with progress and private playback.",
+    "tags": ["helios", "video", "render", "explainer"],
+    "category": "integrations",
+    "app": { "entry": "./app.js" }
+  }
+}
