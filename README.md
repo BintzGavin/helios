@@ -34,7 +34,10 @@ Stop reinventing animation in JavaScript. Use the platform.
 </div>
 
 
-https://github.com/user-attachments/assets/f8102049-4412-4c72-97c2-08903b1a81b3
+
+
+https://github.com/user-attachments/assets/6713cddb-e509-400d-bb43-9961c7dbd128
+
 
 
 (Video created with Helios)
