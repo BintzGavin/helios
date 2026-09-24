@@ -39,12 +39,12 @@ describe('still and sheet commands', () => {
   describe('still', () => {
     it('writes one PNG per time, at the composition size', async () => {
       await program.parseAsync(['node', 'test', 'still', 'page.html', '--at', '0.5,3']);
-      expect(captureFrames).toHaveBeenCalledWith(expect.stringMatching(/^file:.*page\.html$/), [0.5, 3], expect.objectContaining({ width: 1080, height: 1920 }));
+      expect(captureFrames).toHaveBeenCalledWith(expect.stringMatching(/^http:\/\/127\.0\.0\.1:\d+\/page\.html$/), [0.5, 3], expect.objectContaining({ width: 1080, height: 1920 }));
       expect(written()).toEqual(['still-0.5s.png', 'still-3s.png']);
     });
 
     it('treats a local file whose name starts with "http" as a file', async () => {
-      await program.parseAsync(['node', 'test', 'still', 'http-demo.html', '--at', '1', '--width', '640', '--height', '360']);
+      await program.parseAsync(['node', 'test', 'still', 'http-demo.html', '--at', '1', '--width', '640', '--height', '360', '--no-serve']);
       expect(vi.mocked(captureFrames).mock.calls[0][0]).toMatch(/^file:\/\/.*\/http-demo\.html$/);
     });
 
