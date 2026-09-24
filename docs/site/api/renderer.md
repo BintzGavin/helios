@@ -84,6 +84,10 @@ await renderer.render(
 );
 ```
 
+### Browser
+
+The renderer runs a headless Chromium through Playwright. If none is installed (a fresh machine, CI, or a cloud sandbox), the first render downloads the build that the renderer's own Playwright version expects, once, and then continues. Set `HELIOS_SKIP_BROWSER_DOWNLOAD=1` to fail with the install command instead. Running `npx playwright install` yourself installs the browser for the *latest* Playwright, which may not be the build this renderer needs.
+
 ### Strategies
 
 The renderer uses different strategies based on `mode`:

@@ -1,5 +1,5 @@
-import { chromium } from 'playwright';
 import { BrowserPool } from './core/BrowserPool.js';
+import { launchChromium } from './core/launchBrowser.js';
 import { PAGE_SEEK_HOOKS, HOOK_GRACE_MS } from './drivers/SeekTimeDriver.js';
 import { BrowserConfig } from './types.js';
 
@@ -47,7 +47,7 @@ export async function probeComposition(url: string, options: ProbeOptions = {}):
     browserConfig: options.browserConfig,
   }).getLaunchOptions();
 
-  const browser = await chromium.launch(launchOptions);
+  const browser = await launchChromium(launchOptions);
   try {
     const page = await browser.newPage({ viewport: { width, height } });
     await page.goto(url, { waitUntil: 'load', timeout });
