@@ -5,19 +5,7 @@ import { pathToFileURL, fileURLToPath, URL } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions, RendererOptions, probeComposition } from '@helios-project/renderer';
 import type { CompositionInfo } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
-
-const DEFAULT_FPS = 30;
-const DEFAULT_WIDTH = 1920;
-const DEFAULT_HEIGHT = 1080;
-
-function parsePositive(value: string | undefined, flag: string, integer = false): number | undefined {
-  if (value === undefined) return undefined;
-  const n = Number(value);
-  if (!Number.isFinite(n) || n <= 0 || (integer && !Number.isInteger(n))) {
-    throw new Error(`${flag} must be a positive ${integer ? 'integer' : 'number'} (got "${value}")`);
-  }
-  return n;
-}
+import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parsePositive } from '../utils/render-options.js';
 
 function parseMode(value: string): 'canvas' | 'dom' {
   if (value !== 'canvas' && value !== 'dom') {

@@ -128,6 +128,27 @@ const info = await probeComposition('file:///path/to/composition.html');
 // { driver: 'none' }                     (CSS / WAAPI / rAF only)
 ```
 
+### Stills and contact sheets
+
+#### `captureFrames(url, times, options?)` / `captureContactSheet(url, times, options?)`
+These render the frames at the given times (in seconds) straight from the page, without encoding a video. They use the same seek and capture path as a DOM-mode render.
+- `captureFrames` returns one PNG `Buffer` per time.
+- `captureContactSheet` returns a single labelled grid PNG.
+
+Options:
+- `width`, `height`
+- `crop: { x, y, width, height }`
+- `scale`
+- `browserConfig`
+- `stabilityTimeout`
+- sheets only: `columns` and `cellWidth`
+
+```typescript
+import { captureContactSheet } from '@helios-project/renderer';
+
+const png = await captureContactSheet('file:///path/to/page.html', [0, 2, 4, 6], { width: 1920, height: 1080, columns: 4 });
+```
+
 ### Diagnostics
 
 #### `Renderer.diagnose()`

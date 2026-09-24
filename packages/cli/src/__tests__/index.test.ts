@@ -27,6 +27,7 @@ vi.mock('../commands/init.js', () => ({ registerInitCommand: vi.fn() }));
 vi.mock('../commands/add.js', () => ({ registerAddCommand: vi.fn() }));
 vi.mock('../commands/components.js', () => ({ registerComponentsCommand: vi.fn() }));
 vi.mock('../commands/render.js', () => ({ registerRenderCommand: vi.fn() }));
+vi.mock('../commands/frames.js', () => ({ registerFrameCommands: vi.fn() }));
 vi.mock('../commands/merge.js', () => ({ registerMergeCommand: vi.fn() }));
 vi.mock('../commands/list.js', () => ({ registerListCommand: vi.fn() }));
 vi.mock('../commands/remove.js', () => ({ registerRemoveCommand: vi.fn() }));
@@ -59,6 +60,7 @@ describe('CLI Entry Point (index.ts)', () => {
     const { registerAddCommand } = await import('../commands/add.js');
     const { registerComponentsCommand } = await import('../commands/components.js');
     const { registerRenderCommand } = await import('../commands/render.js');
+    const { registerFrameCommands } = await import('../commands/frames.js');
     const { registerMergeCommand } = await import('../commands/merge.js');
     const { registerListCommand } = await import('../commands/list.js');
     const { registerRemoveCommand } = await import('../commands/remove.js');
@@ -77,6 +79,7 @@ describe('CLI Entry Point (index.ts)', () => {
     expect(registerAddCommand).toHaveBeenCalledWith(programInstance);
     expect(registerComponentsCommand).toHaveBeenCalledWith(programInstance);
     expect(registerRenderCommand).toHaveBeenCalledWith(programInstance);
+    expect(registerFrameCommands).toHaveBeenCalledWith(programInstance);
     expect(registerMergeCommand).toHaveBeenCalledWith(programInstance);
     expect(registerListCommand).toHaveBeenCalledWith(programInstance);
     expect(registerRemoveCommand).toHaveBeenCalledWith(programInstance);
