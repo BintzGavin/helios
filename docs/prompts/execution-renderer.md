@@ -217,9 +217,9 @@ console.log(`peak_mem_mb:        ${(process.memoryUsage().heapUsed / 1024 / 1024
 3. **Snapshot files**: Before modifying any file, **re-read its complete current contents** so you can restore it exactly if needed. Track which files you are about to modify.
 4. **Modify the code**: Edit files in `packages/renderer/src/` directly
 5. **Build**: `npm run build` (or equivalent) in `packages/renderer/`
-6. **Run the DOM benchmark**, redirect output:
+6. **Run the DOM benchmark** (the harness lives at `packages/renderer/scripts/benchmark.ts`; it needs `npm run build:examples` to have been run at the repo root once), redirect output:
    ```bash
-   node benchmark.ts > run.log 2>&1
+   npx tsx scripts/benchmark.ts > run.log 2>&1
    ```
 7. **Extract results**:
    ```bash

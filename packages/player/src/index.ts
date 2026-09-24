@@ -897,8 +897,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private resizeObserver: ResizeObserver;
   private controller: HeliosController | null = null;
   private mediaSession: HeliosMediaSession | null = null;
-  // Keep track if we have direct access (optional, mainly for debugging/logging)
-  private directHelios: Helios | null = null;
   private unsubscribe: (() => void) | null = null;
   private connectionInterval: number | null = null;
   private abortController: AbortController | null = null;
@@ -2564,7 +2562,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
         console.log("HeliosPlayer: Connected via Direct Mode.");
         this.stopConnectionAttempts();
         this.hideStatus();
-        this.directHelios = directInstance;
         this.setController(new DirectController(directInstance, this.iframe));
         this.exportBtn.disabled = false;
         return true;
@@ -2884,10 +2881,6 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private handleScrubberLeave = () => {
     this.scrubberTooltip.classList.add("hidden");
-  };
-
-  private handleSpeedChange = () => {
-     // Managed by Settings Menu now
   };
 
   private toggleCaptions = () => {

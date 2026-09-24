@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { templates, TemplateId } from './templates';
+import { templates } from './templates';
 import { CompositionOptions } from './templates/types';
 
 export interface CompositionInfo {

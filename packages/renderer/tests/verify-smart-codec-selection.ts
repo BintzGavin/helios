@@ -7,6 +7,7 @@ async function runTest() {
 
     const createMockPage = (cb: (args: any) => any) => ({
         viewportSize: () => ({ width: 1920, height: 1080 }),
+        waitForSelector: async () => ({}),
         frames: () => [],
         evaluate: async (fn: any, args: any) => {
             let captured = null;

@@ -34,7 +34,7 @@ export type { Signal, ReadonlySignal } from './signals.js';
 export { HeliosError, HeliosErrorCode } from './errors.js';
 
 // Captions
-export { parseSrt, parseCaptions, findActiveCues } from './captions.js';
+export { parseSrt, parseCaptions, stringifySrt, findActiveCues } from './captions.js';
 export type { CaptionCue } from './captions.js';
 
 // Schema & Validation

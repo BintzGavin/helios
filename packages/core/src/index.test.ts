@@ -1,9 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Helios, HeliosState, HeliosSubscriber } from './index.js';
+import { Helios, HeliosConfig, HeliosState, HeliosSubscriber } from './index.js';
 import { TimeDriver, ManualTicker } from './drivers/index.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('Helios Core', () => {
+  it('constructs a composition from a HeliosConfig', () => {
+    const config: HeliosConfig = { width: 1280, height: 720, duration: 10, fps: 30 };
+    const helios = new Helios(config);
+    expect(helios.width.value).toBe(config.width);
+    expect(helios.duration.value).toBe(config.duration);
+  });
+
   it('should initialize with correct state', () => {
     const helios = new Helios({ duration: 10, fps: 30 });
     expect(helios.getState()).toEqual({

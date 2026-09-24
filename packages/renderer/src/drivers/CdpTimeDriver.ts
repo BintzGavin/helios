@@ -3,8 +3,6 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
-const noopCatch = () => {};
-
 export class CdpTimeDriver implements TimeDriver {
   private client: CDPSession | null = null;
   private currentTime: number = 0;
@@ -12,7 +10,6 @@ export class CdpTimeDriver implements TimeDriver {
   private cachedFrames: import('playwright').Frame[] = [];
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
   private executionContextIds: number[] = [];
-  private cachedPromises: Promise<any>[] = [];
   private cdpResolve: (() => void) | null = null;
   private cdpReject: ((err: Error) => void) | null = null;
   private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
@@ -38,10 +35,6 @@ export class CdpTimeDriver implements TimeDriver {
     this.cdpReject = reject;
 
     this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
-  };
-
-  private handleSyncMediaError = (e: any) => {
-    console.warn('[CdpTimeDriver] Failed to sync media:', e);
   };
 
   private handleStabilityCheckResponse = (res: any) => {

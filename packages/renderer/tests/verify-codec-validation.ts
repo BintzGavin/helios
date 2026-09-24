@@ -47,6 +47,7 @@ async function main() {
 
     // Mock page to simulate WebCodecs NOT supported
     const mockPage = {
+        waitForSelector: async () => ({}),
         evaluate: async (fn: any, args: any) => {
             // Return structure that satisfies WebCodecs check (supported: false)
             return { supported: false, reason: 'Mocked unsupported' };

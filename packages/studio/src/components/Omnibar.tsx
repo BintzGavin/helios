@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useStudio, Composition, Asset } from '../context/StudioContext';
+import { useStudio } from '../context/StudioContext';
 import { useKeyboardShortcut } from '../hooks/useKeyboardShortcut';
 import { useToast } from '../context/ToastContext';
 import './Omnibar.css';

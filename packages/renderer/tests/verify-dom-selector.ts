@@ -126,7 +126,7 @@ async function runTest() {
     process.exit(1);
   } catch (e: any) {
     const msg = e.message || '';
-    if (msg.includes('Target element not found')) {
+    if (msg.includes('Target element not found') || (msg.includes('waitForSelector') && msg.includes('#missing'))) {
       console.log('✅ Test 3 Passed: Caught expected error:', msg);
     } else {
       console.error('❌ Test 3 Failed: Caught unexpected error:', e);

@@ -222,7 +222,3 @@ export const registry: ComponentDefinition[] = [
     }
   },
 ];
-
-export function findComponent(name: string): ComponentDefinition | undefined {
-  return registry.find((c) => c.name === name);
-}

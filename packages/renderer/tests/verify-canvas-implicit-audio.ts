@@ -18,6 +18,7 @@ async function runTests() {
   // Mock Page
   const mockPage: any = {
     viewportSize: () => ({ width: 1920, height: 1080 }),
+    waitForSelector: async () => ({}),
     frames: () => [{
         evaluate: async (script: string) => {
             // This mock intercepts the script sent to frames.

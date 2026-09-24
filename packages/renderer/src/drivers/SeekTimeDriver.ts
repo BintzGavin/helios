@@ -3,21 +3,15 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
-const noopCatch = () => {};
-
-
-
 
 export class SeekTimeDriver implements TimeDriver {
   private cdpSession: CDPSession | null = null;
   private cachedFrames: import('playwright').Frame[] = [];
-  private cachedMainFrame: import('playwright').Frame | null = null;
   private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true, returnByValue: false };
   private multiFrameEvaluateParams: any[] = [];
     private executionContextIds: number[] = [];
   private multiFramePromises: Promise<any>[] = [];
   private evaluateArgs: [number, number] = [0, 0];
-  private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
 
   constructor(private timeout: number = 30000) {
     this.evaluateArgs[1] = timeout;
@@ -82,6 +76,38 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedMediaElements = null;
         const cachedPromises = [];
 
+        // Animation libraries (motion.dev, GSAP, ...) defer creating their WAAPI
+        // animations to their own frame loop. Under virtualized time that loop has
+        // not ticked when the first seek runs, so a scan taken then can see only the
+        // declarative CSS animations and miss everything else -- permanently, since
+        // the list used to be cached on that first scan. Those animations were then
+        // never seeked, and the render silently produced blank or wrong scenes.
+        //
+        // A "stable for N seeks" heuristic is NOT enough: the count can sit at its
+        // wrong initial value for several seeks before the library's loop ticks, and
+        // the cache then locks in that wrong value. So instead: watch the
+        // document-level animation count on every seek and rebuild whenever it moves.
+        // That is one getAnimations() call per seek, which the pre-cache code already
+        // paid for the document scope anyway.
+        let lastDocAnimationCount = -1;
+
+        function scanAnimations() {
+          // Scopes can appear late too (shadow roots), so re-scan them while unstable.
+          cachedScopes = findAllScopes(document);
+          const found = [];
+          const numScopes = cachedScopes.length;
+          for (let i = 0; i < numScopes; i++) {
+            const scope = cachedScopes[i];
+            if (scope.getAnimations) {
+              const animations = scope.getAnimations();
+              for (let j = 0; j < animations.length; j++) {
+                found.push(animations[j]);
+              }
+            }
+          }
+          return found;
+        }
+
         function createMediaPromise(el) {
           if (el.__helios_sync_promise) return el.__helios_sync_promise;
 
@@ -112,6 +138,7 @@ export class SeekTimeDriver implements TimeDriver {
           cachedAnimations = null;
           cachedMediaElements = null;
           cachedPromises.length = 0;
+          lastDocAnimationCount = -1;
         };
 
         window.__helios_seek = (t, timeoutMs) => {
@@ -130,22 +157,16 @@ export class SeekTimeDriver implements TimeDriver {
             }
           }
 
-          // Synchronize document timeline (WAAPI) across all scopes
-          if (!cachedAnimations) {
-            if (!cachedScopes) {
-              cachedScopes = findAllScopes(document);
+          // Synchronize document timeline (WAAPI) across all scopes.
+          // Re-scan until the animation count holds steady, so late-instantiated
+          // animations are picked up instead of being lost for the whole render.
+          const docAnimationCount = document.getAnimations().length;
+          if (!cachedAnimations || docAnimationCount !== lastDocAnimationCount) {
+            if (cachedAnimations && docAnimationCount > lastDocAnimationCount) {
+              window.__HELIOS_LATE_ANIMATIONS__ = true;
             }
-            cachedAnimations = [];
-            const numScopes = cachedScopes.length;
-            for (let i = 0; i < numScopes; i++) {
-              const scope = cachedScopes[i];
-              if (scope.getAnimations) {
-                const animations = scope.getAnimations();
-                for (let j = 0; j < animations.length; j++) {
-                  cachedAnimations.push(animations[j]);
-                }
-              }
-            }
+            cachedAnimations = scanAnimations();
+            lastDocAnimationCount = docAnimationCount;
           }
           const numAnimations = cachedAnimations.length;
           for (let i = 0; i < numAnimations; i++) {
@@ -291,7 +312,6 @@ export class SeekTimeDriver implements TimeDriver {
     await new Promise(r => setTimeout(r, 100));
 
     this.cachedFrames = page.frames();
-    this.cachedMainFrame = page.mainFrame();
       }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {

@@ -1,10 +1,6 @@
 import { WorkerInfo } from './BrowserPool.js';
 import { FFmpegManager } from './FFmpegManager.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
-import { RenderStrategy } from '../strategies/RenderStrategy.js';
-import { TimeDriver } from '../drivers/TimeDriver.js';
-
-const noopCatch = () => {};
 
 export class CaptureLoop {
   private drainResolve: (() => void) | null = null;

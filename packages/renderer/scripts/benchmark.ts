@@ -1,9 +1,16 @@
-import { Renderer } from './packages/renderer/dist/index.js';
+// DOM render benchmark harness used by the RENDERER performance workflow
+// (see docs/prompts/execution-renderer.md). Run from packages/renderer after
+// `npm run build:examples` at the repo root:
+//   npx tsx scripts/benchmark.ts > run.log 2>&1
+import { Renderer } from '../src/index.js';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 async function run() {
-  const compositionPath = path.resolve(
-    process.cwd(),
+  const compositionPath = path.join(
+    REPO_ROOT,
     'output/example-build/examples/dom-benchmark/composition.html'
   );
   const compositionUrl = `file://${compositionPath}`;

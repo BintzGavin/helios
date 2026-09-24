@@ -5,6 +5,10 @@ import { Page } from 'playwright';
 
 // Mock Page
 class MockPage {
+  async waitForSelector() {
+    return {};
+  }
+
   viewportSize() {
     return { width: 1920, height: 1080 };
   }
@@ -15,8 +19,8 @@ class MockPage {
       return true;
     }
 
-    // If it's the canvas finder
-    if (fnOrScript.toString().includes('findCanvas') || fnOrScript.toString().includes('eval(args.script)')) {
+    // If it's the canvas finder / canvas element check
+    if (fnOrScript.toString().includes('findCanvas') || fnOrScript.toString().includes('eval(args.script)') || fnOrScript.toString().includes('HTMLCanvasElement')) {
       return true; // Found
     }
 

@@ -89,7 +89,7 @@ async function runTest() {
   } catch (e: any) {
     // We expect the error to come from the capture method or page error
     const msg = e.message || '';
-    if (msg.includes('Canvas not found') || msg.includes('Could not find canvas') || msg.includes('CanvasStrategy: Could not find canvas')) {
+    if (msg.includes('Canvas not found') || msg.includes('Could not find canvas') || msg.includes('CanvasStrategy: Could not find canvas') || (msg.includes('waitForSelector') && msg.includes('#missing'))) {
       console.log('✅ Test 3 Passed: Caught expected error:', msg);
     } else {
       console.error('❌ Test 3 Failed: Caught unexpected error:', e);

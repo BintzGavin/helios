@@ -1,6 +1,6 @@
 import { JobExecutor, JobExecutionOptions } from './job-executor.js';
 import { JobSpec } from '../types/job-spec.js';
-import { JobStatus, JobRepository, JobState } from '../types/job-status.js';
+import { JobStatus, JobRepository } from '../types/job-status.js';
 import { ArtifactStorage } from '../types/storage.js';
 import { randomUUID } from 'crypto';
 

@@ -104,7 +104,11 @@ export class BrowserPool {
     this.browser = await chromium.launch(this.getLaunchOptions());
     this.capturedErrors = [];
 
-    const concurrency = Math.max(1, (os.cpus().length || 4) - 1);
+    const envPoolRaw = process.env.HELIOS_BROWSER_POOL_SIZE;
+    const envPool = envPoolRaw !== undefined ? parseInt(envPoolRaw, 10) : NaN;
+    const concurrency = Number.isFinite(envPool)
+      ? Math.max(1, envPool)
+      : Math.max(1, (os.cpus().length || 4) - 1);
     console.log(`Initializing pool of ${concurrency} pages...`);
 
     const sharedContext = await this.browser!.newContext({
@@ -122,7 +126,12 @@ export class BrowserPool {
     const createPage = async (index: number): Promise<WorkerInfo> => {
       const page = await sharedContext.newPage();
       const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      const timeDriver = this.options.mode === 'dom' ? new SeekTimeDriver(this.options.stabilityTimeout) : new CdpTimeDriver(this.options.stabilityTimeout);
+      /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
+      const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
+      const timeDriver =
+        this.options.mode === 'dom' || canvasSeekClock
+          ? new SeekTimeDriver(this.options.stabilityTimeout)
+          : new CdpTimeDriver(this.options.stabilityTimeout);
 
       page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
       page.on('pageerror', (err: Error) => {

@@ -20,8 +20,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "vitest",
-    "bench": "vitest bench",
+    "test": "vitest run",
     "lint": "tsc --noEmit"
   },
   "devDependencies": {

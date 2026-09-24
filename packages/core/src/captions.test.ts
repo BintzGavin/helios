@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parseSrt, parseWebVTT, parseCaptions, stringifySrt, findActiveCues, CaptionCue } from './captions.js';
+import { parseSrt, parseWebVTT, parseCaptions, findActiveCues, CaptionCue } from './captions.js';
+import { stringifySrt } from './index.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 
 describe('captions', () => {
@@ -183,6 +184,13 @@ First caption`;
   });
 
   describe('stringifySrt', () => {
+    it('assigns missing cue IDs and formats timestamps beyond one hour', () => {
+      expect(stringifySrt([
+        { id: '', startTime: 0, endTime: 1000, text: 'Start' },
+        { id: '', startTime: 3661000, endTime: 3662000, text: 'Hour mark' },
+      ])).toBe('1\n00:00:00,000 --> 00:00:01,000\nStart\n\n2\n01:01:01,000 --> 01:01:02,000\nHour mark');
+    });
+
     it('should convert cues to SRT string', () => {
       const cues: CaptionCue[] = [
         {

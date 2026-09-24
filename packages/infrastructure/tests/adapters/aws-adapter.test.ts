@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { mockClient } from 'aws-sdk-client-mock';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { AwsLambdaAdapter } from '../src/adapters/aws-adapter.js';
+import { AwsLambdaAdapter } from '../../src/adapters/aws-adapter.js';
 
 describe('AwsLambdaAdapter', () => {
   const lambdaMock = mockClient(LambdaClient);

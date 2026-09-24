@@ -6,11 +6,6 @@ import { scanForAudioTracks } from '../utils/dom-scanner.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
-const EMPTY_IMAGE_BUFFER = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMDA4wBfQoO4UAAAAASUVORK5CYII=",
-  "base64"
-);
-
 export class DomStrategy implements RenderStrategy {
   private discoveredAudioTracks: AudioTrackConfig[] = [];
   private cleanupAudio: () => Promise<void> | void = () => {};
@@ -20,10 +15,11 @@ export class DomStrategy implements RenderStrategy {
 
   private cdpScreenshotParams: any = null;
   private targetElementHandle: any = null;
-  private emptyImageBuffer: Buffer = EMPTY_IMAGE_BUFFER;
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
   private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null };
+  /** False when Chrome drops HeadlessExperimental CDP (use Playwright screenshots instead). */
+  private useHeadlessExperimentalBeginFrame = true;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -84,7 +80,15 @@ export class DomStrategy implements RenderStrategy {
       this.cdpSession = await page.context().newCDPSession(page);
       (page as any)._sharedCdpSession = this.cdpSession;
     }
-    await this.cdpSession!.send('HeadlessExperimental.enable');
+    try {
+      await this.cdpSession!.send('HeadlessExperimental.enable');
+    } catch (err: any) {
+      const msg = String(err?.message ?? err);
+      console.warn(
+        `[DomStrategy] HeadlessExperimental unavailable (${msg}). Falling back to Playwright page.screenshot per frame (slower but compatible).`
+      );
+      this.useHeadlessExperimentalBeginFrame = false;
+    }
 
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
@@ -134,15 +138,12 @@ export class DomStrategy implements RenderStrategy {
     if (format === 'jpeg') {
         // 2x2 JPEG pixel
         this.emptyImageBase64 = '/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAACAAIBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=';
-        this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else if (format === 'webp') {
         // 2x2 WEBP pixel
         this.emptyImageBase64 = 'UklGRjIAAABXRUJQVlA4ICYAAAAwAQCdASoCAAIACgEAAwBkAGsAIP4B2gAAACH+/4IAAA==';
-        this.emptyImageBuffer = Buffer.from(this.emptyImageBase64, 'base64');
     } else {
         // Default to PNG
         this.emptyImageBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVQIW2NkYGD4z8DAwMgAI0AMDA4wBfQoO4UAAAAASUVORK5CYII=";
-        this.emptyImageBuffer = EMPTY_IMAGE_BUFFER;
     }
 
     this.lastFrameData = this.emptyImageBase64;
@@ -180,6 +181,23 @@ export class DomStrategy implements RenderStrategy {
         return res;
       }
       return this.lastFrameData!;
+    }
+
+    if (!this.useHeadlessExperimentalBeginFrame) {
+      const fmt = this.cdpScreenshotParams?.format || 'png';
+      const pwType: 'png' | 'jpeg' = fmt === 'jpeg' ? 'jpeg' : 'png';
+      const quality =
+        pwType === 'jpeg' && this.cdpScreenshotParams?.quality !== undefined
+          ? this.cdpScreenshotParams.quality
+          : undefined;
+      const buf = await page.screenshot({
+        type: pwType,
+        quality,
+        fullPage: false,
+        omitBackground: pwType === 'png',
+      });
+      this.lastFrameData = buf;
+      return buf;
     }
 
     this.beginFrameParams.frameTimeTicks = 10000 + frameTime;

@@ -2,16 +2,18 @@ import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vites
 import { createCloudRunServer } from '../../src/worker/cloudrun-server.js';
 import { WorkerRuntime } from '../../src/worker/runtime.js';
 import { Server } from 'node:http';
+import * as http from 'node:http';
 import { ArtifactStorage } from '../../src/types/index.js';
 
 vi.mock('../../src/worker/runtime.js');
 
 describe('CloudRunServer', () => {
+  let app: ReturnType<typeof createCloudRunServer>;
   let server: Server;
   let baseUrl: string;
 
   beforeAll(async () => {
-    const app = createCloudRunServer({ workspaceDir: '/tmp-test', port: 0 });
+    app = createCloudRunServer({ workspaceDir: '/tmp-test', port: 0 });
     server = app.server;
     await new Promise<void>((resolve) => {
       app.listen(() => {
@@ -137,29 +139,6 @@ describe('CloudRunServer', () => {
     expect(data).toEqual({ message: '[object Object]' });
   });
 
-  it('should default to port 8080 when port is undefined and env PORT is undefined', async () => {
-    const originalEnv = process.env.PORT;
-    delete process.env.PORT;
-
-    const appWithDefaultPort = createCloudRunServer({ workspaceDir: '/tmp-test-port' });
-    const localServer = appWithDefaultPort.server;
-
-    await new Promise<void>((resolve) => {
-      appWithDefaultPort.listen(() => resolve());
-    });
-
-    const address = localServer.address() as any;
-    expect(address.port).toBe(8080);
-
-    await new Promise<void>((resolve, reject) => {
-      localServer.close((err) => (err ? reject(err) : resolve()));
-    });
-
-    if (originalEnv !== undefined) {
-      process.env.PORT = originalEnv;
-    }
-  });
-
   it('should default to port 8080 when config has undefined port but no other ports are set', async () => {
     const originalEnv = process.env.PORT;
     delete process.env.PORT;
@@ -225,6 +204,16 @@ describe('CloudRunServer', () => {
     expect(data).toEqual({ message: 'Invalid JSON payload' });
   });
 
+  it('should return 400 for request with missing body', async () => {
+    const res = await fetch(baseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.message).toBe('Invalid JSON payload');
+  });
+
   it('should return 400 for missing required fields', async () => {
     const res = await fetch(baseUrl, {
       method: 'POST',
@@ -234,5 +223,57 @@ describe('CloudRunServer', () => {
     expect(res.status).toBe(400);
     const data = await res.json();
     expect(data).toEqual({ message: 'Missing jobPath or chunkIndex' });
+  });
+
+  it('should handle network interruption during payload receiving', async () => {
+    // We mock the req stream to simulate network interruption inside the server logic directly
+    // to avoid node http level unhandled rejections during test runs.
+
+    const mockReq: any = new http.IncomingMessage(null as any);
+    mockReq.method = 'POST';
+
+    const mockRes: any = new http.ServerResponse(mockReq);
+    mockRes.writeHead = vi.fn();
+    mockRes.end = vi.fn();
+
+    // The handler internally loops: for await (const chunk of req)
+    // We simulate an error being thrown in this stream
+    const errorGen = async function* () {
+      yield Buffer.from('{"jobPath": "');
+      throw 'String error thrown'; // Testing String(e) fallback line 33
+    };
+
+    mockReq[Symbol.asyncIterator] = errorGen;
+
+    // Use a custom createServer to get the handler logic
+    const handler = (app as any).server.listeners('request')[0];
+
+    await handler(mockReq, mockRes);
+
+    expect(mockRes.writeHead).toHaveBeenCalledWith(500, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('String error thrown'));
+  });
+
+  it('should handle network interruption using an actual Error object', async () => {
+    const mockReq: any = new http.IncomingMessage(null as any);
+    mockReq.method = 'POST';
+
+    const mockRes: any = new http.ServerResponse(mockReq);
+    mockRes.writeHead = vi.fn();
+    mockRes.end = vi.fn();
+
+    const errorGen = async function* () {
+      yield Buffer.from('{"jobPath": "');
+      throw new Error('network disconnected');
+    };
+
+    mockReq[Symbol.asyncIterator] = errorGen;
+
+    const handler = (app as any).server.listeners('request')[0];
+
+    await handler(mockReq, mockRes);
+
+    expect(mockRes.writeHead).toHaveBeenCalledWith(500, { 'Content-Type': 'application/json' });
+    expect(mockRes.end).toHaveBeenCalledWith(expect.stringContaining('network disconnected'));
   });
 });

@@ -2,10 +2,7 @@ export type EasingFunction = (t: number) => number;
 
 // Constants for Back easing
 const c1 = 1.70158;
-const c2 = c1 * 1.525;
 const c3 = c1 + 1;
-const c4 = (2 * Math.PI) / 3;
-const c5 = (2 * Math.PI) / 4.5;
 
 function bounceOut(x: number): number {
   const n1 = 7.5625;
@@ -31,8 +28,6 @@ function cubicBezier(mX1: number, mY1: number, mX2: number, mY2: number): Easing
 
   const NEWTON_ITERATIONS = 4;
   const NEWTON_MIN_SLOPE = 0.001;
-  const SUBDIVISION_PRECISION = 0.0000001;
-  const SUBDIVISION_MAX_ITERATIONS = 10;
   const kSplineTableSize = 11;
   const kSampleStepSize = 1.0 / (kSplineTableSize - 1.0);
 
