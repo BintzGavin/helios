@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script>
+// A frame function with a bug halfway through: the render must fail with this error.
+const g = document.getElementById('c').getContext('2d');
+window.renderAt = (t) => {
+  if (t >= 0.5) throw new Error('boom at ' + t);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, 10, 10);
+};
+</script>
+</body>
+</html>

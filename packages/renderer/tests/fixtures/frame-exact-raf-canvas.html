@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script>
+// Not a pure function of time: position is integrated from rAF timestamps, frame by frame.
+const g = document.getElementById('c').getContext('2d');
+let x = 0, last = null;
+function frame(ts) {
+  if (last !== null) x += 100 * (ts - last) / 1000;
+  last = ts;
+  g.fillStyle = '#000'; g.fillRect(0, 0, 320, 180);
+  g.fillStyle = '#fff'; g.fillRect(x, 80, 20, 20);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

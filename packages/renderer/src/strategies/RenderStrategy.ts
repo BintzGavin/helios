@@ -3,6 +3,13 @@ import { RendererOptions, FFmpegConfig } from '../types.js';
 
 export interface RenderStrategy {
   /**
+   * Optional setup before the page navigates, e.g. init scripts that must run before the
+   * page's own scripts.
+   * @param page The Playwright page instance.
+   */
+  init?(page: Page): Promise<void>;
+
+  /**
    * Prepares the strategy for rendering.
    * This method is called once before the capture loop begins.
    * Useful for initializing encoders, setting up event listeners, or other stateful setup.

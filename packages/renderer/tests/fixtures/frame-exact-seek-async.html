@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script>
+// An async seek(t): the renderer must await the returned promise before capturing.
+const g = document.getElementById('c').getContext('2d');
+window.seek = async (t) => {
+  await new Promise((resolve) => setTimeout(resolve, 5));
+  g.fillStyle = '#000'; g.fillRect(0, 0, 320, 180);
+  g.fillStyle = '#fff'; g.fillRect(100 * t, 80, 20, 20);
+};
+</script>
+</body>
+</html>

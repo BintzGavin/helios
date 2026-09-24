@@ -14,6 +14,22 @@ export class CanvasStrategy implements RenderStrategy {
 
   constructor(private options: RendererOptions) {}
 
+  async init(page: Page): Promise<void> {
+    // Canvas mode reads the canvas in a separate step after the frame is drawn. A WebGL
+    // drawing buffer is cleared whenever it is presented, which can happen in between, so
+    // keep it: frames otherwise come out blank now and then. (A string, not a function, so
+    // transpiler helpers never end up in the page.)
+    await page.addInitScript(`(() => {
+      const getContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function (type, attributes) {
+        if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+          attributes = Object.assign({}, attributes, { preserveDrawingBuffer: true });
+        }
+        return getContext.call(this, type, attributes);
+      };
+    })();`);
+  }
+
   private parseBitrate(bitrate: string): number {
     const match = bitrate.match(/^(\d+)([kmg]?)$/i);
     if (!match) return 0;
@@ -594,7 +610,8 @@ export class CanvasStrategy implements RenderStrategy {
 
     if (this.useWebCodecs) {
       if (this.useH264) {
-        videoInputArgs = ['-f', 'h264', '-i', '-'];
+        // Raw Annex B H.264 carries no timestamps; without -framerate FFmpeg assumes 25 fps.
+        videoInputArgs = ['-f', 'h264', '-framerate', `${options.fps}`, '-i', '-'];
       } else {
         videoInputArgs = ['-f', 'ivf', '-i', '-'];
       }

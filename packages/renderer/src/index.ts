@@ -5,3 +5,5 @@ export type { RendererOptions, RenderJobOptions } from './types.js';
 export { concatenateVideos } from './concat.js';
 export type { RenderExecutor } from './executors/RenderExecutor.js';
 export { LocalExecutor } from './executors/LocalExecutor.js';
+export { probeComposition } from './probe.js';
+export type { CompositionInfo, ProbeOptions } from './probe.js';

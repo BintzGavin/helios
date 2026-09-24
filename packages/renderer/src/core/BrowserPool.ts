@@ -60,7 +60,9 @@ export class BrowserPool {
   public getLaunchOptions() {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
-    const gpuArgs = config.gpu !== true ? GPU_DISABLED_ARGS : [];
+    // GPU stays available unless explicitly disabled: without it (and with the software
+    // rasterizer disabled too) pages get no WebGL context at all.
+    const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
     const defaultArgs = this.options.mode === 'dom'
       ? DEFAULT_BROWSER_ARGS.filter(arg =>
           arg !== '--enable-begin-frame-control' &&
@@ -131,12 +133,16 @@ export class BrowserPool {
         }
 
         const page = await context.newPage();
-        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-        /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
-        const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
-        const timeDriver = this.options.mode === 'dom' || canvasSeekClock
-          ? new SeekTimeDriver(this.options.stabilityTimeout)
-          : new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
+        const strategy: RenderStrategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        // Both modes seek the page to each frame's time (Helios, seek hooks, WAAPI, virtual
+        // clocks). Canvas mode also flushes rAF callbacks on each seek, since capturing the
+        // canvas does not produce a browser frame. CdpTimeDriver (CDP virtual time) follows the
+        // wall clock for rAF-driven and Helios-bound pages; HELIOS_CANVAS_SEEK_CLOCK=0 keeps it
+        // available for comparison.
+        const legacyCdpClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '0';
+        const timeDriver: TimeDriver = legacyCdpClock
+          ? new CdpTimeDriver(this.options.stabilityTimeout, 'canvas')
+          : new SeekTimeDriver(this.options.stabilityTimeout, { flushAnimationFrames: this.options.mode !== 'dom' });
 
         page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
         page.on('pageerror', (err: Error) => {
@@ -154,6 +160,7 @@ export class BrowserPool {
           await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
         }
 
+        if (strategy.init) await strategy.init(page);
         await timeDriver.init(page, this.options.randomSeed);
         await page.goto(compositionUrl, { waitUntil: 'commit' });
 
