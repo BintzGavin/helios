@@ -67,6 +67,44 @@ describe('still and sheet commands', () => {
     });
   });
 
+  describe('verify', () => {
+    const logs = () => vi.mocked(console.log).mock.calls.flat().join(' ');
+
+    it('renders sample frames forward and then in reverse, cold, and passes a pure page', async () => {
+      vi.mocked(captureFrames).mockImplementation(async (_url, times) => times.map((t) => Buffer.from(`frame@${t}`)));
+      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4']);
+      expect(vi.mocked(captureFrames).mock.calls.map((call) => call[1])).toEqual([[0, 3, 6, 9], [9, 6, 3, 0]]);
+      expect(exitSpy).not.toHaveBeenCalled();
+      expect(logs()).toContain('identical');
+    });
+
+    it('fails a page whose frames depend on what was rendered before', async () => {
+      let pass = 0;
+      vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
+        pass++;
+        return times.map((t) => Buffer.from(pass === 1 || t === 9 ? `frame@${t}` : `drifted@${t}`));
+      });
+      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('0s, 3s, 6s');
+      expect(errors()).toContain('function of t');
+    });
+
+    it('takes the duration from the composition', async () => {
+      vi.mocked(captureFrames).mockImplementation(async (_url, times) => times.map((t) => Buffer.from(`frame@${t}`)));
+      await program.parseAsync(['node', 'test', 'verify', 'page.html']);
+      expect(vi.mocked(captureFrames).mock.calls[0][1]).toEqual([0, 2, 4, 6, 8, 10]);
+    });
+
+    it('asks for --duration when the page does not declare one', async () => {
+      vi.mocked(probeComposition).mockResolvedValue({ driver: 'hook', hook: 'renderAt' });
+      await program.parseAsync(['node', 'test', 'verify', 'page.html']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('--duration');
+      expect(captureFrames).not.toHaveBeenCalled();
+    });
+  });
+
   describe('sheet', () => {
     const sheetTimes = () => vi.mocked(captureContactSheet).mock.calls.at(-1)![1];
 
