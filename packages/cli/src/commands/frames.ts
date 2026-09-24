@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { captureFrames, captureContactSheet, probeComposition } from '@helios-project/renderer';
 import type { CompositionInfo } from '@helios-project/renderer';
+import { compareFrames } from '../utils/compare-frames.js';
 import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parseCrop, parsePositive, parseRange, parseTimes, withCompositionUrl } from '../utils/render-options.js';
 
 /** More than this and a sheet stops being readable (and gets slow to build). */
@@ -95,7 +96,11 @@ export function registerFrameCommands(program: Command) {
         // after later ones.
         const forward = await captureFrames(url, times, capture);
         const reversed = await captureFrames(url, [...times].reverse(), capture);
-        const differing = times.filter((_, i) => !forward[i].equals(reversed[times.length - 1 - i]));
+        const frameWidth = capture.crop?.width ?? width;
+        const frameHeight = capture.crop?.height ?? height;
+        const comparisons = times.map((_, i) => compareFrames(forward[i], reversed[times.length - 1 - i], frameWidth, frameHeight));
+        const differing = times.filter((_, i) => comparisons[i].verdict === 'different');
+        const noisy = times.filter((_, i) => comparisons[i].verdict === 'noise');
 
         if (differing.length > 0) {
           throw new Error(
@@ -104,7 +109,12 @@ export function registerFrameCommands(program: Command) {
             'and timers with values computed from t, or the video breaks when rendered in chunks or seeked.'
           );
         }
-        console.log(`${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`);
+        if (noisy.length > 0) {
+          console.log(`${times.length} sampled frames match rendered in order and in reverse: each frame depends only on t. ` +
+            `(Frames at ${noisy.map((t) => `${Number(t.toFixed(3))}s`).join(', ')} differ by a few pixels of rendering noise, such as antialiasing; that is ignored.)`);
+        } else {
+          console.log(`${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`);
+        }
       });
     } catch (err: any) {
       console.error('Verify failed:', err.message);

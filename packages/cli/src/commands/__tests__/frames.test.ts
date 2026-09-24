@@ -4,6 +4,16 @@ import fs from 'fs';
 import path from 'path';
 import { captureFrames, captureContactSheet, probeComposition } from '@helios-project/renderer';
 import { registerFrameCommands } from '../frames.js';
+import { spawnSync } from 'child_process';
+import ffmpeg from '@ffmpeg-installer/ffmpeg';
+
+/** A 160x90 grayscale PNG with a white box at x, optionally tweaked pixel by pixel. */
+function boxPng(x: number, tweak?: (pixels: Buffer) => void): Buffer {
+  const pixels = Buffer.alloc(160 * 90);
+  for (let r = 30; r < 50; r++) for (let c = x; c < x + 20; c++) pixels[r * 160 + c] = 255;
+  tweak?.(pixels);
+  return spawnSync(ffmpeg.path, ['-v', 'error', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '160x90', '-i', '-', '-f', 'image2pipe', '-vcodec', 'png', '-'], { input: pixels }).stdout;
+}
 
 vi.mock('@helios-project/renderer', () => ({
   captureFrames: vi.fn(),
@@ -87,12 +97,23 @@ describe('still and sheet commands', () => {
       let pass = 0;
       vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
         pass++;
-        return times.map((t) => Buffer.from(pass === 1 || t === 9 ? `frame@${t}` : `drifted@${t}`));
+        return times.map((t) => (pass === 1 || t === 9 ? boxPng(10 + t) : boxPng(40 + t)));
       });
-      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4']);
+      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4', '--width', '160', '--height', '90']);
       expect(exitSpy).toHaveBeenCalledWith(1);
       expect(errors()).toContain('0s, 3s, 6s');
       expect(errors()).toContain('function of t');
+    });
+
+    it('ignores a few pixels of rendering noise, but says so', async () => {
+      let pass = 0;
+      vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
+        pass++;
+        return times.map((t) => boxPng(10 + t, pass === 2 ? (p) => { for (let i = 0; i < 8; i++) p[(30 + i) * 160 + 9 + t] = 7; } : undefined));
+      });
+      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4', '--width', '160', '--height', '90']);
+      expect(exitSpy).not.toHaveBeenCalled();
+      expect(logs()).toContain('rendering noise');
     });
 
     it('takes the duration from the composition', async () => {
