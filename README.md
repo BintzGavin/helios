@@ -81,7 +81,7 @@ npm install @helios-project/core @helios-project/player
 ### Create a Composition
 
 ```typescript
-import { Helios } from '@helios-engine/core';
+import { Helios } from '@helios-project/core';
 
 // Create a 10-second video at 30fps
 const helios = new Helios({
@@ -96,6 +96,9 @@ helios.subscribe(({ currentFrame, duration, fps }) => {
   // Use progress (0-1) to drive your animations
   document.querySelector('.my-element').style.opacity = progress;
 });
+
+// Let the renderer (and the player) drive it
+window.helios = helios;
 
 // Control playback
 helios.play();
@@ -128,7 +131,24 @@ helios.seek(150); // Jump to frame 150
 ### Render to Video
 
 ```bash
-npx helios render ./composition.html -o output.mp4
+npx @helios-project/cli render ./composition.html -o output.mp4
+```
+
+The duration, frame rate and size come from the composition. Any page that draws its own frames renders too, with no Helios import. The renderer calls `window.renderAt(t)` once per frame, with `t` in seconds:
+
+```html
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+  const ctx = document.getElementById('c').getContext('2d');
+  window.renderAt = (t) => {
+    ctx.fillStyle = '#111'; ctx.fillRect(0, 0, 1920, 1080);
+    ctx.fillStyle = '#f5b700'; ctx.fillRect(200 + 300 * t, 480, 120, 120);
+  };
+</script>
+```
+
+```bash
+npx @helios-project/cli render ./page.html -o output.mp4 --duration 5 --audio song.mp3
 ```
 
 ---

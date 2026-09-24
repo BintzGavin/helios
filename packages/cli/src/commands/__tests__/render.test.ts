@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { registerRenderCommand } from '../render.js';
 import { Command } from 'commander';
-import { RenderOrchestrator } from '@helios-project/renderer';
+import { RenderOrchestrator, probeComposition } from '@helios-project/renderer';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 vi.mock('@helios-project/renderer', () => ({
+  probeComposition: vi.fn(),
   RenderOrchestrator: {
     render: vi.fn(),
     plan: vi.fn().mockReturnValue({
@@ -36,6 +39,7 @@ describe('render command', () => {
     program = new Command();
     registerRenderCommand(program);
     vi.clearAllMocks();
+    vi.mocked(probeComposition).mockResolvedValue({ driver: 'helios', durationInSeconds: 5, fps: 30, width: 1920, height: 1080 });
     exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => {}) as any);
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -242,4 +246,91 @@ describe('render command', () => {
     }
   });
 
+
+  describe('first-run defaults', () => {
+    const renderOptions = () => vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![2];
+    const errors = () => consoleErrorSpy.mock.calls.flat().join(' ');
+
+    it('reads duration, fps and size from the page when they are not passed', async () => {
+      vi.mocked(probeComposition).mockResolvedValueOnce({ driver: 'helios', durationInSeconds: 12.5, fps: 24, width: 1080, height: 1920 });
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html']);
+      expect(renderOptions()).toEqual(expect.objectContaining({ durationInSeconds: 12.5, fps: 24, width: 1080, height: 1920 }));
+    });
+
+    it('lets explicit flags win over what the page declares', async () => {
+      vi.mocked(probeComposition).mockResolvedValueOnce({ driver: 'helios', durationInSeconds: 12.5, fps: 24, width: 1080, height: 1920 });
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', '3', '--fps', '60']);
+      expect(renderOptions()).toEqual(expect.objectContaining({ durationInSeconds: 3, fps: 60, width: 1080, height: 1920 }));
+    });
+
+    it('does not load the page when every value is given', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', '3', '--fps', '60', '--width', '640', '--height', '360']);
+      expect(probeComposition).not.toHaveBeenCalled();
+      expect(RenderOrchestrator.render).toHaveBeenCalled();
+    });
+
+    it('fails with a clear message when nothing declares the duration', async () => {
+      vi.mocked(probeComposition).mockResolvedValueOnce({ driver: 'hook', hook: 'renderAt' });
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/page.html']);
+      expect(RenderOrchestrator.render).not.toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('--duration');
+      expect(errors()).toContain('window.renderAt');
+    });
+
+    it('keeps fractional duration and fps', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', '12.5', '--fps', '29.97']);
+      expect(renderOptions()).toEqual(expect.objectContaining({ durationInSeconds: 12.5, fps: 29.97 }));
+    });
+
+    it('rejects a duration or fps that is not a positive number', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', 'abc']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('--duration');
+      exitSpy.mockClear();
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--fps', '0']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(RenderOrchestrator.render).not.toHaveBeenCalled();
+    });
+
+    it('defaults to DOM mode, which captures any page', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html']);
+      expect(renderOptions()).toEqual(expect.objectContaining({ mode: 'dom' }));
+    });
+
+    it('rejects an unknown mode', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--mode', 'webgl']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(RenderOrchestrator.render).not.toHaveBeenCalled();
+    });
+
+    it('--audio passes the soundtrack as an absolute path', async () => {
+      const here = fileURLToPath(import.meta.url);
+      const relative = path.relative(process.cwd(), here);
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--audio', relative]);
+      expect(renderOptions()).toEqual(expect.objectContaining({ audioFilePath: here }));
+    });
+
+    it('--audio fails when the file does not exist', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--audio', 'no-such-song.mp3']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('no-such-song.mp3');
+      expect(RenderOrchestrator.render).not.toHaveBeenCalled();
+    });
+
+    it('refuses --audio with --emit-job rather than dropping the soundtrack', async () => {
+      const here = fileURLToPath(import.meta.url);
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--audio', here, '--emit-job', 'job.json']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('--emit-job');
+      expect(RenderOrchestrator.plan).not.toHaveBeenCalled();
+    });
+
+    it('--gpu and --no-gpu set browserConfig.gpu', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--gpu']);
+      expect(renderOptions().browserConfig).toEqual(expect.objectContaining({ gpu: true }));
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--no-gpu']);
+      expect(renderOptions().browserConfig).toEqual(expect.objectContaining({ gpu: false }));
+    });
+  });
 });

@@ -2,8 +2,38 @@ import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
 import { pathToFileURL, fileURLToPath, URL } from 'url';
-import { RenderOrchestrator, DistributedRenderOptions, RendererOptions } from '@helios-project/renderer';
+import { RenderOrchestrator, DistributedRenderOptions, RendererOptions, probeComposition } from '@helios-project/renderer';
+import type { CompositionInfo } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
+
+const DEFAULT_FPS = 30;
+const DEFAULT_WIDTH = 1920;
+const DEFAULT_HEIGHT = 1080;
+
+function parsePositive(value: string | undefined, flag: string, integer = false): number | undefined {
+  if (value === undefined) return undefined;
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0 || (integer && !Number.isInteger(n))) {
+    throw new Error(`${flag} must be a positive ${integer ? 'integer' : 'number'} (got "${value}")`);
+  }
+  return n;
+}
+
+function parseMode(value: string): 'canvas' | 'dom' {
+  if (value !== 'canvas' && value !== 'dom') {
+    throw new Error(`--mode must be "dom" or "canvas" (got "${value}")`);
+  }
+  return value;
+}
+
+function describeDriver(info: CompositionInfo): string {
+  switch (info.driver) {
+    case 'helios': return 'its window.helios declares no duration';
+    case 'hook': return `it draws frames with window.${info.hook}(t) but declares no duration`;
+    case 'gsap': return 'it drives a GSAP timeline but declares no duration';
+    default: return 'it defines no window.helios or window.renderAt(t)';
+  }
+}
 
 function rendererOptionsToFlags(options: RendererOptions): string {
   const flags: string[] = [];
@@ -23,12 +53,15 @@ export function registerRenderCommand(program: Command) {
     .command('render <input>')
     .description('Render a composition to video')
     .option('-o, --output <path>', 'Output file path', 'output.mp4')
-    .option('--width <number>', 'Viewport width', '1920')
-    .option('--height <number>', 'Viewport height', '1080')
-    .option('--fps <number>', 'Frames per second', '30')
-    .option('--duration <number>', 'Duration in seconds', '1')
+    .option('--width <number>', `Viewport width (default: the composition's, else ${DEFAULT_WIDTH})`)
+    .option('--height <number>', `Viewport height (default: the composition's, else ${DEFAULT_HEIGHT})`)
+    .option('--fps <number>', `Frames per second (default: the composition's, else ${DEFAULT_FPS})`)
+    .option('--duration <seconds>', "Duration in seconds (default: the composition's)")
     .option('--quality <number>', 'CRF quality (0-51)')
-    .option('--mode <mode>', 'Render mode (canvas or dom)', 'canvas')
+    .option('--mode <mode>', 'dom: screenshot the page, works for any page; canvas: capture the first <canvas>, faster', 'dom')
+    .option('--audio <file>', 'Audio file to use as the soundtrack')
+    .option('--gpu', 'Enable GPU acceleration in the browser (WebGL)')
+    .option('--no-gpu', 'Disable GPU acceleration in the browser')
     .option('--start-frame <number>', 'Frame to start rendering from')
     .option('--frame-count <number>', 'Number of frames to render')
     .option('--concurrency <number>', 'Number of concurrent render jobs', '1')
@@ -80,30 +113,73 @@ export function registerRenderCommand(program: Command) {
           console.log(`Using custom browser executable: ${executablePath}`);
         }
 
-        if (options.emitJob) {
-          const fps = parseInt(options.fps, 10);
-          const duration = parseInt(options.duration, 10);
-          const width = parseInt(options.width, 10);
-          const height = parseInt(options.height, 10);
-          const crf = options.quality ? parseInt(options.quality, 10) : undefined;
+        const mode = parseMode(options.mode);
+        const fpsFlag = parsePositive(options.fps, '--fps');
+        const durationFlag = parsePositive(options.duration, '--duration');
+        const widthFlag = parsePositive(options.width, '--width', true);
+        const heightFlag = parsePositive(options.height, '--height', true);
+        const crf = options.quality ? parseInt(options.quality, 10) : undefined;
 
+        let audioFilePath: string | undefined;
+        if (options.audio) {
+          if (options.emitJob) {
+            // `helios merge` cannot mux a soundtrack yet, so the job would silently lose it.
+            throw new Error('--audio is not supported with --emit-job yet; add the soundtrack to the merged video instead');
+          }
+          audioFilePath = path.resolve(process.cwd(), options.audio);
+          if (!fs.existsSync(audioFilePath)) {
+            throw new Error(`Audio file not found: ${options.audio}`);
+          }
+        }
+
+        const browserConfig = {
+          headless: options.headless, // 'no-headless' sets this to false
+          args: browserArgs,
+          executablePath,
+          ...(options.gpu !== undefined ? { gpu: options.gpu as boolean } : {}),
+        };
+
+        // Whatever the flags leave open comes from the composition itself.
+        let info: CompositionInfo | undefined;
+        const needsDuration = durationFlag === undefined && frameCount === undefined;
+        if (fpsFlag === undefined || needsDuration || widthFlag === undefined || heightFlag === undefined) {
+          info = await probeComposition(url, {
+            browserConfig,
+            width: widthFlag ?? DEFAULT_WIDTH,
+            height: heightFlag ?? DEFAULT_HEIGHT,
+          });
+          const declared = [
+            info.durationInSeconds !== undefined ? `${info.durationInSeconds}s` : null,
+            info.fps !== undefined ? `${info.fps} fps` : null,
+            info.width !== undefined && info.height !== undefined ? `${info.width}x${info.height}` : null,
+          ].filter(Boolean);
+          if (declared.length) console.log(`Composition declares ${declared.join(', ')}`);
+        }
+        const fps = fpsFlag ?? info?.fps ?? DEFAULT_FPS;
+        const width = widthFlag ?? info?.width ?? DEFAULT_WIDTH;
+        const height = heightFlag ?? info?.height ?? DEFAULT_HEIGHT;
+        const declaredDuration = durationFlag ?? info?.durationInSeconds;
+        if (declaredDuration === undefined && frameCount === undefined) {
+          throw new Error(`How long should the video be? Pass --duration <seconds>: ${describeDriver(info!)}.`);
+        }
+        const durationInSeconds = declaredDuration ?? frameCount! / fps;
+        console.log(`Rendering ${durationInSeconds}s at ${fps} fps, ${width}x${height}, ${mode} mode`);
+
+        if (options.emitJob) {
           const renderOptions: DistributedRenderOptions = {
             width,
             height,
             fps,
-            durationInSeconds: duration,
+            durationInSeconds,
             crf,
-            mode: options.mode as 'canvas' | 'dom',
+            mode,
             startFrame,
             frameCount,
             concurrency,
+            audioFilePath,
             audioCodec: options.audioCodec,
             videoCodec: options.videoCodec,
-            browserConfig: {
-              headless: options.headless,
-              args: browserArgs,
-              executablePath,
-            },
+            browserConfig,
           };
 
           const plan = RenderOrchestrator.plan(url, outputPath, renderOptions);
@@ -198,22 +274,19 @@ export function registerRenderCommand(program: Command) {
         }
 
         const renderOptions: DistributedRenderOptions = {
-          width: parseInt(options.width, 10),
-          height: parseInt(options.height, 10),
-          fps: parseInt(options.fps, 10),
-          durationInSeconds: parseInt(options.duration, 10),
-          crf: options.quality ? parseInt(options.quality, 10) : undefined,
-          mode: options.mode as 'canvas' | 'dom',
+          width,
+          height,
+          fps,
+          durationInSeconds,
+          crf,
+          mode,
           startFrame,
           frameCount,
           concurrency,
+          audioFilePath,
           audioCodec: options.audioCodec,
           videoCodec: options.videoCodec,
-          browserConfig: {
-            headless: options.headless, // 'no-headless' sets this to false
-            args: browserArgs,
-            executablePath,
-          },
+          browserConfig,
         };
 
         await RenderOrchestrator.render(url, outputPath, renderOptions);
