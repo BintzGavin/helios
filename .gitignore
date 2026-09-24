@@ -63,3 +63,7 @@ coverage/
 verification*.png
 packages/*/*_pid.txt
 packages/*/test_output.txt
+
+# Agent video scoreboard (tests/agent-eval): generated audio and run results
+tests/agent-eval/assets/track.mp3
+tests/agent-eval/results/

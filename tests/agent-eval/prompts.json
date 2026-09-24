@@ -1,0 +1,44 @@
+[
+  {
+    "id": "music-video",
+    "prompt": "Make a 15 second music video for track.mp3 (it's in this folder). The visuals should pulse with the beat. Export an MP4 with the song as its audio.",
+    "assets": ["track.mp3"],
+    "expect": { "durationSec": 15, "durationTolerance": 0.5, "audio": true }
+  },
+  {
+    "id": "animated-short",
+    "prompt": "Make me a short animated film, about 20 seconds, about a paper boat that makes it through a storm to calm water. I want an MP4.",
+    "expect": { "durationSec": 20, "durationTolerance": 5 }
+  },
+  {
+    "id": "explainer",
+    "prompt": "Create a 30-second explainer video on how HTTPS keeps a connection private: a title card, three steps with simple diagrams, and a closing card. MP4 please.",
+    "expect": { "durationSec": 30, "durationTolerance": 1 }
+  },
+  {
+    "id": "social-vertical",
+    "prompt": "I need a 10 second vertical video (9:16, 1080x1920) for Instagram for my coffee shop, Morning Ritual. Three beats: \"Freshly roasted\", \"Open at 7am\", \"Come say hi\". Bold type, warm colors. Give me an MP4.",
+    "expect": { "durationSec": 10, "durationTolerance": 0.5, "width": 1080, "height": 1920 }
+  },
+  {
+    "id": "chart",
+    "prompt": "Turn sales.csv into an animated chart video, around 12 seconds, where the bars grow year by year. Export it as an MP4.",
+    "assets": ["sales.csv"],
+    "expect": { "durationSec": 12, "durationTolerance": 3 }
+  },
+  {
+    "id": "ui-demo",
+    "prompt": "Make a 15 second product demo video of a simple todo app: a cursor adds two tasks and checks one off. 1920x1080 MP4.",
+    "expect": { "durationSec": 15, "durationTolerance": 0.5, "width": 1920, "height": 1080 }
+  },
+  {
+    "id": "logo-reveal",
+    "prompt": "Animate a 5 second logo reveal for \"NOVA LABS\" and export it as an MP4.",
+    "expect": { "durationSec": 5, "durationTolerance": 0.5 }
+  },
+  {
+    "id": "gif-loop",
+    "prompt": "Make an 8 second seamless looping animation of drifting gradient blobs. I need it as an MP4 and as a GIF.",
+    "expect": { "durationSec": 8, "durationTolerance": 0.5, "gif": true }
+  }
+]
