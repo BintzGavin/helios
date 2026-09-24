@@ -101,6 +101,7 @@ helios render <input> [options]
 - `--height <number>`: Viewport height (default: the composition's, else `1080`).
 - `--audio <file>`: Audio file to use as the soundtrack.
 - `--quality <number>`: CRF quality (0-51). Lower is better quality.
+- `--preset <name>`: The x264 encoder preset. `ultrafast` (default) renders fastest but makes the largest files. `medium` or `slow` make much smaller files of the same quality and take longer to encode. Use one of those for a final delivery.
 - `--mode <mode>`: `dom` screenshots the page and works for any page; `canvas` captures the first `<canvas>` and is faster (default: `dom`).
 - `--gpu` / `--no-gpu`: Enable or disable GPU acceleration in the browser (for WebGL).
 - `--no-headless`: Run in a visible browser window (useful for debugging).

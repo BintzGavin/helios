@@ -156,7 +156,7 @@ describe('render command', () => {
 
   it('should include all options in rendererOptionsToFlags correctly', async () => {
     vi.mocked(RenderOrchestrator.plan).mockReturnValueOnce({
-      chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: { width: 1920, height: 1080, fps: 60, crf: 23, mode: 'dom', audioCodec: 'aac', videoCodec: 'libx264', browserConfig: { headless: false } } as any }],
+      chunks: [{ id: 1, startFrame: 0, frameCount: 10, outputFile: 'out.mp4', options: { width: 1920, height: 1080, fps: 60, crf: 23, mode: 'dom', audioCodec: 'aac', videoCodec: 'libx264', preset: 'slow', browserConfig: { headless: false } } as any }],
       concatManifest: ['out.mp4'],
       mixOptions: {} as any,
       totalFrames: 10,
@@ -189,6 +189,7 @@ describe('render command', () => {
       expect(command).toContain('--audio-codec aac');
       expect(command).toContain('--video-codec libx264');
       expect(command).toContain('--no-headless');
+      expect(command).toContain('--preset slow');
     }
   });
 
@@ -347,6 +348,18 @@ describe('render command', () => {
         await program.parseAsync(['node', 'test', 'render', url, '--duration', '1']);
         expect(vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![0]).toBe(url);
       }
+    });
+
+    it('--preset trades encode speed for file size', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', '1', '--preset', 'medium']);
+      expect(renderOptions()).toEqual(expect.objectContaining({ preset: 'medium' }));
+    });
+
+    it('rejects an unknown x264 preset', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--duration', '1', '--preset', 'turbo']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('veryslow');
+      expect(RenderOrchestrator.render).not.toHaveBeenCalled();
     });
 
     it('--gpu and --no-gpu set browserConfig.gpu', async () => {
