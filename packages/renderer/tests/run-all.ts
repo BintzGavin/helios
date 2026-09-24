@@ -12,6 +12,7 @@ const tests = [
   'tests/verify-bitrate.ts',
   'tests/verify-blob-audio.ts',
   'tests/verify-browser-config.ts',
+  'tests/verify-browser-install.ts',
   'tests/verify-canvas-implicit-audio.ts',
   'tests/verify-canvas-preload.ts',
   'tests/verify-canvas-selector.ts',

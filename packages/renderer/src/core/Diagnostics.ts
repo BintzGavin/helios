@@ -1,10 +1,10 @@
-import { chromium } from 'playwright';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { RendererOptions } from '../types.js';
 import { DomStrategy } from '../strategies/DomStrategy.js';
 import { CanvasStrategy } from '../strategies/CanvasStrategy.js';
 import { FFmpegInspector } from '../utils/FFmpegInspector.js';
 import { BrowserPool } from './BrowserPool.js';
+import { launchChromium } from './launchBrowser.js';
 
 export class Diagnostics {
   constructor(private options: RendererOptions) {}
@@ -13,7 +13,7 @@ export class Diagnostics {
     console.log(`Starting diagnostics (Mode: ${this.options.mode || 'canvas'})`);
 
     const pool = new BrowserPool(this.options);
-    const browser = await chromium.launch(pool.getLaunchOptions());
+    const browser = await launchChromium(pool.getLaunchOptions());
 
     try {
       const page = await browser.newPage();

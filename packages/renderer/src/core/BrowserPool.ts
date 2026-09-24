@@ -1,4 +1,4 @@
-import { chromium, ConsoleMessage } from 'playwright';
+import { ConsoleMessage } from 'playwright';
 import os from 'os';
 import fs from 'fs';
 import { RenderStrategy } from '../strategies/RenderStrategy.js';
@@ -8,6 +8,7 @@ import { TimeDriver } from '../drivers/TimeDriver.js';
 import { CdpTimeDriver } from '../drivers/CdpTimeDriver.js';
 import { SeekTimeDriver } from '../drivers/SeekTimeDriver.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
+import { launchChromium } from './launchBrowser.js';
 
 const DEFAULT_BROWSER_ARGS = [
   '--disable-extensions',
@@ -118,7 +119,7 @@ export class BrowserPool {
     console.log(`Initializing pool of ${concurrency} browsers/pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
-      const browser = await chromium.launch(this.getLaunchOptions());
+      const browser = await launchChromium(this.getLaunchOptions());
       try {
         const context = await browser.newContext({
           viewport: {
