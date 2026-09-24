@@ -326,6 +326,18 @@ describe('render command', () => {
       expect(RenderOrchestrator.plan).not.toHaveBeenCalled();
     });
 
+    it('treats a local file whose name starts with "http" as a file, not a URL', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'https-explainer.html', '--duration', '1']);
+      expect(vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![0]).toMatch(/^file:\/\/.*\/https-explainer\.html$/);
+    });
+
+    it('passes real URLs through unchanged', async () => {
+      for (const url of ['https://example.com/page.html', 'http://localhost:5173/', 'file:///tmp/page.html']) {
+        await program.parseAsync(['node', 'test', 'render', url, '--duration', '1']);
+        expect(vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![0]).toBe(url);
+      }
+    });
+
     it('--gpu and --no-gpu set browserConfig.gpu', async () => {
       await program.parseAsync(['node', 'test', 'render', 'http://example.com/comp.html', '--gpu']);
       expect(renderOptions().browserConfig).toEqual(expect.objectContaining({ gpu: true }));

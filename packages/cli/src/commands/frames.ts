@@ -1,18 +1,13 @@
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
-import { pathToFileURL } from 'url';
 import { captureFrames, captureContactSheet, probeComposition } from '@helios-project/renderer';
 import type { CompositionInfo } from '@helios-project/renderer';
-import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parseCrop, parsePositive, parseRange, parseTimes } from '../utils/render-options.js';
+import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parseCrop, parsePositive, parseRange, parseTimes, toCompositionUrl } from '../utils/render-options.js';
 
 /** More than this and a sheet stops being readable (and gets slow to build). */
 const MAX_SHEET_FRAMES = 60;
 const DEFAULT_SHEET_FRAMES = 12;
-
-function toUrl(input: string): string {
-  return input.startsWith('http') ? input : pathToFileURL(path.resolve(process.cwd(), input)).href;
-}
 
 function browserConfig(options: any) {
   return {
@@ -48,7 +43,7 @@ export function registerFrameCommands(program: Command) {
   ).action(async (input, options) => {
     try {
       const times = parseTimes(options.at, '--at');
-      const url = toUrl(input);
+      const url = toCompositionUrl(input);
       const { width, height } = await pageSize(url, options);
       const frames = await captureFrames(url, times, {
         width,
@@ -80,7 +75,7 @@ export function registerFrameCommands(program: Command) {
       .option('--samples <number>', 'Frames to compare', '6')
   ).action(async (input, options) => {
     try {
-      const url = toUrl(input);
+      const url = toCompositionUrl(input);
       const samples = parsePositive(options.samples, '--samples', true)!;
       const durationFlag = parsePositive(options.duration, '--duration');
       const needsProbe = durationFlag === undefined || options.width === undefined || options.height === undefined;
@@ -128,7 +123,7 @@ export function registerFrameCommands(program: Command) {
       .option('-o, --output <path>', 'Output PNG', 'sheet.png')
   ).action(async (input, options) => {
     try {
-      const url = toUrl(input);
+      const url = toCompositionUrl(input);
       const durationFlag = parsePositive(options.duration, '--duration');
       const fpsFlag = parsePositive(options.fps, '--fps');
       const every = parsePositive(options.every, '--every');

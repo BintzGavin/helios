@@ -1,3 +1,6 @@
+import path from 'path';
+import { pathToFileURL } from 'url';
+
 export const DEFAULT_FPS = 30;
 export const DEFAULT_WIDTH = 1920;
 export const DEFAULT_HEIGHT = 1080;
@@ -38,4 +41,14 @@ export function parseCrop(value: string | undefined): { x: number; y: number; wi
   }
   const [x, y, width, height] = parts;
   return { x, y, width, height };
+}
+
+/** True for inputs with a scheme, like https://…, http://localhost:5173/ or file:///…. */
+export function isUrl(input: string): boolean {
+  return /^[a-z][a-z\d+.-]*:\/\//i.test(input);
+}
+
+/** A composition URL from a CLI input: URLs pass through, anything else is a local path. */
+export function toCompositionUrl(input: string): string {
+  return isUrl(input) ? input : pathToFileURL(path.resolve(process.cwd(), input)).href;
 }
