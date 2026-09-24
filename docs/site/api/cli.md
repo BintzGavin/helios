@@ -105,6 +105,8 @@ helios render <input> [options]
 - `--gpu` / `--no-gpu`: Enable or disable GPU acceleration in the browser (for WebGL).
 - `--no-headless`: Run in a visible browser window (useful for debugging).
 
+**Local pages are served over http**: `helios render page.html`, and likewise `still`, `sheet` and `verify`, serves the page from `127.0.0.1` for the length of the command. The server's root is the current directory, or the page's own folder if the page is outside it. So the page can `fetch()` data files that sit next to it, and media elements get byte-range requests. `--no-serve` loads the page from `file://` instead.
+
 **Pages that draw their own frames**: a page that defines `window.renderAt(t)` (or `window.seek(t)`, or `window.__render(t)`) is called once per frame with the time `t` in seconds, and the frame is captured when it returns. If it returns a promise, the frame is captured after the promise resolves. The page needs no Helios import:
 
 ```bash

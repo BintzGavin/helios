@@ -1,5 +1,6 @@
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { serveLocalPage } from './serve.js';
 
 export const DEFAULT_FPS = 30;
 export const DEFAULT_WIDTH = 1920;
@@ -51,4 +52,18 @@ export function isUrl(input: string): boolean {
 /** A composition URL from a CLI input: URLs pass through, anything else is a local path. */
 export function toCompositionUrl(input: string): string {
   return isUrl(input) ? input : pathToFileURL(path.resolve(process.cwd(), input)).href;
+}
+
+/**
+ * Runs fn with a URL for the input. URLs pass through. A local page is served over http on
+ * 127.0.0.1 for the duration (so it can fetch() files next to it), unless serve is false.
+ */
+export async function withCompositionUrl<T>(input: string, serve: boolean, fn: (url: string) => Promise<T>): Promise<T> {
+  if (isUrl(input) || !serve) return fn(toCompositionUrl(input));
+  const served = await serveLocalPage(path.resolve(process.cwd(), input));
+  try {
+    return await fn(served.url);
+  } finally {
+    await served.close();
+  }
 }

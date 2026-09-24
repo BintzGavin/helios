@@ -327,8 +327,19 @@ describe('render command', () => {
     });
 
     it('treats a local file whose name starts with "http" as a file, not a URL', async () => {
-      await program.parseAsync(['node', 'test', 'render', 'https-explainer.html', '--duration', '1']);
+      await program.parseAsync(['node', 'test', 'render', 'https-explainer.html', '--duration', '1', '--no-serve']);
       expect(vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![0]).toMatch(/^file:\/\/.*\/https-explainer\.html$/);
+    });
+
+    it('serves a local page over http so it can fetch() files next to it', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'https-explainer.html', '--duration', '1', '--width', '640', '--height', '360', '--fps', '30']);
+      expect(vi.mocked(RenderOrchestrator.render).mock.calls.at(-1)![0]).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/https-explainer\.html$/);
+      expect(vi.mocked(probeComposition)).not.toHaveBeenCalled();
+    });
+
+    it('probes the served page too', async () => {
+      await program.parseAsync(['node', 'test', 'render', 'page.html']);
+      expect(vi.mocked(probeComposition).mock.calls[0][0]).toMatch(/^http:\/\/127\.0\.0\.1:\d+\/page\.html$/);
     });
 
     it('passes real URLs through unchanged', async () => {

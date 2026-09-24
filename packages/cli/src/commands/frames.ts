@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { captureFrames, captureContactSheet, probeComposition } from '@helios-project/renderer';
 import type { CompositionInfo } from '@helios-project/renderer';
-import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parseCrop, parsePositive, parseRange, parseTimes, toCompositionUrl } from '../utils/render-options.js';
+import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parseCrop, parsePositive, parseRange, parseTimes, withCompositionUrl } from '../utils/render-options.js';
 
 /** More than this and a sheet stops being readable (and gets slow to build). */
 const MAX_SHEET_FRAMES = 60;
@@ -30,7 +30,8 @@ function addPageOptions(command: Command): Command {
     .option('--crop <x,y,w,h>', 'Cut each frame to this region, in pixels')
     .option('--gpu', 'Enable GPU acceleration in the browser (WebGL)')
     .option('--no-gpu', 'Disable GPU acceleration in the browser')
-    .option('--no-headless', 'Run in a visible browser window');
+    .option('--no-headless', 'Run in a visible browser window')
+    .option('--no-serve', 'Load a local page from file:// instead of serving it over http');
 }
 
 export function registerFrameCommands(program: Command) {
@@ -43,23 +44,24 @@ export function registerFrameCommands(program: Command) {
   ).action(async (input, options) => {
     try {
       const times = parseTimes(options.at, '--at');
-      const url = toCompositionUrl(input);
-      const { width, height } = await pageSize(url, options);
-      const frames = await captureFrames(url, times, {
-        width,
-        height,
-        crop: parseCrop(options.crop),
-        browserConfig: browserConfig(options),
-      });
+      await withCompositionUrl(input, options.serve !== false, async (url) => {
+        const { width, height } = await pageSize(url, options);
+        const frames = await captureFrames(url, times, {
+          width,
+          height,
+          crop: parseCrop(options.crop),
+          browserConfig: browserConfig(options),
+        });
 
-      const single = times.length === 1 && options.output;
-      if (options.output && !single) fs.mkdirSync(path.resolve(process.cwd(), options.output), { recursive: true });
-      frames.forEach((png, i) => {
-        const name = `still-${round(times[i])}s.png`;
-        const file = single ? options.output : path.join(options.output ?? '.', name);
-        const target = path.resolve(process.cwd(), file);
-        fs.writeFileSync(target, png);
-        console.log(`Wrote ${path.relative(process.cwd(), target)} (t=${round(times[i])}s)`);
+        const single = times.length === 1 && options.output;
+        if (options.output && !single) fs.mkdirSync(path.resolve(process.cwd(), options.output), { recursive: true });
+        frames.forEach((png, i) => {
+          const name = `still-${round(times[i])}s.png`;
+          const file = single ? options.output : path.join(options.output ?? '.', name);
+          const target = path.resolve(process.cwd(), file);
+          fs.writeFileSync(target, png);
+          console.log(`Wrote ${path.relative(process.cwd(), target)} (t=${round(times[i])}s)`);
+        });
       });
     } catch (err: any) {
       console.error('Still failed:', err.message);
@@ -75,34 +77,35 @@ export function registerFrameCommands(program: Command) {
       .option('--samples <number>', 'Frames to compare', '6')
   ).action(async (input, options) => {
     try {
-      const url = toCompositionUrl(input);
-      const samples = parsePositive(options.samples, '--samples', true)!;
-      const durationFlag = parsePositive(options.duration, '--duration');
-      const needsProbe = durationFlag === undefined || options.width === undefined || options.height === undefined;
-      const info = needsProbe ? await probe(url, options) : undefined;
-      const duration = durationFlag ?? info?.durationInSeconds;
-      if (duration === undefined) {
-        throw new Error('The page declares no duration: pass --duration <seconds>');
-      }
-      const { width, height } = await pageSize(url, options, info);
-      const times = Array.from({ length: samples }, (_, i) => round((i * duration) / samples));
-      const capture = { width, height, crop: parseCrop(options.crop), browserConfig: browserConfig(options) };
+      await withCompositionUrl(input, options.serve !== false, async (url) => {
+        const samples = parsePositive(options.samples, '--samples', true)!;
+        const durationFlag = parsePositive(options.duration, '--duration');
+        const needsProbe = durationFlag === undefined || options.width === undefined || options.height === undefined;
+        const info = needsProbe ? await probe(url, options) : undefined;
+        const duration = durationFlag ?? info?.durationInSeconds;
+        if (duration === undefined) {
+          throw new Error('The page declares no duration: pass --duration <seconds>');
+        }
+        const { width, height } = await pageSize(url, options, info);
+        const times = Array.from({ length: samples }, (_, i) => round((i * duration) / samples));
+        const capture = { width, height, crop: parseCrop(options.crop), browserConfig: browserConfig(options) };
 
-      // Once in order, then in reverse on a fresh page: the reverse pass starts cold at the
-      // last frame, the way a chunk of a distributed render does, and revisits every frame
-      // after later ones.
-      const forward = await captureFrames(url, times, capture);
-      const reversed = await captureFrames(url, [...times].reverse(), capture);
-      const differing = times.filter((_, i) => !forward[i].equals(reversed[times.length - 1 - i]));
+        // Once in order, then in reverse on a fresh page: the reverse pass starts cold at the
+        // last frame, the way a chunk of a distributed render does, and revisits every frame
+        // after later ones.
+        const forward = await captureFrames(url, times, capture);
+        const reversed = await captureFrames(url, [...times].reverse(), capture);
+        const differing = times.filter((_, i) => !forward[i].equals(reversed[times.length - 1 - i]));
 
-      if (differing.length > 0) {
-        throw new Error(
-          `Frames at ${differing.map((t) => `${Number(t.toFixed(3))}s`).join(', ')} differ depending on what was rendered before them. ` +
-          'Every frame must be a function of t alone: replace counters, `x += speed`, randomness drawn per frame ' +
-          'and timers with values computed from t, or the video breaks when rendered in chunks or seeked.'
-        );
-      }
-      console.log(`${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`);
+        if (differing.length > 0) {
+          throw new Error(
+            `Frames at ${differing.map((t) => `${Number(t.toFixed(3))}s`).join(', ')} differ depending on what was rendered before them. ` +
+            'Every frame must be a function of t alone: replace counters, `x += speed`, randomness drawn per frame ' +
+            'and timers with values computed from t, or the video breaks when rendered in chunks or seeked.'
+          );
+        }
+        console.log(`${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`);
+      });
     } catch (err: any) {
       console.error('Verify failed:', err.message);
       process.exit(1);
@@ -123,53 +126,54 @@ export function registerFrameCommands(program: Command) {
       .option('-o, --output <path>', 'Output PNG', 'sheet.png')
   ).action(async (input, options) => {
     try {
-      const url = toCompositionUrl(input);
-      const durationFlag = parsePositive(options.duration, '--duration');
-      const fpsFlag = parsePositive(options.fps, '--fps');
-      const every = parsePositive(options.every, '--every');
-      const strip = options.strip ? parseRange(options.strip, '--strip') : undefined;
-      const at = options.at ? parseTimes(options.at, '--at') : undefined;
+      await withCompositionUrl(input, options.serve !== false, async (url) => {
+        const durationFlag = parsePositive(options.duration, '--duration');
+        const fpsFlag = parsePositive(options.fps, '--fps');
+        const every = parsePositive(options.every, '--every');
+        const strip = options.strip ? parseRange(options.strip, '--strip') : undefined;
+        const at = options.at ? parseTimes(options.at, '--at') : undefined;
 
-      const needsDuration = !at && !strip && durationFlag === undefined;
-      const needsFps = strip !== undefined && fpsFlag === undefined;
-      const needsSize = options.width === undefined || options.height === undefined;
-      const info = needsDuration || needsFps || needsSize ? await probe(url, options) : undefined;
-      const { width, height } = await pageSize(url, options, info);
+        const needsDuration = !at && !strip && durationFlag === undefined;
+        const needsFps = strip !== undefined && fpsFlag === undefined;
+        const needsSize = options.width === undefined || options.height === undefined;
+        const info = needsDuration || needsFps || needsSize ? await probe(url, options) : undefined;
+        const { width, height } = await pageSize(url, options, info);
 
-      let times: number[];
-      if (at) {
-        times = at;
-      } else if (strip) {
-        const fps = fpsFlag ?? info?.fps ?? DEFAULT_FPS;
-        const first = Math.ceil(strip[0] * fps - 1e-9);
-        const last = Math.floor(strip[1] * fps + 1e-9);
-        times = Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => round((first + i) / fps));
-      } else {
-        const duration = durationFlag ?? info?.durationInSeconds;
-        if (duration === undefined) {
-          throw new Error('The page declares no duration: pass --duration <seconds>, or pick frames with --at or --strip');
+        let times: number[];
+        if (at) {
+          times = at;
+        } else if (strip) {
+          const fps = fpsFlag ?? info?.fps ?? DEFAULT_FPS;
+          const first = Math.ceil(strip[0] * fps - 1e-9);
+          const last = Math.floor(strip[1] * fps + 1e-9);
+          times = Array.from({ length: Math.max(0, last - first + 1) }, (_, i) => round((first + i) / fps));
+        } else {
+          const duration = durationFlag ?? info?.durationInSeconds;
+          if (duration === undefined) {
+            throw new Error('The page declares no duration: pass --duration <seconds>, or pick frames with --at or --strip');
+          }
+          const step = every ?? duration / DEFAULT_SHEET_FRAMES;
+          const count = Math.ceil(duration / step - 1e-9);
+          times = Array.from({ length: count }, (_, i) => round(i * step));
         }
-        const step = every ?? duration / DEFAULT_SHEET_FRAMES;
-        const count = Math.ceil(duration / step - 1e-9);
-        times = Array.from({ length: count }, (_, i) => round(i * step));
-      }
 
-      if (times.length === 0) throw new Error('No frames selected');
-      if (times.length > MAX_SHEET_FRAMES) {
-        throw new Error(`That selects ${times.length} frames; a sheet holds up to ${MAX_SHEET_FRAMES}. Narrow --strip, or use a larger --every.`);
-      }
+        if (times.length === 0) throw new Error('No frames selected');
+        if (times.length > MAX_SHEET_FRAMES) {
+          throw new Error(`That selects ${times.length} frames; a sheet holds up to ${MAX_SHEET_FRAMES}. Narrow --strip, or use a larger --every.`);
+        }
 
-      const sheet = await captureContactSheet(url, times, {
-        width,
-        height,
-        crop: parseCrop(options.crop),
-        columns: parsePositive(options.cols, '--cols', true),
-        cellWidth: parsePositive(options.cellWidth, '--cell-width', true),
-        browserConfig: browserConfig(options),
+        const sheet = await captureContactSheet(url, times, {
+          width,
+          height,
+          crop: parseCrop(options.crop),
+          columns: parsePositive(options.cols, '--cols', true),
+          cellWidth: parsePositive(options.cellWidth, '--cell-width', true),
+          browserConfig: browserConfig(options),
+        });
+        const target = path.resolve(process.cwd(), options.output);
+        fs.writeFileSync(target, sheet);
+        console.log(`Wrote ${path.relative(process.cwd(), target)} (${times.length} frames: ${times.slice(0, 6).join('s, ')}s${times.length > 6 ? ', …' : ''})`);
       });
-      const target = path.resolve(process.cwd(), options.output);
-      fs.writeFileSync(target, sheet);
-      console.log(`Wrote ${path.relative(process.cwd(), target)} (${times.length} frames: ${times.slice(0, 6).join('s, ')}s${times.length > 6 ? ', …' : ''})`);
     } catch (err: any) {
       console.error('Sheet failed:', err.message);
       process.exit(1);
