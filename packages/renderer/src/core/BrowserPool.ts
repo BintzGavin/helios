@@ -132,11 +132,15 @@ export class BrowserPool {
 
         const page = await context.newPage();
         const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-        /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
-        const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
-        const timeDriver = this.options.mode === 'dom' || canvasSeekClock
-          ? new SeekTimeDriver(this.options.stabilityTimeout)
-          : new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
+        // Both modes seek the page to each frame's time (Helios, seek hooks, WAAPI, virtual
+        // clocks). Canvas mode also flushes rAF callbacks on each seek, since capturing the
+        // canvas does not produce a browser frame. CdpTimeDriver (CDP virtual time) follows the
+        // wall clock for rAF-driven and Helios-bound pages; HELIOS_CANVAS_SEEK_CLOCK=0 keeps it
+        // available for comparison.
+        const legacyCdpClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '0';
+        const timeDriver: TimeDriver = legacyCdpClock
+          ? new CdpTimeDriver(this.options.stabilityTimeout, 'canvas')
+          : new SeekTimeDriver(this.options.stabilityTimeout, { flushAnimationFrames: this.options.mode !== 'dom' });
 
         page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
         page.on('pageerror', (err: Error) => {

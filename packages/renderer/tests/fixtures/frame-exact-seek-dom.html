@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;width:320px;height:180px;overflow:hidden}#box{position:absolute;left:0;top:80px;width:20px;height:20px;background:#fff}</style></head>
+<body>
+<div id="box"></div>
+<script>
+// A DOM page driven by seek(t) (seconds). No Helios import, no CSS animation.
+const box = document.getElementById('box');
+window.seek = (t) => { box.style.transform = `translateX(${100 * t}px)`; };
+</script>
+</body>
+</html>

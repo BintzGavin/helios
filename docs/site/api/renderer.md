@@ -88,11 +88,41 @@ await renderer.render(
 
 The renderer uses different strategies based on `mode`:
 
-- **`canvas`**: Uses `CdpTimeDriver` (Chrome DevTools Protocol) and `CanvasStrategy`. Captures frames via WebCodecs or Screenshot. Best for Canvas/WebGL.
+- **`canvas`**: Uses `SeekTimeDriver` and `CanvasStrategy`. Captures frames via WebCodecs or Screenshot. Best for Canvas/WebGL. On each frame, the renderer runs the page's queued `requestAnimationFrame` callbacks at that frame's time, so rAF-driven canvases are frame-exact. (`HELIOS_CANVAS_SEEK_CLOCK=0` selects the older `CdpTimeDriver`, which follows the wall clock for rAF-driven and Helios-bound pages.)
     - **H.264 Support**: By default, `CanvasStrategy` prioritizes H.264 (`avc1`) intermediate capture for performance.
     - **Hardware Acceleration**: Prioritizes hardware-accelerated codecs (checking `navigator.mediaCapabilities.encodingInfo` for `powerEfficient: true`) and prefers H.264 over VP9 when hardware support is equivalent.
     - **Stream Copy**: If `videoCodec: 'copy'` is used, the renderer performs a lossless stream copy from the WebCodecs output to the container, bypassing re-encoding.
 - **`dom`**: Uses `SeekTimeDriver` and `DomStrategy`. Captures frames by taking screenshots of the DOM. Supports CSS animations, font loading, image preloading, visual playback rate synchronization, and `startFrame`.
+
+### Frame hooks
+
+A page doesn't have to import Helios. If it defines one of these functions, the renderer calls it once per frame, in both modes, before capturing that frame. The first one defined is used:
+
+- `window.renderAt(t)`
+- `window.__render(t)`
+- `window.seek(t)`
+
+- `t` is the frame's time in **seconds**.
+- If the function returns a promise, the renderer waits for it, up to `stabilityTimeout`.
+- If it throws or rejects, the render fails with the page's error, naming the function and the time.
+- `window.helios`, CSS/WAAPI animations and a `window.__helios_gsap_timeline__` are still seeked as before, and the page's clock (`performance.now()`, `Date.now()`, rAF timestamps) reads the frame's time.
+- Timers (`setTimeout`, `setInterval`) run on real time. Animate from `t`, not from timers.
+
+The renderer starts as soon as the page defines one of these hooks or `window.helios`. A page that defines neither starts after a 3 s grace period, and a warning is logged.
+
+### Probing a composition
+
+#### `probeComposition(url, options?)`
+Loads a page once and reports what drives it and, for Helios compositions, what they declare. `helios render` uses this to fill in `--duration`, `--fps` and the size when they're omitted.
+
+```typescript
+import { probeComposition } from '@helios-project/renderer';
+
+const info = await probeComposition('file:///path/to/composition.html');
+// { driver: 'helios', durationInSeconds: 10, fps: 30, width: 1920, height: 1080 }
+// { driver: 'hook', hook: 'renderAt' }   (a page with window.renderAt(t))
+// { driver: 'none' }                     (CSS / WAAPI / rAF only)
+```
 
 ### Diagnostics
 

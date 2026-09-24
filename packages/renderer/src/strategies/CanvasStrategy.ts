@@ -594,7 +594,8 @@ export class CanvasStrategy implements RenderStrategy {
 
     if (this.useWebCodecs) {
       if (this.useH264) {
-        videoInputArgs = ['-f', 'h264', '-i', '-'];
+        // Raw Annex B H.264 carries no timestamps; without -framerate FFmpeg assumes 25 fps.
+        videoInputArgs = ['-f', 'h264', '-framerate', `${options.fps}`, '-i', '-'];
       } else {
         videoInputArgs = ['-f', 'ivf', '-i', '-'];
       }

@@ -41,13 +41,45 @@ class ReusableAggregator {
 }
 
 
+/**
+ * Page-defined "draw the frame at time t" functions the renderer calls on every frame,
+ * in priority order. `t` is in seconds; a returned promise is awaited before capture.
+ * These are the shapes agents write unprompted (`renderAt(t)`, `__render(t)`, `seek(t)`).
+ */
+export const PAGE_SEEK_HOOKS = ['renderAt', '__render', 'seek'] as const;
+
+/**
+ * How long to wait after load for a page to define `window.helios`, a GSAP timeline or a
+ * seek hook. Pages that never define one (plain CSS, WAAPI or rAF animation) start
+ * rendering after this grace period instead of waiting out the full stability timeout.
+ */
+export const HOOK_GRACE_MS = 3000;
+
+const SEEK_FUNCTION_DECLARATION =
+  "function(t, timeoutMs) { return typeof window.__helios_seek === 'function' ? window.__helios_seek(t, timeoutMs) : undefined; }";
+
+/** Marks errors thrown by a page hook so they fail the render instead of being ignored. */
+const PAGE_HOOK_ERROR_MARKER = '[helios:page-hook]';
+
+export interface SeekTimeDriverOptions {
+  /**
+   * Run the page's pending requestAnimationFrame callbacks on every seek, with the new
+   * virtual time, instead of waiting for the browser to produce a frame. Canvas mode needs
+   * this: it captures the canvas directly, so nothing else forces a frame between seek and
+   * capture (and begin-frame control stops the browser from producing frames on its own).
+   */
+  flushAnimationFrames?: boolean;
+}
+
 export class SeekTimeDriver implements TimeDriver {
   private aggregator = new ReusableAggregator();
   private cdpSession: CDPSession | null = null;
   private multiFrameCallParams: any[] = [];
   private executionContextIds: number[] = [];
+  private flushAnimationFrames: boolean;
+  private warnedInternalSeekError = false;
   private callFunctionOnParams: any = {
-    functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+    functionDeclaration: SEEK_FUNCTION_DECLARATION,
     arguments: [{ value: 0 }, { value: 0 }],
     awaitPromise: true
   };
@@ -70,8 +102,9 @@ export class SeekTimeDriver implements TimeDriver {
     this.multiFrameCallParams.length = 0;
   };
 
-  constructor(private timeout: number = 30000) {
+  constructor(private timeout: number = 30000, options: SeekTimeDriverOptions = {}) {
     this.evaluateArgs[1] = timeout;
+    this.flushAnimationFrames = options.flushAnimationFrames === true;
   }
 
   async init(page: Page, seed?: number): Promise<void> {
@@ -90,13 +123,41 @@ export class SeekTimeDriver implements TimeDriver {
       // Override Date.now()
       window.Date.now = () => initialDate + (window as any).__HELIOS_VIRTUAL_TIME__;
 
-      // Override requestAnimationFrame
-      const originalRAF = window.requestAnimationFrame;
+      // Override requestAnimationFrame. Callbacks receive virtual time instead of the real
+      // timestamp, and stay tracked until they run so a seek can flush them (see
+      // __helios_flush_animation_frames). A callback runs once: either when the browser
+      // produces a frame or when it is flushed, whichever comes first.
+      const originalRAF = window.requestAnimationFrame.bind(window);
+      const originalCAF = window.cancelAnimationFrame.bind(window);
+      const pendingCallbacks = new Map<number, FrameRequestCallback>();
       window.requestAnimationFrame = (callback) => {
-        return originalRAF((_timestamp) => {
-          // Pass virtual time to the callback instead of the real timestamp
+        const id = originalRAF(() => {
+          if (!pendingCallbacks.delete(id)) return;
           callback((window as any).__HELIOS_VIRTUAL_TIME__);
         });
+        pendingCallbacks.set(id, callback);
+        return id;
+      };
+      window.cancelAnimationFrame = (id) => {
+        pendingCallbacks.delete(id);
+        originalCAF(id);
+      };
+      (window as any).__helios_flush_animation_frames = () => {
+        if (pendingCallbacks.size === 0) return;
+        // Like a browser frame: run what is queued now; callbacks queued while running
+        // (a loop re-arming itself) wait for the next frame.
+        const callbacks = Array.from(pendingCallbacks.values());
+        pendingCallbacks.clear();
+        const timestamp = (window as any).__HELIOS_VIRTUAL_TIME__;
+        for (const callback of callbacks) {
+          try {
+            callback(timestamp);
+          } catch (err) {
+            // Report it the way a browser reports a throwing rAF callback, without
+            // skipping the remaining callbacks.
+            queueMicrotask(() => { throw err; });
+          }
+        }
       };
     });
 
@@ -171,6 +232,57 @@ export class SeekTimeDriver implements TimeDriver {
           return found;
         }
 
+        // Page-defined frame hooks: window.renderAt(t) / window.__render(t) / window.seek(t),
+        // with t in seconds. The first one defined wins.
+        const PAGE_HOOK_NAMES = ${JSON.stringify(PAGE_SEEK_HOOKS)};
+        const FLUSH_ANIMATION_FRAMES = ${this.flushAnimationFrames ? 'true' : 'false'};
+
+        function findPageHook() {
+          for (let i = 0; i < PAGE_HOOK_NAMES.length; i++) {
+            if (typeof window[PAGE_HOOK_NAMES[i]] === 'function') return PAGE_HOOK_NAMES[i];
+          }
+          return null;
+        }
+
+        function pageHookError(name, t, err) {
+          const detail = err && err.stack ? err.stack : String(err);
+          return new Error('${PAGE_HOOK_ERROR_MARKER} window.' + name + '(' + t + ') threw: ' + detail);
+        }
+
+        // Calls the hook; returns a promise if the hook is async, otherwise null.
+        function callPageHook(name, t) {
+          let result;
+          try {
+            result = window[name](t);
+          } catch (err) {
+            throw pageHookError(name, t, err);
+          }
+          if (result && typeof result.then === 'function') {
+            return Promise.resolve(result).then(undefined, (err) => { throw pageHookError(name, t, err); });
+          }
+          return null;
+        }
+
+        // The frame to seek Helios to at time t. A Helios bound to the document timeline
+        // already follows virtual time exactly, including between its own frames when the
+        // render fps differs from the composition's, and waitUntilStable() waits for that
+        // exact frame; seeking it to a rounded frame made every such frame wait out the
+        // stability timeout. So a bound Helios gets the exact frame (a whole frame when only
+        // float error separates them); an unbound one gets whole frames, as before.
+        function heliosFrameFor(helios, t) {
+          const fps = helios.fps ? helios.fps.value : 30;
+          const exact = t * fps;
+          const nearest = Math.round(exact);
+          const bound = helios.isVirtualTimeBound === true || helios.syncWithDocumentTimeline === true;
+          return !bound || Math.abs(exact - nearest) < 1e-6 ? nearest : exact;
+        }
+
+        function flushAnimationFrames() {
+          if (FLUSH_ANIMATION_FRAMES && typeof window.__helios_flush_animation_frames === 'function') {
+            window.__helios_flush_animation_frames();
+          }
+        }
+
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
           cachedAnimations = null;
@@ -210,20 +322,21 @@ export class SeekTimeDriver implements TimeDriver {
           const numAnimations = cachedAnimations.length;
           for (let i = 0; i < numAnimations; i++) {
             const anim = cachedAnimations[i];
-            anim.currentTime = timeInMs;
+            // Pause first: pausing a running animation completes on the next frame and
+            // holds whatever time it has reached by then, which drifts past a time set
+            // before it. Setting the time after pause() completes the pause at exactly
+            // that time.
             if (anim.playState !== 'paused') {
               anim.pause();
             }
+            anim.currentTime = timeInMs;
           }
 
           // CRITICAL: Trigger Helios state update FIRST to ensure subscriptions fire
           if (typeof window.helios !== 'undefined' && window.helios.seek) {
             try {
               const helios = window.helios;
-              const fps = helios.fps ? helios.fps.value : 30;
-              const frame = Math.round(t * fps);
-
-              helios.seek(frame);
+              helios.seek(heliosFrameFor(helios, t));
               heliosSeeked = true;
               const _ = helios.currentFrame.value;
             } catch (e) {
@@ -244,9 +357,11 @@ export class SeekTimeDriver implements TimeDriver {
 
 
           cachedPromises.length = 0;
+          const pendingLabels = [];
           // 1. Wait for Fonts
           if (t === 0 && document.fonts && document.fonts.ready) {
             cachedPromises[cachedPromises.length] = document.fonts.ready;
+            pendingLabels.push('fonts');
           }
 
           // 2. Synchronize media elements (video, audio)
@@ -283,6 +398,7 @@ export class SeekTimeDriver implements TimeDriver {
                   });
                 }
                 cachedPromises[cachedPromises.length] = el.__helios_sync_promise;
+                pendingLabels.push('<' + el.tagName.toLowerCase() + '> ' + (el.currentSrc || el.src || '').slice(-60));
               }
             }
           }
@@ -290,18 +406,39 @@ export class SeekTimeDriver implements TimeDriver {
           // 3. Wait for Helios Stability (Custom Checks)
           if (typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function') {
             cachedPromises[cachedPromises.length] = window.helios.waitUntilStable();
+            pendingLabels.push('helios.waitUntilStable()');
           }
 
-          // 4. Wait for stability with a safety timeout (only if needed)
+          // 4. Page-defined frame hook. An async hook is awaited before capture.
+          const pageHook = findPageHook();
+          let pageHookIsSync = false;
+          if (pageHook) {
+            const hookPromise = callPageHook(pageHook, t);
+            if (hookPromise) {
+              cachedPromises[cachedPromises.length] = hookPromise;
+              pendingLabels.push('window.' + pageHook + '()');
+            } else {
+              pageHookIsSync = true;
+            }
+          }
+
+          // 5. Canvas mode: run queued rAF callbacks now, at the new virtual time.
+          flushAnimationFrames();
+
+          // 6. Wait for stability with a safety timeout (only if needed)
           if (cachedPromises.length > 0) {
             return new Promise((resolve, reject) => {
               let done = false;
+              // Keep rAF-driven code (loops, polling) moving while we wait; under begin-frame
+              // control nothing else runs it.
+              const pumpId = FLUSH_ANIMATION_FRAMES ? setInterval(flushAnimationFrames, 16) : null;
               const finish = () => {
                 if (done) return;
                 done = true;
                 clearTimeout(timeoutId);
+                if (pumpId !== null) clearInterval(pumpId);
 
-                // 5. After stability, ensure GSAP timelines are seeked again in case async changes occurred
+                // 7. After stability, ensure GSAP timelines are seeked again in case async changes occurred
                 if (gsapTimelineSeeked && window.__helios_gsap_timeline__ && typeof window.__helios_gsap_timeline__.seek === 'function') {
                   try {
                     window.__helios_gsap_timeline__.seek(t);
@@ -312,14 +449,22 @@ export class SeekTimeDriver implements TimeDriver {
 
                 if (heliosSeeked && typeof window.helios !== 'undefined' && window.helios.seek) {
                   try {
-                    const helios = window.helios;
-                    const fps = helios.fps ? helios.fps.value : 30;
-                    const frame = Math.round(t * fps);
-                    helios.seek(frame);
+                    window.helios.seek(heliosFrameFor(window.helios, t));
                   } catch (e) {
                     console.warn('[SeekTimeDriver] Error seeking Helios:', e);
                   }
                 }
+
+                // A synchronous hook drew before media and fonts settled; draw again now.
+                if (pageHookIsSync && findPageHook() === pageHook) {
+                  try {
+                    callPageHook(pageHook, t);
+                  } catch (err) {
+                    reject(err);
+                    return;
+                  }
+                }
+                flushAnimationFrames();
                 resolve();
               };
 
@@ -327,10 +472,15 @@ export class SeekTimeDriver implements TimeDriver {
                 if (done) return;
                 done = true;
                 clearTimeout(timeoutId);
+                if (pumpId !== null) clearInterval(pumpId);
                 reject(err);
               };
 
-              const timeoutId = setTimeout(finish, timeoutMs);
+              const timeoutId = setTimeout(() => {
+                console.warn('[Helios] Frame at t=' + t + 's was still waiting on ' + pendingLabels.join(', ') +
+                  ' after ' + timeoutMs + 'ms; capturing it anyway. Raise stabilityTimeout if this frame needs longer.');
+                finish();
+              }, timeoutMs);
 
               if (cachedPromises.length === 1) {
                 cachedPromises[0].then(finish, fail);
@@ -356,18 +506,34 @@ export class SeekTimeDriver implements TimeDriver {
       await Promise.all(initPromises);
     }
 
-    // Wait for app initialization (GSAP timeline OR Helios instance)
+    // Wait for app initialization: the page has loaded and defined whatever drives it -- a
+    // seek hook (window.renderAt / __render / seek), a Helios instance or a GSAP timeline.
     // This handles the race condition where main.js (ES module) hasn't finished executing when rendering starts.
-    // We check for either the GSAP timeline (for GSAP projects) or the Helios global (for any Helios project).
-    try {
-      await page.waitForFunction(
-        () => typeof (window as any).__helios_gsap_timeline__ !== 'undefined' || typeof (window as any).helios !== 'undefined',
-        { timeout: this.timeout }
-      );
-    } catch (e) {
-      // Ignore - likely a static page or initialization took too long.
-      // We'll proceed and rely on Helios subscription/polling as fallback.
-    }
+    // Poll on an interval: rAF-based polling never fires under begin-frame control (canvas mode).
+    const polling = 100;
+    await page
+      .waitForFunction(() => document.readyState === 'complete', undefined, { timeout: this.timeout, polling })
+      .catch(() => {});
+    await page
+      .waitForFunction(
+        (hookNames: string[]) => {
+          const w = window as any;
+          return typeof w.helios !== 'undefined' ||
+            typeof w.__helios_gsap_timeline__ !== 'undefined' ||
+            hookNames.some((name) => typeof w[name] === 'function');
+        },
+        [...PAGE_SEEK_HOOKS],
+        { timeout: Math.min(this.timeout, HOOK_GRACE_MS), polling }
+      )
+      .catch(() => {
+        // No hook after the grace period: a plain CSS/WAAPI/rAF page, driven by virtual time
+        // alone. Say so: it is also what a composition whose script failed to load looks like.
+        console.warn(
+          '[SeekTimeDriver] The page defines no window.helios, window.renderAt(t) / __render(t) / seek(t) ' +
+          'or GSAP timeline hook; rendering it on virtual time alone (CSS, WAAPI and rAF animation). ' +
+          'If it should define one, check the page for load errors.'
+        );
+      });
 
     // Wait briefly to ensure execution contexts have been gathered by CDP
     await new Promise(r => setTimeout(r, 100));
@@ -375,20 +541,44 @@ export class SeekTimeDriver implements TimeDriver {
     this.callFunctionOnParams.arguments[1].value = this.timeout;
       }
 
+  /**
+   * Runtime.callFunctionOn reports page exceptions in the response instead of rejecting.
+   * A throwing page hook (window.renderAt etc.) fails the render with the page's own error;
+   * anything else keeps the previous behaviour of carrying on, but is no longer silent.
+   */
+  private checkSeekResult = (response: any): void => {
+    const details = response && response.exceptionDetails;
+    if (!details) return;
+    const description: string = details.exception?.description || details.text || 'unknown error';
+    const markerIndex = description.indexOf(PAGE_HOOK_ERROR_MARKER);
+    if (markerIndex !== -1) {
+      // Keep the page's own error and stack; drop the frames of the renderer's seek plumbing.
+      const lines = description.slice(markerIndex + PAGE_HOOK_ERROR_MARKER.length).trim().split('\n');
+      const wrapperFrames = lines.findIndex((line) => /^\s*at pageHookError\b/.test(line));
+      const pageLines = (wrapperFrames === -1 ? lines : lines.slice(0, wrapperFrames))
+        .filter((line) => !/^\s*at (callPageHook\b|window\.__helios_seek\b|<anonymous>)/.test(line));
+      throw new Error([...new Set(pageLines)].join('\n'));
+    }
+    if (!this.warnedInternalSeekError) {
+      this.warnedInternalSeekError = true;
+      console.warn(`[SeekTimeDriver] Seeking raised an error in the page; continuing: ${description}`);
+    }
+  };
+
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {
     if (this.executionContextIds.length === 0) return Promise.resolve();
 
     if (this.executionContextIds.length === 1) {
       this.callFunctionOnParams.arguments[0].value = timeInSeconds;
       this.callFunctionOnParams.executionContextId = this.executionContextIds[0];
-      return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams) as unknown as Promise<void>;
+      return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams).then(this.checkSeekResult);
     }
 
     if (this.multiFrameCallParams.length !== this.executionContextIds.length) {
       this.multiFrameCallParams.length = this.executionContextIds.length;
       for (let i = 0; i < this.executionContextIds.length; i++) {
         this.multiFrameCallParams[i] = {
-          functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+          functionDeclaration: SEEK_FUNCTION_DECLARATION,
           arguments: [{ value: timeInSeconds }, { value: this.timeout }],
           executionContextId: this.executionContextIds[i],
           awaitPromise: true,
@@ -407,6 +597,7 @@ export class SeekTimeDriver implements TimeDriver {
 
     for (let i = 0; i < this.executionContextIds.length; i++) {
         this.cdpSession!.send('Runtime.callFunctionOn', this.multiFrameCallParams[i])
+            .then(this.checkSeekResult)
             .then(this.aggregator.tick)
             .catch(this.aggregator.fail);
     }

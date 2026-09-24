@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script type="module">
+// The canonical Helios canvas composition: bound to the document timeline, drawn from subscribe.
+import { Helios } from '../../../core/dist/index.js';
+const g = document.getElementById('c').getContext('2d');
+const helios = new Helios({ duration: 2, fps: 10, width: 320, height: 180 });
+helios.bindToDocumentTimeline();
+helios.subscribe(({ currentFrame }) => {
+  const t = currentFrame / 10;
+  g.fillStyle = '#000'; g.fillRect(0, 0, 320, 180);
+  g.fillStyle = '#fff'; g.fillRect(100 * t, 80, 20, 20);
+});
+window.helios = helios;
+</script>
+</body>
+</html>
