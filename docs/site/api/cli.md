@@ -95,13 +95,21 @@ helios render <input> [options]
 
 **Options**:
 - `-o, --output <path>`: Output file path (default: `output.mp4`).
-- `--width <number>`: Viewport width (default: `1920`).
-- `--height <number>`: Viewport height (default: `1080`).
-- `--fps <number>`: Frames per second (default: `30`).
-- `--duration <number>`: Duration in seconds (default: `1`).
+- `--duration <seconds>`: Duration in seconds; fractions are fine (e.g. `12.5`). Defaults to the composition's `window.helios` duration. A page without one needs this flag.
+- `--fps <number>`: Frames per second (default: the composition's, else `30`).
+- `--width <number>`: Viewport width (default: the composition's, else `1920`).
+- `--height <number>`: Viewport height (default: the composition's, else `1080`).
+- `--audio <file>`: Audio file to use as the soundtrack.
 - `--quality <number>`: CRF quality (0-51). Lower is better quality.
-- `--mode <mode>`: Render mode (`canvas` or `dom`) (default: `canvas`).
+- `--mode <mode>`: `dom` screenshots the page and works for any page; `canvas` captures the first `<canvas>` and is faster (default: `dom`).
+- `--gpu` / `--no-gpu`: Enable or disable GPU acceleration in the browser (for WebGL).
 - `--no-headless`: Run in a visible browser window (useful for debugging).
+
+**Pages that draw their own frames**: a page that defines `window.renderAt(t)` (or `window.seek(t)`, or `window.__render(t)`) is called once per frame with the time `t` in seconds, and the frame is captured when it returns. If it returns a promise, the frame is captured after the promise resolves. The page needs no Helios import:
+
+```bash
+helios render page.html -o video.mp4 --duration 15 --audio song.mp3
+```
 
 ### `helios merge`
 
