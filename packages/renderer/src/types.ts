@@ -181,7 +181,8 @@ export interface RendererOptions {
   crf?: number;
 
   /**
-   * The encoding preset. Defaults to 'fast' (if supported by codec).
+   * The encoding preset. Defaults to 'ultrafast' for libx264/libx265: fastest to render, but the
+   * largest files. 'medium' or 'slow' make much smaller files of the same quality.
    */
   preset?: string;
 

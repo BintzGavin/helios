@@ -7,6 +7,17 @@ import type { CompositionInfo } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
 import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, isUrl, parsePositive, withCompositionUrl } from '../utils/render-options.js';
 
+const X264_PRESETS = ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow', 'placebo'];
+
+function parsePreset(value: string | undefined, videoCodec: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  const x26x = !videoCodec || videoCodec === 'libx264' || videoCodec === 'libx265';
+  if (x26x && !X264_PRESETS.includes(value)) {
+    throw new Error(`--preset must be one of ${X264_PRESETS.join(', ')} (got "${value}")`);
+  }
+  return value;
+}
+
 function parseMode(value: string): 'canvas' | 'dom' {
   if (value !== 'canvas' && value !== 'dom') {
     throw new Error(`--mode must be "dom" or "canvas" (got "${value}")`);
@@ -32,6 +43,7 @@ function rendererOptionsToFlags(options: RendererOptions): string {
   if (options.mode) flags.push(`--mode ${options.mode}`);
   if (options.audioCodec) flags.push(`--audio-codec ${options.audioCodec}`);
   if (options.videoCodec) flags.push(`--video-codec ${options.videoCodec}`);
+  if (options.preset) flags.push(`--preset ${options.preset}`);
   if (options.browserConfig?.headless === false) flags.push('--no-headless');
   return flags.join(' ');
 }
@@ -46,6 +58,7 @@ export function registerRenderCommand(program: Command) {
     .option('--fps <number>', `Frames per second (default: the composition's, else ${DEFAULT_FPS})`)
     .option('--duration <seconds>', "Duration in seconds (default: the composition's)")
     .option('--quality <number>', 'CRF quality (0-51)')
+    .option('--preset <name>', 'Encoder preset: ultrafast (default) renders fastest; medium or slow make much smaller files')
     .option('--mode <mode>', 'dom: screenshot the page, works for any page; canvas: capture the first <canvas>, faster', 'dom')
     .option('--audio <file>', 'Audio file to use as the soundtrack')
     .option('--gpu', 'Enable GPU acceleration in the browser (WebGL)')
@@ -108,6 +121,7 @@ export function registerRenderCommand(program: Command) {
           const widthFlag = parsePositive(options.width, '--width', true);
           const heightFlag = parsePositive(options.height, '--height', true);
           const crf = options.quality ? parseInt(options.quality, 10) : undefined;
+        const preset = parsePreset(options.preset, options.videoCodec);
 
           let audioFilePath: string | undefined;
           if (options.audio) {
@@ -161,6 +175,7 @@ export function registerRenderCommand(program: Command) {
               fps,
               durationInSeconds,
               crf,
+              preset,
               mode,
               startFrame,
               frameCount,
@@ -268,6 +283,7 @@ export function registerRenderCommand(program: Command) {
             fps,
             durationInSeconds,
             crf,
+            preset,
             mode,
             startFrame,
             frameCount,
