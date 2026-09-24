@@ -40,10 +40,6 @@ class ReusableAggregator {
   };
 }
 
-const noopCatch = () => {};
-
-
-
 
 export class SeekTimeDriver implements TimeDriver {
   private aggregator = new ReusableAggregator();
@@ -56,7 +52,6 @@ export class SeekTimeDriver implements TimeDriver {
     awaitPromise: true
   };
   private evaluateArgs: [number, number] = [0, 0];
-  private evaluateClosure = ([t, timeoutMs]: any) => { (window as any).__helios_seek(t, timeoutMs); };
   private handleExecutionContextCreated = (event: any) => {
     if (event.context.name === '' && !this.executionContextIds.includes(event.context.id)) {
       this.executionContextIds.push(event.context.id);
@@ -144,11 +139,44 @@ export class SeekTimeDriver implements TimeDriver {
         let cachedMediaElements = null;
         const cachedPromises = [];
 
+        // Animation libraries (motion.dev, GSAP, ...) defer creating their WAAPI
+        // animations to their own frame loop. Under virtualized time that loop has
+        // not ticked when the first seek runs, so a scan taken then can see only the
+        // declarative CSS animations and miss everything else -- permanently, since
+        // the list used to be cached on that first scan. Those animations were then
+        // never seeked, and the render silently produced blank or wrong scenes.
+        //
+        // A "stable for N seeks" heuristic is NOT enough: the count can sit at its
+        // wrong initial value for several seeks before the library's loop ticks, and
+        // the cache then locks in that wrong value. So instead: watch the
+        // document-level animation count on every seek and rebuild whenever it moves.
+        // That is one getAnimations() call per seek, which the pre-cache code already
+        // paid for the document scope anyway.
+        let lastDocAnimationCount = -1;
+
+        function scanAnimations() {
+          // Scopes can appear late too (shadow roots), so re-scan them while unstable.
+          cachedScopes = findAllScopes(document);
+          const found = [];
+          const numScopes = cachedScopes.length;
+          for (let i = 0; i < numScopes; i++) {
+            const scope = cachedScopes[i];
+            if (scope.getAnimations) {
+              const animations = scope.getAnimations();
+              for (let j = 0; j < animations.length; j++) {
+                found.push(animations[j]);
+              }
+            }
+          }
+          return found;
+        }
+
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
           cachedAnimations = null;
           cachedMediaElements = null;
           cachedPromises.length = 0;
+          lastDocAnimationCount = -1;
         };
 
         window.__helios_seek = (t, timeoutMs) => {
@@ -167,22 +195,17 @@ export class SeekTimeDriver implements TimeDriver {
             }
           }
 
-          // Synchronize document timeline (WAAPI) across all scopes
-          if (!cachedAnimations) {
-            if (!cachedScopes) {
-              cachedScopes = findAllScopes(document);
+          // Synchronize document timeline (WAAPI) across all scopes.
+          // Re-scan whenever the document-level animation count moves, so
+          // late-instantiated animations are picked up instead of being lost
+          // for the whole render.
+          const docAnimationCount = document.getAnimations().length;
+          if (!cachedAnimations || docAnimationCount !== lastDocAnimationCount) {
+            if (cachedAnimations && docAnimationCount > lastDocAnimationCount) {
+              window.__HELIOS_LATE_ANIMATIONS__ = true;
             }
-            cachedAnimations = [];
-            const numScopes = cachedScopes.length;
-            for (let i = 0; i < numScopes; i++) {
-              const scope = cachedScopes[i];
-              if (scope.getAnimations) {
-                const animations = scope.getAnimations();
-                for (let j = 0; j < animations.length; j++) {
-                  cachedAnimations.push(animations[j]);
-                }
-              }
-            }
+            cachedAnimations = scanAnimations();
+            lastDocAnimationCount = docAnimationCount;
           }
           const numAnimations = cachedAnimations.length;
           for (let i = 0; i < numAnimations; i++) {

@@ -1,6 +1,5 @@
 import { spawn, ChildProcess } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
-import { once } from 'events';
 import { RendererOptions, RenderJobOptions } from '../types.js';
 
 export class FFmpegManager {

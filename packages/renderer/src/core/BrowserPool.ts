@@ -1,4 +1,4 @@
-import { chromium, Browser, ConsoleMessage } from 'playwright';
+import { chromium, ConsoleMessage } from 'playwright';
 import os from 'os';
 import fs from 'fs';
 import { RenderStrategy } from '../strategies/RenderStrategy.js';
@@ -110,7 +110,9 @@ export class BrowserPool {
   public async init(compositionUrl: string, jobOptions?: RenderJobOptions): Promise<void> {
     this.capturedErrors = [];
 
-    const concurrency = 1;
+    const envPoolRaw = process.env.HELIOS_BROWSER_POOL_SIZE;
+    const envPool = envPoolRaw !== undefined ? parseInt(envPoolRaw, 10) : NaN;
+    const concurrency = Number.isFinite(envPool) ? Math.max(1, envPool) : 1;
     console.log(`Initializing pool of ${concurrency} browsers/pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
@@ -130,7 +132,9 @@ export class BrowserPool {
 
         const page = await context.newPage();
         const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-        const timeDriver = this.options.mode === 'dom'
+        /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
+        const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
+        const timeDriver = this.options.mode === 'dom' || canvasSeekClock
           ? new SeekTimeDriver(this.options.stabilityTimeout)
           : new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
 

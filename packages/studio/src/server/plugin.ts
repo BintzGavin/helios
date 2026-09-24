@@ -1,5 +1,4 @@
 import { Plugin, ViteDevServer, PreviewServer } from 'vite';
-import { AddressInfo } from 'net';
 import fs from 'fs';
 import path from 'path';
 import { createMcpHttpHandler } from './mcp-http';

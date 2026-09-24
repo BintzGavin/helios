@@ -45,7 +45,6 @@ export async function getAudioAssets(
     // 2. id attribute (Standard DOM)
     // 3. Fallback: generated "track-${index}" (Stable fallback for listing)
     const id = tag.getAttribute('data-helios-track-id') || tag.id || `track-${index}`;
-    const volumeAttr = tag.getAttribute('volume');
     const state = audioTrackState[id];
 
     let volume = 1;

@@ -126,6 +126,7 @@ async function runTest() {
 
     const createMockPage = (cb: (script: string, args: any) => Promise<any>) => ({
         viewportSize: () => ({ width: 1920, height: 1080 }),
+        waitForSelector: async () => ({}),
         frames: () => [],
         evaluate: async (fn: any, args: any) => {
              // fn is the script string

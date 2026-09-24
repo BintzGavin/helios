@@ -40,7 +40,6 @@ export class CdpTimeDriver implements TimeDriver {
   private timeout: number;
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
   private executionContextIds: number[] = [];
-  private cachedPromises: Promise<any>[] = [];
 
   private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];

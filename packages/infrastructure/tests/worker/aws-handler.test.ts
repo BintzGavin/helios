@@ -60,6 +60,32 @@ describe('AwsHandler', () => {
     });
   });
 
+  it('should return 500 with the thrown string when WorkerRuntime throws a non-Error string', async () => {
+    const handler = createAwsHandler();
+
+    const p = Promise.reject('String throw');
+    p.catch(() => {});
+    vi.mocked(WorkerRuntime.prototype.run).mockReturnValue(p);
+
+    const result = await handler({ jobPath: 'http://example.com/job.json', chunkIndex: 1 });
+
+    expect(result.statusCode).toBe(500);
+    expect(JSON.parse(result.body).message).toBe('String throw');
+  });
+
+  it('should return 500 with fallback message when WorkerRuntime throws null', async () => {
+    const handler = createAwsHandler();
+
+    const p = Promise.reject(null);
+    p.catch(() => {});
+    vi.mocked(WorkerRuntime.prototype.run).mockReturnValue(p);
+
+    const result = await handler({ jobPath: 'http://example.com/job.json', chunkIndex: 1 });
+
+    expect(result.statusCode).toBe(500);
+    expect(JSON.parse(result.body).message).toBe('Unknown error in AWS Lambda handler');
+  });
+
   it('should handle non-zero exit codes', async () => {
     const handler = createAwsHandler();
 
@@ -81,6 +107,11 @@ describe('AwsHandler', () => {
   it('should return 400 for invalid event types', async () => {
     const handler = createAwsHandler();
 
+    expect(await handler(undefined)).toEqual({
+      statusCode: 400,
+      body: JSON.stringify({ message: 'Invalid payload: must be an object' })
+    });
+
     expect(await handler(null)).toEqual({
       statusCode: 400,
       body: JSON.stringify({ message: 'Invalid payload: must be an object' })
@@ -90,6 +121,8 @@ describe('AwsHandler', () => {
       statusCode: 400,
       body: JSON.stringify({ message: 'Invalid payload: must be an object' })
     });
+
+    expect(WorkerRuntime).not.toHaveBeenCalled();
   });
 
   it('should return 400 for missing jobPath or chunkIndex', async () => {
@@ -109,5 +142,7 @@ describe('AwsHandler', () => {
       statusCode: 400,
       body: JSON.stringify({ message: 'Invalid payload: missing jobPath or chunkIndex' })
     });
+
+    expect(WorkerRuntime).not.toHaveBeenCalled();
   });
 });

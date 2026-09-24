@@ -1,5 +1,5 @@
 import { WorkerAdapter, WorkerResult } from '../types/adapter.js';
-import { JobSpec, RenderJobChunk } from '../types/job-spec.js';
+import { JobSpec } from '../types/job-spec.js';
 import { VideoStitcher } from '../stitcher/ffmpeg-stitcher.js';
 import { parseCommand } from '../utils/command.js';
 import path from 'node:path';

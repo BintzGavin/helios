@@ -27,11 +27,7 @@ function AppContent() {
     setOmnibarOpen,
     setCreateOpen,
     controller,
-    playerState,
     setPlayerState,
-    loop,
-    inPoint,
-    outPoint
   } = useStudio();
 
   const src = activeComposition?.url || '';

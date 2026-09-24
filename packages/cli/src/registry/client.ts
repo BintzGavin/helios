@@ -1,5 +1,5 @@
 import { registry as localRegistry } from './manifest.js';
-import { ComponentDefinition, RemoteRegistryIndex, RemoteComponent } from './types.js';
+import { ComponentDefinition, RemoteComponent } from './types.js';
 
 export class RegistryClient {
   private url: string | undefined;

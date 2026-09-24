@@ -176,8 +176,6 @@ export class ClientSideExporter {
       }
 
       const { frame: firstFrame, captions: firstCaptions } = firstResult;
-      const width = firstFrame.displayWidth;
-      const height = firstFrame.displayHeight;
 
       // 3. Setup Mediabunny Output
       const target = new BufferTarget();

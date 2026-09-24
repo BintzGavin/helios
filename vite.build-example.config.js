@@ -4,23 +4,6 @@ import fs from "fs";
 import react from "@vitejs/plugin-react";
 import vue from "@vitejs/plugin-vue";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import solidPlugin from "vite-plugin-solid";
-
-const copyExcalidrawAssetsPlugin = () => {
-  return {
-    name: 'copy-excalidraw-assets',
-    closeBundle: async () => {
-      const src = resolve(__dirname, 'node_modules/@excalidraw/excalidraw/dist/prod/fonts');
-      const dest = resolve(__dirname, 'output/example-build/excalidraw-assets');
-      if (fs.existsSync(src)) {
-        await fs.promises.cp(src, dest, { recursive: true });
-        console.log('Copied Excalidraw fonts to output/example-build/excalidraw-assets');
-      } else {
-        console.warn('Excalidraw fonts source not found at:', src);
-      }
-    }
-  }
-}
 
 function discoverExamples() {
   const examplesDir = resolve(__dirname, "examples");
@@ -43,7 +26,6 @@ function discoverExamples() {
 
       // Check for index.html (custom apps only)
       // HEURISTIC: Only include index.html for known app examples to avoid build errors with absolute paths
-      // like /src/main.ts in svelte-runes-animation
       const indexPath = join(dirPath, "index.html");
       if (fs.existsSync(indexPath)) {
         if (entry.name === 'client-export-api') {
@@ -64,17 +46,7 @@ export default defineConfig({
       "@helios-project/player": resolve(__dirname, "packages/player/src"),
     },
   },
-  plugins: [
-    react({
-      exclude: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3|chartjs)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
-    }),
-    vue(),
-    svelte(),
-    solidPlugin({
-      include: /examples\/solid-(canvas|dom|threejs-canvas|captions|lottie|pixi|d3|chartjs)-animation|examples\/solid-transitions|examples\/solid-animation-helpers|examples\/solid-audio-visualization/,
-    }),
-    copyExcalidrawAssetsPlugin()
-  ],
+  plugins: [react(), vue(), svelte()],
   // Root of the project
   root: ".",
   base: "./",

@@ -32,15 +32,9 @@ lerna-debug.log*
 .DS_Store
 Thumbs.db
 
-# Allow promo video output
-!examples/promo-video/output/
-!examples/promo-video/output/helios-promo.mp4
 test-results/
-!examples/excalidraw-animation/output/
-!examples/excalidraw-animation/output/excalidraw-animation.mp4
 
 .env
-the-window/
 climate-central-clip
 
 # Agent scratch files (root-level one-offs)
@@ -53,12 +47,19 @@ fix_status.js
 append_backlog.js
 verify_*.py
 verify_*.ts
+/patch*.py
+/patch_*.py
+/test-*.js
+/test_*.js
+/test_*.py
+/*.patch
 dom-animation.mp4
 lickstep_videos/coverage/
 
-# Generated coverage reports and disposable root render outputs
-/coverage/
+# Generated coverage reports and disposable render/verification outputs
+coverage/
 /coverage.json
-/output-perf-*.mp4
-/test-output*.mp4
-/test_output_*.mp4
+/*.mp4
+verification*.png
+packages/*/*_pid.txt
+packages/*/test_output.txt

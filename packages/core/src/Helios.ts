@@ -2,7 +2,7 @@ import { TimeDriver, DomDriver, NoopDriver, Ticker, RafTicker, TimeoutTicker, Au
 import { signal, effect, computed, Signal, ReadonlySignal } from './signals.js';
 import { HeliosError, HeliosErrorCode } from './errors.js';
 import { HeliosSchema, validateProps, validateSchema } from './schema.js';
-import { CaptionCue, parseSrt, parseCaptions, findActiveCues, areCuesEqual } from './captions.js';
+import { CaptionCue, parseCaptions, findActiveCues, areCuesEqual } from './captions.js';
 import { Marker, validateMarker, validateMarkers } from './markers.js';
 import { HeliosConfig, AudioTrackState, HeliosTimeline, HeliosClip } from './types.js';
 

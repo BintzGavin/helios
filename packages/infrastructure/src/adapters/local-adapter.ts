@@ -47,7 +47,6 @@ export class LocalWorkerAdapter implements WorkerAdapter {
       if (timeout && timeout > 0) {
         timeoutId = setTimeout(() => {
           child.kill();
-          const durationMs = Date.now() - startTime;
           reject(new Error(`Worker job timed out after ${timeout}ms`));
         }, timeout);
       }

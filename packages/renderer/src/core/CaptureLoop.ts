@@ -1,10 +1,6 @@
 import { WorkerInfo } from "./BrowserPool.js";
 import { FFmpegManager } from "./FFmpegManager.js";
 import { RendererOptions, RenderJobOptions } from "../types.js";
-import { RenderStrategy } from "../strategies/RenderStrategy.js";
-import { TimeDriver } from "../drivers/TimeDriver.js";
-
-const noopCatch = () => {};
 
 class ReusableThenable {
   public resolveCb: (() => void) | null = null;
@@ -77,21 +73,6 @@ class ReusableNumberThenable {
       this.isRejected = true;
       this.rejectedError = err;
     }
-  }
-}
-
-class PooledBuffer {
-  public buffer: Buffer;
-  public size: number;
-  public freeCb: () => void;
-  public next: PooledBuffer | null = null;
-  constructor(size: number, poolObj: { head: PooledBuffer | null }) {
-    this.buffer = Buffer.allocUnsafe(size);
-    this.size = size;
-    this.freeCb = () => {
-      this.next = poolObj.head;
-      poolObj.head = this;
-    };
   }
 }
 
@@ -428,7 +409,6 @@ export class CaptureLoop {
       const frameBufferRing = new Array<Buffer | string | null>(
         maxPipelineDepth,
       ).fill(null);
-      const frameReadyRing = null; // removed in PERF-891 // 0 = not ready, 1 = ready
       let fatalError: any = null;
 
 

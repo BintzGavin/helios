@@ -131,6 +131,54 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Root Cause**: `window.__helios_gsap_timeline__` is not available when `setTime()` first runs, and subscription timing may be off.
   - **Goal**: Ensure GSAP timelines are correctly synchronized during frame capture.
   - **Verification**: `examples/promo-video` must render correctly with all scenes visible.
+  - **Note (2026-07-31)**: `examples/promo-video` was archived out of the repo; this
+    verification path no longer exists. See the same failure mode for motion.dev in
+    "Third-party animation libraries are invisible to the first seek" below.
+
+- [x] **Third-party animation libraries are invisible to the first seek** *(fixed 2026-07-31)*
+  - **Fix**: `SeekTimeDriver` now reads `document.getAnimations().length` on every seek
+    and rebuilds the scoped animation list whenever that count moves, instead of caching
+    it permanently on the first seek. Sets `window.__HELIOS_LATE_ANIMATIONS__` when it
+    sees the count grow, so late instantiation is detectable.
+  - **Rejected first attempt**: "re-scan until the count is stable for N seeks" is NOT
+    sufficient — the count sits at its wrong initial value long enough to satisfy the
+    stability test, and the cache then locks in that wrong value. A render with that
+    version still produced blank scenes at 3s, 11s and 13s.
+  - **Regression test**: `late-anim-test/` renders a declarative CSS animation alongside
+    one created inside a `requestAnimationFrame` callback (i.e. after `window.helios` is
+    set, which is how motion.dev and GSAP behave under virtualized time). Both must track
+    identically. Measured: x=140/140 at 0.1s, 640/640 at 2.0s, 1036/1036 at 3.5s.
+    Worth porting into `packages/renderer/tests/` in the harness' own format.
+  - **Problem**: `SeekTimeDriver` caches the animation list on its first seek and only
+    clears it via `window.__helios_invalidate_cache()`. Libraries that defer creating
+    their WAAPI animations to their own frame loop have created *nothing* by then,
+    because the renderer runs the page under virtualized time and that loop never ticks.
+    Measured in a DOM render: `document.getAnimations()` returned **3** (the declarative
+    CSS animations) instead of **72**. The other 69 were never seeked for the entire
+    render — every scene before the point where they happened to materialize came out
+    blank, and the cutover time moved between runs with machine load.
+  - **Why it matters**: this is the same root cause as the GSAP item above, and it fails
+    **silently** — the CLI prints `Render complete!` and the MP4 probes as a perfectly
+    valid 1920x1080/30fps file. Only frame sampling catches it. `guided/promo-video` in
+    `helios-skills` instructs agents to animate with motion.dev, so this is on the
+    default authoring path.
+  - **Workaround (composition side)**: retain every handle `animate()` returns and call
+    `.pause()` on each before setting `window.helios`, which forces instantiation.
+  - **Goal**: fix it engine-side — invalidate the cache after the first seek (once the
+    frame loop has ticked), or warn when the animation count changes after caching.
+  - **Verification**: a DOM composition animated with motion.dev renders all scenes,
+    verified by sampling frames from the encoded file rather than by exit code.
+
+- [ ] **Renderer should warn when `window.helios` is absent**
+  - **Problem**: a composition whose module fails to load (e.g. served over `file://`,
+    where an ES module import is CORS-blocked) renders with `window.helios` undefined.
+    For a pure-CSS composition the output can look correct, because `SeekTimeDriver`
+    drives WAAPI directly — so the engine appears to work while it is not wired up.
+    The README's headline command, `npx helios render ./composition.html`, is a
+    `file://` invocation and hits exactly this.
+  - **Goal**: warn loudly when `window.helios` is missing after the readiness wait —
+    `SeekTimeDriver` already warns when `isVirtualTimeBound` is false. Document that
+    compositions must be served over HTTP.
 
 - [x] **Documentation**: Add Quickstart guide.
 - [x] ⛔ Renderer Verification Blocked: packages/studio dependency mismatch

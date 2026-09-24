@@ -24,7 +24,6 @@
     "build": "tsc",
     "dev": "tsc -w",
     "test": "vitest run",
-    "bench": "vitest bench",
     "lint": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },

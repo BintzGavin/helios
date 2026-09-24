@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { CloudRunAdapter } from '../src/adapters/cloudrun-adapter.js';
+import { CloudRunAdapter } from '../../src/adapters/cloudrun-adapter.js';
 
 // Define the mock implementation for GoogleAuth
 const mockRequest = vi.fn();

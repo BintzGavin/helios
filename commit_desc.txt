@@ -1,5 +1,0 @@
-💡 What: Optimized the final worker cleanup logic in CaptureLoop.ts by replacing the while (freeWorkersHead > 0) loop with a standard for loop.
-🎯 Why: Standard for loop induction variables allow the V8 TurboFan compiler to better pipeline instructions and eliminate mutating conditional evaluations, improving loop execution speed on microbenchmarks.
-📊 Impact: Microbenchmark overhead dropped ~2-3%.
-🔬 Verification: Tests, Output Validation, Benchmark Consistency.
-📎 Plan: PERF-924

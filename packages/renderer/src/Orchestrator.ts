@@ -3,7 +3,6 @@ import * as path from 'path';
 import * as os from 'os';
 import { spawn } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
-import { Renderer } from './Renderer.js';
 import { RendererOptions, RenderJobOptions, RenderPlan, RenderChunk } from './types.js';
 import { concatenateVideos } from './concat.js';
 import { FFmpegBuilder } from './utils/FFmpegBuilder.js';

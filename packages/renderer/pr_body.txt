@@ -1,5 +1,0 @@
-💡 What: Removed `async`/`await` in `DomStrategy.capture()` to return raw CDP Promises, shifting synchronous formatting into `CaptureLoop`.
-🎯 Why: To eliminate dynamic Promise allocation per frame during `HeadlessExperimental.beginFrame`, reducing GC pressure.
-📊 Impact: Render time changed from 32.102s to 32.040s.
-🔬 Verification: `npm run build`, `ffprobe` format checks, benchmark tests.
-📎 Plan: Reference `/.sys/plans/PERF-277-eliminate-capture-then-allocation.md`
