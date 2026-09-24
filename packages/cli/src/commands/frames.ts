@@ -74,6 +74,48 @@ export function registerFrameCommands(program: Command) {
 
   addPageOptions(
     program
+      .command('verify <input>')
+      .description('Check that every frame depends only on its time, as rendering in chunks or out of order needs')
+      .option('--duration <seconds>', "Duration to sample (default: the composition's)")
+      .option('--samples <number>', 'Frames to compare', '6')
+  ).action(async (input, options) => {
+    try {
+      const url = toUrl(input);
+      const samples = parsePositive(options.samples, '--samples', true)!;
+      const durationFlag = parsePositive(options.duration, '--duration');
+      const needsProbe = durationFlag === undefined || options.width === undefined || options.height === undefined;
+      const info = needsProbe ? await probe(url, options) : undefined;
+      const duration = durationFlag ?? info?.durationInSeconds;
+      if (duration === undefined) {
+        throw new Error('The page declares no duration: pass --duration <seconds>');
+      }
+      const { width, height } = await pageSize(url, options, info);
+      const times = Array.from({ length: samples }, (_, i) => round((i * duration) / samples));
+      const capture = { width, height, crop: parseCrop(options.crop), browserConfig: browserConfig(options) };
+
+      // Once in order, then in reverse on a fresh page: the reverse pass starts cold at the
+      // last frame, the way a chunk of a distributed render does, and revisits every frame
+      // after later ones.
+      const forward = await captureFrames(url, times, capture);
+      const reversed = await captureFrames(url, [...times].reverse(), capture);
+      const differing = times.filter((_, i) => !forward[i].equals(reversed[times.length - 1 - i]));
+
+      if (differing.length > 0) {
+        throw new Error(
+          `Frames at ${differing.map((t) => `${Number(t.toFixed(3))}s`).join(', ')} differ depending on what was rendered before them. ` +
+          'Every frame must be a function of t alone: replace counters, `x += speed`, randomness drawn per frame ' +
+          'and timers with values computed from t, or the video breaks when rendered in chunks or seeked.'
+        );
+      }
+      console.log(`${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`);
+    } catch (err: any) {
+      console.error('Verify failed:', err.message);
+      process.exit(1);
+    }
+  });
+
+  addPageOptions(
+    program
       .command('sheet <input>')
       .description('Render a labelled contact sheet of frames (one PNG), without encoding a video')
       .option('--at <seconds>', 'Times to show, comma-separated')

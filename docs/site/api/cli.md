@@ -143,6 +143,19 @@ helios sheet <input> [--at <times> | --every <seconds> | --strip <start:end>] [o
 - `--crop <x,y,w,h>`: Show only this region of each frame.
 - `-o, --output <path>`: Output PNG (default: `sheet.png`).
 
+### `helios verify`
+
+Checks that every frame depends only on its time. Rendering in chunks (distributed rendering), seeking and `helios still` all rely on that. The command renders sample frames in order, and then in reverse on a fresh page. The reverse pass starts cold at the last frame, like a render chunk does. If any frame comes out different, the page keeps state between frames (a counter, `x += speed`, randomness drawn per frame, timers), and the command exits 1, naming the frames that differ.
+
+```bash
+helios verify page.html --duration 12
+```
+
+**Options**:
+- `--duration <seconds>`: The span to sample (default: the composition's).
+- `--samples <n>`: The number of frames to compare (default: `6`).
+- `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
+
 ### `helios merge`
 
 Merges multiple video files into a single output file without re-encoding.
