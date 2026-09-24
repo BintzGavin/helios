@@ -68,9 +68,6 @@ Then tell your agent something like:
 ```bash
 generate a product demo video using the guided helios skill.
 ```
-
-This tends to get the best results using Opus 4.6 or GPT 5.4. I've gotten mixed results with Gemini 3.1 so far.
-
 ---
 
 ## Quick Start
