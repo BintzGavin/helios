@@ -1,11 +1,11 @@
 import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
-import { pathToFileURL, fileURLToPath, URL } from 'url';
+import { fileURLToPath, URL } from 'url';
 import { RenderOrchestrator, DistributedRenderOptions, RendererOptions, probeComposition } from '@helios-project/renderer';
 import type { CompositionInfo } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
-import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, parsePositive } from '../utils/render-options.js';
+import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, isUrl, parsePositive, toCompositionUrl } from '../utils/render-options.js';
 
 function parseMode(value: string): 'canvas' | 'dom' {
   if (value !== 'canvas' && value !== 'dom') {
@@ -61,9 +61,7 @@ export function registerRenderCommand(program: Command) {
     .option('--video-codec <codec>', 'Video codec (e.g., libx264, libvpx)')
     .action(async (input, options) => {
       try {
-        const url = input.startsWith('http')
-          ? input
-          : pathToFileURL(path.resolve(process.cwd(), input)).href;
+        const url = toCompositionUrl(input);
         const outputPath = path.resolve(process.cwd(), options.output);
 
         console.log(`Initializing renderer...`);
@@ -191,7 +189,7 @@ export function registerRenderCommand(program: Command) {
             let commandInput = relativeInput;
             const jobBaseUrl = options.baseUrl || options.jobBaseUrl;
 
-            if (jobBaseUrl && !relativeInput.startsWith('http')) {
+            if (jobBaseUrl && !isUrl(relativeInput)) {
               // If we have a base URL, we want to resolve the input file relative to the project root
               // (process.cwd()) and append it to the base URL.
               // This allows workers to fetch assets from a remote server using the same folder structure.

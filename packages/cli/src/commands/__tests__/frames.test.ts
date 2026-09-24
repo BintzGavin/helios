@@ -43,6 +43,11 @@ describe('still and sheet commands', () => {
       expect(written()).toEqual(['still-0.5s.png', 'still-3s.png']);
     });
 
+    it('treats a local file whose name starts with "http" as a file', async () => {
+      await program.parseAsync(['node', 'test', 'still', 'http-demo.html', '--at', '1', '--width', '640', '--height', '360']);
+      expect(vi.mocked(captureFrames).mock.calls[0][0]).toMatch(/^file:\/\/.*\/http-demo\.html$/);
+    });
+
     it('writes a single time to -o', async () => {
       await program.parseAsync(['node', 'test', 'still', 'page.html', '--at', '2', '-o', 'frame.png']);
       expect(written()).toEqual(['frame.png']);
