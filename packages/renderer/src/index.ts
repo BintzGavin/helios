@@ -7,3 +7,5 @@ export type { RenderExecutor } from './executors/RenderExecutor.js';
 export { LocalExecutor } from './executors/LocalExecutor.js';
 export { probeComposition } from './probe.js';
 export type { CompositionInfo, ProbeOptions } from './probe.js';
+export { captureFrames, captureContactSheet } from './stills.js';
+export type { CaptureFramesOptions, ContactSheetOptions } from './stills.js';

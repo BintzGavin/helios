@@ -111,6 +111,38 @@ helios render <input> [options]
 helios render page.html -o video.mp4 --duration 15 --audio song.mp3
 ```
 
+### `helios still`
+
+Renders frames of a composition as PNGs without encoding a video. Use it to check your work while you build it.
+
+```bash
+helios still <input> --at <seconds>[,<seconds>...] [options]
+```
+
+**Options**:
+- `--at <seconds>`: Time or times to capture, comma-separated (e.g. `0.5,3,7.25`).
+- `-o, --output <path>`: The output file for one time, or a directory for several (default: `still-<t>s.png`).
+- `--width`, `--height`: Viewport size (default: the composition's, else `1920`×`1080`).
+- `--crop <x,y,w,h>`: Cut each frame to this region, in pixels.
+- `--gpu` / `--no-gpu`, `--no-headless`: As for `render`.
+
+### `helios sheet`
+
+Renders a labelled contact sheet of frames as a single PNG.
+
+```bash
+helios sheet <input> [--at <times> | --every <seconds> | --strip <start:end>] [options]
+```
+
+**Options**:
+- `--at <seconds>`: Exact times, comma-separated.
+- `--every <seconds>`: One frame every N seconds across the duration.
+- `--strip <start:end>`: Every frame in a range, at `--fps` (default: the composition's, else `30`).
+- `--duration <seconds>`: The duration used by `--every` and by the default sheet (default: the composition's). With no frame selection, the sheet shows 12 frames spread across the duration.
+- `--cols <n>`, `--cell-width <px>`: Grid layout (default: up to 4 columns of 480px).
+- `--crop <x,y,w,h>`: Show only this region of each frame.
+- `-o, --output <path>`: Output PNG (default: `sheet.png`).
+
 ### `helios merge`
 
 Merges multiple video files into a single output file without re-encoding.

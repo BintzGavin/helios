@@ -47,6 +47,7 @@ const tests = [
   'tests/verify-enhanced-dom-preload.ts',
   'tests/verify-frame-count.ts',
   'tests/verify-frame-exact-seek.ts',
+  'tests/verify-frame-stills.ts',
   'tests/verify-hardware-codec-selection.ts',
   'tests/verify-hwaccel-args.ts',
   'tests/verify-hwaccel-validation.ts',
