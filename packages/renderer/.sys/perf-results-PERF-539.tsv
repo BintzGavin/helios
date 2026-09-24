@@ -1,0 +1,9 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	17.175	600	34.93	37.5	keep	baseline
+2	17.137	600	35.01	46.6	keep	baseline
+3	17.383	600	34.52	37.1	keep	baseline
+4	18.104	600	33.14	37.8	keep	baseline
+5	17.362	600	34.56	41.2	discard	disable-sandbox
+6	17.716	600	33.87	43.7	discard	disable-sandbox
+7	17.513	600	34.26	36.8	discard	disable-sandbox
+8	17.615	600	34.06	44.7	discard	disable-sandbox

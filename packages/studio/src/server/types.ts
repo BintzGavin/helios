@@ -7,6 +7,9 @@ export interface StudioComponentDefinition {
 }
 
 export interface StudioPluginOptions {
+  /** Explicit project directory, pinned for the lifetime of this Studio process. */
+  projectRoot?: string;
+  remoteMcp?: import('./remote-startup').RemoteMcpOptions;
   studioRoot?: string;
   skillsRoot?: string;
   components?: StudioComponentDefinition[];

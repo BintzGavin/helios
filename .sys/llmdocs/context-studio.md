@@ -1,46 +1,36 @@
-# Studio Context
+# Helios Studio Context
 
 ## Section A: Architecture
-Helios Studio is a React-based web application served locally by Vite. It provides a visual development environment for creating, previewing, and configuring video compositions. The frontend communicates with the backend via API endpoints (e.g., asset discovery, rendering tasks) and directly manipulates the embedded `<helios-player>` to control playback and state. The Studio integrates tightly with the Core schema system, enabling dynamic UI generation for properties.
+Helios Studio is the browser-based development environment for video composition. It consists of:
+- **CLI (`packages/cli`)**: Provides the `npx helios studio` command which starts the dev server.
+- **Server (`src/server`)**: A Vite-based dev server that serves the Studio UI, discovers user compositions/assets via `HELIOS_PROJECT_ROOT`, and handles rendering/MCP requests.
+- **UI (`src/components`)**: React-based frontend providing a visual interface for timeline, properties, and asset management.
 
 ## Section B: File Tree
 ```
 packages/studio/
 ├── bin/
 ├── src/
-│   ├── components/       # Reusable UI components (Timeline, PropsEditor, Stage, RendersPanel, AssetsPanel)
-│   ├── context/          # React Context providers (StudioContext)
+│   ├── components/       # React UI components (Timeline, Stage, Panels)
+│   ├── context/          # React Contexts (StudioContext for global state)
 │   ├── hooks/            # Custom React hooks
-│   ├── server/           # Backend API routes and Vite dev server
-│   ├── types/            # TypeScript interface definitions
-│   ├── App.tsx           # Main application root
-│   ├── index.css         # Global styles
-│   └── main.tsx          # Entry point
+│   ├── server/           # Vite plugin, API endpoints, rendering integrations
+│   └── utils/            # Helper functions
+├── vite.config.ts
+└── package.json
 ```
 
 ## Section C: CLI Interface
-The Studio is invoked via `npx helios studio` (or `npm run dev` in development). The CLI starts the Vite development server and opens the Studio UI in the default browser. It accepts options to configure the server port or specify a custom project root path for composition discovery.
+The Studio is launched via the CLI package using: `npx helios studio`. The CLI injects `HELIOS_PROJECT_ROOT` pointing to the user's CWD to allow Studio to discover their compositions and assets dynamically.
 
 ## Section D: UI Components
-- **Stage**: Renders the `<helios-player>` and handles resolution, panning, zooming, and snapshot captures. Includes Safe Area Guides.
-- **Timeline**: Visualizes the composition duration, current playhead, draggable In/Out point markers, audio waveforms, and snap-to guides. Supports dragging and dropping assets.
-- **Props Editor**: Dynamically generated input fields based on the active composition's schema, allowing real-time modification of props. Includes specialized editors (JSON, Color, Enum, Asset Inputs).
-- **Assets Panel**: Displays and manages project assets (images, videos, audio, fonts, 3D models). Supports rich preview, drag & drop uploading, and directory organization.
-- **Renders Panel**: Manages remote and local rendering jobs, showing progress and providing export options. Generates distributed render job JSON specs (`exportJobSpec`).
-- **Captions Panel**: Edits and synchronizes subtitle data with the video timeline.
-
-**Key Shortcuts**:
-- `Space` or `K`: Play/Pause
-- `Home`: Restart/Rewind
-- `Shift+L`: Toggle Loop
-- `L`: Play Forward / Faster
-- `J`: Play Reverse / Slower
-- `Cmd+K`: Switch Composition
-- `?`: Show Shortcuts Modal
-- `I`/`O`: Set In/Out Point
-- `Shift + ←/→`: Navigate 10 frames
+- **Stage**: The main preview area integrating `<helios-player>`.
+- **Timeline**: Visual track-based editor for sequencing assets.
+- **PropsEditor**: JSON-based property editor for composition variables.
+- **AssetsPanel**: Drag-and-drop asset management interface.
+- **PlaybackControls**: Centralized playback state control.
 
 ## Section E: Integration
-- **Core (`packages/core`)**: Consumes the `Helios` class and schema definitions to discover properties and handle data synchronization.
-- **Player (`packages/player`)**: Directly integrates the `<helios-player>` web component to power the Stage playback and preview logic.
-- **Renderer (`packages/renderer`)**: Orchestrates and manages background rendering tasks requested via the Studio's backend API.
+- **Core**: Consumes the `Helios` class for composition management.
+- **Player**: Integrates the `<helios-player>` Web Component into the Stage.
+- **Renderer**: Uses `@helios-project/renderer` via `/api/render` to execute real video exports based on the timeline.

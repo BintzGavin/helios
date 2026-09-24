@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.486	600	57.22	67.1	keep	inline await in DomStrategy.capture
+2	10.514	600	57.07	66	keep	inline await in DomStrategy.capture
+3	10.541	600	56.92	66.2	keep	inline await in DomStrategy.capture
+4	10.819	600	55.46	68.3	keep	inline await in DomStrategy.capture
+5	10.837	600	55.37	62.7	keep	inline await in DomStrategy.capture
+6	12.123	600	49.49	66.1	keep	inline await in DomStrategy.capture
+7	21.528	600	27.87	65.9	keep	inline await in DomStrategy.capture

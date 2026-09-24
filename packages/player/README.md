@@ -69,6 +69,8 @@ The player will automatically attempt to access `window.helios` on the iframe's 
 | `sandbox` | Security flags for the iframe. | `allow-scripts allow-same-origin` |
 | `export-width` | Target width for client-side export. | - |
 | `export-height` | Target height for client-side export. | - |
+| `muted` | Automatically mute the player's audio upon loading. | `false` |
+| `playsinline` | Indicates that the video is to be played "inline", that is within the element's playback area. | `false` |
 | `export-bitrate` | Target bitrate for client-side export (bps). | - |
 | `export-filename` | Filename for client-side export (without extension). | `video` |
 | `export-caption-mode` | Strategy for caption export: `burn-in` or `file`. | `burn-in` |
@@ -132,22 +134,67 @@ The player exposes several CSS variables to allow theming of the controls:
 
 The `<helios-player>` element implements a subset of the HTMLMediaElement interface, allowing you to control playback programmatically.
 
+### HTMLMediaElement Constants
+
+Both class-level and instance-level properties are provided for standard media states:
+
+- `HAVE_NOTHING` (0): No media data available.
+- `HAVE_METADATA` (1): Media metadata available.
+- `HAVE_CURRENT_DATA` (2): Data for current playback position available.
+- `HAVE_FUTURE_DATA` (3): Data for current and future playback position available.
+- `HAVE_ENOUGH_DATA` (4): Enough data available to play through.
+- `NETWORK_EMPTY` (0): Uninitialized network state.
+- `NETWORK_IDLE` (1): Idle network state.
+- `NETWORK_LOADING` (2): Loading network state.
+- `NETWORK_NO_SOURCE` (3): No source network state.
+
 ### Methods
 
+- `setDuration(seconds: number): void` - Updates the composition duration dynamically.
+- `setFps(fps: number): void` - Updates the composition framerate dynamically.
+- `setSize(width: number, height: number): void` - Updates the composition dimensions dynamically.
+- `setMarkers(markers: Marker[]): void` - Updates the timeline markers dynamically.
+- `setSinkId(sinkId: string): Promise<void>` - Sets the audio sink id.
+
 - `play(): Promise<void>` - Starts playback.
+- `getController(): HeliosController | null` - Retrieves the underlying HeliosController instance, if connected.
+
 - `getSchema(): Promise<HeliosSchema | undefined>` - Retrieves the input properties schema from the composition.
 - `pause(): void` - Pauses playback.
+- `setPlaybackRange(startFrame: number, endFrame: number): void` - Sets the playback range to a specific start and end frame.
+- `clearPlaybackRange(): void` - Clears the playback range.
 - `load(): void` - Reloads the iframe (useful if `src` changed or to retry connection).
 - `addTextTrack(kind: string, label?: string, language?: string): TextTrack` - Adds a new text track to the media element.
 - `diagnose(): Promise<DiagnosticReport>` - Runs environment diagnostics (WebCodecs, WebGL) and returns a report.
 - `requestPictureInPicture(): Promise<PictureInPictureWindow>` - Requests Picture-in-Picture mode for the player.
 - `export(options?: HeliosExportOptions): Promise<void>` - Programmatically trigger client-side export.
 - `fastSeek(time: number): void` - Seeks to the specified time as fast as possible (currently equivalent to setting `currentTime`).
+- `getStartDate(): number` - Returns NaN since the player does not support a specific start date timeline.
 - `canPlayType(type: string): CanPlayTypeResult` - Returns whether the player can play the specified media type (e.g., `'probably'`, `'maybe'`, or `''`).
+- `captureStream(): Promise<MediaStream>` - Returns a MediaStream capturing the player's canvas (if same-origin).
+- `startAudioMetering(): void` - Starts audio metering calculation.
+- `stopAudioMetering(): void` - Stops audio metering calculation.
+- `getVideoPlaybackQuality(): VideoPlaybackQuality` - Returns an object containing the video playback quality metrics.
+- `requestVideoFrameCallback(callback: VideoFrameRequestCallback): number` - Registers a callback to be fired when a new frame is rendered.
+- `cancelVideoFrameCallback(handle: number): void` - Cancels a previously registered video frame callback.
 
 ### Properties
+- `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
+- `remote` (RemotePlayback): Returns a mock RemotePlayback object to complete HTMLMediaElement parity.
+- `mediaGroup` (string): Reflected mediagroup attribute.
+- `sinkId` (string, read-only): Returns the current audio sink id.
 
+- `src` (string): URL of the composition page to load in the iframe.
+- `autoplay` (boolean): Reflected autoplay attribute.
+- `loop` (boolean): Reflected loop attribute.
+- `controls` (boolean): Reflected controls attribute.
+- `poster` (string): Reflected poster attribute.
+- `preload` (string): Reflected preload attribute.
+- `sandbox` (string): Reflected sandbox attribute.
+- `interactive` (boolean): Reflected interactive attribute.
 - `textTracks` (TextTrackList, read-only): The text tracks associated with the media element.
+- `audioTracks` (AudioTrackList, read-only): The audio tracks associated with the media element.
+- `videoTracks` (VideoTrackList, read-only): The video tracks associated with the media element.
 - `currentTime` (number): Current playback position in seconds.
 - `duration` (number, read-only): Total duration in seconds.
 - `paused` (boolean, read-only): Whether playback is paused.
@@ -169,12 +216,12 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `inputProps` (object): Get or set the input properties passed to the composition.
 - `playsInline` (boolean): Reflected playsinline attribute.
 - `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
+- `autoPictureInPicture` (boolean): If true, automatically enters Picture-in-Picture when the user switches tabs or apps.
 - `error` (MediaError | null, read-only): The current media error, or `null` if no error occurred.
 - `currentSrc` (string, read-only): The absolute URL of the chosen media resource.
 - `played` (TimeRanges, read-only): The ranges of the media source that the browser has played.
 - `defaultMuted` (boolean): Reflected `defaultMuted` attribute.
 - `defaultPlaybackRate` (number): The default rate of playback.
-- `preservesPitch` (boolean): Whether pitch should be preserved when altering playback speed.
 - `srcObject` (MediaProvider | null): The media provider object assigned to the player.
 - `crossOrigin` (string | null): The CORS setting for this media element.
 - `exportMode` (string): Reflected export-mode attribute.
@@ -192,12 +239,50 @@ The `<helios-player>` element implements a subset of the HTMLMediaElement interf
 - `mediaArtwork` (string): Reflected media-artwork attribute.
 
 
+
+### Event Handlers
+
+- `onplay` (function | null): Event handler for the `play` event.
+- `onplaying` (function | null): Event handler for the `playing` event.
+- `onpause` (function | null): Event handler for the `pause` event.
+- `onended` (function | null): Event handler for the `ended` event.
+- `ontimeupdate` (function | null): Event handler for the `timeupdate` event.
+- `onvolumechange` (function | null): Event handler for the `volumechange` event.
+- `onratechange` (function | null): Event handler for the `ratechange` event.
+- `ondurationchange` (function | null): Event handler for the `durationchange` event.
+- `onseeking` (function | null): Event handler for the `seeking` event.
+- `onseeked` (function | null): Event handler for the `seeked` event.
+- `onresize` (function | null): Event handler for the `resize` event.
+- `onloadstart` (function | null): Event handler for the `loadstart` event.
+- `onloadedmetadata` (function | null): Event handler for the `loadedmetadata` event.
+- `onloadeddata` (function | null): Event handler for the `loadeddata` event.
+- `oncanplay` (function | null): Event handler for the `canplay` event.
+- `oncanplaythrough` (function | null): Event handler for the `canplaythrough` event.
+- `onsuspend` (function | null): Event handler for the `suspend` event.
+- `onstalled` (function | null): Event handler for the `stalled` event.
+- `onwaiting` (function | null): Event handler for the `waiting` event.
+- `onerror` (function | null): Event handler for the `error` event.
+- `onenterpictureinpicture` (function | null): Event handler for the `enterpictureinpicture` event.
+- `onleavepictureinpicture` (function | null): Event handler for the `leavepictureinpicture` event.
+- `onaudiometering` (function | null): Event handler for the `audiometering` event.
+- `onabort` (function | null): Event handler for the `abort` event.
+- `onemptied` (function | null): Event handler for the `emptied` event.
+- `onprogress` (function | null): Event handler for the `progress` event.
+
 ## Events
 
 The element dispatches the following custom events:
 
+- `error`: Fired when an error occurs during media loading or playback.
+- `audiometering`: Fired during playback to report stereo RMS and Peak audio levels.
+- `playing`: Fired when playback is ready to start after having been paused or delayed due to lack of data.
+- `suspend`: Fired when media data loading has been suspended.
+- `stalled`: Fired when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
+- `waiting`: Fired when playback has stopped because of a temporary lack of data.
 - `play`: Fired when playback starts.
 - `pause`: Fired when playback is paused.
+- `seeking`: Fired when a seek operation starts.
+- `seeked`: Fired when a seek operation completes.
 - `ended`: Fired when playback completes.
 - `timeupdate`: Fired when the current time/frame changes.
 - `volumechange`: Fired when volume or mute state changes.
@@ -208,7 +293,12 @@ The element dispatches the following custom events:
 - `loadeddata`: Fired when data for the current frame is available.
 - `canplay`: Fired when the browser can resume playback of the media.
 - `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
+- `abort`: Fired when the loading of the media has been aborted.
+- `emptied`: Fired when the media has become empty.
+- `progress`: Fired periodically as the browser loads a resource.
 - `resize`: Fired when the player dimensions change.
+- `enterpictureinpicture`: Fired when the player enters Picture-in-Picture mode.
+- `leavepictureinpicture`: Fired when the player leaves Picture-in-Picture mode.
 
 ## Client-Side Export
 

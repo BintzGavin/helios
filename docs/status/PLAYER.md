@@ -1,4 +1,27 @@
-**Version**: 0.77.29
+**Version**: 0.79.16
+
+[v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
+[v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
+[v0.77.53] ✅ Completed: Identified missing HTMLMediaElement events (`abort`, `emptied`, `progress`) in `<helios-player>`. Created plan `.sys/plans/2027-02-15-PLAYER-Add-Missing-Events.md` to implement them.
+**Version**: 0.78.5
+[v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
+[v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
+[v0.78.1] ✅ Completed: Implement Instance Constants - Added standard media constants (e.g., HAVE_NOTHING, NETWORK_EMPTY) to the HeliosPlayer instance for HTMLMediaElement parity.
+[v0.77.60] ✅ Completed: Discovered that 2026-06-03-PLAYER-configurable-export-resolution.md is an IMPOSSIBLE: DUPLICATION plan. The export-width and export-height properties are already fully implemented and verified in the codebase. Documented as impossible and discarded.
+[v0.77.41] ✅ Completed: Discovered undocumented event handler properties in implementation missing from README. Created plan `.sys/plans/2027-02-15-PLAYER-Document-Event-Handlers.md` to document `onplay`, `onpause`, etc.
+[v0.77.52] ✅ Completed: Fix API Parity Events - Implemented synthetic dispatches for missing media events (suspend, stalled, waiting) to improve HTMLMediaElement API parity.
+[0.77.49] ✅ Completed: Document Missing Event Handlers - Documented onplaying, onwaiting, onsuspend, and onstalled properties and events.
+[v0.77.46] ✅ Completed: Discovered that `2027-02-16-PLAYER-Add-onaudiometering-handler.md` is an IMPOSSIBLE: DUPLICATION plan. The `onaudiometering` property is already fully implemented. Documented as impossible and discarded. Also added 'audiometering' to the event handlers test in `index.test.ts`.
+[v0.77.44] ✅ Completed: Document Missing Events - Deleted lingering plan file as the README already contained the required documentation updates.
+[v0.77.43] ✅ Completed: Document Event Handlers - Updated README.md to include standard event handler properties to match the actual implementation in packages/player/src/index.ts.
+[v0.77.42] ✅ Completed: Discovered that v0.77.40-PLAYER-Document-Missing-Events.md is an IMPOSSIBLE plan because the events `error` and `audiometering` are already documented in `packages/player/README.md`. Documented as duplicate and discarded.
+[v0.77.38] ✅ Completed: Expand Index Coverage - Added unit tests for disconnectedCallback in packages/player/src/index.ts.
+[v0.77.37] ✅ Completed: Improve index.ts test coverage - Added tests for diagnose API and retryConnection.
+[v0.77.36] ✅ Completed: Discovered that 2026-06-21-PLAYER-Smart-Controls.md is an IMPOSSIBLE: DUPLICATION plan. The smart controls for CC and PiP are already fully implemented. Documented as duplicate and discarded.
+[v0.77.35] ✅ Completed: Improve index.ts test coverage - Added tests for captureStream and audio metering edge cases.
+[v0.77.39] ✅ Completed: Discovered that 2026-11-26-PLAYER-Add-Undocumented-Shortcuts-UI.md is an IMPOSSIBLE: DUPLICATION plan. The shortcuts are already fully implemented in the UI overlay inside index.ts. Documented as impossible and discarded.
+[v0.77.33] ✅ Completed: Discovered that 2026-03-01-PLAYER-Client-Side-Video-Inlining.md is an IMPOSSIBLE: DUPLICATION plan. The inlineVideos functionality is already fully implemented and tested in dom-capture.ts. Documented as impossible and discarded.
+[v0.77.30] ✅ Completed: Document Tracks API - Added audioTracks and videoTracks properties to README.md API parity list.
 [v0.77.27] ✅ Completed: Document API Parity Gap - Deleted lingering plan file as the README already contained the required documentation updates.
 [v0.77.27] ✅ Completed: Add Media Session properties to README
 [v0.77.26] ✅ Completed: Implement WebVTT Support - Refactored WebVTT parser to use single-pass loops instead of chained map/filter arrays for better performance
@@ -12,6 +35,8 @@
 
 [v0.77.18] ✅ Completed: Fix Duplicate README Entry - Removed duplicate getSchema entry from README.md.
 ## Status Log
+[v0.77.50] ✅ Completed: Document Missing Media Properties - Added src, autoplay, loop, controls, poster, preload, sandbox, and interactive to README.md
+[v0.77.49] ✅ Completed: Discovered undocumented event handler properties and events (playing, waiting, suspend, stalled) in implementation missing from README. Created plan `.sys/plans/v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` to document them.
 [v0.77.17] ✅ Completed: Improve Index Coverage - Expanded unit tests for HTMLMediaElement properties and events.
 [v0.77.14] ✅ Completed: Document getSchema API Parity - Added missing getSchema method to README documentation.
 [v0.77.13] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner to create the next implementation spec.
@@ -225,3 +250,65 @@
 [v0.77.25] ✅ Completed: Discovered broken test due to missing vitest environment pragma. Created plan .sys/plans/2026-12-29-PLAYER-Fix-Export-Options-Test.md to fix test configuration.
 [v0.77.28] ✅ Completed: Fix Export Options Test - Deleted obsolete plan file as export-options.test.ts is already configured and passing.
 [v0.77.29] ✅ Completed: Discovered that `2026-03-01-PLAYER-Click-To-Play.md` is an IMPOSSIBLE: DUPLICATION plan. The `.click-layer` and `interactive` attributes are already fully implemented. Documented as impossible and discarded.
+[v0.77.30] ✅ Completed: Discovered undocumented API properties and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `audioTracks`, `videoTracks`, `enterpictureinpicture`, and `leavepictureinpicture`.
+[v0.77.31] ✅ Completed: Discovered undocumented API properties, methods and events in README.md. Created plan `.sys/plans/2026-12-30-PLAYER-README-API-Update.md` to document `enterpictureinpicture`, `leavepictureinpicture`, `captureStream`, `startAudioMetering`, and `stopAudioMetering`.
+[v0.77.32] ✅ Completed: Document API Parity Gap - Updated README to document existing methods (captureStream, startAudioMetering, stopAudioMetering) and events (enterpictureinpicture, leavepictureinpicture).
+[v0.77.33] ✅ Completed: Discovered undocumented seeking events in README.md. Created plan `.sys/plans/v0.77.33-PLAYER-Document-Seeking-Events.md` to document `seeking` and `seeked` events.
+[v0.77.39] ✅ Completed: Document Seeking Events - Updated README to document existing seeking and seeked events to match the actual implementation in packages/player/src/index.ts.
+[v0.77.40] ✅ Completed: Document Missing Events - Updated README.md to include documentation for error and audiometering events.
+[v0.77.45] ✅ Completed: Add onaudiometering event handler to HeliosPlayer class and documentation.
+[v0.77.47] ✅ Completed: Document Missing Attributes - Updated README.md to document the missing `muted` and `playsinline` attributes.
+
+[v0.77.48] ✅ Completed: Fix API Parity Events - Implemented missing media events (playing, waiting, suspend, stalled) to improve API parity with HTMLMediaElement.
+[v0.77.50] ✅ Completed: Discovered that `v0.77.49-PLAYER-Document-Missing-Event-Handlers.md` is an IMPOSSIBLE: DUPLICATION plan. The event handlers (`onplaying`, `onsuspend`, `onstalled`, `onwaiting`) are already fully documented in the README. Documented as impossible and discarded.
+[v0.77.51] ✅ Completed: Discovered that 2027-02-17-PLAYER-Document-Missing-Media-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The missing properties are already fully documented in the README. Documented as impossible and discarded.
+
+[v0.77.52] ✅ Completed: Document Event Handlers - Implemented missing media event handlers (onabort, onemptied, onprogress) to improve API parity with HTMLMediaElement and updated documentation.
+[v0.77.54] ✅ Completed: Implement Missing Media Properties - Added `disableRemotePlayback`, `mediaGroup`, `sinkId`, and `setSinkId` to `HeliosPlayer` to complete API parity.[v0.77.55] ✅ Completed: Fix Missing Coverage - Added test coverage for mediaTitle, mediaArtist, mediaAlbum, and mediaArtwork properties in export-options.test.ts.
+
+[v0.77.56] ✅ Completed: Implement Missing Media Event Dispatches - Added missing synthetic event dispatches for abort, emptied, and progress to improve HTMLMediaElement API parity.
+[v0.77.57] ✅ Completed: Discovered that `2027-02-18-PLAYER-Implement-Missing-Media-Event-Dispatches.md` is an IMPOSSIBLE: DUPLICATION plan. The event dispatches (`abort`, `emptied`, `progress`) are already fully implemented in the code. Documented as impossible and discarded.[v0.77.58] ✅ Completed: Discovered that `2027-02-18-PLAYER-Implement-Missing-Media-Properties.md` is an IMPOSSIBLE: DUPLICATION plan. The missing standard properties and methods (`disableRemotePlayback`, `mediaGroup`, `sinkId`, `setSinkId`) are already fully implemented in the code. Documented as impossible and discarded.
+[v0.77.59] ✅ Completed: Document Missing Media Events - Documented the abort, emptied, and progress events in the project README.
+[v0.77.61] ✅ Completed: Discovered that 2027-02-15-PLAYER-Add-Missing-Events.md is an IMPOSSIBLE: DUPLICATION plan. The event dispatches (abort, emptied, progress) are already fully implemented in packages/player/src/index.ts. Documented as impossible and discarded.
+[v0.77.62] ✅ Completed: Discovered missing HTMLVideoElement parity methods (`getVideoPlaybackQuality`, `requestVideoFrameCallback`). Created plan `.sys/plans/2027-03-01-PLAYER-Implement-Video-API-Parity-Methods.md` to implement them.
+[v0.77.63] ✅ Completed: Created `2027-03-01-PLAYER-Implement-Video-API-Parity-Methods.md` execution plan to achieve deeper API parity with the HTMLVideoElement interface.
+[v0.78.0] ✅ Completed: Implement Video API Parity Methods - Added `getVideoPlaybackQuality`, `requestVideoFrameCallback`, and `cancelVideoFrameCallback` to complete HTMLVideoElement API parity.
+
+
+[v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
+[v0.78.2] ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.
+[v0.78.3] ✅ Completed: Discovered that `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md` is an IMPOSSIBLE: DUPLICATION plan. The missing constants are already implemented. Created plan `.sys/plans/2027-03-03-PLAYER-Document-Instance-Constants.md` to document them.
+**Version**: 0.79.15
+
+[v0.78.3] ✅ Completed: Document HTMLMediaElement Constants - Added documentation for HTMLMediaElement instance and class constants to the README.
+[v0.78.4] ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
+
+[v0.79.0] ✅ Completed: Expose Composition Setters - Exposed setDuration, setFps, setSize, and setMarkers on HeliosPlayer Web Component
+[v0.79.1] ✅ Completed: Discovered that 2027-03-04-PLAYER-Expose-Playback-Range-Methods.md is an IMPOSSIBLE: DUPLICATION plan. The setPlaybackRange and clearPlaybackRange methods are already fully implemented and documented. Documented as impossible and discarded.
+[v0.79.2] ✅ Completed: Document Composition Setters - Documented setDuration, setFps, setSize, and setMarkers in the player README.
+[v0.79.2] ✅ Completed: Discovered that 2027-03-05-PLAYER-Expose-Composition-Setters.md is an IMPOSSIBLE: DUPLICATION plan. The setDuration, setFps, setSize, and setMarkers methods are already fully implemented and documented. Documented as impossible and discarded.
+[v0.79.3] ✅ Completed: Document getController - Documented getController in the player README.
+
+[v0.79.4] ✅ Completed: Remove preservesPitch documentation - Removed preservesPitch from the player README as it is currently unsupported by the core architecture.
+[v0.79.4] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
+[v0.79.5] ✅ Completed: Remove Unsupported EME - Removed the unsupported setMediaKeys method and mediaKeys property from both the codebase and documentation.
+
+[v0.79.6] ✅ Completed: Discovered that 2027-03-05-PLAYER-Remove-preservesPitch-Documentation.md and 2027-03-06-PLAYER-Remove-preservesPitch-Docs.md are IMPOSSIBLE: DUPLICATION plans. The preservesPitch documentation is already removed. Documented as impossible and discarded.
+[v0.79.7] ✅ Completed: Discovered that .sys/plans/2027-03-05-PLAYER-Remove-Unsupported-EME.md is an IMPOSSIBLE: DUPLICATION plan. The mediaKeys removal is already fully implemented. Documented as impossible and discarded.
+
+[v0.79.8] ✅ Completed: Discovered missing HTMLVideoElement parity property (`autoPictureInPicture`). Created plan `.sys/plans/2027-03-06-PLAYER-Implement-autoPictureInPicture.md` to implement it.
+
+[v0.79.9] ✅ Completed: Implement autoPictureInPicture - Added autoPictureInPicture property getter and setter to complete HTMLVideoElement parity.
+[v0.79.10] ✅ Completed: Implement getStartDate - Added getStartDate method returning NaN for HTMLMediaElement parity
+
+
+[v0.79.11] ✅ Completed: Discovered missing HTMLMediaElement parity property (`remote`). Created plan `.sys/plans/2026-07-13-PLAYER-Implement-HTMLMediaElement-Parity.md` to implement it.
+
+[v0.79.12] ✅ Completed: Implement remote property - Added remote property returning a mock RemotePlayback object to complete HTMLMediaElement parity.
+[v0.79.13] ✅ Completed: Discovered that plans 2026-07-13, 2027-03-06, and 2027-03-07 for remote, autoPictureInPicture, and getStartDate are IMPOSSIBLE: DUPLICATION plans. They are already fully implemented in packages/player/src/index.ts and documented in README.md. Documented as impossible and discarded.
+[v0.79.14] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
+
+[v0.79.15] ✅ Completed: Implement Promise for play() - Modified play() to return a Promise that resolves when playback begins or rejects if it fails, matching HTMLMediaElement parity.
+
+[v0.79.15] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.
+[v0.79.16] 🚫 Blocked: No new plan found in /.sys/plans/ for PLAYER. Waiting for Planner.

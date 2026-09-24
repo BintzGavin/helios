@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.377	150	108.93	42.5	keep	inline worker promise chain
+2	1.317	150	113.88	45.3	keep	inline worker promise chain
+3	1.373	150	109.27	42.6	keep	inline worker promise chain

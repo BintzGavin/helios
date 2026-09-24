@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.413	150	106.18	70.2	baseline	baseline run 1
+2	1.351	150	111.02	70.3	baseline	baseline run 2
+3	1.445	150	103.82	70.9	baseline	baseline run 3
+4	1.442	150	104.02	70.3	discard	batch stdin writes unified buffer

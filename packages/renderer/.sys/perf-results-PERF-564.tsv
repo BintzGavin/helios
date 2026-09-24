@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1030.500	150	0.15	0.0	discard	webcodecs DOM-to-SVG-to-Canvas fallback (extremely slow)

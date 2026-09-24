@@ -1,5 +1,85 @@
 # Status: LLMS
-**Version**: 1.81.0
+[v1.122.5] ✅ Completed: Comprehensive Daily Review - Verified packages/studio/src/index.ts was already correctly absent from Key Files for Agents. Verified all other sections match project state perfectly.
+
+[v1.122.4] ✅ Completed: Comprehensive Daily Review - Added skill-creator to Agent Skills. Synced Roadmap with recent verifiable completions across Studio (Export Job Spec).
+
+[v1.122.0] ✅ Completed: Comprehensive Daily Review - Aligned Quick Facts and Roadmap to active package.json versions (Core v5.13.0, Studio v0.107.1, Player v0.78.1, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0). Synced Roadmap features across all domains (Studio: Improve Omnibar Test Coverage, CLI: CLI Command Coverage Tests V9, Core: Generic Input Props, Player: Document getSchema API Parity, Renderer: Validate HW Accel, Infrastructure: Optimize GCS Uploads).
+
+[v1.114.0] ✅ Completed: Comprehensive Daily Review - Updated Key Files to include `packages/studio/src/server/render-manager.ts`. Verified package versions and existing completions.
+**Version**: 1.122.5
+
+[v1.121.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: AudioMixerPanel Coverage, AssetsPanel Coverage, PlaybackControls Coverage; CLI: CLI Command Coverage Tests V10, CLI Deploy Command Coverage, CLI Registry Types Regression Tests; Player: Remove Unsupported EME, Document getController, Document HTMLMediaElement Constants). Verified all package versions match package.json exactly.
+
+[v1.118.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: AssistantModal Coverage, RenderManager Test Coverage; CLI: Command Coverage V9, Registry Types Tests; Core: Generic Input Props, Active Clips; Player: Composition Setters, Playback Range; Renderer: Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize S3/GCS Uploads). Verified all package versions match package.json exactly.
+
+[v1.117.1] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Preview Command, CLI Build Command; CLI: Command Coverage Tests V7, Utils Coverage Tests V2; Core: WaitUntilStable, diagnose; Player: Refactor Player Control Logic, setMediaKeys; Renderer: Smart Codec Selection, CdpTimeDriver Iframe Sync; Infrastructure: CloudRun Coverage, Modal Adapter). Verified all file paths and package versions perfectly match package.json.
+[v1.116.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Core: WaitUntilStable, Diagnose, Testing; Studio: CLI Build/Update, Refine Skills; Player: Sandbox/Bridge, setMediaKeys, Refactor Control Logic; Renderer: Smart Audio Fades, Distributed Audio Mixing, CdpTimeDriver Iframe Sync; CLI: Command Coverage V7, Registry Client Coverage; Infrastructure: Optimize S3 Uploads, Orchestrator Coverage Expansion). Verified all package versions and Key Files.
+
+
+[v1.113.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Renderer: Fix GSAP Timeline, CLI: Docker Adapter Tests, Player: Media Session Tests, Infrastructure: InMemoryJobRepository Coverage). Updated Architecture components to reflect `timeline` and `RenderExecutor`. Verified all Key Files and Agent Skills sections.
+
+[v1.112.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Core: Generic Input Props, Active Clips; Studio: Improve Omnibar Test Coverage, Asset Drag and Drop; Player: Document getSchema API Parity, Bridge Coverage; Renderer: Validate HW Accel, Orchestrator Plan; CLI: CLI Command Coverage V9; Infrastructure: Optimize GCS Uploads, Orchestrator Coverage Expansion). Verified all Key Files and Agent Skills sections, and maintained alignment with true package versions.
+**Version**: 1.112.0
+
+[v1.111.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Core: Diagnose, WaitUntilStable, Testing; Studio: CLI Build/Update, Refine Skills; Player: Sandbox, Bridge, setMediaKeys; Renderer: Smart Audio Fades, Distributed Audio Mixing; CLI: Command Coverage V4/V7, Docker Tests; Infrastructure: S3 Uploads, Orchestrator Coverage). Verified all Key Files and Agent Skills sections.
+**Version**: 1.111.0
+
+[v1.110.0] ✅ Completed: Comprehensive Daily Review - Synced Quick Facts and Roadmap with true package versions (Core v5.13.0+, Studio v0.107.1+, Player v0.78.1+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Fixed version drift. Updated Roadmap completions to accurately reflect progress for the aligned versions. Verified all Key Files and Agent Skills sections.
+
+[v1.109.0] ✅ Completed: Comprehensive Daily Review - Synced Quick Facts and Roadmap with current package versions (Core v5.13.0+, Studio v0.121.11+, Player v0.77.5+, Renderer v1.79.0+, CLI v0.46.53+, Infrastructure v0.54.26+). Updated Roadmap with recent completions including Cloudflare Sandbox Deployment (CLI), Asset Drag and Drop (Studio), and Orchestrator Test Coverage Expansion (Infrastructure).
+
+[v1.104.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Tier 3 Cloud Adapters for CLI and Infrastructure, Component Management for Studio). Verified all package versions match package.json exactly. Verified File Paths and Key Files.
+
+[v1.103.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with verifiable completions across Studio, CLI, Core, Player, Renderer, and Infrastructure domains. Verified package versions exactly match package.json.
+
+[v1.102.0] ✅ Completed: Daily llms.txt Review - Cleaned up Roadmap and synced package versions. Verified all file paths and API references.
+
+[v1.100.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions (Studio TimelineAudioTrack Regression Tests, CLI Command Coverage Tests V4-V7, Player Bridge Coverage Expansion, Infrastructure Orchestrator Coverage Expansion). Verified all file paths and package versions perfectly match package.json.
+
+[v1.99.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions (Studio Test Coverage, Player Media Properties & Events, CLI Command Coverage Tests V5-V7). Verified all package versions match package.json exactly.
+
+[v1.98.0] ✅ Completed: Comprehensive Daily Review - Updated Core API example and synced Roadmap with recent verifiable completions (Generic Input Props, Validate HW Accel, Bridge Coverage). Verified all file paths and package versions perfectly match package.json.
+
+[1.97.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress logs (Command Coverage Tests V4, CLI Job/Render/Merge Tests). Verified all file paths and package versions perfectly match package.json.
+[v1.96.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions (Studio TimelineAudioTrack Regression Tests, CLI Templates Regression Tests, Player Bridge Coverage Expansion, Infrastructure Orchestrator Coverage Expansion). Verified all file paths and package versions perfectly match package.json.
+
+[v1.93.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions exactly to package.json. Verified API stability and file paths.
+
+
+[v1.91.1] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions (CLI Adapters, Player Bridge Coverage, Infrastructure S3 Uploads). Verified all package versions match package.json exactly.
+
+[v1.91.0] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Synced Roadmap with recent verifiable completions. Verified Agent Skills paths.
+
+[v1.90.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.121.23+, CLI v0.46.41+, Player v0.77.47+, Renderer v1.80.1+, Infrastructure v0.54.28+). Synced Roadmap features across domains. Verified Key Files and Agent Skills section.
+
+[1.89.0] ✅ Completed: Daily llms.txt Review - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.121.22+, Player v0.77.46+, CLI v0.46.40+, Renderer v1.80.1+, Infrastructure v0.54.28+). Synced Roadmap with recent verifiable completions (CLI Command Coverage Tests V4, CLI Job/Registry Types Regression Tests, Player Missing Events/srcObject fixes, Infrastructure Modal Adapter). Verified Agent Skills paths.
+
+[v1.88.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Preview Command, CompositionsPanel Tests, CLI Build Command; CLI: CLI Command Coverage Tests V2; Infrastructure: Optimize GCS Uploads, Orchestrator Coverage Expansion; Player: Document getSchema API Parity). Verified all package versions match package.json exactly.
+[v1.88.1] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions. Verified package versions and API examples.
+[v1.86.8] ✅ Completed: Comprehensive Daily Review - Updated V1.x Roadmap with recent verified features from all domain progress logs. Verified exact package.json versions.
+
+
+[v1.86.7] ✅ Completed: Comprehensive Daily Review - Updated V1.x Roadmap with recent verified features from all domain progress logs and removed the invalid `docs/prompts/` link from Key Files. Verified package versions.
+
+[v1.86.3] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with recent completions across CLI (Regression Tests), Player (Index Coverage), Renderer (WebCodecs, Skill Docs), and Infrastructure (S3 Uploads).
+[v1.86.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with Cloudflare Sandbox Adapter support and added Player API parity and shortcut documentation items. Verified File Paths and Key Files.
+[v1.86.1] ✅ Completed: Comprehensive Daily Review - Verified package versions match package.json exactly. Verified File Paths and Key Files. No changes required to llms.txt.
+
+[v1.86.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with TimelineAudioTrack Regression Tests and Bridge Coverage Expansion. Verified versions and file paths.
+
+[v1.85.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with CLI Templates Regression Tests and InMemoryJobRepository Coverage. Verified versions and file paths.
+
+[v1.84.4] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Asset Drag and Drop; CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution; Player: Bridge Coverage Completeness, Regression Tests for Audio Fader; Renderer: Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize GCS Uploads, CloudRun Resiliency Tests). Verified all package versions match package.json exactly.
+
+[v1.84.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (CLI: CLI Utils Regression Tests, Registry Manifest Regression Tests; Player: Bridge Coverage Expansion; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage). Verified all package versions match package.json.
+
+[v1.84.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example to include audioDecoders and userAgent. Updated Roadmap with latest domain completions (Studio, CLI, Player, Renderer, Infrastructure).
+
+[v1.83.0] ✅ Completed: Comprehensive Daily Review - Updated DiagnosticReport API example and removed deprecated PROGRESS.md reference from Key Files.
+
+[v1.82.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Update Keyboard Shortcuts, Asset Drag and Drop, Toggle Loop Shortcut; CLI: CLI Utils Regression Tests, Build Command Regression Tests, Scaffold Docker Deployment Command; Player: Document API Parity Gap, Implement WebVTT Support, Add Undocumented Shortcuts to UI, Improve Index Coverage; Renderer: WebCodecs Preference, Update Skill Documentation, Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize S3 Uploads, Optimize GCS Uploads, FfmpegStitcher Coverage, Orchestrator Test Coverage Expansion). Verified all package versions match package.json (Core v5.13.0, Studio v0.107.1, Player v0.76.20, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0).
+
+[v1.81.1] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Update Keyboard Shortcuts Documentation, Timeline Drag & Drop; CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution; Core: Generic Input Props; Player: Implement WebVTT Support; Renderer: Fix GSAP Timeline Synchronization; Infrastructure: Optimize GCS Uploads). Verified all package versions match package.json.
 
 [v1.80.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Studio: Schema Validation, Asset Move, WebCodecs Preference, Enhance MCP Server; CLI: Realtime Log Streaming, Enhance Worker Job Cancellation; Infrastructure: FfmpegStitcher Coverage, Orchestrator Coverage Expansion, FileJobRepository Spec). Verified all package versions match package.json (Core v5.13.0+, Studio v0.107.1+, Player v0.76.20+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+). Verified File Paths and Key Files.
 
@@ -130,3 +210,45 @@ Verified package versions match package.json exactly. Verified File Paths and Ke
 
 
 [v1.81.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent completions from domain PROGRESS logs (Core: Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps; Studio: CLI Build Command, Preview Command, CLI Update Command; Player: Dom Canvas Capture, Bridge Documentation, Client-Side Image Inlining; Renderer: CdpTimeDriver Determinism, Smart Codec Selection Update, Smart Audio Fades; CLI: Scaffold Cloudflare Sandbox Deployment Command, Build Command Regression Tests; Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads). Verified all package versions match package.json (Core v5.13.0, Studio v0.107.1, Player v0.76.20, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0).
+
+[v1.84.2] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Export Job Spec; CLI: Scaffold Hetzner Deployment Command; Player: Regression Tests for Media Session; Renderer: Abstraction for Pluggable Execution; Infrastructure: InMemoryJobRepository Coverage). Verified all package versions match package.json exactly.
+[v1.84.3] ✅ Completed: Daily llms.txt Review - Fixed Agent Skill paths and updated roadmap with recent verified completions.
+[v1.86.5] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Expand Reverse Speeds; Player: Expand Index Coverage, Document Tracks API, Implement WebVTT Support; Renderer: Refactor DOM Traversal, Canvas Image Preload; CLI: CLI Registry Types Regression Tests; Infrastructure: FfmpegStitcher Coverage). Updated Quick Facts to match actual status versions. Verified all Key Files and Package descriptions.
+[v1.86.4] ✅ Completed: Comprehensive Daily Review - Verified package versions, checked Key Files and Agent Skills sections. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.86.6] ✅ Completed: Comprehensive Daily Review - Realigned Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, CLI v0.45.2+, Player v0.76.20+, Renderer v1.78.3+, Infrastructure v0.25.0+). Added CLI Index Regression Tests to Roadmap.
+
+[v1.86.9] ✅ Completed: Comprehensive Daily Review - Verified package versions, checked Key Files and Agent Skills sections. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.87.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap with recent verifiable completions from domain PROGRESS logs (Studio: Asset Move). Verified exact package.json versions.
+[v1.88.0] ✅ Completed: Comprehensive Daily Review - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.121.11+, CLI v0.46.26+, Player v0.77.5+, Renderer v1.79.0+, Infrastructure v0.54.26+). Synced Roadmap features across all domains. Verified Key Files and Agent Skills section.
+[v1.92.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Enable Audio State Persistence, Audio Fade Easing). Kept package versions in Quick Facts aligned to package.json.
+
+[v1.94.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio Asset Drag and Drop, CLI Registry updates, Infrastructure Modal adapter). Verified all file paths and package versions.
+[v1.95.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio RenderManager/AudioMeter tests, CLI template tests, Infrastructure coverage). Verified all file paths and package versions perfectly match package.json.
+
+[v1.98.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio Agent Skills Tests, CLI Command Coverage Tests, Player Bridge Coverage Expansion). Verified all file paths and package versions perfectly match package.json.
+
+[v1.101.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent progress (Studio Agent Skills Tests, CLI Command Coverage Tests V7, Player Bridge Coverage Expansion). Verified all file paths and package versions perfectly match package.json.
+
+[v1.105.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Component Management, Preview/Update Commands, Portable Job Paths; CLI: Registry/Template/Index/Command Regression Tests; Core: Variable Playback Rate, Animation Helpers, Stability Checks; Player: DOM Canvas Capture, Bridge Coverage Expansion, Client-Side Inlining, Media Session/Property Tests; Renderer: CdpTimeDriver Determinism, Smart Codec Priority, Iframe Media Sync, Smart Audio Fades, Distributed Audio Mixing; Infrastructure: Bounded Dependency Synchronizer, Optimize GCS/S3 Uploads, Orchestrator Coverage). Verified all file paths and package versions perfectly match package.json.
+
+[v1.106.0] ✅ Completed: Comprehensive Daily Review - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: CLI Build Command, CompositionsPanel Tests, Agent Skills Tests; Player: DOM Canvas Capture, Lock UI During Export, Bridge Documentation; Infrastructure: FfmpegStitcher Coverage, Optimize GCS/S3 Uploads). Verified exact package.json versions.
+
+[v1.107.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions across all domains (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage). Fixed Core API example in llms.txt (using start and duration). Verified all file paths and package versions perfectly match package.json.
+
+[v1.108.0] ✅ Completed: Daily llms.txt Review - Synced Roadmap with recent verifiable completions across Studio, CLI, Core, Player, Renderer, and Infrastructure domains. Verified package versions exactly match package.json.
+
+[v1.115.0] ✅ Completed: Daily llms.txt Review - Verified versions and roadmap
+
+[v1.117.0] ✅ Completed: Comprehensive Daily Review - Synced Roadmap with recent verifiable completions from domain PROGRESS logs (Studio: Component Management, Preview Command; CLI: CLI Utils Coverage Tests, Registry Client Coverage; Renderer: Fix GSAP Timeline Synchronization; Infrastructure: Cloudflare Sandbox Adapter, R2 Storage Adapter). Verified all package versions exactly match package.json. Verified Key Files and Agent Skills section.
+
+[v1.119.0] ✅ Completed: Daily llms.txt Review - Verified all package versions perfectly match package.json. Verified File Paths and Key Files. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.120.0] ✅ Completed: Daily llms.txt Review - Verified package versions, checked Key Files and Agent Skills sections. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.122.1] ✅ Completed: Comprehensive Daily Review - Verified package versions exactly match package.json (Core v5.13.0, Studio v0.107.1, Player v0.78.1, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0). Verified File Paths and Key Files. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.122.2] ✅ Completed: Daily llms.txt Review - Verified all package versions perfectly match package.json. Verified File Paths and Key Files. No changes required to llms.txt as it matches the true project state perfectly.
+
+[v1.122.3] ✅ Completed: Daily llms.txt Review - Verified all package versions perfectly match package.json. Verified File Paths and Key Files. No changes required to llms.txt as it matches the true project state perfectly.

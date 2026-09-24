@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.303	150	65.14	44.1	discard	--process-per-tab (slower run 1)
+2	1.826	150	82.14	42.4	discard	--process-per-tab (run 2)
+3	1.600	150	93.73	42.2	discard	--process-per-tab (run 3)

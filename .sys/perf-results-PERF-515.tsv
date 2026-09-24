@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.489	150	100.71	42.4	discard	PERF-515 run 1
+2	2.124	150	70.61	42.5	discard	PERF-515 run 2
+3	1.436	150	104.48	45.1	discard	PERF-515 run 3
+4	1.431	150	104.83	42.5	discard	PERF-515 run 4

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.581	150	258.24	41.8	discard	IsolateOrigins,site-per-process added to disable-features
+2	0.585	150	256.54	38.6	discard	IsolateOrigins,site-per-process added to disable-features
+3	0.582	150	257.91	38.7	discard	IsolateOrigins,site-per-process added to disable-features

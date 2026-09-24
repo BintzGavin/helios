@@ -1,0 +1,12 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	30.489	600	19.68	40.6	keep	baseline
+2	18.210	600	32.95	38.2	keep	baseline
+3	20.418	600	29.39	39.6	keep	baseline
+4	20.675	600	29.02	44.5	keep	baseline
+5	20.422	600	29.38	38.7	keep	concurrency 2
+6	20.958	600	28.63	37.8	keep	concurrency 2
+7	20.891	600	28.72	37.2	keep	concurrency 2
+8	28.157	600	21.31	36.1	discard	concurrency 1
+9	27.724	600	21.64	37.8	discard	concurrency 1
+10	28.301	600	21.20	36.7	discard	concurrency 1
+11	18.181	600	33.00	41.5	keep	concurrency 3 (revert to baseline)

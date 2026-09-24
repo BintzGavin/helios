@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.744	150	54.67	63.6	keep	PERF-676 conditionally update budget
+2	2.466	150	60.83	63.7	keep	PERF-676 conditionally update budget
+3	2.475	150	60.60	63.7	keep	PERF-676 conditionally update budget
+4	2.432	150	61.66	63.8	keep	PERF-676 conditionally update budget

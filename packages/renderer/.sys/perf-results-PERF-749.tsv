@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	14.391	300	20.85	53.4	discard	hoist-try-catch-in-runworker
+2	17.708	300	16.94	48.5	discard	hoist-try-catch-in-runworker
+3	15.750	300	19.05	53.5	discard	hoist-try-catch-in-runworker
+4	14.464	300	20.74	53.5	discard	hoist-try-catch-in-runworker
+5	14.758	300	20.33	53.5	discard	hoist-try-catch-in-runworker

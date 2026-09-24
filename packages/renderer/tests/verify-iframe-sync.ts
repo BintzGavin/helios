@@ -37,6 +37,8 @@ async function verifyIframeSync() {
     throw new Error('Iframe not found');
   }
 
+  await driver.prepare(page);
+
   // Set time to 500ms
   const targetTime = 0.5;
   console.log(`Setting time to ${targetTime}s...`);

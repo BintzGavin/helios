@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.707	600	56.04	43.4	keep	bypass CDP evaluate when no media
+2	10.440	600	57.47	43.5	keep	bypass CDP evaluate when no media
+3	10.531	600	56.97	46.0	keep	bypass CDP evaluate when no media

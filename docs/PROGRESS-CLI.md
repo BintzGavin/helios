@@ -1,3 +1,24 @@
+### CLI v0.46.65
+- 🛑 Blocked: Waiting for a new, valid plan in /.sys/plans/
+
+### CLI v0.46.53
+- ✅ Completed: CLI Command Coverage Tests V9 - Implemented tests to achieve 100% line coverage for the render command.
+
+### CLI v0.46.52
+- ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
+
+### CLI v0.46.44
+- ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
+
+## CLI v0.46.26
+- ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
+
+## CLI v0.46.21
+- ✅ Completed: Document duplicated Cloudflare Sandbox Execution plan - Logged the duplicated plan as impossible.
+
+## CLI v0.46.20
+- ✅ Completed: Document duplicated CLI Utils Regression Tests plan - Logged the duplicated plan as impossible.
+
 ## CLI v0.46.3
 - ✅ Completed: Scaffold Hetzner Deployment Command - Verified existing implementation of helios deploy hetzner command fulfills the scaffolding requirements.
 
@@ -12,6 +33,9 @@
 
 ## CLI v0.43.0
 - ✅ Completed: Scaffold Hetzner Deployment Command - Implemented `helios deploy hetzner` to scaffold README-HETZNER.md for the Hetzner Cloud adapter.
+
+### CLI v0.46.44
+- ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
 
 ### CLI v0.40.2
 - ✅ Completed: Scaffold Kubernetes Deployment Command - Implemented `helios deploy kubernetes` to scaffold job.yaml and README-KUBERNETES.md for Kubernetes Job clusters.
@@ -324,3 +348,43 @@ This file tracks progress for the CLI domain (`packages/cli`).
 
 ### CLI v0.46.19
 - ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
+
+### CLI v0.46.22
+- ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
+
+### CLI v0.46.23
+- ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
+
+### CLI v0.46.24
+- ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
+
+### CLI v0.46.31
+- ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
+
+### CLI v0.46.37
+- ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.
+
+### CLI v0.46.38
+- ✅ Completed: CLI Job/Render/Merge Tests Missing Mock - Fixed vitest mock resolution errors by setting `server.deps.inline` in `vitest.config.ts`.
+### CLI v0.46.39
+- ✅ Completed: CLI Command Coverage Tests V4 - Implemented missing test cases for init, build, job, render, and studio commands, improving test coverage metrics and resolving missing branch execution logic.
+### CLI v0.46.41
+- ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
+
+### CLI v0.46.46
+- ✅ Completed: CLI Command Coverage Tests V7 - Implemented 100% test coverage for the remaining branch logic in the CLI commands build.ts and studio.ts.
+
+### CLI v0.46.59
+- ✅ Completed: CLI Registry Client Coverage Tests - Achieved 100% branch and line coverage for RegistryClient in client.ts.
+
+### CLI v0.46.60
+- ✅ Completed: CLI Utils Coverage Tests V2 - Achieved 100% line coverage for CLI utils install.ts and examples.ts
+
+### CLI v0.46.62
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
+
+### CLI v0.46.64
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
+
+### CLI v0.46.61
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.

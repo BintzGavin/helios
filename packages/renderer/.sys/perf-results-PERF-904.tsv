@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.347	300	865.29	48.6	keep	PERF-904: Remove Math.min from Single-Worker Chunk Loops
+2	0.288	300	1043.31	48.9	keep	PERF-904: Remove Math.min from Single-Worker Chunk Loops
+3	0.292	300	1027.88	48.9	keep	PERF-904: Remove Math.min from Single-Worker Chunk Loops

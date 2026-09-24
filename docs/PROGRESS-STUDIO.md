@@ -1,3 +1,9 @@
+### STUDIO v0.122.0
+- ✅ Completed: Improve Omnibar Test Coverage - Reached 100% test coverage for Omnibar by adding tests for commands, asset icons, and keyboard boundary edge cases.
+
+### STUDIO v0.121.11
+- ✅ Completed: STUDIO-ExportJobSpec - Verified that the Export Job Spec feature in Renders Panel was already fully implemented (IMPOSSIBLE: DUPLICATION).
+
 ### STUDIO v0.119.5
 - ✅ Completed: Refine CLI Component Removal - Verified existing implementation of component file deletion and interactive confirmation prompts in `helios remove` command (2026-10-23-STUDIO-Refine-CLI-Component-Removal.md).
 

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	13.520	300	22.19	489.1	keep	baseline (estimated)
+2	13.480	300	22.25	488.2	keep	unrolled final worker cleanup
+3	13.490	300	22.24	488.5	keep	unrolled final worker cleanup

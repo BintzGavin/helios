@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.007	150	49.88	63.7	discard	Strict undefined check previousWritePromise
+2	2.696	150	55.63	63.7	discard	Strict undefined check previousWritePromise
+3	2.456	150	61.07	63.7	discard	Strict undefined check previousWritePromise

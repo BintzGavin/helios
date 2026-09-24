@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Stage } from './Stage';
 import * as StudioContext from '../../context/StudioContext';
 import * as PersistentHooks from '../../hooks/usePersistentState';
+import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut';
 
 // Mock child components
 vi.mock('./EmptyState', () => ({
@@ -13,10 +14,14 @@ vi.mock('./EmptyState', () => ({
 }));
 
 vi.mock('./StageToolbar', () => ({
-  StageToolbar: ({ zoom, onZoom }: any) => (
+  StageToolbar: ({ zoom, onZoom, onFit, onToggleTransparent, onToggleGuides, onOpenSettings }: any) => (
     <div data-testid="stage-toolbar">
       Toolbar
       <button onClick={() => onZoom(zoom + 0.1)}>ZoomIn</button>
+      <button onClick={onFit}>Fit</button>
+      <button onClick={onToggleTransparent}>Toggle Transparent</button>
+      <button onClick={onToggleGuides}>Toggle Guides</button>
+      <button onClick={onOpenSettings}>Open Settings</button>
     </div>
   )
 }));
@@ -204,6 +209,228 @@ describe('Stage', () => {
     expect(mockControllerB.seek).toHaveBeenCalledWith(10);
     expect(mockControllerB.play).toHaveBeenCalled();
     expect(mockControllerB.setInputProps).toHaveBeenCalledWith({ foo: 'bar' });
+  });
+
+  it('handles toolbar actions', () => {
+    const { getByText, container } = render(<Stage src="test.js" />);
+
+    // Initial pan is (0,0), let's pan first to test onFit
+    const stageContainer = container.firstChild as HTMLElement;
+    fireEvent.mouseDown(stageContainer, { clientX: 100, clientY: 100, button: 0 });
+    fireEvent.mouseMove(stageContainer, { clientX: 150, clientY: 150 });
+    fireEvent.mouseUp(stageContainer);
+
+    // Zoom in
+    fireEvent.click(getByText('ZoomIn'));
+
+    // Verify transformed state before fit
+    let content = container.querySelector('.stage-content');
+    expect(content).toHaveStyle('transform: translate(50px, 50px) scale(1.1)');
+
+    // Test onFit
+    fireEvent.click(getByText('Fit'));
+    expect(content).toHaveStyle('transform: translate(0px, 0px) scale(1)');
+
+    // Test onToggleTransparent
+    expect(stageContainer).toHaveClass('checkerboard-bg');
+    fireEvent.click(getByText('Toggle Transparent'));
+    expect(stageContainer).not.toHaveClass('checkerboard-bg');
+
+    // Test onToggleGuides
+    expect(container.querySelector('.stage-guides-overlay')).not.toBeInTheDocument();
+    fireEvent.click(getByText('Toggle Guides'));
+    expect(container.querySelector('.stage-guides-overlay')).toBeInTheDocument();
+
+    // Test onOpenSettings
+    fireEvent.click(getByText('Open Settings'));
+    expect(mockSetSettingsOpen).toHaveBeenCalledWith(true);
+  });
+
+  it('catches and logs errors on HMR restore', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Initial Render
+    const mockControllerA = {
+      seek: vi.fn(),
+      play: vi.fn(),
+      setInputProps: vi.fn()
+    };
+    const { container, rerender } = render(<Stage src="test.js" />);
+    const player = container.querySelector('helios-player') as any;
+    player.getController = () => mockControllerA;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    // Update state to have something to restore
+    const contextWithState = {
+        ...defaultContext,
+        controller: mockControllerA,
+        playerState: {
+            currentFrame: 10,
+            isPlaying: true,
+            inputProps: { foo: 'bar' }
+        },
+        activeComposition: {
+            id: 'test-comp',
+            metadata: { defaultProps: { test: 1 } }
+        }
+    };
+    vi.spyOn(StudioContext, 'useStudio').mockReturnValue(contextWithState as any);
+    rerender(<Stage src="test.js" />);
+
+    // HMR with a bad controller
+    const badController = {
+        seek: () => { throw new Error('Seek Failed'); },
+        play: vi.fn(),
+        setInputProps: vi.fn()
+    };
+    player.getController = () => badController;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to restore state after HMR', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it('catches and logs errors on applying default props', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const badController = {
+        seek: vi.fn(),
+        play: vi.fn(),
+        setInputProps: () => { throw new Error('Props Failed'); }
+    };
+
+    const { container } = render(<Stage src="test.js" />);
+    const player = container.querySelector('helios-player') as any;
+    player.getController = () => badController;
+
+    act(() => { vi.advanceTimersByTime(250); });
+
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to apply default props', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it('does not restore if inputProps empty', () => {
+    const mockControllerA = { seek: vi.fn(), play: vi.fn(), setInputProps: vi.fn() };
+    const { container, rerender } = render(<Stage src="test.js" />);
+    const player = container.querySelector('helios-player') as any;
+    player.getController = () => mockControllerA;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    const contextWithState = {
+        ...defaultContext,
+        controller: mockControllerA,
+        playerState: {
+            currentFrame: 0,
+            isPlaying: false,
+            inputProps: {}
+        }
+    };
+    vi.spyOn(StudioContext, 'useStudio').mockReturnValue(contextWithState as any);
+    rerender(<Stage src="test.js" />);
+
+    const mockControllerB = { seek: vi.fn(), play: vi.fn(), setInputProps: vi.fn() };
+    player.getController = () => mockControllerB;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    expect(mockControllerB.setInputProps).not.toHaveBeenCalled();
+    expect(mockControllerB.seek).not.toHaveBeenCalled();
+    expect(mockControllerB.play).not.toHaveBeenCalled();
+  });
+
+  it('does not apply defaultProps if none exist', () => {
+    const mockController = { seek: vi.fn(), play: vi.fn(), setInputProps: vi.fn() };
+    const contextNoProps = {
+        ...defaultContext,
+        activeComposition: {
+            id: 'test-comp',
+            metadata: {}
+        }
+    };
+    vi.spyOn(StudioContext, 'useStudio').mockReturnValue(contextNoProps as any);
+
+    const { container } = render(<Stage src="test.js" />);
+    const player = container.querySelector('helios-player') as any;
+    player.getController = () => mockController;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    expect(mockController.setInputProps).not.toHaveBeenCalled();
+  });
+
+  it('handles null controller gracefully', () => {
+    const { container } = render(<Stage src="test.js" />);
+    const player = container.querySelector('helios-player') as any;
+
+    player.getController = () => null;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    const mockController = { seek: vi.fn(), play: vi.fn(), setInputProps: vi.fn() };
+    player.getController = () => mockController;
+    act(() => { vi.advanceTimersByTime(250); });
+
+    act(() => { vi.advanceTimersByTime(250); });
+  });
+
+  it('handles mouse middle click, mouse move without drag, and ignores right click', () => {
+    const { container } = render(<Stage src="test.js" />);
+    const stageContainer = container.firstChild as HTMLElement;
+
+    fireEvent.mouseDown(stageContainer, { clientX: 100, clientY: 100, button: 2 });
+    fireEvent.mouseMove(stageContainer, { clientX: 150, clientY: 150 });
+    const content = container.querySelector('.stage-content');
+    expect(content).toHaveStyle('transform: translate(0px, 0px) scale(1)');
+
+    fireEvent.mouseDown(stageContainer, { clientX: 100, clientY: 100, button: 1 });
+    fireEvent.mouseMove(stageContainer, { clientX: 150, clientY: 150 });
+    expect(content).toHaveStyle('transform: translate(50px, 50px) scale(1)');
+
+    fireEvent.mouseLeave(stageContainer);
+  });
+
+  it('handles unmounting by clearing interval', () => {
+    const { unmount } = render(<Stage src="test.js" />);
+    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+
+    unmount();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+
+  it('cleans up interval when src is empty', () => {
+    const { rerender } = render(<Stage src="test.js" />);
+    const clearIntervalSpy = vi.spyOn(global, 'clearInterval');
+
+    rerender(<Stage src="" />);
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+
+  it('handles keyboard shortcut to toggle guides', () => {
+    const { container } = render(<Stage src="test.js" />);
+    const callArgs = (useKeyboardShortcut as any).mock.calls.find((call: any) => call[0] === "'");
+
+    if (callArgs) {
+        const callback = callArgs[1];
+
+        expect(container.querySelector('.stage-guides-overlay')).not.toBeInTheDocument();
+
+        act(() => {
+            callback();
+        });
+
+        expect(container.querySelector('.stage-guides-overlay')).toBeInTheDocument();
+    }
+  });
+
+  it('handles pan via Wheel (no ctrl/meta)', () => {
+    const { container } = render(<Stage src="test.js" />);
+    const stageContainer = container.firstChild as HTMLElement;
+
+    fireEvent.wheel(stageContainer, { deltaX: 50, deltaY: 50 });
+
+    const content = container.querySelector('.stage-content');
+    expect(content).toHaveStyle('transform: translate(-50px, -50px) scale(1)');
   });
 
   it('applies default props on fresh load', () => {

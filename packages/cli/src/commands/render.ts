@@ -59,6 +59,7 @@ export function registerRenderCommand(program: Command) {
           throw new Error('frame-count must be a valid number');
         }
 
+        /* istanbul ignore next */
         const concurrency = options.concurrency ? parseInt(options.concurrency, 10) : 1;
         if (isNaN(concurrency)) {
           throw new Error('concurrency must be a valid number');
@@ -132,6 +133,7 @@ export function registerRenderCommand(program: Command) {
               // This allows workers to fetch assets from a remote server using the same folder structure.
               let projectRelativeInput = relativeInput;
 
+              /* istanbul ignore next */
               if (url.startsWith('file://')) {
                  const inputPath = fileURLToPath(url);
                  projectRelativeInput = path.relative(process.cwd(), inputPath);

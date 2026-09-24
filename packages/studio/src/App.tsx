@@ -19,6 +19,7 @@ import { Stage } from './components/Stage/Stage'
 import { Sidebar } from './components/Sidebar/Sidebar'
 import { ToastProvider } from './context/ToastContext'
 import { ToastContainer } from './components/Toast/ToastContainer'
+import { HotReloadToast } from './components/Toast/HotReloadToast'
 
 function AppContent() {
   const {
@@ -138,6 +139,7 @@ function App() {
         <AppContent />
       </StudioProvider>
       <ToastContainer />
+      <HotReloadToast />
     </ToastProvider>
   )
 }

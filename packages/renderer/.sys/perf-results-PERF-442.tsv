@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.596	90	2.76	37.8	discard	cdp call function on instead of evaluate
+2	32.515	90	2.77	37.8	discard	cdp call function on instead of evaluate
+3	32.339	90	2.78	38.4	discard	cdp call function on instead of evaluate
+4	32.312	90	2.79	38.7	discard	cdp call function on instead of evaluate
+5	32.666	90	2.76	37.6	discard	cdp call function on instead of evaluate

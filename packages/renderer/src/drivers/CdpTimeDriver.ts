@@ -3,64 +3,105 @@ import { TimeDriver } from './TimeDriver.js';
 import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
+const RESOLVED_PROMISE = Promise.resolve();
+
+class ReusableThenable {
+  public resolveCb: (() => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+
+  then(resolve: () => void, reject: (err: Error) => void) {
+    this.resolveCb = resolve;
+    this.rejectCb = reject;
+  }
+
+  resolve() {
+    if (this.resolveCb) {
+      const cb = this.resolveCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb();
+    }
+  }
+
+  reject(err: Error) {
+    if (this.rejectCb) {
+      const cb = this.rejectCb;
+      this.resolveCb = null;
+      this.rejectCb = null;
+      cb(err);
+    }
+  }
+}
+
 export class CdpTimeDriver implements TimeDriver {
+  private timePromise = new ReusableThenable();
   private client: CDPSession | null = null;
   private currentTime: number = 0;
   private timeout: number;
-  private cachedFrames: import('playwright').Frame[] = [];
   private setVirtualTimePolicyParams: any = { policy: 'advance', budget: 0 };
   private executionContextIds: number[] = [];
-  private cdpResolve: (() => void) | null = null;
-  private cdpReject: ((err: Error) => void) | null = null;
-  private evaluateStabilityParams: any = { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false };
-  private singleFrameSyncMediaParams: any = { expression: "", awaitPromise: false, returnByValue: false };
+
+  private singleFrameSyncMediaParams: any = { expression: "window.__helios_sync_media();" };
   private multiFrameSyncMediaParams: any[] = [];
+  private hasMedia: boolean = true;
+  private syncMediaFn: (timeInSeconds: number) => Promise<void> = () => RESOLVED_PROMISE;
+  private mode: string;
 
-  private stabilityTimeoutId: NodeJS.Timeout | null = null;
-  private stabilityTimeoutReject: ((err: Error) => void) | null = null;
 
-  private stabilityTimeoutCallback = () => {
-    if (this.stabilityTimeoutReject) {
-      this.stabilityTimeoutReject(new Error('Stability check timed out'));
-    }
-  };
 
-  private stabilityTimeoutExecutor = (_: () => void, reject: (err: Error) => void) => {
-    this.stabilityTimeoutReject = reject;
-    this.stabilityTimeoutId = setTimeout(this.stabilityTimeoutCallback, this.timeout);
-  };
-
-  private virtualTimePromiseExecutor = (resolve: () => void, reject: (err: Error) => void) => {
-    this.cdpResolve = resolve;
-    this.cdpReject = reject;
-
-    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams).catch(this.handleVirtualTimeBudgetError);
-  };
-
-  private handleStabilityCheckResponse = (res: any) => {
-    if (res && res.exceptionDetails) {
-      throw new Error('Stability check failed: ' + res.exceptionDetails.exception?.description);
-    }
+  private handleSyncMediaError = (e: any) => {
+    console.warn('[CdpTimeDriver] Failed to sync media:', e);
   };
 
   private handleVirtualTimeBudgetExpired = () => {
-    if (this.cdpResolve) {
-      this.cdpResolve();
-      this.cdpResolve = null;
-      this.cdpReject = null;
-    }
+    this.timePromise.resolve();
   };
 
-  private handleVirtualTimeBudgetError = (err: any) => {
-    if (this.cdpReject) {
-      this.cdpReject(err);
-      this.cdpResolve = null;
-      this.cdpReject = null;
-    }
-  };
+  private async waitUntilStable(): Promise<void> {
+    if (!this.client) return;
 
-  constructor(timeout: number = 30000) {
+    const stabilityPromise = this.client.send('Runtime.evaluate', {
+      expression: "(() => typeof window.__helios_wait_until_stable === 'function' ? window.__helios_wait_until_stable() : undefined)()",
+      awaitPromise: true,
+      returnByValue: false,
+    }).then(() => undefined).catch(() => undefined);
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeoutPromise = new Promise<void>((resolve) => {
+      timeoutId = setTimeout(resolve, this.timeout);
+    });
+
+    await Promise.race([stabilityPromise, timeoutPromise]);
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+
+  private async setCanvasTime(
+    previousTime: number,
+    timeInSeconds: number,
+    syncPromise: Promise<void>,
+  ): Promise<void> {
+    // Media must reach the target before virtual time advances, otherwise an
+    // animation frame can observe the previous media time.
+    await syncPromise;
+
+    const delta = timeInSeconds - previousTime;
+    this.setVirtualTimePolicyParams.budget = delta * 1000;
+    this.client!.send('Emulation.setVirtualTimePolicy', this.setVirtualTimePolicyParams);
+    await (this.timePromise as any as Promise<void>);
+    await this.waitUntilStable();
+  }
+
+  private async setDomTime(
+    syncPromise: Promise<void>,
+  ): Promise<void> {
+    await syncPromise;
+    await this.waitUntilStable();
+  }
+
+
+  constructor(timeout: number = 30000, mode: string = 'canvas') {
     this.timeout = timeout;
+    this.mode = mode;
   }
 
   async init(page: Page, seed?: number): Promise<void> {
@@ -70,6 +111,10 @@ export class CdpTimeDriver implements TimeDriver {
   private handleExecutionContextCreated = (event: any) => {
     if (event.context.name === '') {
       this.executionContextIds.push(event.context.id);
+      this.multiFrameSyncMediaParams.push({
+          expression: "window.__helios_sync_media();",
+          contextId: event.context.id
+      });
     }
   };
 
@@ -88,7 +133,9 @@ export class CdpTimeDriver implements TimeDriver {
     this.client!.on('Emulation.virtualTimeBudgetExpired', this.handleVirtualTimeBudgetExpired);
 
     this.executionContextIds = [];
+    this.multiFrameSyncMediaParams = [];
     this.client!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    await this.client!.send('Runtime.enable');
 
     // Initialize virtual time policy to 'pause' to take control of the clock.
     // We set initialVirtualTime to Jan 1, 2024 (UTC) to ensure deterministic Date.now()
@@ -117,7 +164,10 @@ export class CdpTimeDriver implements TimeDriver {
           cachedMediaElements = null;
         };
 
-        window.__helios_sync_media = (t) => {
+        window.__helios_sync_media = (requestedTime) => {
+          const t = typeof requestedTime === 'number'
+            ? requestedTime
+            : performance.now() / 1000;
           if (!cachedMediaElements) {
             cachedMediaElements = findAllMedia(document);
           }
@@ -125,6 +175,7 @@ export class CdpTimeDriver implements TimeDriver {
           for (let i = 0; i < numMedia; i++) {
             syncMedia(cachedMediaElements[i], t);
           }
+          return numMedia;
         };
 
         window.__helios_wait_until_stable = () => {
@@ -147,117 +198,85 @@ export class CdpTimeDriver implements TimeDriver {
       await Promise.all(initPromises);
     }
 
-    this.cachedFrames = page.frames();
+    const noopCatch = () => {};
 
-    // Enable Runtime so we actually receive executionContextCreated events
-    // Catch errors in case another driver instance sharing this session already enabled it.
-    await this.client!.send('Runtime.enable').catch(() => {});
+    this.hasMedia = false;
+    await this.client!.send('Runtime.evaluate', {
+       expression: "typeof window.__helios_sync_media === 'function' ? window.__helios_sync_media() : 0",
+       returnByValue: true
+    }).then(({ result }) => {
+      if (result && result.value > 0) {
+         this.hasMedia = true;
+      }
+    }).catch(() => {
+      this.hasMedia = true;
+    });
 
-    // For reused sessions where contexts already exist, we need to manually fetch them.
-    if (this.executionContextIds.length === 0) {
-       // Since the events didn't fire, try to manually evaluate in all frames to get context IDs
-       // This handles the reuse scenario where the execution context events were consumed by a previous driver
-       try {
-         // In a shared session case, the best we can do is fall back or trigger a re-eval if needed
-         // We'll let frame.evaluate fallback handle it if executionContextIds.length is wrong later
-       } catch (e) {
-          // ignore
-       }
+    await this.client!.send('Runtime.evaluate', {
+      expression: "typeof window.helios !== 'undefined' && typeof window.helios.waitUntilStable === 'function'",
+      returnByValue: true
+    }).then(async ({ result }) => {
+      if (result && result.value) {
+        await this.client!.send('Runtime.evaluate', { expression: "if (typeof window.__helios_wait_until_stable === 'function') window.__helios_wait_until_stable();", awaitPromise: true, returnByValue: false }).catch(noopCatch);
+      }
+    }).catch(noopCatch);
+
+    const len = this.executionContextIds.length;
+    if (len === 0) {
+      this.syncMediaFn = (timeInSeconds) => {
+        this.singleFrameSyncMediaParams.expression = `window.__helios_sync_media(${timeInSeconds});`;
+        return this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
+      };
+    } else if (len === 1) {
+      const param = this.multiFrameSyncMediaParams[0];
+      this.syncMediaFn = (timeInSeconds) => {
+        param.expression = `window.__helios_sync_media(${timeInSeconds});`;
+        return this.client!.send('Runtime.evaluate', param)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
+      };
+    } else {
+      const params = this.multiFrameSyncMediaParams;
+      this.syncMediaFn = (timeInSeconds) => {
+        const promises = new Array(params.length);
+        for (let i = 0; i < len; i++) {
+          params[i].expression = `window.__helios_sync_media(${timeInSeconds});`;
+          promises[i] = this.client!.send('Runtime.evaluate', params[i]);
+        }
+        return Promise.all(promises)
+          .then(() => undefined)
+          .catch(this.handleSyncMediaError);
+      };
     }
 
     this.currentTime = 0;
   }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {
-    return this.runSetTime(page, timeInSeconds);
-  }
-
-  private async runSetTime(page: Page, timeInSeconds: number): Promise<void> {
-    const delta = timeInSeconds - this.currentTime;
-
     // If delta is 0 or negative, we don't advance.
     // In a renderer loop, time usually moves forward.
-    if (delta <= 0) {
+    if (timeInSeconds <= this.currentTime) {
         return;
     }
 
-    // Convert to milliseconds for CDP
-    const budget = delta * 1000;
-
-    // 1. Synchronize media elements (video, audio)
-    // We do this manually BEFORE advancing time so that when the frame renders (rAF),
-    // the video elements are already at the correct time.
-    // Execute in all frames (including main frame) to support iframes
-    const frames = this.cachedFrames;
-    if (frames.length === 1) {
-      this.singleFrameSyncMediaParams.expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-      this.client!.send('Runtime.evaluate', this.singleFrameSyncMediaParams);
-    } else {
-        if (this.executionContextIds.length > 0) {
-          const expression = "if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");";
-          if (this.multiFrameSyncMediaParams.length !== this.executionContextIds.length) {
-            this.multiFrameSyncMediaParams.length = this.executionContextIds.length;
-            for (let i = 0; i < this.executionContextIds.length; i++) {
-              this.multiFrameSyncMediaParams[i] = {
-                expression: "",
-                contextId: this.executionContextIds[i],
-                awaitPromise: false,
-                returnByValue: false
-              };
-            }
-          }
-          for (let i = 0; i < this.executionContextIds.length; i++) {
-            this.multiFrameSyncMediaParams[i].expression = expression;
-            this.client!.send('Runtime.evaluate', this.multiFrameSyncMediaParams[i]);
-          }
-        } else {
-          // Fallback if execution contexts couldn't be resolved (e.g. reused CDP session)
-          for (let i = 0; i < frames.length; i++) {
-            const frame = frames[i];
-            frame.evaluate("if(typeof window.__helios_sync_media==='function') window.__helios_sync_media(" + timeInSeconds + ");");
-          }
-        }
-    }
+    // Synchronize media to the requested render time directly. Using the
+    // previous virtual-clock value here leaves media one frame behind.
+    const syncPromise = this.hasMedia
+      ? this.syncMediaFn(timeInSeconds)
+      : RESOLVED_PROMISE;
 
     // 2. Advance virtual time
     // This triggers the browser event loop and requestAnimationFrame
-    this.setVirtualTimePolicyParams.budget = budget;
-    await new Promise<void>(this.virtualTimePromiseExecutor);
-
+    const previousTime = this.currentTime;
     this.currentTime = timeInSeconds;
 
-    // Wait for custom stability checks
-    // We use a string-based evaluation to avoid build-tool artifacts.
-    // We rely on awaitPromise: true natively.
-
-    // We still need a timeout mechanism because CDP evaluate with awaitPromise doesn't have an inherent timeout,
-    // and virtual time is paused, so internal setTimeout won't work.
-    const evaluatePromise = this.client!.send('Runtime.evaluate', this.evaluateStabilityParams);
-
-    const timeoutPromise = new Promise<void>(this.stabilityTimeoutExecutor);
-
-    try {
-        const res = await Promise.race([evaluatePromise, timeoutPromise]);
-        if (res) {
-            this.handleStabilityCheckResponse(res);
-        }
-    } catch (e: any) {
-        if (e.message === 'Stability check timed out') {
-            console.warn(`[CdpTimeDriver] Stability check timed out after ${this.timeout}ms. Terminating execution.`);
-            try {
-                await this.client?.send('Runtime.terminateExecution');
-            } catch (termErr) {
-                console.warn('[CdpTimeDriver] Failed to terminate hanging script (might have finished race):', termErr);
-            }
-        } else {
-            throw e;
-        }
-    } finally {
-        if (this.stabilityTimeoutId !== null) {
-            clearTimeout(this.stabilityTimeoutId);
-            this.stabilityTimeoutId = null;
-        }
-        this.stabilityTimeoutReject = null;
+    if (this.mode === 'dom') {
+      // DomStrategy's beginFrame will advance the virtual time via its 'interval' parameter
+      return this.setDomTime(syncPromise);
     }
+
+    return this.setCanvasTime(previousTime, timeInSeconds, syncPromise);
   }
 }

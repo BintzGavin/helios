@@ -1,4 +1,4 @@
-import { chromium, Browser, ConsoleMessage } from 'playwright';
+import { chromium, ConsoleMessage } from 'playwright';
 import os from 'os';
 import fs from 'fs';
 import { RenderStrategy } from '../strategies/RenderStrategy.js';
@@ -10,7 +10,6 @@ import { SeekTimeDriver } from '../drivers/SeekTimeDriver.js';
 import { RendererOptions, RenderJobOptions } from '../types.js';
 
 const DEFAULT_BROWSER_ARGS = [
-  '--disable-dev-shm-usage',
   '--disable-extensions',
   '--disable-default-apps',
   '--disable-sync',
@@ -23,8 +22,8 @@ const DEFAULT_BROWSER_ARGS = [
   '--allow-file-access-from-files',
   '--enable-begin-frame-control',
   '--run-all-compositor-stages-before-draw',
-  '--disable-site-isolation-trials',
-  '--disable-features=IsolateOrigins,site-per-process',
+  '--single-process',
+  '--disable-features=PaintHolding,Translate,OptimizationHints,OptimizationGuideModelDownloading,CalculateNativeWinOcclusion',
   '--disable-lcd-text',
   '--disable-threaded-animation',
   '--disable-threaded-scrolling',
@@ -37,9 +36,12 @@ const GPU_DISABLED_ARGS = [
   '--disable-gpu',
   '--disable-software-rasterizer',
   '--disable-gpu-compositing',
+  '--disable-gpu-memory-buffer-video-frames',
+  '--disable-gpu-memory-buffer-compositor-resources'
 ];
 
 export interface WorkerInfo {
+  browser: import('playwright').Browser;
   context: import('playwright').BrowserContext;
   page: import('playwright').Page;
   strategy: RenderStrategy;
@@ -48,7 +50,6 @@ export interface WorkerInfo {
 
 export class BrowserPool {
   private options: RendererOptions;
-  public browser: Browser | null = null;
   public workers: WorkerInfo[] = [];
   public capturedErrors: Error[] = [];
 
@@ -60,6 +61,12 @@ export class BrowserPool {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
     const gpuArgs = config.gpu !== true ? GPU_DISABLED_ARGS : [];
+    const defaultArgs = this.options.mode === 'dom'
+      ? DEFAULT_BROWSER_ARGS.filter(arg =>
+          arg !== '--enable-begin-frame-control' &&
+          arg !== '--run-all-compositor-stages-before-draw'
+        )
+      : DEFAULT_BROWSER_ARGS;
 
     let executablePath = config.executablePath;
 
@@ -95,67 +102,69 @@ export class BrowserPool {
     return {
       headless: config.headless ?? true,
       executablePath: executablePath,
-      args: [...DEFAULT_BROWSER_ARGS, ...gpuArgs, ...userArgs],
+      args: [...defaultArgs, ...gpuArgs, ...userArgs],
       pipe: true,
     };
   }
 
   public async init(compositionUrl: string, jobOptions?: RenderJobOptions): Promise<void> {
-    this.browser = await chromium.launch(this.getLaunchOptions());
     this.capturedErrors = [];
 
     const envPoolRaw = process.env.HELIOS_BROWSER_POOL_SIZE;
     const envPool = envPoolRaw !== undefined ? parseInt(envPoolRaw, 10) : NaN;
-    const concurrency = Number.isFinite(envPool)
-      ? Math.max(1, envPool)
-      : Math.max(1, (os.cpus().length || 4) - 1);
-    console.log(`Initializing pool of ${concurrency} pages...`);
-
-    const sharedContext = await this.browser!.newContext({
-      viewport: {
-        width: this.options.width,
-        height: this.options.height,
-      },
-    });
-
-    if (jobOptions?.tracePath) {
-      console.log(`Enabling Playwright tracing for shared context...`);
-      await sharedContext.tracing.start({ screenshots: true, snapshots: true });
-    }
+    const concurrency = Number.isFinite(envPool) ? Math.max(1, envPool) : 1;
+    console.log(`Initializing pool of ${concurrency} browsers/pages...`);
 
     const createPage = async (index: number): Promise<WorkerInfo> => {
-      const page = await sharedContext.newPage();
-      const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
-      /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
-      const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
-      const timeDriver =
-        this.options.mode === 'dom' || canvasSeekClock
+      const browser = await chromium.launch(this.getLaunchOptions());
+      try {
+        const context = await browser.newContext({
+          viewport: {
+            width: this.options.width,
+            height: this.options.height,
+          },
+        });
+
+        if (index === 0 && jobOptions?.tracePath) {
+          console.log(`Enabling Playwright tracing for worker 0 context...`);
+          await context.tracing.start({ screenshots: true, snapshots: true });
+        }
+
+        const page = await context.newPage();
+        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        /** Manual `window.helios.seek` compositions (html-in-canvas) need SeekTimeDriver; CdpTimeDriver never calls seek. */
+        const canvasSeekClock = this.options.mode !== 'dom' && process.env.HELIOS_CANVAS_SEEK_CLOCK === '1';
+        const timeDriver = this.options.mode === 'dom' || canvasSeekClock
           ? new SeekTimeDriver(this.options.stabilityTimeout)
-          : new CdpTimeDriver(this.options.stabilityTimeout);
+          : new CdpTimeDriver(this.options.stabilityTimeout, 'canvas');
 
-      page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
-      page.on('pageerror', (err: Error) => {
-        console.error(`PAGE ERROR [${index}]: ${err.message}`);
-        this.capturedErrors.push(err);
-      });
-      page.on('crash', () => {
-        const err = new Error(`Page ${index} crashed!`);
-        console.error(err.message);
-        this.capturedErrors.push(err);
-      });
+        page.on('console', (msg: ConsoleMessage) => console.log(`PAGE LOG [${index}]: ${msg.text()}`));
+        page.on('pageerror', (err: Error) => {
+          console.error(`PAGE ERROR [${index}]: ${err.message}`);
+          this.capturedErrors.push(err);
+        });
+        page.on('crash', () => {
+          const err = new Error(`Page ${index} crashed!`);
+          console.error(err.message);
+          this.capturedErrors.push(err);
+        });
 
-      if (this.options.inputProps) {
-        const serializedProps = JSON.stringify(this.options.inputProps);
-        await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+        if (this.options.inputProps) {
+          const serializedProps = JSON.stringify(this.options.inputProps);
+          await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
+        }
+
+        await timeDriver.init(page, this.options.randomSeed);
+        await page.goto(compositionUrl, { waitUntil: 'commit' });
+
+        await strategy.prepare(page);
+        await timeDriver.prepare(page);
+
+        return { browser, context, page, strategy, timeDriver };
+      } catch (error) {
+        await browser.close().catch(() => {});
+        throw error;
       }
-
-      await timeDriver.init(page, this.options.randomSeed);
-      await page.goto(compositionUrl, { waitUntil: 'networkidle' });
-
-      await strategy.prepare(page);
-      await timeDriver.prepare(page);
-
-      return { context: sharedContext, page, strategy, timeDriver };
     };
 
     const poolPromises = [];
@@ -169,17 +178,15 @@ export class BrowserPool {
 
   public async close(jobOptions?: RenderJobOptions): Promise<void> {
     if (this.workers.length > 0) {
-      const sharedContext = this.workers[0].context;
       if (jobOptions?.tracePath) {
         console.log('Stopping tracing...');
-        await sharedContext.tracing.stop({ path: jobOptions.tracePath });
+        await this.workers[0].context.tracing.stop({ path: jobOptions.tracePath });
       }
-      await sharedContext.close();
-    }
-
-    if (this.browser) {
-      await this.browser.close();
-      console.log('Browser closed.');
+      for (const worker of this.workers) {
+        await worker.context.close();
+        await worker.browser.close();
+      }
+      console.log('Browsers closed.');
     }
   }
 

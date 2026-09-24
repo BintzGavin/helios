@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.705	300	52.59	100.0	keep	PERF-1044

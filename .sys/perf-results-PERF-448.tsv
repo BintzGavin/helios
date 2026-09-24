@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	32.466	90	2.77	37.7	discard	baseline
+2	32.474	90	2.77	37.6	discard	baseline
+3	32.554	90	2.76	37.8	discard	baseline
+4	32.638	90	2.76	38.6	discard	CdpTimeDriver skip media sync (empty image regression)

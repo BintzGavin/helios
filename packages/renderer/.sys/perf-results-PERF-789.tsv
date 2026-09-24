@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.323	150	64.56	62.9	discard	4MB threshold
+2	2.257	150	66.45	62.9	discard	4MB threshold
+3	2.274	150	65.98	63.0	discard	4MB threshold
+4	2.314	150	64.82	63.0	discard	4MB threshold
+5	2.335	150	64.23	62.9	discard	4MB threshold

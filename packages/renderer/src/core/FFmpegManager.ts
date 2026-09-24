@@ -4,6 +4,7 @@ import { RendererOptions, RenderJobOptions } from '../types.js';
 
 export class FFmpegManager {
   private process: ChildProcess | null = null;
+  private startPromise: Promise<void> | null = null;
   public ffmpegPath: string;
 
   constructor(private options: RendererOptions, private jobOptions?: RenderJobOptions) {
@@ -18,6 +19,10 @@ export class FFmpegManager {
     }
 
     this.process = spawn(this.ffmpegPath, args, { stdio });
+    this.startPromise = new Promise<void>((resolve, reject) => {
+      this.process!.once('spawn', resolve);
+      this.process!.once('error', reject);
+    });
     console.log(`Spawning FFmpeg: ${this.ffmpegPath} ${args.join(' ')}`);
 
     if (this.process.stdin) {
@@ -54,6 +59,13 @@ export class FFmpegManager {
     return this.process;
   }
 
+  public waitUntilStarted(): Promise<void> {
+    if (!this.startPromise) {
+      return Promise.reject(new Error('FFmpeg process not spawned'));
+    }
+    return this.startPromise;
+  }
+
   public getExitPromise(capturedErrors: Error[]): Promise<void> {
     if (!this.process) return Promise.reject(new Error('FFmpeg process not spawned'));
 
@@ -80,8 +92,15 @@ export class FFmpegManager {
   }
 
   public kill() {
-    if (this.process && !this.process.killed) {
-      this.process.kill();
+    if (this.process) {
+      for (const stream of this.process.stdio) {
+        if (stream && typeof (stream as any).destroy === 'function') {
+          (stream as any).destroy();
+        }
+      }
+      if (this.process.exitCode === null && this.process.signalCode === null) {
+        this.process.kill('SIGKILL');
+      }
     }
   }
 

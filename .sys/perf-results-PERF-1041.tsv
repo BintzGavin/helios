@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	11.200	600	53.57	410.2	keep	baseline (PERF-1040)
+2	10.800	600	55.55	408.0	keep	isolate multi-worker writer loops based on strategy
+3	10.900	600	55.04	409.1	keep	isolate multi-worker writer loops based on strategy

@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	44.713	150	0	0	keep	baseline string allocation multi-worker
+2	11.178	150	0	0	keep	new buffer pool base64 decode multi-worker

@@ -17,6 +17,10 @@ npx helios studio
 
 The Studio will start a local server (typically at `http://localhost:3000`) and open in your default browser.
 
+For authenticated remote MCP and the brief-to-video package, see
+[Make a video with Kody](./kody.md). That workflow publishes a separate,
+authenticated listener while keeping the Studio editor local.
+
 ## Features
 
 ### Omnibar (Command Palette)

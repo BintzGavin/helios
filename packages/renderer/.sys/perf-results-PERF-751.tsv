@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.534	150	59.19	63.5	keep	baseline
+2	2.814	150	53.30	62.8	discard	Hoist Runtime.enable to DomStrategy.prepare()

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.537	150	97.59	42.2	discard	PERF-583: Eliminate .catch() Promise Chaining in CdpTimeDriver (Run 1)
+2	1.481	150	101.26	42.3	discard	PERF-583: Eliminate .catch() Promise Chaining in CdpTimeDriver (Run 2)
+3	1.517	150	98.88	42.2	discard	PERF-583: Eliminate .catch() Promise Chaining in CdpTimeDriver (Run 3)

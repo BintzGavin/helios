@@ -9,6 +9,7 @@ async function runTest() {
         viewportSize: () => ({ width: 1920, height: 1080 }),
         waitForSelector: async () => ({}),
         frames: () => [],
+        waitForSelector: async () => ({}),
         evaluate: async (fn: any, args: any) => {
             let captured = null;
             if (typeof fn === 'string') {

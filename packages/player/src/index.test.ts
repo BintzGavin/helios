@@ -918,6 +918,61 @@ describe('HeliosPlayer', () => {
     });
   });
 
+
+
+  describe('Missing Event Dispatches', () => {
+    it('should dispatch abort event when loadIframe is called while already loading', () => {
+      const abortSpy = vi.fn();
+      player.addEventListener('abort', abortSpy);
+
+      // Force network state to loading
+      player['_networkState'] = 2; // HeliosPlayer.NETWORK_LOADING
+
+      player['loadIframe']('test.html');
+
+      expect(abortSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch emptied event when loadIframe is called', () => {
+      const emptiedSpy = vi.fn();
+      player.addEventListener('emptied', emptiedSpy);
+
+      player['loadIframe']('test.html');
+
+      expect(emptiedSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch progress event during connection polling', () => {
+      vi.useFakeTimers();
+
+      const progressSpy = vi.fn();
+      player.addEventListener('progress', progressSpy);
+
+      // Mock iframe contentWindow
+      Object.defineProperty(player, 'iframe', {
+        value: {
+          contentWindow: {
+            postMessage: vi.fn()
+          },
+          getAttribute: vi.fn(),
+          setAttribute: vi.fn(),
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn()
+        },
+        writable: true
+      });
+
+      player['startConnectionAttempts']();
+
+      // Fast forward interval to trigger the polling logic
+      vi.advanceTimersByTime(150);
+
+      expect(progressSpy).toHaveBeenCalled();
+
+      player['stopConnectionAttempts']();
+      vi.useRealTimers();
+    });
+  });
   describe('Captions', () => {
     let mockController: any;
 
@@ -1205,7 +1260,10 @@ describe('HeliosPlayer', () => {
 
 
     it('should implement HTMLMediaElement event handlers', () => {
-        const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange', 'durationchange', 'seeking', 'seeked', 'resize', 'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'error', 'enterpictureinpicture', 'leavepictureinpicture'];
+        const events = [
+      'abort', 'emptied', 'progress',
+      'play', 'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange', 'durationchange', 'seeking', 'seeked', 'resize', 'loadstart', 'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough', 'error', 'enterpictureinpicture', 'leavepictureinpicture', 'audiometering'
+    ];
 
         for (const eventName of events) {
             const propName = `on${eventName}`;
@@ -1448,14 +1506,27 @@ describe('Input Props', () => {
 
         const iframe = player.shadowRoot!.querySelector('iframe');
 
-        // Call play
-        await player.play();
+        // Mock the play event dispatch to avoid hanging the promise
+        const playPromise = player.play();
+        setTimeout(() => player.dispatchEvent(new Event('play')), 10);
+        await playPromise;
 
         // Should load iframe
         expect(iframe!.src).toContain('test.html');
 
         // Should set autoplay
         expect(player.hasAttribute('autoplay')).toBe(true);
+    });
+
+    it('should reject play() promise if pause() is called before it resolves', async () => {
+        player.setAttribute('preload', 'none');
+        player.setAttribute('src', 'test.html');
+
+        const playPromise = player.play();
+        player.pause(); // trigger pause
+        player.dispatchEvent(new Event('pause')); // send event
+
+        await expect(playPromise).rejects.toThrow('The play() request was interrupted by a call to pause().');
     });
 
     it('should hide poster when playing starts', () => {
@@ -1742,6 +1813,82 @@ describe('Input Props', () => {
         expect(player.networkState).toBe(HeliosPlayer.NETWORK_LOADING);
         expect(player.readyState).toBe(HeliosPlayer.HAVE_NOTHING);
         expect(loadStartSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Export Menu Behavior', () => {
+    it('should show error when export clicked without controller', () => {
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+
+      // Ensure controller is null
+      (player as any).controller = null;
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(consoleSpy).toHaveBeenCalledWith("Export not available: Not connected.");
+      consoleSpy.mockRestore();
+    });
+
+    it('should abort export if abortController is set', () => {
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+
+      const abortMock = vi.fn();
+      (player as any).abortController = { abort: abortMock };
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(abortMock).toHaveBeenCalled();
+    });
+
+    it('should toggle export menu when export clicked with controller', () => {
+      const exportBtn = player.shadowRoot!.querySelector('.export-btn') as HTMLButtonElement;
+      const toggleMock = vi.spyOn(player as any, 'toggleExportMenu').mockImplementation(() => {});
+
+      (player as any).controller = { pause: vi.fn(), dispose: vi.fn() }; // Mock controller
+      (player as any).abortController = null;
+      exportBtn.disabled = false;
+      exportBtn.click();
+
+      expect(toggleMock).toHaveBeenCalled();
+      toggleMock.mockRestore();
+    });
+  });
+
+  describe('captureStream API Coverage', () => {
+    it('should throw error if canvas not found for captureStream', async () => {
+      (player as any).mode = 'direct';
+      const mockController = Object.create(DirectController.prototype);
+      mockController.instance = { getCanvas: () => null, fps: { peek: () => 30 } };
+      mockController.pause = vi.fn();
+      mockController.dispose = vi.fn();
+      (player as any).controller = mockController;
+
+      await expect(player.captureStream()).rejects.toThrow('Canvas not found for captureStream().');
+    });
+  });
+
+  describe('Audio Metering APIs Coverage', () => {
+    it('should call controller.startAudioMetering', () => {
+      (player as any).controller = { startAudioMetering: vi.fn(), pause: vi.fn(), dispose: vi.fn() };
+      player.startAudioMetering();
+      expect((player as any).controller.startAudioMetering).toHaveBeenCalled();
+    });
+
+    it('should handle startAudioMetering without controller', () => {
+      (player as any).controller = null;
+      expect(() => player.startAudioMetering()).not.toThrow();
+    });
+
+    it('should call controller.stopAudioMetering', () => {
+      (player as any).controller = { stopAudioMetering: vi.fn(), pause: vi.fn(), dispose: vi.fn() };
+      player.stopAudioMetering();
+      expect((player as any).controller.stopAudioMetering).toHaveBeenCalled();
+    });
+
+    it('should handle stopAudioMetering without controller', () => {
+      (player as any).controller = null;
+      expect(() => player.stopAudioMetering()).not.toThrow();
     });
   });
 
@@ -2115,6 +2262,75 @@ describe('Input Props', () => {
     });
   });
 
+  describe('diagnose API', () => {
+    it('should throw error if controller is missing', async () => {
+      (player as any).controller = null;
+      await expect(player.diagnose()).rejects.toThrow("Cannot run diagnostics: Player is not connected.");
+    });
+
+    it('should return report from controller', async () => {
+      const mockReport = { status: 'ok' };
+      const mockController = {
+          diagnose: vi.fn().mockResolvedValue(mockReport),
+          pause: vi.fn(),
+          dispose: vi.fn()
+      } as any;
+      (player as any).controller = mockController;
+      const report = await player.diagnose();
+      expect(report).toBe(mockReport);
+      expect(mockController.diagnose).toHaveBeenCalled();
+    });
+
+    it('should handle toggleDiagnostics success', async () => {
+      const mockReport = { status: 'ok' };
+      player.diagnose = vi.fn().mockResolvedValue(mockReport);
+
+      const debugOverlay = player.shadowRoot!.querySelector('.debug-overlay')!;
+      const debugContent = player.shadowRoot!.querySelector('.debug-content')!;
+
+      // Initially hidden
+      expect(debugOverlay.classList.contains('hidden')).toBe(true);
+
+      // Call toggle
+      await (player as any).toggleDiagnostics();
+
+      // Now visible
+      expect(debugOverlay.classList.contains('hidden')).toBe(false);
+      expect(debugContent.textContent).toBe(JSON.stringify(mockReport, null, 2));
+
+      // Call toggle again
+      await (player as any).toggleDiagnostics();
+
+      // Hidden again
+      expect(debugOverlay.classList.contains('hidden')).toBe(true);
+    });
+
+    it('should handle toggleDiagnostics failure', async () => {
+      player.diagnose = vi.fn().mockRejectedValue(new Error("Diagnostics failed"));
+
+      const debugOverlay = player.shadowRoot!.querySelector('.debug-overlay')!;
+      const debugContent = player.shadowRoot!.querySelector('.debug-content')!;
+
+      // Call toggle
+      await (player as any).toggleDiagnostics();
+
+      // Error message should be displayed
+      expect(debugContent.textContent).toBe("Error: Diagnostics failed");
+    });
+  });
+
+  describe('retryConnection', () => {
+    it('should show retrying status and reload iframe', () => {
+        const showStatusSpy = vi.spyOn(player as any, 'showStatus');
+        const loadSpy = vi.spyOn(player as any, 'load');
+
+        (player as any).retryConnection();
+
+        expect(showStatusSpy).toHaveBeenCalledWith("Retrying...", false);
+        expect(loadSpy).toHaveBeenCalled();
+    });
+  });
+
   describe('Connection Timeout', () => {
     beforeEach(() => {
       vi.useFakeTimers();
@@ -2384,6 +2600,37 @@ describe('Input Props', () => {
                 scale: 0.05
             }
         }));
+    });
+  });
+
+  describe('disconnectedCallback', () => {
+    it('should remove event listeners when disconnected from the DOM', () => {
+      const windowSpy = vi.spyOn(window, 'removeEventListener');
+      const documentSpy = vi.spyOn(document, 'removeEventListener');
+
+      // We know it's attached to the DOM (done in beforeEach), so let's trigger disconnect
+      player.remove();
+
+      // Verify cleanup occurred
+      expect(windowSpy).toHaveBeenCalledWith('message', expect.any(Function));
+      expect(documentSpy).toHaveBeenCalledWith('fullscreenchange', expect.any(Function));
+      expect(documentSpy).toHaveBeenCalledWith('click', expect.any(Function));
+
+      // Verify resize observer was disconnected
+      expect(player['resizeObserver'].disconnect).toHaveBeenCalled();
+
+      windowSpy.mockRestore();
+      documentSpy.mockRestore();
+    });
+
+    it('should not throw if called before the component is fully initialized', () => {
+      // Create a raw instance without appending to DOM
+      const rawPlayer = new HeliosPlayer();
+
+      // Should not throw an error if called before fully initialized
+      expect(() => {
+        rawPlayer.disconnectedCallback();
+      }).not.toThrow();
     });
   });
 

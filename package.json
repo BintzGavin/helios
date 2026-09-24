@@ -30,7 +30,8 @@
     "dev:d3": "vite serve examples/d3-animation",
     "build:examples": "vite build -c vite.build-example.config.js",
     "render:canvas-example": "npm run build:examples && npx tsx packages/renderer/scripts/render.ts",
-    "verify:e2e": "npx tsx tests/e2e/verify-all.ts"
+    "verify:e2e": "npx tsx tests/e2e/verify-all.ts",
+    "verify:release": "node --test tests/release-contract.test.mjs"
   },
   "devDependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -54,5 +55,8 @@
     "vite": "^7.1.2",
     "vitest": "^4.0.17",
     "vue": "^3.5.27"
+  },
+  "dependencies": {
+    "playwright": "^1.60.0"
   }
 }

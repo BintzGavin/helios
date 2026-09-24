@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.113	150	134.79	41.3	keep	networkidle to load
+2	1.147	150	130.74	41.5	keep	networkidle to load
+3	1.130	150	132.74	41.5	keep	networkidle to load

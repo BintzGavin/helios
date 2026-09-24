@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.417	150	105.83	70.2	keep	baseline
+2	1.317	150	113.89	70.2	keep	try/catch inline
+3	1.291	150	116.23	70.1	keep	try/catch inline
+4	1.320	150	113.68	70.0	keep	try/catch inline
+5	1.312	150	114.30	70.1	keep	try/catch inline

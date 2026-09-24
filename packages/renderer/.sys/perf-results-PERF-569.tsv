@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.017	150	74.39	43.0	keep	baseline
+2	1.511	150	99.26	42.3	keep	Removed explicit frameTimeTicks from beginFrame

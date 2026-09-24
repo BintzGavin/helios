@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	19.705	600	30.45	39.8	keep	optimize intermediate format to jpeg

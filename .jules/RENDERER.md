@@ -1,23 +1,10 @@
-## [2026-10-18] - WebCodecs Determinism Gap (Retry)
-**Learning:** Re-identified the WebCodecs determinism gap. The original plan from 2026-09-15 was not executed. `CanvasStrategy` still strictly prioritizes hardware encoding.
-**Action:** Created fresh plan `2026-10-18-RENDERER-WebCodecs-Preference.md` to introduce `webCodecsPreference` option. This is critical for reliable regression testing.
-
-## [1.79.1] - Missing Web Audio Support
-**Learning:** `CanvasStrategy` lacks `AudioEncoder` integration, preventing capture of procedural audio generated via Web Audio API.
-**Action:** Documented as a known limitation; future work should explore `AudioContext` capture.
-
-## [1.79.1] - Codec/PixelFormat Mismatch
-**Learning:** No validation exists for incompatible combinations like `libx264` + `yuva420p` (alpha channel), which causes FFmpeg to fail silently or produce corrupted output.
-**Action:** Future task should implement strict validation in `FFmpegBuilder` to warn or fail fast on invalid combinations.
-
-## [1.79.1] - GSAP Fragility
-**Learning:** `SeekTimeDriver` relies on the `window.__helios_gsap_timeline__` global for synchronization, which is fragile if the user doesn't expose it correctly or uses multiple timelines.
-**Action:** Future task should consider more robust discovery mechanisms or an explicit registration API.
+# RENDERER Context
+I will write some context here to help guide my plan. I need to write a PERF plan.
 ## Performance Trajectory
-Current best: 51.645s (baseline was 53.107s, -2.75%)
-Last updated by: PERF-006
+Current best: ~500ms (from journals)
+Last updated by: PERF-945
 
 ## What Works
-- Removed GL flags and forced Chromium into native Skia CPU pathways via `--disable-gpu`, `--disable-software-rasterizer`, and `--disable-gpu-compositing`. Reduces translation overhead from SwiftShader (~2.75% faster). (PERF-006)
-- raw CDP capture fallback instead of page.screenshot (PERF-008)
-- Eliminated DOM attribute parsing overhead in media sync by caching parsed attributes on the media element and checking `el.paused` before calling `el.pause()`. Reduces CPU overhead inside V8. (PERF-413)
+- **PERF-945**: Optimized multi-worker and single-worker pooled buffer length access in CaptureLoop.ts by tracking buffer length directly on the PooledBuffer instance.
+  - **Improvement**: Replaced `pooled.buffer.length < maxBytes` with `pooled.size < maxBytes`. Caching the size parameter locally on the V8 class bypassed the native Node.js Buffer `.length` property getter cross-boundary penalty, improving access speed by ~51% in hot microbenchmarks (86ms vs 176ms).
+  - **Plan ID**: PERF-945

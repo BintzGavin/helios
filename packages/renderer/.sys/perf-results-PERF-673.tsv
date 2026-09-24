@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.528	150	42.51	62.8	keep	quality 1
+2	2.573	150	58.30	62.8	keep	quality 1
+3	3.085	150	48.62	62.8	keep	quality 1
+4	2.676	150	56.04	62.8	keep	quality 1

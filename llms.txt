@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.76.20+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.78.1+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -15,17 +15,31 @@ Helios is a modern engine for creating videos programmatically using standard we
 ```typescript
 import { Helios } from '@helios-project/core';
 
-// Define strict types for input props (Generic TInputProps)
+// Define strict types for input props (Generic TInputProps) and structure
 const helios = new Helios<{ title: string }>({
   duration: 10,  // seconds
   fps: 30,
+  width: 1920,
+  height: 1080,
+  loop: false,
+  playbackRate: 1,
+  volume: 1,
+  muted: false,
   autoSyncAnimations: true, // Auto-sync CSS/WAAPI
   inputProps: { title: "Hello World" }, // Dynamic data via constructor
-  captions: [{ id: "1", startTime: 0, endTime: 1000, text: "Welcome" }] // SRT string or objects (milliseconds)
+  captions: [{ id: "1", start: 0, end: 1000, text: "Welcome" }], // SRT string or objects (milliseconds)
+  timeline: {
+    tracks: [
+      {
+        id: "main",
+        clips: [{ id: "clip1", source: "video.mp4", start: 0, duration: 300 }]
+      }
+    ]
+  }
 });
 
 // Reactively subscribe to state changes
-helios.subscribe(({ currentFrame, inputProps, availableAudioTracks }) => {
+helios.subscribe(({ currentFrame, inputProps, availableAudioTracks, activeClips }) => {
   // Drive animations with progress or props
   // availableAudioTracks is AudioTrackMetadata[] (id, src, startTime, duration, fadeInDuration, fadeOutDuration, fadeEasing)
 });
@@ -63,10 +77,10 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 2. **DOM-to-Video**: Playwright screenshots for HTML/CSS/SVG
 
 ### Components
-- **Helios class**: Headless state machine (currentFrame, isPlaying, etc.)
+- **Helios class**: Headless state machine (currentFrame, isPlaying, timeline, etc.)
 - **Framework adapters**: React hook, Vue composable, Svelte store, Solid signal
-- **Web Component**: `<helios-player>` for browser preview
-- **Renderer**: FFmpeg with piped frames (no temp files)
+- **Web Component**: `<helios-player>` for browser preview and client-side export
+- **Renderer**: FFmpeg with piped frames (no temp files) and pluggable RenderExecutor
 
 ## vs Remotion
 | | Helios | Remotion |
@@ -79,17 +93,17 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 
 ## Agent Skills
 Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
-- `core/SKILL.md` - Core API patterns, state management, subscriptions
-- `renderer/SKILL.md` - Rendering pipeline usage
-- `player/SKILL.md` - Player component usage
-- `studio/SKILL.md` - Studio usage and extensions
-- `getting-started/SKILL.md` - Initial scaffolding and basic tasks
-- `workflows/*.md`, `examples/*.md` & `guided/*.md` - Task-specific workflows, examples, and guided skills
+- `.agents/skills/helios-skills/skills/core/SKILL.md` - Core API patterns, state management, subscriptions
+- `.agents/skills/helios-skills/skills/renderer/SKILL.md` - Rendering pipeline usage
+- `.agents/skills/helios-skills/skills/player/SKILL.md` - Player component usage
+- `.agents/skills/helios-skills/skills/studio/SKILL.md` - Studio usage and extensions
+- `.agents/skills/helios-skills/skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
+- `.agents/skills/helios-skills/skills/workflows/*.md`, `.agents/skills/helios-skills/skills/examples/*.md` & `.agents/skills/helios-skills/skills/guided/*.md` - Task-specific workflows, examples, and guided skills
+- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills
 
 ## Key Files for Agents
 - `README.md` - Vision document
 - `docs/BACKLOG.md` - Feature backlog
-- `docs/PROGRESS.md` - Aggregated progress log
 - `docs/PROGRESS-*.md` - Completed work (per domain)
 - `docs/status/[ROLE].md` - Domain-specific status
 - `.sys/llmdocs/context-*.md` - Architecture summaries
@@ -100,6 +114,7 @@ Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
 - `packages/infrastructure/src/index.ts` - Infrastructure public API
 - `packages/studio/src/server/mcp.ts` - Studio MCP Server
 - `packages/studio/src/server/plugin.ts` - Studio Vite Plugin
+- `packages/studio/src/server/render-manager.ts` - Studio Render Manager
 
 ## Diagnostics
 ```typescript
@@ -113,20 +128,21 @@ const report = await Helios.diagnose();
 //   webAudio: boolean,
 //   colorGamut: 'srgb' | 'p3' | 'rec2020' | null,
 //   videoCodecs: { h264: boolean, vp8: boolean, vp9: boolean, av1: boolean },
-//   audioCodecs: { aac: boolean, mp3: boolean, opus: boolean, vorbis: boolean },
+//   audioCodecs: { aac: boolean, opus: boolean },
 //   videoDecoders: { h264: boolean, vp8: boolean, vp9: boolean, av1: boolean },
-//   audioDecoders: { aac: boolean, mp3: boolean, opus: boolean, vorbis: boolean }
+//   audioDecoders: { aac: boolean, opus: boolean },
+//   userAgent: string
 // }
 ```
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.1+ (CLI Build Command, Preview Command, CompositionsPanel Tests, CLI Update Command, Refine Agent Skills)
-- **CLI**: v0.45.2+ (Scaffold Cloudflare Sandbox Deployment, Build Command Regression Tests, Scaffold Cloudflare Sandbox Deployment Command)
-- **Core**: v5.13.0+ (Implement Animation Helpers, Implement Variable Playback Rate, Implement InputProps, Enable Core Testing And Robustness, Implement Helios.diagnose())
-- **Player**: v0.76.20+ (Dom Canvas Capture, Lock UI During Export, Bridge Documentation, CSS Asset Inlining, Client-Side Image Inlining)
-- **Renderer**: v1.78.3+ (CdpTimeDriver Determinism, Robust Distributed Audio Pipeline, Smart Codec Selection Update, CdpTimeDriver Iframe Sync, Smart Audio Fades)
-- **Infrastructure**: v0.25.0+ (Gravitational Equilibrium, Orchestrator Coverage Expansion, FfmpegStitcher Coverage, Optimize GCS Uploads, Optimize S3 Uploads)
+- **Studio**: v0.107.1+ (Completed: Improve Omnibar Test Coverage, Asset Drag and Drop, Export Job Spec)
+- **CLI**: v0.45.2+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests)
+- **Core**: v5.13.0+ (Completed: Generic Input Props, Active Clips, Composition Schema)
+- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Bridge Coverage Expansion)
+- **Renderer**: v1.78.3+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage)
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
@@ -143,4 +159,3 @@ const report = await Helios.diagnose();
 - Repository: https://github.com/gavinbintz/helios
 - Documentation: ./docs/
 - Examples: ./examples/
-- Agent Prompts: ./docs/prompts/

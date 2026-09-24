@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { render, act, waitFor } from '@testing-library/react';
+import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { StudioProvider, useStudio } from './StudioContext';
 
@@ -275,6 +275,73 @@ describe('StudioContext', () => {
     });
   });
 
+  describe('Editor Integration', () => {
+    it('openInEditor calls fetch with mapped url', async () => {
+      let context: any;
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.openInEditor('/@fs/my/file/path.ts');
+      });
+
+      expect(mockFetch).toHaveBeenCalledWith('/__open-in-editor?file=%2Fmy%2Ffile%2Fpath.ts');
+    });
+
+    it('openInEditor handles fetch error gracefully', async () => {
+      let context: any;
+
+      // Override the specific call in openInEditor to reject
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      mockFetch.mockImplementation((url: string) => {
+        if (url.startsWith('/__open-in-editor')) {
+            return Promise.reject(new Error('Network error'));
+        }
+        return Promise.resolve({
+            json: () => Promise.resolve([]),
+            ok: true
+        });
+      });
+
+      render(
+        <StudioProvider>
+          <TestComponent onReady={(ctx) => { context = ctx; }} />
+        </StudioProvider>
+      );
+
+      await waitFor(() => expect(context).toBeDefined());
+
+      act(() => {
+        context.openInEditor('/my/file/path.ts');
+      });
+
+      await waitFor(() => {
+        expect(errorSpy).toHaveBeenCalledWith('Failed to open in editor', expect.any(Error));
+      });
+
+      errorSpy.mockRestore();
+    });
+  });
+
+  describe('useStudio hook', () => {
+    it('throws error when used outside of StudioProvider', () => {
+      // Suppress the expected error from React boundaries in test output
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      expect(() => {
+        renderHook(() => useStudio());
+      }).toThrow('useStudio must be used within a StudioProvider');
+
+      errorSpy.mockRestore();
+    });
+  });
+
   describe('Render Config Persistence', () => {
     let getItemSpy: any;
     let setItemSpy: any;
@@ -342,6 +409,113 @@ describe('StudioContext', () => {
       await waitFor(() => expect(context).toBeDefined());
 
       expect(context.renderConfig).toEqual({ mode: 'canvas' });
+    });
+  });
+
+  describe('export functions', () => {
+    it('cancels export if controller exists', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      await act(async () => {
+        ctx.exportVideo('mp4');
+      });
+
+      await act(async () => {
+        ctx.cancelExport();
+      });
+    });
+
+    it('exports job spec successfully', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      // Set active composition
+      await act(async () => {
+        ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
+      });
+
+      // Mock URL functions
+      const mockCreateObjectURL = vi.fn().mockReturnValue('blob:test');
+      const mockRevokeObjectURL = vi.fn();
+      global.URL.createObjectURL = mockCreateObjectURL;
+      global.URL.revokeObjectURL = mockRevokeObjectURL;
+
+      // Spy on HTMLAnchorElement click instead of mocking the whole element
+      const clickSpy = vi.spyOn(window.HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+
+      // Mock fetch for job spec
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(['{}']))
+      });
+
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
+
+      expect(mockCreateObjectURL).toHaveBeenCalled();
+      expect(clickSpy).toHaveBeenCalled();
+      expect(mockRevokeObjectURL).toHaveBeenCalled();
+
+      vi.restoreAllMocks();
+    });
+
+    it('handles export job spec failure', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+
+          <StudioProvider>
+            <TestComponent />
+          </StudioProvider>
+
+      );
+
+      await act(async () => {
+        ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
+      });
+
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: () => Promise.resolve({ error: 'Server error' })
+      });
+
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
+
+      // Test fetch failure catch block
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      await act(async () => {
+        await ctx.exportJobSpec();
+      });
     });
   });
 });

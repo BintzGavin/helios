@@ -374,7 +374,7 @@ export const Timeline: React.FC = () => {
       </div>
 
       <div
-        className={`timeline-track-area ${isDragOverTimeline ? 'drag-over' : ''}`}
+        className={`timeline-track-area ${isDragOverTimeline ? "drag-over" : ""}`}
         ref={scrollContainerRef}
         onDragLeave={handleDragLeave}
       >

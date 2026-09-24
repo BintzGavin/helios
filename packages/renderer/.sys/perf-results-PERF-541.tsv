@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	22.859	600	26.25	41.9	keep	warmup
+2	10.046	600	59.72	45.0	keep	single-process flag
+3	10.007	600	59.96	43.2	keep	single-process flag

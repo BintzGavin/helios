@@ -11,15 +11,11 @@ export class DomStrategy implements RenderStrategy {
   private cleanupAudio: () => Promise<void> | void = () => {};
   private cdpSession: CDPSession | null = null;
   private lastFrameData: Buffer | string | null = null;
-  private elementScreenshotParams: any = null;
 
   private cdpScreenshotParams: any = null;
-  private targetElementHandle: any = null;
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
-  private beginFrameParams: any = { interval: 0, frameTimeTicks: 0, screenshot: null };
-  /** False when Chrome drops HeadlessExperimental CDP (use Playwright screenshots instead). */
-  private useHeadlessExperimentalBeginFrame = true;
+  private beginFrameParams: any = {};
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -80,15 +76,7 @@ export class DomStrategy implements RenderStrategy {
       this.cdpSession = await page.context().newCDPSession(page);
       (page as any)._sharedCdpSession = this.cdpSession;
     }
-    try {
-      await this.cdpSession!.send('HeadlessExperimental.enable');
-    } catch (err: any) {
-      const msg = String(err?.message ?? err);
-      console.warn(
-        `[DomStrategy] HeadlessExperimental unavailable (${msg}). Falling back to Playwright page.screenshot per frame (slower but compatible).`
-      );
-      this.useHeadlessExperimentalBeginFrame = false;
-    }
+    await this.cdpSession!.send('Runtime.enable');
 
     // Check if the requested pixel format supports alpha
     const pixelFormat = this.options.pixelFormat || 'yuv420p';
@@ -111,10 +99,10 @@ export class DomStrategy implements RenderStrategy {
 
     if (!format) {
       if (hasAlpha) {
-        format = 'webp';
-        quality = quality ?? 75;
-      } else {
         format = 'png';
+      } else {
+        format = 'jpeg';
+        quality = quality ?? 90;
       }
     }
 
@@ -127,12 +115,6 @@ export class DomStrategy implements RenderStrategy {
     this.beginFrameParams.interval = this.frameInterval;
     this.cdpScreenshotParams = cdpScreenshotParams;
     this.beginFrameParams.screenshot = cdpScreenshotParams;
-
-    this.elementScreenshotParams = {
-      type: cdpScreenshotParams.format,
-      quality: cdpScreenshotParams.quality,
-      omitBackground: cdpScreenshotParams.format !== 'jpeg'
-    };
 
     // Set format-appropriate empty buffer
     if (format === 'jpeg') {
@@ -152,58 +134,64 @@ export class DomStrategy implements RenderStrategy {
 
 
     if (this.options.targetSelector) {
-      const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 });
+      const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 }).catch(() => null);
       if (!element) {
         throw new Error(`Target element not found: ${this.options.targetSelector}`);
       }
-      this.targetElementHandle = element;
+
+      const box = await element.boundingBox();
+      if (box) {
+        this.beginFrameParams.screenshot.clip = {
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+          scale: 1
+        };
+      }
     }
 
 
   }
 
 
-  private handleBeginFrameSuccess = (result: any) => {
-    const frameData = result.screenshotData || this.lastFrameData!;
-    this.lastFrameData = frameData;
-    return frameData;
-  };
-
-  private handleBeginFrameError = () => {
-    return this.lastFrameData!;
-  };
-
-  async capture(page: Page, frameTime: number): Promise<Buffer | string> {
-    if (this.targetElementHandle) {
-      const res = await this.targetElementHandle.screenshot(this.elementScreenshotParams);
-      if (res) {
-        this.lastFrameData = res;
-        return res;
-      }
-      return this.lastFrameData!;
+  processCaptureResult(result: any): string | Buffer {
+    const data = result.screenshotData;
+    if (data) {
+      this.lastFrameData = data;
     }
+    return this.lastFrameData as string | Buffer;
+  }
 
-    if (!this.useHeadlessExperimentalBeginFrame) {
-      const fmt = this.cdpScreenshotParams?.format || 'png';
-      const pwType: 'png' | 'jpeg' = fmt === 'jpeg' ? 'jpeg' : 'png';
-      const quality =
-        pwType === 'jpeg' && this.cdpScreenshotParams?.quality !== undefined
-          ? this.cdpScreenshotParams.quality
-          : undefined;
-      const buf = await page.screenshot({
-        type: pwType,
-        quality,
-        fullPage: false,
-        omitBackground: pwType === 'png',
-      });
-      this.lastFrameData = buf;
-      return buf;
+  async capture(page: Page, frameTime: number): Promise<any> {
+    const timeoutMs = this.options.stabilityTimeout ?? 30000;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    try {
+      const result = await Promise.race([
+        this.cdpSession!.send('Page.captureScreenshot', {
+          ...this.cdpScreenshotParams,
+          fromSurface: true,
+          ...(this.beginFrameParams.screenshot?.clip
+            ? { clip: this.beginFrameParams.screenshot.clip }
+            : {}),
+        }),
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error(
+              `DomStrategy.capture watchdog: Page.captureScreenshot exceeded ${timeoutMs}ms (frameTime=${frameTime})`
+            ));
+          }, timeoutMs);
+        }),
+      ]);
+
+      return {
+        hasDamage: true,
+        screenshotData: result.data,
+      };
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
     }
-
-    this.beginFrameParams.frameTimeTicks = 10000 + frameTime;
-
-    return this.cdpSession!.send('HeadlessExperimental.beginFrame', this.beginFrameParams)
-      .then(this.handleBeginFrameSuccess, this.handleBeginFrameError);
   }
 
   async finish(page: Page): Promise<void> {
@@ -217,7 +205,7 @@ export class DomStrategy implements RenderStrategy {
     const format = this.cdpScreenshotParams?.format || 'png';
 
     if (format === 'webp') {
-      inputFormat = 'webp_pipe';
+      inputFormat = 'image2pipe';
     } else if (format === 'jpeg') {
       inputFormat = 'mjpeg';
     } else if (format === 'png') {
@@ -226,8 +214,8 @@ export class DomStrategy implements RenderStrategy {
 
     const videoInputArgs = [
       '-f', inputFormat,
+      ...(format === 'webp' ? ['-vcodec', 'webp'] : []),
       '-framerate', `${options.fps}`,
-      '-thread_queue_size', '512',
       '-i', '-',
     ];
 

@@ -1,44 +1,24 @@
-## [v0.76.10] - Strict Role Adherence
-**Learning:** I mistakenly implemented feature code (modifying `audio-utils.ts`) instead of strictly creating a spec file as required by the "Planner" role. This violates the protocol.
-**Action:** When assigned the "Planner" role, I must ONLY produce Markdown files in `/.sys/plans/` and NEVER modify source code in `packages/`.
-## v0.76.12 - Enforcing Blocked Protocol
-**Learning:** If there are no uncompleted implementation plans explicitly listed for my domain in `/.sys/plans/`, I must strictly adhere to the 'EXECUTOR'S PHILOSOPHY' and STOP. Attempting to artificially fulfill context file regeneration steps when there is no new code to write violates the boundary protocol and introduces unmaintainable clutter.
-**Action:** Before writing any code or updating documentation, always verify that a valid, uncompleted plan exists. If none exists, immediately update the status and backlog files to indicate a blocked state and ask for the next plan.
-## v0.76.12 - Context File Preservation
-**Learning:** Even if no new implementation code is written (e.g., when blocked), I must NEVER delete the `/.sys/llmdocs/context-player.md` file. Deleting it destroys the shared context that other agents rely on.
-**Action:** Always preserve the context file. Only modify it to reflect actual changes to the codebase.
-## v0.76.13 - Regression Fallback
-**Learning:** The PLAYER domain has reached gravitational equilibrium with the documented vision. No missing features exist from the README.
-**Action:** When no feature deltas exist, always fall back to improving test coverage and documentation stability instead of creating unwarranted logic changes.
-## v0.77.0 - Documentation Synchronization
-**Learning:** During the implementation of the media session properties, I learned that strict adherence to the protocol requires not only modifying the source files (`src/index.ts`) but also updating the corresponding tracking and context files (`docs/status/PLAYER.md`, `docs/PROGRESS.md`, `.sys/llmdocs/context-player.md`) in the repository. Modifying compiled build artifacts (`dist/`) directly is incorrect and will cause issues.
-**Action:** Always ensure that modifications are made only to source files, and follow the protocol to update status and documentation files before finalizing a commit.
-## [v0.77.1] - Add Missing Plan
-**Learning:** The previous plan was missing from `/.sys/plans/`, violating the protocol.
-**Action:** Always create a plan file when instructed as Planner.
-## [v0.77.10] - Identifying minor API Parity Gaps
-**Learning:** During review of API parity tests, `srcObject` only returns null and warns on assignment. While `srcObject` stream rendering isn't supported, assigning the property should persist the value to match standard `HTMLMediaElement` wrapper expectations.
-**Action:** When creating plans for API Parity, ensure getters and setters interact coherently with internal state even if the underlying functionality is deferred or partially supported.
-## [v0.77.12] - Bridge Coverage Limitations
-**Learning:** Attempting to force missing parameter boundaries onto the `bridge.ts` message listener improves branch coverage, but highlights that the true source of validation should be on the core `Helios` controller side. Testing these defensive checks in `bridge.test.ts` brings the file to 100% coverage, satisfying the objective.
-**Action:** Write tests for the boundaries anyway to achieve the 100% coverage goal.
-## v0.77.15 - Strict Execution of Plans
-**Learning:** Even if a feature like srcObject persistence has been previously completed according to the status file, I must strictly identify the *next uncompleted plan* for my domain and implement it, or create a new plan for an unaddressed vision gap. In this case,  parity was already completed in , so creating another plan for it was incorrect.
-**Action:** Always check  for completed versions to avoid creating duplicate plans. If the latest plan is completed, look for new gaps in the vision.
-## [v0.77.20] - Frame-based Keydown Alignments
-**Learning:** The implementation of keyboard shortcuts like `ArrowLeft` and `ArrowRight` was originally seeking by seconds, but the `README.md` explicitly promised frame-based seeking.
-**Action:** When planning, double-check that the fine-grained implementation details match the high-level documentation in `README.md`.
-## [v0.77.25] - Addressing Environment Issues in Tests
-**Learning:** `packages/player/src/export-options.test.ts` was failing because the `vitest` environment defaults to Node, making `document` unavailable. The `HeliosPlayer` Web Component uses `document` at the module level.
-**Action:** Created plan to ensure the `@vitest-environment jsdom` pragma is added to files testing DOM components.
+## v0.78.4 - Missing Methods vs Internal Features
+**Learning:** Found that while a feature might be fully implemented internally (like `setPlaybackRange` in `HeliosController`), it can sometimes be omitted from the public `HeliosPlayer` API wrapper. We must explicitly check `packages/player/src/index.ts` to confirm public availability, rather than just trusting `HeliosController` or the UI shortcuts.
+**Action:** Always verify if internal controller capabilities are mapped to public Web Component methods.
+## v0.78.4 - Missing Methods vs Internal Features
+**Learning:** Found that while a feature might be fully implemented internally (like `setPlaybackRange` in `HeliosController`), it can sometimes be omitted from the public `HeliosPlayer` API wrapper. We must explicitly check `packages/player/src/index.ts` to confirm public availability, rather than just trusting `HeliosController` or the UI shortcuts.
+**Action:** Always verify if internal controller capabilities are mapped to public Web Component methods.
+## v0.79.2 - Missing Methods vs Internal Features
+**Learning:** Found that while a feature might be fully implemented internally (like `setPlaybackRange` in `HeliosController`), it can sometimes be omitted from the public `HeliosPlayer` API wrapper. We must explicitly check `packages/player/src/index.ts` to confirm public availability, rather than just trusting `HeliosController` or the UI shortcuts.
+**Action:** Always verify if internal controller capabilities are mapped to public Web Component methods.
+## v0.79.3 - preservesPitch gap
+**Learning:** Found that `preservesPitch` is exposed in `HeliosPlayer` and documented in `README.md`, but it requires core architectural changes in `packages/core/src/drivers/DomDriver.ts` to actually function. As a PLAYER domain planner, I cannot modify `packages/core`.
+**Action:** When an API property requires core logic that isn't implemented, it must be removed from the README to avoid misleading users until a core task can be scheduled.
 
-## [v0.77.25] - Missing README properties
-**Learning:** Properties implemented in `index.ts` (e.g., `mediaTitle`) are sometimes missing from the `README.md` properties list due to disconnected implementation and documentation steps.
-**Action:** When adding new properties, explicitly include updating the README in the implementation spec, or periodically cross-reference `index.ts` exported properties with the README.
-## v0.76.20 - Template Compliance
-**Learning:** Missing one of the required bullet points in the implementation spec template can cause validation failure.
-**Action:** When planning, make sure to include all required sections from the template (Context & Goal, File Inventory, Implementation Spec, Test Plan) and their respective sub-bullets.
+## [0.79.10] - Implement getStartDate
+**Learning:** Implementing missing API parity methods improves standard compliance.
+**Action:** Always check the HTMLMediaElement specification for missing methods.
 
-## 0.77.29 - IMPOSSIBLE DUPLICATION Plan
-**Learning:** Found a plan `2026-03-01-PLAYER-Click-To-Play.md` that requested implementing a `.click-layer` with `pointer-events: none` and click events. However, this feature was already completely implemented in the source code.
-**Action:** When picking up plans, strictly verify their requested changes against the current state of the codebase. Do not blindly overwrite or duplicate existing features if they are already present. If found to be a duplication, document it as impossible and close it.
+## [0.79.11] - Implement remote property
+**Learning:** Implementing missing API parity properties like `remote` improves standard compliance even if they are stubbed.
+**Action:** Always check the HTMLMediaElement specification for missing properties.
+
+## [v0.79.16] - Implement encrypted Event
+**Learning:** Found that standard events like `encrypted` should be included for HTMLMediaElement parity even if the underlying feature (EME/DRM) is not explicitly supported by the core, in order to complete the standard API surface and pass standard compliance checkers.
+**Action:** Include all standard HTMLMediaElement event handlers and document them for API parity.

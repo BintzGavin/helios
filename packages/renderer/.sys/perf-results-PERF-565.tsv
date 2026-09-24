@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.96	30	31.25	0.0	keep	revert-no-display-updates-bug
+2	0.96	30	31.25	0.0	keep	revert-no-display-updates-bug
+3	0.96	30	31.25	0.0	keep	revert-no-display-updates-bug

@@ -259,4 +259,115 @@ describe('installComponent', () => {
 
     expect(installPackage).not.toHaveBeenCalled();
   });
+
+  it('should handle package installation errors gracefully', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    (fs.readFileSync as any).mockReturnValue('{}');
+    (installPackage as any).mockRejectedValueOnce(new Error('Install failed'));
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await installComponent(mockRootDir, 'test-component', { install: true, client: mockClient });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to install dependencies: Install failed'));
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('should initialize components and dependencies if missing in config', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    const partialConfig = {
+      version: '1.0.0',
+      directories: {
+        components: 'src/components/helios',
+      },
+      framework: 'react',
+    };
+    (loadConfig as any).mockReturnValue(partialConfig);
+
+    await installComponent(mockRootDir, 'test-component', { install: false, client: mockClient });
+
+    expect(saveConfig).toHaveBeenCalledWith(expect.objectContaining({
+      components: ['test-component'],
+      dependencies: { 'test-component': 'latest' }
+    }), mockRootDir);
+  });
+  it('should ignore error reading package.json', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    (fs.readFileSync as any).mockImplementation(() => {
+      throw new Error('Failed to read');
+    });
+
+    await installComponent(mockRootDir, 'test-component', { install: true, client: mockClient });
+
+    expect(installPackage).toHaveBeenCalledWith(
+      mockRootDir,
+      ['react@^18.0.0']
+    );
+  });
+
+  it('should handle string error thrown from installPackage', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    (fs.readFileSync as any).mockReturnValue('{}');
+    (installPackage as any).mockRejectedValueOnce('String Error');
+
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await installComponent(mockRootDir, 'test-component', { install: true, client: mockClient });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to install dependencies: String Error'));
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('should initialize missing config.dependencies', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    const configWithoutDeps = {
+      version: '1.0.0',
+      directories: {
+        components: 'src/components/helios',
+      },
+      components: [],
+      framework: 'react',
+    };
+    (loadConfig as any).mockReturnValue(configWithoutDeps);
+
+    await installComponent(mockRootDir, 'test-component', { install: false, client: mockClient });
+
+    expect(saveConfig).toHaveBeenCalledWith(expect.objectContaining({
+      dependencies: { 'test-component': 'latest' }
+    }), mockRootDir);
+  });
+
+  it('should not update config if configChanged is false', async () => {
+    const mockClient = {
+      findComponent: vi.fn().mockResolvedValue(mockComponent),
+    } as any;
+
+    const configFullyPopulated = {
+      version: '1.0.0',
+      directories: {
+        components: 'src/components/helios',
+      },
+      components: ['test-component'],
+      dependencies: { 'test-component': 'latest' },
+      framework: 'react',
+    };
+    (loadConfig as any).mockReturnValue(configFullyPopulated);
+
+    await installComponent(mockRootDir, 'test-component', { install: false, client: mockClient });
+
+    expect(saveConfig).not.toHaveBeenCalled();
+  });
 });

@@ -42,25 +42,24 @@ async function main() {
     width: 1280,
     height: 720,
     fps: 30,
-    durationInSeconds: 10, // Long enough to ensure we can abort
+    durationInSeconds: 10,
     mode: 'canvas'
   });
 
   const controller = new AbortController();
   const signal = controller.signal;
 
-  console.log('Starting render with cancellation scheduled in 2 seconds...');
-
-  setTimeout(() => {
-    console.log('Aborting render now!');
-    controller.abort();
-  }, 2000);
+  console.log('Starting render with cancellation scheduled after measurable progress...');
 
   try {
     await renderer.render(compositionUrl, outputPath, {
       signal,
       onProgress: (p) => {
         console.log(`Progress callback: ${(p * 100).toFixed(1)}%`);
+        if (p >= 0.1 && !signal.aborted) {
+          console.log('Aborting render now!');
+          controller.abort();
+        }
       }
     });
     console.error('Test Failed: Render completed despite cancellation.');

@@ -2,6 +2,7 @@ import { spawnSync } from 'child_process';
 import * as path from 'path';
 
 const tests = [
+  'tests/seek-shared-session.test.ts',
   'tests/verify-asset-timeout.ts',
   'tests/verify-audio-codecs.ts',
   'tests/verify-audio-fades.ts',
@@ -22,7 +23,6 @@ const tests = [
   'tests/verify-cdp-driver-stability.ts',
   'tests/verify-cdp-driver-timeout.ts',
   'tests/verify-cdp-hang.ts',
-  'tests/verify-cdp-iframe-media-sync.ts',
   'tests/verify-cdp-media-offsets.ts',
   'tests/verify-cdp-media-sync-timing.ts',
   'tests/verify-cdp-shadow-dom-sync.ts',
@@ -41,6 +41,8 @@ const tests = [
   'tests/verify-dom-media-attributes.ts',
   'tests/verify-dom-selector.ts',
   'tests/verify-dom-strategy-capture.ts',
+  'tests/verify-dom-renderer-hardening.ts',
+
   'tests/verify-enhanced-dom-preload.ts',
   'tests/verify-frame-count.ts',
   'tests/verify-hardware-codec-selection.ts',

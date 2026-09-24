@@ -83,7 +83,8 @@ jobs:
 
           # Retry loop for gh pr merge to handle rate limits
           for i in {1..5}; do
-            if gh pr merge --auto --squash "$PR_URL"; then
+            MERGE_OUTPUT=$(gh pr merge --auto --squash "$PR_URL" 2>&1 || true)
+            if [ $? -eq 0 ] || echo "$MERGE_OUTPUT" | grep -q "Merge already in progress"; then
               echo "Auto-merge enabled successfully"
               exit 0
             fi

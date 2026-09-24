@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.702	150	88.14	41.7	discard	PERF-464-cdptimedriver-promise-chain
+2	1.651	150	90.88	41.5	discard	PERF-464-cdptimedriver-promise-chain
+3	1.714	150	87.50	41.0	discard	PERF-464-cdptimedriver-promise-chain
+4	1.689	150	88.80	41.0	discard	PERF-464-cdptimedriver-promise-chain
+5	1.698	150	88.31	41.0	discard	PERF-464-cdptimedriver-promise-chain

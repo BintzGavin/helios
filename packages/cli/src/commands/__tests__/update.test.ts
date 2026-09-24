@@ -144,4 +144,32 @@ describe('update command', () => {
       }
     );
   });
+
+  it('should exit with 1 if installComponent throws an error', async () => {
+    vi.mocked(installUtil.installComponent).mockRejectedValue(new Error('Installation failed'));
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await program.parseAsync(['node', 'test', 'update', 'test-component', '--yes']);
+
+    expect(installUtil.installComponent).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to update component: Installation failed'));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+
+    consoleSpy.mockRestore();
+  });
+
+  it('should exit with 1 if installComponent throws a non-Error object', async () => {
+    vi.mocked(installUtil.installComponent).mockRejectedValue('String Error');
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    await program.parseAsync(['node', 'test', 'update', 'test-component', '--yes']);
+
+    expect(installUtil.installComponent).toHaveBeenCalled();
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to update component: String Error'));
+    expect(exitSpy).toHaveBeenCalledWith(1);
+
+    consoleSpy.mockRestore();
+  });
 });

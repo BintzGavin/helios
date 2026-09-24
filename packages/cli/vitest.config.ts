@@ -4,5 +4,13 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    server: {
+      deps: {
+        inline: [
+          /@helios-project\/infrastructure/,
+          /@helios-project\/renderer/
+        ]
+      }
+    }
   },
 });

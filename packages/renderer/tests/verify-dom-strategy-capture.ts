@@ -27,7 +27,7 @@ async function test() {
 
   const result = await strategy.capture(page, 0.5);
 
-  console.log(`Buffer returned: ${Buffer.isBuffer(result) || typeof result === 'string'}`);
+  console.log(`Buffer returned: ${Buffer.isBuffer(result) || typeof result === 'string' || typeof (result as any).screenshotData === 'string'}`);
 
   await browser.close();
 }

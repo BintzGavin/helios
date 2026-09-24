@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.830	150	53.01	62.9	discard	bypass stream writable getter
+2	2.311	150	64.91	63.0	discard	bypass stream writable getter
+3	2.205	150	68.04	63.1	discard	bypass stream writable getter

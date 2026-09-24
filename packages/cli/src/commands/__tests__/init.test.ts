@@ -16,6 +16,7 @@ vi.mock('fs', async () => {
       existsSync: vi.fn(),
       mkdirSync: vi.fn(),
       readdirSync: vi.fn(),
+      readFileSync: vi.fn(),
       promises: {
         mkdir: vi.fn(),
         writeFile: vi.fn()
@@ -179,4 +180,181 @@ describe('init command', () => {
     expect(exitSpy).toHaveBeenCalledWith(1);
     expect(configUtil.saveConfig).not.toHaveBeenCalled();
   });
+
+  it('should exit when failing to download example', async () => {
+    vi.mocked(examplesUtil.downloadExample).mockRejectedValue(new Error('fail'));
+    vi.mocked(prompts).mockResolvedValueOnce({ framework: 'react', components: 'c', lib: 'l' });
+    await program.parseAsync(['node', 'test', 'init', '--example', 'bad']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should exit when scaffold fails', async () => {
+    vi.mocked(fs.promises.writeFile).mockRejectedValue(new Error('fail'));
+    await program.parseAsync(['node', 'test', 'init', '--yes']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should prompt for config and framework if missing', async () => {
+    vi.mocked(prompts)
+      .mockResolvedValueOnce({ mode: 'template' })
+      .mockResolvedValueOnce({ framework: 'solid' })
+      .mockResolvedValueOnce({ framework: 'solid', components: 'c', lib: 'l' });
+    await program.parseAsync(['node', 'test', 'init']);
+    expect(fs.promises.writeFile).toHaveBeenCalled();
+  });
+
+  it('should auto-detect framework from package.json for examples', async () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ dependencies: { "react": "*" } }));
+    // We want the script to think package.json is NOT there initially so it enters scaffolding flow,
+    // but then we want it to read package.json when auto-detecting framework.
+    // However, it calls fs.readFileSync(packageJsonPath) without checking fs.existsSync.
+    // The initial fs.existsSync(packageJsonPath) must be FALSE.
+    let existsSyncCalls = 0;
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) {
+        existsSyncCalls++;
+        return false;
+      }
+      return false;
+    });
+
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'example' }).mockResolvedValueOnce({ example: 'test-example' });
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+    vi.mocked(examplesUtil.downloadExample).mockResolvedValue(undefined);
+    vi.mocked(examplesUtil.transformProject).mockImplementation(() => {});
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(configUtil.saveConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ framework: 'react' }),
+      expect.any(String)
+    );
+  });
+
+  it('should exit when saving config fails', async () => {
+    vi.mocked(configUtil.saveConfig).mockImplementation(() => { throw new Error('fail'); });
+    await program.parseAsync(['node', 'test', 'init', '--yes']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should auto-detect vue framework from package.json for examples', async () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ dependencies: { "vue": "*" } }));
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) return false;
+      return false;
+    });
+
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'example' }).mockResolvedValueOnce({ example: 'test-example' });
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+    vi.mocked(examplesUtil.downloadExample).mockResolvedValue(undefined);
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(configUtil.saveConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ framework: 'vue' }),
+      expect.any(String)
+    );
+  });
+
+  it('should auto-detect svelte framework from package.json for examples', async () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ dependencies: { "svelte": "*" } }));
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) return false;
+      return false;
+    });
+
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'example' }).mockResolvedValueOnce({ example: 'test-example' });
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+    vi.mocked(examplesUtil.downloadExample).mockResolvedValue(undefined);
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(configUtil.saveConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ framework: 'svelte' }),
+      expect.any(String)
+    );
+  });
+
+  it('should auto-detect solid framework from package.json for examples', async () => {
+    vi.mocked(fs.readFileSync).mockReturnValue(JSON.stringify({ dependencies: { "solid-js": "*" } }));
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) return false;
+      return false;
+    });
+
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'example' }).mockResolvedValueOnce({ example: 'test-example' });
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+    vi.mocked(examplesUtil.downloadExample).mockResolvedValue(undefined);
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(configUtil.saveConfig).toHaveBeenCalledWith(
+      expect.objectContaining({ framework: 'solid' }),
+      expect.any(String)
+    );
+  });
+
+  it('should exit if target directory is not empty and user cancels without continue', async () => {
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+    vi.mocked(fs.readdirSync).mockReturnValue(['some-file.txt'] as any);
+    vi.mocked(prompts).mockResolvedValueOnce({}); // user hits ctrl+c
+
+    await program.parseAsync(['node', 'test', 'init', 'my-app']);
+
+    expect(exitSpy).toHaveBeenCalledWith(1);
+    expect(fs.promises.writeFile).not.toHaveBeenCalled();
+  });
+
+  it('should exit if mode prompt cancelled', async () => {
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => false);
+    vi.mocked(prompts).mockResolvedValueOnce({}); // user hits ctrl+c
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('should exit if framework prompt cancelled', async () => {
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => false);
+    vi.mocked(prompts)
+      .mockResolvedValueOnce({ mode: 'template' })
+      .mockResolvedValueOnce({}); // user hits ctrl+c on framework
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('should exit if example select cancelled', async () => {
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => false);
+    vi.mocked(prompts)
+      .mockResolvedValueOnce({ mode: 'example' })
+      .mockResolvedValueOnce({}); // user hits ctrl+c on example
+    vi.mocked(examplesUtil.fetchExamples).mockResolvedValue(['test-example']);
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+  it('should exit if config prompt cancelled', async () => {
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => {
+      if (typeof p === 'string' && p.endsWith('package.json')) return true; // simulate existing project
+      return false;
+    });
+    vi.mocked(prompts).mockResolvedValueOnce({}); // user hits ctrl+c on config prompt
+
+    await program.parseAsync(['node', 'test', 'init']);
+
+    expect(exitSpy).toHaveBeenCalledWith(0);
+  });
+
+
+  it('should exit when scaffold fails on writeFile error', async () => {
+    vi.mocked(fs.promises.writeFile).mockRejectedValueOnce(new Error('fail writeFile'));
+    vi.mocked(prompts).mockResolvedValueOnce({ mode: 'template' }).mockResolvedValueOnce({ framework: 'vue' });
+    await program.parseAsync(['node', 'test', 'init']);
+    expect(exitSpy).toHaveBeenCalledWith(1);
+  });
+
 });

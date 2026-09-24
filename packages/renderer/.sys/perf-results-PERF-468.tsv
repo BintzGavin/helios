@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	3.072	150	48.83	4.4	keep	bypass await for undefined stabilityCheckFn via truthiness
+2	3.089	150	48.56	4.4	keep	bypass await for undefined stabilityCheckFn via truthiness
+3	3.072	150	48.82	4.4	keep	bypass await for undefined stabilityCheckFn via truthiness
+4	3.058	150	49.05	4.4	keep	bypass await for undefined stabilityCheckFn via truthiness
+5	3.077	150	48.75	4.4	keep	bypass await for undefined stabilityCheckFn via truthiness

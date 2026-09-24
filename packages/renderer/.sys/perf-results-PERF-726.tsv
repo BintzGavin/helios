@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.122	150	70.70	63.0	keep	Pre-bind processCaptureResult
+2	2.059	150	72.87	63.0	keep	Pre-bind processCaptureResult
+3	2.068	150	72.52	62.8	keep	Pre-bind processCaptureResult

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.160	150	69.45	63.2	keep	baseline
+2	2.220	150	67.55	63.1	keep	baseline
+3	2.141	150	70.07	63.2	keep	Eliminate frameErrorRing array to reduce hot loop overhead

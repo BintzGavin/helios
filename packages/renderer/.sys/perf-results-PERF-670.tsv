@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.592	150	57.87	62.8	discard	cache bufferIsString flag
+2	2.502	150	59.95	62.7	discard	cache bufferIsString flag
+3	2.691	150	55.74	62.8	discard	cache bufferIsString flag
+4	5.233	150	28.67	63.4	discard	cache bufferIsString flag
+5	2.827	150	53.06	62.8	discard	cache bufferIsString flag

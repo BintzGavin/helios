@@ -4,14 +4,71 @@ import { getSeedScript } from '../utils/random-seed.js';
 import { FIND_ALL_MEDIA_FUNCTION, FIND_ALL_SCOPES_FUNCTION, SYNC_MEDIA_FUNCTION, PARSE_MEDIA_ATTRIBUTES_FUNCTION } from '../utils/dom-scripts.js';
 
 
+class ReusableAggregator {
+  public resolveCb: (() => void) | null = null;
+  public rejectCb: ((err: Error) => void) | null = null;
+  public target: number = 0;
+  public count: number = 0;
+
+  then(resolve: () => void, reject: (err: Error) => void) {
+    this.resolveCb = resolve;
+    this.rejectCb = reject;
+    this.check();
+  }
+
+  check() {
+    if (this.count >= this.target && this.resolveCb) {
+        const cb = this.resolveCb;
+        this.resolveCb = null;
+        this.rejectCb = null;
+        cb();
+    }
+  }
+
+  tick = () => {
+      this.count++;
+      this.check();
+  };
+
+  fail = (err: Error) => {
+    if (this.rejectCb) {
+        const cb = this.rejectCb;
+        this.resolveCb = null;
+        this.rejectCb = null;
+        cb(err);
+    }
+  };
+}
+
+
 export class SeekTimeDriver implements TimeDriver {
+  private aggregator = new ReusableAggregator();
   private cdpSession: CDPSession | null = null;
-  private cachedFrames: import('playwright').Frame[] = [];
-  private singleFrameEvaluateParams: any = { expression: '', awaitPromise: true, returnByValue: false };
-  private multiFrameEvaluateParams: any[] = [];
-    private executionContextIds: number[] = [];
-  private multiFramePromises: Promise<any>[] = [];
+  private multiFrameCallParams: any[] = [];
+  private executionContextIds: number[] = [];
+  private callFunctionOnParams: any = {
+    functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+    arguments: [{ value: 0 }, { value: 0 }],
+    awaitPromise: true
+  };
   private evaluateArgs: [number, number] = [0, 0];
+  private handleExecutionContextCreated = (event: any) => {
+    if (event.context.name === '' && !this.executionContextIds.includes(event.context.id)) {
+      this.executionContextIds.push(event.context.id);
+      this.multiFrameCallParams.length = 0;
+    }
+  };
+  private handleExecutionContextDestroyed = (event: any) => {
+    const index = this.executionContextIds.indexOf(event.executionContextId);
+    if (index !== -1) {
+      this.executionContextIds.splice(index, 1);
+      this.multiFrameCallParams.length = 0;
+    }
+  };
+  private handleExecutionContextsCleared = () => {
+    this.executionContextIds = [];
+    this.multiFrameCallParams.length = 0;
+  };
 
   constructor(private timeout: number = 30000) {
     this.evaluateArgs[1] = timeout;
@@ -54,12 +111,18 @@ export class SeekTimeDriver implements TimeDriver {
     }
 
     this.executionContextIds = [];
+    this.multiFrameCallParams.length = 0;
+    this.cdpSession!.removeListener('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    this.cdpSession!.removeListener('Runtime.executionContextDestroyed', this.handleExecutionContextDestroyed);
+    this.cdpSession!.removeListener('Runtime.executionContextsCleared', this.handleExecutionContextsCleared);
+    this.cdpSession!.on('Runtime.executionContextCreated', this.handleExecutionContextCreated);
+    this.cdpSession!.on('Runtime.executionContextDestroyed', this.handleExecutionContextDestroyed);
+    this.cdpSession!.on('Runtime.executionContextsCleared', this.handleExecutionContextsCleared);
+    // DomStrategy may already have enabled Runtime on this shared session.
+    // Re-enable from a disabled state so Chrome reports existing contexts to
+    // our newly attached listeners; otherwise every seek silently becomes a no-op.
+    await this.cdpSession!.send('Runtime.disable');
     await this.cdpSession!.send('Runtime.enable');
-    this.cdpSession!.on('Runtime.executionContextCreated', (event) => {
-      if (event.context.name === '') {
-        this.executionContextIds.push(event.context.id);
-      }
-    });
 
     // Inject the seek script once during initialization
     // We wrap it in an IIFE to avoid polluting the global namespace with helper functions
@@ -108,31 +171,6 @@ export class SeekTimeDriver implements TimeDriver {
           return found;
         }
 
-        function createMediaPromise(el) {
-          if (el.__helios_sync_promise) return el.__helios_sync_promise;
-
-          el.__helios_sync_promise = new Promise((resolve) => {
-            let resolved = false;
-            const finish = () => {
-              if (resolved) return;
-              resolved = true;
-              cleanup();
-              el.__helios_sync_promise = null;
-              resolve();
-            };
-            const cleanup = () => {
-              el.removeEventListener('seeked', finish);
-              el.removeEventListener('canplay', finish);
-              el.removeEventListener('error', finish);
-            };
-            el.addEventListener('seeked', finish);
-            el.addEventListener('canplay', finish);
-            el.addEventListener('error', finish);
-          });
-
-          return el.__helios_sync_promise;
-        }
-
         window.__helios_invalidate_cache = () => {
           cachedScopes = null;
           cachedAnimations = null;
@@ -158,8 +196,9 @@ export class SeekTimeDriver implements TimeDriver {
           }
 
           // Synchronize document timeline (WAAPI) across all scopes.
-          // Re-scan until the animation count holds steady, so late-instantiated
-          // animations are picked up instead of being lost for the whole render.
+          // Re-scan whenever the document-level animation count moves, so
+          // late-instantiated animations are picked up instead of being lost
+          // for the whole render.
           const docAnimationCount = document.getAnimations().length;
           if (!cachedAnimations || docAnimationCount !== lastDocAnimationCount) {
             if (cachedAnimations && docAnimationCount > lastDocAnimationCount) {
@@ -182,7 +221,7 @@ export class SeekTimeDriver implements TimeDriver {
             try {
               const helios = window.helios;
               const fps = helios.fps ? helios.fps.value : 30;
-              const frame = Math.floor(t * fps);
+              const frame = Math.round(t * fps);
 
               helios.seek(frame);
               heliosSeeked = true;
@@ -220,8 +259,30 @@ export class SeekTimeDriver implements TimeDriver {
               const el = cachedMediaElements[i];
               syncMedia(el, t);
 
-              if (el.seeking || el.readyState < 2) {
-                cachedPromises[cachedPromises.length] = createMediaPromise(el);
+              const hasSource = Boolean(
+                el.currentSrc ||
+                el.src ||
+                el.querySelector('source[src]')
+              );
+              if (hasSource && (el.seeking || el.readyState < 2)) {
+                if (!el.__helios_sync_promise) {
+                  el.__helios_sync_promise = new Promise((resolve) => {
+                    let resolved = false;
+                    const finish = () => {
+                      if (resolved) return;
+                      resolved = true;
+                      el.removeEventListener('seeked', finish);
+                      el.removeEventListener('canplay', finish);
+                      el.removeEventListener('error', finish);
+                      el.__helios_sync_promise = null;
+                      resolve();
+                    };
+                    el.addEventListener('seeked', finish);
+                    el.addEventListener('canplay', finish);
+                    el.addEventListener('error', finish);
+                  });
+                }
+                cachedPromises[cachedPromises.length] = el.__helios_sync_promise;
               }
             }
           }
@@ -253,7 +314,7 @@ export class SeekTimeDriver implements TimeDriver {
                   try {
                     const helios = window.helios;
                     const fps = helios.fps ? helios.fps.value : 30;
-                    const frame = Math.floor(t * fps);
+                    const frame = Math.round(t * fps);
                     helios.seek(frame);
                   } catch (e) {
                     console.warn('[SeekTimeDriver] Error seeking Helios:', e);
@@ -311,36 +372,44 @@ export class SeekTimeDriver implements TimeDriver {
     // Wait briefly to ensure execution contexts have been gathered by CDP
     await new Promise(r => setTimeout(r, 100));
 
-    this.cachedFrames = page.frames();
+    this.callFunctionOnParams.arguments[1].value = this.timeout;
       }
 
   setTime(page: Page, timeInSeconds: number): Promise<void> | void {
-    const frames = this.cachedFrames;
+    if (this.executionContextIds.length === 0) return Promise.resolve();
 
-    if (frames.length === 1) {
-      this.singleFrameEvaluateParams.expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-      return this.cdpSession!.send('Runtime.evaluate', this.singleFrameEvaluateParams) as unknown as Promise<void>;
+    if (this.executionContextIds.length === 1) {
+      this.callFunctionOnParams.arguments[0].value = timeInSeconds;
+      this.callFunctionOnParams.executionContextId = this.executionContextIds[0];
+      return this.cdpSession!.send('Runtime.callFunctionOn', this.callFunctionOnParams) as unknown as Promise<void>;
     }
 
-    const expression = 'window.__helios_seek(' + timeInSeconds + ', ' + this.timeout + ')';
-
-    this.multiFramePromises.length = this.executionContextIds.length;
-    if (this.multiFrameEvaluateParams.length !== this.executionContextIds.length) {
-      this.multiFrameEvaluateParams.length = this.executionContextIds.length;
+    if (this.multiFrameCallParams.length !== this.executionContextIds.length) {
+      this.multiFrameCallParams.length = this.executionContextIds.length;
       for (let i = 0; i < this.executionContextIds.length; i++) {
-        this.multiFrameEvaluateParams[i] = {
-          expression: "",
-          contextId: this.executionContextIds[i],
+        this.multiFrameCallParams[i] = {
+          functionDeclaration: 'function(t, timeoutMs) { return window.__helios_seek(t, timeoutMs); }',
+          arguments: [{ value: timeInSeconds }, { value: this.timeout }],
+          executionContextId: this.executionContextIds[i],
           awaitPromise: true,
           returnByValue: false
         };
       }
+    } else {
+      for (let i = 0; i < this.executionContextIds.length; i++) {
+        this.multiFrameCallParams[i].executionContextId = this.executionContextIds[i];
+        this.multiFrameCallParams[i].arguments[0].value = timeInSeconds;
+      }
     }
+
+    this.aggregator.count = 0;
+    this.aggregator.target = this.executionContextIds.length;
+
     for (let i = 0; i < this.executionContextIds.length; i++) {
-      this.multiFrameEvaluateParams[i].expression = expression;
-      this.multiFrameEvaluateParams[i].contextId = this.executionContextIds[i];
-      this.multiFramePromises[i] = this.cdpSession!.send('Runtime.evaluate', this.multiFrameEvaluateParams[i]);
+        this.cdpSession!.send('Runtime.callFunctionOn', this.multiFrameCallParams[i])
+            .then(this.aggregator.tick)
+            .catch(this.aggregator.fail);
     }
-    return Promise.all(this.multiFramePromises) as unknown as Promise<void>;
+    return this.aggregator as any as Promise<void>;
   }
 }

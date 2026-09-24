@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.257	600	58.50	44.7	discard	Increase maxPipelineDepth buffer multiplier to 64
+2	9.940	600	60.36	39.8	discard	Increase maxPipelineDepth buffer multiplier to 64
+3	10.006	600	59.96	46.1	discard	Increase maxPipelineDepth buffer multiplier to 64
+4	10.107	600	59.37	47.3	discard	Increase maxPipelineDepth buffer multiplier to 64
+5	10.131	600	59.23	46.8	discard	Increase maxPipelineDepth buffer multiplier to 64

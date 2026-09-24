@@ -156,4 +156,87 @@ describe('useAudioWaveform', () => {
 
     expect(result.current.peaks).toBeNull();
   });
+
+  it('logs warning and returns null when OfflineAudioContext is missing', async () => {
+    const url = 'http://test.com/missing-context.mp3';
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(8))
+    });
+
+    // Remove OfflineAudioContext
+    const originalContext = (window as any).OfflineAudioContext;
+    delete (window as any).OfflineAudioContext;
+    delete (window as any).webkitOfflineAudioContext;
+
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { result } = renderHook(() => useAudioWaveform(url, 100));
+
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith("OfflineAudioContext not supported");
+    });
+
+    expect(result.current.peaks).toBeNull();
+    expect(result.current.error).toBe(false);
+
+    // Restore
+    (window as any).OfflineAudioContext = originalContext;
+    consoleSpy.mockRestore();
+  });
+
+  it('returns empty array when samplesPerPeak < 1', async () => {
+    const url = 'http://test.com/low-sample-rate.mp3';
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(8))
+    });
+
+    // Mock OfflineAudioContext to return very low sampleRate
+    MockOfflineAudioContext = vi.fn().mockImplementation(function(this: any) {
+        this.decodeAudioData = vi.fn().mockImplementation((buffer: any) => {
+          return Promise.resolve({
+            sampleRate: 50, // very low sample rate
+            length: 100,
+            getChannelData: vi.fn().mockReturnValue(new Float32Array(100).fill(0.5))
+          });
+        });
+    });
+    (window as any).OfflineAudioContext = MockOfflineAudioContext;
+
+    // Request high peaksPerSecond so that samplesPerPeak (50 / 100) < 1
+    const { result } = renderHook(() => useAudioWaveform(url, 100));
+
+    await waitFor(() => {
+      expect(result.current.peaks).not.toBeNull();
+    });
+
+    expect(result.current.peaks).toBeInstanceOf(Float32Array);
+    expect(result.current.peaks?.length).toBe(0);
+    expect(result.current.error).toBe(false);
+  });
+
+  it('does not update error state if unmounted before fetch fails', async () => {
+    const url = 'http://test.com/unmount-error.mp3';
+    // delay rejection so unmount runs first
+    mockFetch.mockImplementationOnce(() => new Promise((_, reject) => setTimeout(() => reject(new Error('Fetch failed')), 10)));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { unmount } = renderHook(() => useAudioWaveform(url, 100));
+    unmount();
+    // wait for rejection to happen
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    consoleSpy.mockRestore();
+  });
+
+  it('does not update state if unmounted before fetch completes', async () => {
+    const url = 'http://test.com/unmount.mp3';
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      arrayBuffer: () => Promise.resolve(new ArrayBuffer(8))
+    });
+    const { unmount } = renderHook(() => useAudioWaveform(url, 100));
+    unmount(); // Unmount immediately
+  });
 });

@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.710	150	55.36	64.3	keep	baseline
+2	3.335	150	44.98	63.6	keep	baseline
+3	2.669	150	56.21	63.6	keep	baseline
+4	3.014	150	49.77	63.5	keep	removed thread_queue_size
+5	2.599	150	57.72	63.4	keep	removed thread_queue_size
+6	2.624	150	57.17	64.3	keep	removed thread_queue_size

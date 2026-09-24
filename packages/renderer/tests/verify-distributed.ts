@@ -29,11 +29,23 @@ async function main() {
     audioFilePath: audioPath,
   };
 
-  const compositionPath = path.resolve(
-    process.cwd(),
-    'output/example-build/examples/simple-canvas-animation/composition.html'
-  );
-  const compositionUrl = `file://${compositionPath}`;
+  const compositionHtml = `<!doctype html>
+    <html>
+      <body style="margin:0">
+        <canvas width="600" height="600"></canvas>
+        <script>
+          const canvas = document.querySelector('canvas');
+          const context = canvas.getContext('2d');
+          function draw(time) {
+            context.fillStyle = 'rgb(' + Math.floor((time / 20) % 255) + ', 30, 90)';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            requestAnimationFrame(draw);
+          }
+          requestAnimationFrame(draw);
+        </script>
+      </body>
+    </html>`;
+  const compositionUrl = `data:text/html;charset=utf-8,${encodeURIComponent(compositionHtml)}`;
 
   const outputPath = path.resolve(process.cwd(), 'output/distributed-render.mp4');
 

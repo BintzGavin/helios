@@ -121,5 +121,26 @@ describe('uninstall utils', () => {
       expect(fs.unlinkSync).toHaveBeenCalled();
       expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Failed to delete'));
     });
+
+    it('cleans up empty parent directories', async () => {
+      const mockClient = new RegistryClient('mock');
+      mockClient.findComponent = vi.fn().mockResolvedValue({
+        name: 'button',
+        files: [{ name: 'ui/button/Button.tsx', content: '' }]
+      });
+
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+
+      vi.mocked(fs.readdirSync).mockImplementation((dirPath: fs.PathLike) => {
+        if (dirPath.toString().endsWith('ui/button')) return [] as any;
+        return ['other-file'] as any; // non-empty
+      });
+
+      vi.mocked(fs.rmdirSync).mockImplementation(() => {});
+
+      await uninstallComponent('/test', 'button', { removeFiles: true, client: mockClient });
+
+      expect(fs.rmdirSync).toHaveBeenCalledTimes(1);
+    });
   });
 });

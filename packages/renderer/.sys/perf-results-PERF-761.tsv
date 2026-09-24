@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.314	150	64.83	63.1	discard	FFmpeg PNG multithreading via -threads 0
+2	2.455	150	61.09	63.0	discard	FFmpeg PNG multithreading via -threads 0
+3	2.436	150	61.58	62.9	discard	FFmpeg PNG multithreading via -threads 0

@@ -19,8 +19,8 @@ class MockPage {
       return true;
     }
 
-    // If it's the canvas finder / canvas element check
-    if (fnOrScript.toString().includes('findCanvas') || fnOrScript.toString().includes('eval(args.script)') || fnOrScript.toString().includes('HTMLCanvasElement')) {
+    // If it's the canvas finder
+    if (fnOrScript.toString().includes('HTMLCanvasElement') || fnOrScript.toString().includes('findCanvas') || fnOrScript.toString().includes('eval(args.script)')) {
       return true; // Found
     }
 

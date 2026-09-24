@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	21.5	300	13.95	50.2	keep	baseline
+2	19.8	300	15.15	50.7	keep	optimize base64 buffer pooling using node chain linked list

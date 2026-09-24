@@ -98,6 +98,217 @@ describe('CaptionsPanel', () => {
     expect(updated[0].text).toBe('Hello Updated');
   });
 
+  it('formats hours correctly', () => {
+    const captions = [
+        { id: '1', startTime: 3600000, endTime: 3601000, text: 'Hello' } // 1 hour
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    // 3600000ms -> 01:00:00.000
+    expect(screen.getByDisplayValue('01:00:00.000')).toBeInTheDocument();
+    // 3601000ms -> 01:00:01.000
+    expect(screen.getByDisplayValue('01:00:01.000')).toBeInTheDocument();
+  });
+
+  it('updates time on blur parsing hh:mm:ss', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const startInputs = screen.getAllByDisplayValue('00:00.000');
+    // start time input
+    fireEvent.change(startInputs[0], { target: { value: '01:02:03.456' } });
+    fireEvent.blur(startInputs[0]);
+
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    // 1h = 3600s, 2m = 120s, 3.456s => 3723.456s => 3723456ms
+    expect(updated[0].startTime).toBe(3723456);
+  });
+
+  it('updates time on blur parsing mm:ss', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const startInputs = screen.getAllByDisplayValue('00:00.000');
+    fireEvent.change(startInputs[0], { target: { value: '02:03.456' } });
+    fireEvent.blur(startInputs[0]);
+
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    // 2m = 120s, 3.456s => 123.456s => 123456ms
+    expect(updated[0].startTime).toBe(123456);
+  });
+
+  it('updates time on blur parsing fallback', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const startInputs = screen.getAllByDisplayValue('00:00.000');
+    fireEvent.change(startInputs[0], { target: { value: '123.456' } });
+    fireEvent.blur(startInputs[0]);
+
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    expect(updated[0].startTime).toBe(123456);
+  });
+
+  it('updates end time on blur parsing hh:mm:ss', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const endInputs = screen.getAllByDisplayValue('00:01.000');
+    fireEvent.change(endInputs[0], { target: { value: '01:02:03.456' } });
+    fireEvent.blur(endInputs[0]);
+
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    // 1h = 3600s, 2m = 120s, 3.456s => 3723.456s => 3723456ms
+    expect(updated[0].endTime).toBe(3723456);
+  });
+
+  it('updates time on blur parsing fallback invalid', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const startInputs = screen.getAllByDisplayValue('00:00.000');
+    fireEvent.change(startInputs[0], { target: { value: 'invalid' } });
+    fireEvent.blur(startInputs[0]);
+
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    expect(updated[0].startTime).toBe(0);
+  });
+
+  it('clears captions', () => {
+    const captions = [
+        { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }
+    ];
+
+    (StudioContext.useStudio as any).mockReturnValue({
+        ...defaultContext,
+        playerState: { ...defaultPlayerState, captions }
+    });
+
+    render(<CaptionsPanel />);
+
+    const clearButton = screen.getByText('Clear');
+    fireEvent.click(clearButton);
+
+    expect(mockSetCaptions).toHaveBeenCalledWith([]);
+  });
+
+  it('handles file upload success', () => {
+    render(<CaptionsPanel />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['1\n00:00:01,000 --> 00:00:02,000\nTest caption'], 'test.srt', { type: 'text/plain' });
+
+    // Mock FileReader
+    const readAsTextMock = vi.fn();
+    const originalFileReader = global.FileReader;
+    global.FileReader = class {
+      onload: any;
+      readAsText(file: Blob) {
+        readAsTextMock(file);
+        if (this.onload) {
+          this.onload({ target: { result: '1\n00:00:01,000 --> 00:00:02,000\nTest caption' } } as any);
+        }
+      }
+    } as any;
+
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(readAsTextMock).toHaveBeenCalledWith(file);
+    expect(mockSetCaptions).toHaveBeenCalledTimes(1);
+    const updated = mockSetCaptions.mock.calls[0][0];
+    expect(updated[0].text).toBe('Test caption');
+
+    global.FileReader = originalFileReader;
+  });
+
+  it('handles file upload missing file', () => {
+    render(<CaptionsPanel />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [] } });
+
+    expect(mockSetCaptions).not.toHaveBeenCalled();
+  });
+
+  it('handles file upload parse error', () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<CaptionsPanel />);
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['invalid srt'], 'test.srt', { type: 'text/plain' });
+
+    const readAsTextMock = vi.fn();
+    const originalFileReader = global.FileReader;
+    global.FileReader = class {
+      onload: any;
+      readAsText(file: Blob) {
+        readAsTextMock(file);
+        if (this.onload) {
+          // This should trigger parseSrt which will throw an error for invalid SRT
+          this.onload({ target: { result: 'invalid srt content' } } as any);
+        }
+      }
+    } as any;
+
+    fireEvent.change(fileInput, { target: { files: [file] } });
+
+    expect(alertSpy).toHaveBeenCalledWith('Failed to parse SRT file.');
+    expect(consoleSpy).toHaveBeenCalled();
+    expect(mockSetCaptions).not.toHaveBeenCalled();
+
+    alertSpy.mockRestore();
+    consoleSpy.mockRestore();
+    global.FileReader = originalFileReader;
+  });
+
   it('deletes a caption', () => {
     const captions = [
         { id: '1', startTime: 0, endTime: 1000, text: 'Hello' }

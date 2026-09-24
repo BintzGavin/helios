@@ -50,7 +50,7 @@ const options: RendererOptions = {
 
   // Stability & Determinism
   randomSeed: 'my-seed', // Optional: Seed for deterministic randomness
-  stabilityTimeout: 30000, // Optional: Timeout for waitUntilStable (ms)
+  stabilityTimeout: 30000, // Optional: Timeout for stability waits and DOM capture (ms)
 
   // Browser Configuration
   browserConfig: {

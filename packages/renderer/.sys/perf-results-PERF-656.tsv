@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.543	150	58.99	63.8	discard	Pre-bind currentTime Update Handler in CdpTimeDriver.ts

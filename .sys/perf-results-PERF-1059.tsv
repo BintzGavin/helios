@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.0054	1000000	0.00	0.0	keep	optimized strict-equal-next-progress microbenchmark loop

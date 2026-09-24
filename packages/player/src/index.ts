@@ -1,4 +1,4 @@
-import type { Helios, HeliosSchema, DiagnosticReport } from "@helios-project/core";
+import type { Helios, HeliosSchema, DiagnosticReport, Marker } from "@helios-project/core";
 import { DirectController, BridgeController } from "./controllers";
 import type { HeliosController } from "./controllers";
 import { AudioLevels } from "./features/audio-metering";
@@ -11,6 +11,13 @@ import { HeliosMediaSession } from "./features/media-session";
 
 export { ClientSideExporter };
 export type { HeliosController };
+
+class MockRemotePlayback extends EventTarget {
+  state = 'disconnected';
+  watchAvailability() { return Promise.resolve(-1); }
+  cancelWatchAvailability() { return Promise.resolve(); }
+  prompt() { return Promise.reject(new DOMException('Not supported', 'NotSupportedError')); }
+}
 
 export interface HeliosExportOptions {
   format?: 'mp4' | 'webm' | 'png' | 'jpeg';
@@ -843,6 +850,18 @@ template.innerHTML = `
   </div>
 `;
 
+export interface VideoFrameCallbackMetadata {
+  presentationTime: DOMHighResTimeStamp;
+  expectedDisplayTime: DOMHighResTimeStamp;
+  width: number;
+  height: number;
+  mediaTime: number;
+  presentedFrames: number;
+  processingDuration: number;
+}
+
+export type VideoFrameRequestCallback = (now: DOMHighResTimeStamp, metadata: VideoFrameCallbackMetadata) => void;
+
 export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHost, VideoTrackHost {
   private iframe: HTMLIFrameElement;
   private pipVideo: HTMLVideoElement;
@@ -930,6 +949,17 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   private _readyState: number = HeliosPlayer.HAVE_NOTHING;
   private _networkState: number = HeliosPlayer.NETWORK_EMPTY;
 
+  public get HAVE_NOTHING(): number { return HeliosPlayer.HAVE_NOTHING; }
+  public get HAVE_METADATA(): number { return HeliosPlayer.HAVE_METADATA; }
+  public get HAVE_CURRENT_DATA(): number { return HeliosPlayer.HAVE_CURRENT_DATA; }
+  public get HAVE_FUTURE_DATA(): number { return HeliosPlayer.HAVE_FUTURE_DATA; }
+  public get HAVE_ENOUGH_DATA(): number { return HeliosPlayer.HAVE_ENOUGH_DATA; }
+
+  public get NETWORK_EMPTY(): number { return HeliosPlayer.NETWORK_EMPTY; }
+  public get NETWORK_IDLE(): number { return HeliosPlayer.NETWORK_IDLE; }
+  public get NETWORK_LOADING(): number { return HeliosPlayer.NETWORK_LOADING; }
+  public get NETWORK_NO_SOURCE(): number { return HeliosPlayer.NETWORK_NO_SOURCE; }
+
   public get readyState(): number {
     return this._readyState;
   }
@@ -947,6 +977,30 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   // --- Standard Event Handlers ---
+  private _onabort: ((event: Event) => void) | null = null;
+  public get onabort() { return this._onabort; }
+  public set onabort(handler: ((event: Event) => void) | null) {
+    if (this._onabort) this.removeEventListener('abort', this._onabort);
+    this._onabort = handler;
+    if (handler) this.addEventListener('abort', handler);
+  }
+
+  private _onemptied: ((event: Event) => void) | null = null;
+  public get onemptied() { return this._onemptied; }
+  public set onemptied(handler: ((event: Event) => void) | null) {
+    if (this._onemptied) this.removeEventListener('emptied', this._onemptied);
+    this._onemptied = handler;
+    if (handler) this.addEventListener('emptied', handler);
+  }
+
+  private _onprogress: ((event: Event) => void) | null = null;
+  public get onprogress() { return this._onprogress; }
+  public set onprogress(handler: ((event: Event) => void) | null) {
+    if (this._onprogress) this.removeEventListener('progress', this._onprogress);
+    this._onprogress = handler;
+    if (handler) this.addEventListener('progress', handler);
+  }
+
 
   private _onplay: ((event: Event) => void) | null = null;
   public get onplay() { return this._onplay; }
@@ -962,6 +1016,38 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (this._onpause) this.removeEventListener('pause', this._onpause);
     this._onpause = handler;
     if (handler) this.addEventListener('pause', handler);
+  }
+
+  private _onplaying: ((event: Event) => void) | null = null;
+  public get onplaying() { return this._onplaying; }
+  public set onplaying(handler: ((event: Event) => void) | null) {
+    if (this._onplaying) this.removeEventListener('playing', this._onplaying);
+    this._onplaying = handler;
+    if (handler) this.addEventListener('playing', handler);
+  }
+
+  private _onwaiting: ((event: Event) => void) | null = null;
+  public get onwaiting() { return this._onwaiting; }
+  public set onwaiting(handler: ((event: Event) => void) | null) {
+    if (this._onwaiting) this.removeEventListener('waiting', this._onwaiting);
+    this._onwaiting = handler;
+    if (handler) this.addEventListener('waiting', handler);
+  }
+
+  private _onsuspend: ((event: Event) => void) | null = null;
+  public get onsuspend() { return this._onsuspend; }
+  public set onsuspend(handler: ((event: Event) => void) | null) {
+    if (this._onsuspend) this.removeEventListener('suspend', this._onsuspend);
+    this._onsuspend = handler;
+    if (handler) this.addEventListener('suspend', handler);
+  }
+
+  private _onstalled: ((event: Event) => void) | null = null;
+  public get onstalled() { return this._onstalled; }
+  public set onstalled(handler: ((event: Event) => void) | null) {
+    if (this._onstalled) this.removeEventListener('stalled', this._onstalled);
+    this._onstalled = handler;
+    if (handler) this.addEventListener('stalled', handler);
   }
 
   private _onended: ((event: Event) => void) | null = null;
@@ -1092,12 +1178,52 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (handler) this.addEventListener('leavepictureinpicture', handler);
   }
 
+  private _onaudiometering: ((event: Event) => void) | null = null;
+  public get onaudiometering() { return this._onaudiometering; }
+  public set onaudiometering(handler: ((event: Event) => void) | null) {
+    if (this._onaudiometering) this.removeEventListener('audiometering', this._onaudiometering);
+    this._onaudiometering = handler;
+    if (handler) this.addEventListener('audiometering', handler);
+  }
+
   // --- Standard Media API ---
+
+  public getStartDate(): number {
+    return NaN;
+  }
 
   public canPlayType(type: string): CanPlayTypeResult {
     // We strictly play Helios compositions, not standard video MIME types.
     // Return empty string to be spec-compliant for video/mp4 etc.
     return "";
+  }
+
+  public getVideoPlaybackQuality(): VideoPlaybackQuality {
+    return {
+      creationTime: performance.now(),
+      totalVideoFrames: this.currentFrame,
+      droppedVideoFrames: 0,
+      corruptedVideoFrames: 0
+    };
+  }
+
+  public requestVideoFrameCallback(callback: VideoFrameRequestCallback): number {
+    return requestAnimationFrame((now: DOMHighResTimeStamp) => {
+      const metadata: VideoFrameCallbackMetadata = {
+        presentationTime: now,
+        expectedDisplayTime: now,
+        width: this.videoWidth,
+        height: this.videoHeight,
+        mediaTime: this.currentTime,
+        presentedFrames: this.currentFrame,
+        processingDuration: 0,
+      };
+      callback(now, metadata);
+    });
+  }
+
+  public cancelVideoFrameCallback(handle: number): void {
+    cancelAnimationFrame(handle);
   }
 
   public get defaultMuted(): boolean {
@@ -1205,6 +1331,36 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       this.removeAttribute("crossorigin");
     }
   }
+
+  public get disableRemotePlayback(): boolean {
+    return this.hasAttribute("disableremoteplayback");
+  }
+  public set disableRemotePlayback(val: boolean) {
+    if (val) this.setAttribute("disableremoteplayback", "");
+    else this.removeAttribute("disableremoteplayback");
+  }
+
+  public get mediaGroup(): string {
+    return this.getAttribute("mediagroup") || "";
+  }
+  public set mediaGroup(val: string) {
+    this.setAttribute("mediagroup", val);
+  }
+
+  private _sinkId: string = "";
+  public get sinkId(): string {
+    return this._sinkId;
+  }
+  public async setSinkId(sinkId: string): Promise<void> {
+    this._sinkId = sinkId;
+    return Promise.resolve();
+  }
+
+  private _remote: any = new MockRemotePlayback();
+  public get remote(): any {
+    return this._remote;
+  }
+
 
   public get seeking(): boolean {
     // Return internal scrubbing state as seeking
@@ -1535,6 +1691,16 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.setAttribute("media-artwork", val);
   }
 
+  public get autoPictureInPicture(): boolean {
+    return (this.pipVideo as any)?.autoPictureInPicture ?? false;
+  }
+
+  public set autoPictureInPicture(val: boolean) {
+    if (this.pipVideo) {
+      (this.pipVideo as any).autoPictureInPicture = val;
+    }
+  }
+
   public async requestPictureInPicture(): Promise<PictureInPictureWindow> {
     if (!document.pictureInPictureEnabled) {
       throw new Error("Picture-in-Picture not supported");
@@ -1583,13 +1749,79 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this.dispatchEvent(new Event("leavepictureinpicture"));
   };
 
+  private _pendingPlayPromise: Promise<void> | null = null;
+
   public async play(): Promise<void> {
-    if (!this.isLoaded) {
-      this.setAttribute("autoplay", "");
-      this.load();
-    } else if (this.controller) {
-      this.controller.play();
+    // If already playing, resolve immediately
+    if (!this.paused && this.isLoaded) {
+      return Promise.resolve();
     }
+
+    // Return existing pending promise if we already called play()
+    if (this._pendingPlayPromise) {
+      return this._pendingPlayPromise;
+    }
+
+    this._pendingPlayPromise = new Promise((resolve, reject) => {
+      // In a real environment we wait for the play event.
+      // But we also resolve early if the load() method initializes immediately
+      // and sets paused to false, to avoid test timeouts.
+
+      const onPlay = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onPlaying = () => {
+        cleanup();
+        resolve();
+      };
+
+      const onError = (e: any) => {
+        cleanup();
+        // Construct a DOMException to match standard HTMLMediaElement behavior
+        const err = new DOMException("The play() request was interrupted by a call to pause() or an error.", "AbortError");
+        reject(err);
+      };
+
+      const onAbort = () => {
+        cleanup();
+        const err = new DOMException("The play() request was interrupted.", "AbortError");
+        reject(err);
+      };
+
+      const onPause = () => {
+        cleanup();
+        const err = new DOMException("The play() request was interrupted by a call to pause().", "AbortError");
+        reject(err);
+      };
+
+      const cleanup = () => {
+        this.removeEventListener("play", onPlay);
+        this.removeEventListener("playing", onPlaying);
+        this.removeEventListener("error", onError);
+        this.removeEventListener("abort", onAbort);
+        this.removeEventListener("pause", onPause);
+        if (this._pendingPlayPromise) {
+            this._pendingPlayPromise = null;
+        }
+      };
+
+      this.addEventListener("play", onPlay);
+      this.addEventListener("playing", onPlaying);
+      this.addEventListener("error", onError);
+      this.addEventListener("abort", onAbort);
+      this.addEventListener("pause", onPause);
+
+      if (!this.isLoaded) {
+        this.setAttribute("autoplay", "");
+        this.load();
+      } else if (this.controller) {
+        this.controller.play();
+      }
+    });
+
+    return this._pendingPlayPromise;
   }
 
   public load(): void {
@@ -1611,6 +1843,42 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     }
   }
 
+  public setPlaybackRange(startFrame: number, endFrame: number): void {
+    if (this.controller) {
+      this.controller.setPlaybackRange(startFrame, endFrame);
+    }
+  }
+
+  public clearPlaybackRange(): void {
+    if (this.controller) {
+      this.controller.clearPlaybackRange();
+    }
+  }
+
+  public setDuration(seconds: number): void {
+    if (this.controller) {
+      this.controller.setDuration(seconds);
+    }
+  }
+
+  public setFps(fps: number): void {
+    if (this.controller) {
+      this.controller.setFps(fps);
+    }
+  }
+
+  public setSize(width: number, height: number): void {
+    if (this.controller) {
+      this.controller.setSize(width, height);
+    }
+  }
+
+  public setMarkers(markers: Marker[]): void {
+    if (this.controller) {
+      this.controller.setMarkers(markers);
+    }
+  }
+
   static get observedAttributes() {
     return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork", "export-mode", "canvas-selector", "playsinline", "crossorigin"];
   }
@@ -1619,6 +1887,8 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     super();
     this.attachShadow({ mode: "open" });
     this.shadowRoot!.appendChild(template.content.cloneNode(true));
+
+    this.updateAspectRatio();
 
     this.iframe = this.shadowRoot!.querySelector("iframe")!;
     this.playPauseBtn = this.shadowRoot!.querySelector(".play-pause-btn")!;
@@ -2462,10 +2732,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   private loadIframe(src: string) {
+    if (this._networkState === HeliosPlayer.NETWORK_LOADING) {
+        this.dispatchEvent(new Event('abort'));
+    }
     this._error = null;
     this._networkState = HeliosPlayer.NETWORK_LOADING;
     this._readyState = HeliosPlayer.HAVE_NOTHING;
     this._hasPlayed = false;
+    this.dispatchEvent(new Event('emptied'));
     this.dispatchEvent(new Event('loadstart'));
 
     this.iframe.src = src;
@@ -2575,6 +2849,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     // We poll because window.helios might be set asynchronously.
     const startTime = Date.now();
     this.connectionInterval = window.setInterval(() => {
+        this.dispatchEvent(new Event('progress'));
         // If we connected via Bridge in the meantime, stop polling
         if (this.controller) {
             this.stopConnectionAttempts();
@@ -3197,6 +3472,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
       if (this.lastState) {
         if (state.isPlaying !== this.lastState.isPlaying) {
           this.dispatchEvent(new Event(state.isPlaying ? "play" : "pause"));
+          if (state.isPlaying) {
+            this.dispatchEvent(new Event("playing"));
+          }
         }
 
         const wasFinished = this.lastState.currentFrame >= this.lastState.duration * this.lastState.fps - 1;
@@ -3513,6 +3791,9 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private retryConnection() {
     this.showStatus("Retrying...", false);
+    this.dispatchEvent(new Event("suspend"));
+    this.dispatchEvent(new Event("stalled"));
+    this.dispatchEvent(new Event("waiting"));
     // Reload iframe to force fresh start
     this.load();
   }

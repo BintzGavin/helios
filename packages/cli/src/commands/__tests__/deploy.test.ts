@@ -42,7 +42,17 @@ describe('deploy command', () => {
     exitSpy.mockRestore();
   });
 
-  describe('setup subcommand', () => {
+    describe('setup subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'setup']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create files when they do not exist', async () => {
       // Mock fs.existsSync to return false (files don't exist)
       vi.mocked(fs.existsSync).mockReturnValue(false);
@@ -112,7 +122,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('docker subcommand', () => {
+    describe('docker subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'docker']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create docker files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
 
@@ -145,7 +165,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('aws subcommand', () => {
+    describe('aws subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'aws']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create AWS files when they do not exist', async () => {
       // Mock fs.existsSync to return false
       vi.mocked(fs.existsSync).mockReturnValue(false);
@@ -248,7 +278,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('gcp subcommand', () => {
+    describe('gcp subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'gcp']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create GCP files when they do not exist', async () => {
       // Mock fs.existsSync to return false
       vi.mocked(fs.existsSync).mockReturnValue(false);
@@ -318,7 +358,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('cloudflare subcommand', () => {
+    describe('cloudflare subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'cloudflare']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Cloudflare files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -355,7 +405,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('cloudflare-sandbox subcommand', () => {
+    describe('cloudflare-sandbox subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'cloudflare-sandbox']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Cloudflare Sandbox files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -390,7 +450,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('fly subcommand', () => {
+    describe('fly subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'fly']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Fly files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -424,7 +494,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('azure subcommand', () => {
+    describe('azure subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'azure']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Azure files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -460,7 +540,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('kubernetes subcommand', () => {
+    describe('kubernetes subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'kubernetes']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Kubernetes files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -493,7 +583,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('hetzner subcommand', () => {
+    describe('hetzner subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'hetzner']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Hetzner files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -525,7 +625,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('modal subcommand', () => {
+    describe('modal subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'modal']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Modal files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -557,7 +667,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('deno subcommand', () => {
+    describe('deno subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'deno']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Deno files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});
@@ -589,7 +709,17 @@ describe('deploy command', () => {
     });
   });
 
-  describe('vercel subcommand', () => {
+    describe('vercel subcommand', () => {
+    it('should exit if prompt is cancelled', async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(prompts).mockResolvedValue({ value: undefined });
+
+      await program.parseAsync(['node', 'test', 'deploy', 'vercel']);
+
+      expect(exitSpy).toHaveBeenCalledWith(0);
+      expect(fs.writeFileSync).not.toHaveBeenCalled();
+    });
+
     it('should create Vercel files when they do not exist', async () => {
       vi.mocked(fs.existsSync).mockReturnValue(false);
       vi.mocked(fs.writeFileSync).mockImplementation(() => {});

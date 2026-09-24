@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	11.880	150	12.63	63.0	discard	consolidate capture branching (initial slow run)
+2	2.498	150	60.05	63.3	discard	consolidate capture branching
+3	2.057	150	72.93	63.1	discard	consolidate capture branching
+4	2.241	150	66.95	63.1	discard	consolidate capture branching
+5	2.102	150	71.34	63.0	discard	consolidate capture branching
+6	2.127	150	70.53	63.2	discard	consolidate capture branching

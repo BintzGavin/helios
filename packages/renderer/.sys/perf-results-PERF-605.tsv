@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.346	150	111.42	69.9	discard	omit write callback
+2	1.327	150	113.06	70.1	discard	omit write callback
+3	1.341	150	111.89	70.1	discard	omit write callback

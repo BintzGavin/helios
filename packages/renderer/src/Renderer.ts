@@ -40,6 +40,7 @@ export class Renderer {
 
       const { args, inputBuffers } = firstWorker.strategy.getFFmpegArgs(this.options, outputPath);
       ffmpegManager.spawn(args, inputBuffers);
+      await ffmpegManager.waitUntilStarted();
 
       const ffmpegExitPromise = ffmpegManager.getExitPromise(pool.capturedErrors);
 

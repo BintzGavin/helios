@@ -8,22 +8,16 @@ export const PlaybackControls: React.FC = () => {
 
   const handleSpeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const rate = parseFloat(e.target.value);
-    if (controller) {
-      controller.setPlaybackRate(rate);
-    }
+    controller?.setPlaybackRate(rate);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
-    if (controller) {
-      controller.setAudioVolume(newVolume);
-    }
+    controller?.setAudioVolume(newVolume);
   };
 
   const handleMuteToggle = () => {
-    if (controller) {
-      controller.setAudioMuted(!muted);
-    }
+    controller?.setAudioMuted(!muted);
   };
 
   const handlePlayPause = () => {
@@ -41,21 +35,15 @@ export const PlaybackControls: React.FC = () => {
   };
 
   const handleRewind = () => {
-    if (controller) {
-      controller.seek(inPoint);
-    }
+    controller?.seek(inPoint);
   };
 
   const handlePrevFrame = () => {
-    if (controller) {
-      controller.seek(Math.max(0, currentFrame - 1));
-    }
+    controller?.seek(Math.max(0, currentFrame - 1));
   };
 
   const handleNextFrame = () => {
-    if (controller) {
-      controller.seek(currentFrame + 1);
-    }
+    controller?.seek(currentFrame + 1);
   };
 
   return (
@@ -188,6 +176,8 @@ export const PlaybackControls: React.FC = () => {
           outline: 'none'
         }}
       >
+        <option value="-4">⏪ -4x</option>
+        <option value="-2">⏪ -2x</option>
         <option value="-1">⏪ -1x</option>
         <option value="0.25">0.25x</option>
         <option value="0.5">0.5x</option>

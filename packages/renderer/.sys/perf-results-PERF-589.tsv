@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.287	150	116.51	42.2	keep	Inline FFmpeg stdin writes
+2	1.249	150	120.14	42.2	keep	Inline FFmpeg stdin writes
+3	1.212	150	123.77	44.9	keep	Inline FFmpeg stdin writes

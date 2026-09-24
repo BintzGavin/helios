@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.904	150	51.65	62.8	discard	eliminate frameReadyRing
+2	2.814	150	53.30	63.0	discard	eliminate frameReadyRing
+3	2.830	150	53.00	62.8	discard	eliminate frameReadyRing

@@ -1,7 +1,9 @@
-## 0.120.4 - Timeline Drag Drop
-**Learning:** React drag events need `e.preventDefault()` on both `onDragOver` and `onDrop` to successfully trigger the drop event and calculate correct timeline placement metrics using cursor coordinates. And `playerState.schema` values might not have `inputProps` locally defined but it's available via context logic.
-**Action:** Always ensure dragover receives `e.preventDefault()` to bypass default browser behaviors preventing the drop action.
+## 0.122.2 - Ensure clean state for mock inputs
+**Learning:** Testing component behaviour dependent on generic HTML nodes without ARIA labels or `id`s causes standard queries like `getByLabelText` to fail. File `<input>` inputs for instance are challenging to select if lacking `id` or direct labeling.
+**Action:** Use CSS selector fallback like `document.querySelector('input[type="file"]')` or directly query `container.querySelector` in test files when standard React Testing Library queries fail for unlabelled hidden inputs.
 
-## 0.121.10 - Update Keyboard Shortcuts Documentation
-**Learning:** IMPOSSIBLE: DUPLICATION. The requested feature in `2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation.md` to add JKL shortcuts to `KeyboardShortcutsModal.tsx` is already implemented. The `Playback` section already includes `J`, `K`, and `L` shortcuts.
-**Action:** Always check the codebase before implementing documentation updates to avoid duplicating effort.
+\n## 0.122.9 - Improving act() React testing blocks\n**Learning:** Components that invoke side effects affecting context state immediately on mount or user interaction can leak asynchronous updates outside of the normal testing boundaries, triggering  console warnings if not handled properly.\n**Action:** Ensure asynchronous mounts like  are wrapped with  and interactions like  updates are encapsulated using  correctly.
+
+## 0.122.9 - Improving React testing boundaries
+**Learning:** Components that invoke side effects affecting context state immediately on mount or user interaction can leak asynchronous updates outside of the normal testing boundaries, triggering act() console warnings if not handled properly.
+**Action:** Ensure asynchronous mounts like render() are wrapped with await act(async () => { ... }) and interactions like fireEvent updates are encapsulated correctly.

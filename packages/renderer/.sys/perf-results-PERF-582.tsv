@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.639	150	91.52	42.3	discard	inlining setTime promise
+2	1.791	150	83.76	42.1	discard	inlining setTime promise
+3	1.788	150	83.89	42.2	discard	inlining setTime promise

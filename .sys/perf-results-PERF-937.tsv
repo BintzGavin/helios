@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.315	1000000	760456.27	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.334)
+2	1.265	1000000	790513.83	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.295)
+3	1.273	1000000	785545.95	0.0	keep	Use strict equality for progress tracking (baseline >=: 1.315)

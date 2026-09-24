@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.723	150	55.09	62.7	keep	baseline
+2	2.746	150	54.63	63.0	keep	baseline
+3	2.550	150	58.82	62.7	keep	baseline
+4	2.650	150	56.59	62.2	discard	remove diagnostic logs
+5	2.665	150	56.28	62.0	discard	remove diagnostic logs

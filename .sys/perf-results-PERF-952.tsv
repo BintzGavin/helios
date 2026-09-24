@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.840	300	357.14	100.0	keep	Baseline
+2	0.835	300	359.28	100.0	keep	if (writeSuccess) else if (pendingBytes)
+3	0.835	300	359.28	100.0	keep	if (writeSuccess) else if (pendingBytes)

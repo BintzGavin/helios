@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.075	300000	4000000	100	keep	Chunked progress counter in multi-worker path

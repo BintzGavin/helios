@@ -331,3 +331,6 @@
 - ✅ Completed: Refactor Player Export - Extracted `ClientSideExporter`, added cancellation support, and modularized controllers.
 - ✅ Completed: Sandbox and Bridge - Implemented `postMessage` bridge and sandboxed iframe support.
 - ✅ Completed: Refactor Player Control Logic - Verified `<helios-player>` uses `window.helios` and supports client-side export.
+
+### PLAYER v0.78.2
+- ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.

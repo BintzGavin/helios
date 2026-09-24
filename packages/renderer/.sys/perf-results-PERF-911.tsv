@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.708	100000000	0.00	0.0	keep	PERF-911 strict equality nextFrameToSubmit (baseline: 0.733s)
+2	0.707	100000000	0.00	0.0	keep	PERF-911 strict equality nextFrameToSubmit (baseline: 0.732s)

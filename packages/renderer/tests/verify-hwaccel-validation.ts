@@ -4,8 +4,20 @@ import fs from 'fs';
 
 const OUTPUT_PATH = path.join(process.cwd(), 'verify-hwaccel-output.mp4');
 
-// Minimal composition
-const COMPOSITION = `data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sPgo8aGVhZD4KICA8c3R5bGU+Ym9keSB7IGJhY2tncm91bmQ6IHJlZDsgfTwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CiAgPGgxPkhXIEFjY2VsIFRlc3Q8L2gxPgo8L2JvZHk+CjwvaHRtbD4=`;
+// Minimal canvas composition
+const COMPOSITION = `data:text/html;charset=utf-8,${encodeURIComponent(`
+  <!doctype html>
+  <html>
+    <body style="margin:0">
+      <canvas width="100" height="100"></canvas>
+      <script>
+        const context = document.querySelector('canvas').getContext('2d');
+        context.fillStyle = 'red';
+        context.fillRect(0, 0, 100, 100);
+      </script>
+    </body>
+  </html>
+`)}`;
 
 async function run() {
   console.log('Verifying Hardware Acceleration Validation...');

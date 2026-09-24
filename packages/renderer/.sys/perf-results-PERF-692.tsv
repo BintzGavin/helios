@@ -1,0 +1,8 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.886	150	51.97	63.6	keep	avoid setTime thenable
+2	2.840	150	52.82	63.6	keep	avoid setTime thenable
+3	2.528	150	59.34	63.7	keep	avoid setTime thenable
+4	2.397	150	62.57	63.8	keep	avoid setTime thenable
+5	2.335	150	64.24	63.6	keep	avoid setTime thenable
+6	2.361	150	63.52	63.5	keep	avoid setTime thenable
+7	2.338	150	64.16	63.5	keep	avoid setTime thenable

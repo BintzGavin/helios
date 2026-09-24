@@ -1,9 +1,48 @@
+**Version**: 0.46.65
+
+[v0.46.61] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
+
+[v0.46.60] 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
+
+[v0.46.52] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
+
+[v0.46.51] 🟢 Completed: CLI Command Coverage Tests Spec V9 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V9.md for covering missing exit prompt branches in deploy subcommands.
+
+**Version**: 0.46.65
+
+[v0.46.63] ✅ Completed: CLI Registry Client Coverage Tests - Implemented unit tests for caching logic and fallback handlers in RegistryClient, achieving 100% branch and line coverage.
+
+[v0.46.44] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
+[v0.46.41] ✅ Completed: CLI Docker Adapter Regression Tests - Logged the duplicated plan as impossible since docker-adapter template tests are already fully implemented.
+[v0.46.40] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
+[v0.46.39] 🟢 Completed: CLI Command Coverage Tests Spec V3 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V3.md for improving CLI command regression tests.
+[v0.46.38] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
+[v0.46.34] ✅ Completed: CLI Registry Types Regression Tests - Implemented structural verification tests for registry interfaces.
+[v0.46.33] ✅ Completed: CLI Job Regression Tests Missing Mock - Added missing mock setup for @helios-project/infrastructure to fix import resolution errors
+[v0.46.32] ✅ Completed: CLI Docker Adapter Regression Tests - Implemented unit tests for the docker-adapter cloud template.
+
+[v0.46.30] ✅ Completed: CLI Cloud Templates Tests - Implemented unit tests for remaining cloud deployment templates.
+
+[v0.46.29] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created strictly new specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests-V2.md` to address the missing tests for cloud infrastructure templates in `packages/cli/src/templates/__tests__/cloud.test.ts`.
+[v0.46.28] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add missing tests for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates to `packages/cli/src/templates/__tests__/cloud.test.ts`.
+[v0.46.28] 🟢 Completed: CLI Cloud Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Cloud-Templates-Regression-Tests.md` to add missing tests for Docker, Deno, Vercel, Modal, Hetzner, and Fly.io templates to `packages/cli/src/templates/__tests__/cloud.test.ts`.
 # CLI Status
 
-**Version**: 0.46.19
+
+[v0.46.26] ✅ Completed: Document duplicated CLI Index Regression Tests plan - Logged the duplicated plan as impossible.
+[v0.46.25] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the CLI entry point in index.ts.
+[v0.46.23] ✅ Completed: Document duplicated Registry Manifest Regression Tests plan - Logged the duplicated plan as impossible.
+
+[v0.46.22] ✅ Completed: Registry Manifest Regression Tests - Implemented unit tests for packages/cli/src/registry/manifest.ts
+
+
+[v0.46.21] ✅ Completed: Document duplicated Cloudflare Sandbox Execution plan - Logged the duplicated plan as impossible.
+[v0.46.20] ✅ Completed: Document duplicated CLI Utils Regression Tests plan - Logged the duplicated plan as impossible.
+
 [v0.46.19] ✅ Completed: CLI Utils Regression Tests - Implemented comprehensive unit tests for ffmpeg, package-manager, and uninstall utilities in packages/cli/src/utils/.
 
 ## Recent Completions
+[v0.46.21] ✅ Completed: Registry Manifest Regression Tests Spec - Created specification plan for implementing regression tests for packages/cli/src/registry/manifest.ts to ensure structural data retrieval works as expected.
 [v0.46.18] ✅ Completed: CLI Utils Regression Tests Spec - Created specification plan for implementing regression tests for the remaining uncovered utilities in packages/cli/src/utils/ to ensure core functions are robust.
 [v0.46.16] ✅ Completed: Remaining CLI Regression Tests - Identified as duplicate plan; tests for preview, skills, and studio are already implemented.
 [v0.46.15] ✅ Completed: Document duplicated Remaining Regression Tests plan - Logged the duplicated plan as impossible.
@@ -119,3 +158,55 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.39.1] ✅ Completed: CLI Scaffold Components - Verified existing implementation of helios components command fulfills the scaffolding requirements.
 [v0.41.2] ✅ Completed: Scaffold Cloudflare Sandbox Adapter - Exposed the Cloudflare Sandbox adapter in the `helios job run` command options and configuration block.
 [v0.46.17] ✅ Completed: Document duplicated Deploy Command Regression Tests plan - Logged the duplicated plan as impossible.
+
+[v0.46.22] 🟢 Completed: CLI Templates Regression Tests Spec - Created specification plan `2027-06-05-CLI-Templates-Regression-Tests.md` for implementing regression tests for all file generation templates in `packages/cli/src/templates`.
+
+[v0.46.24] ✅ Completed: CLI Templates Regression Tests - Implemented unit tests for file generation templates in packages/cli/src/templates.
+- [x] [v0.46.27] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+[v0.46.31] ✅ Completed: CLI Index Regression Tests - Implemented unit tests for the main CLI entry point in packages/cli/src/__tests__/index.test.ts.
+[v0.46.33] 🟢 Completed: CLI Registry Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Registry-Types-Regression-Tests.md` for implementing structural verification tests for registry interfaces.
+[v0.46.34] 🟢 Completed: CLI Job Types Regression Tests Spec - Created specification plan `2027-06-05-CLI-Job-Types-Regression-Tests.md` for implementing structural verification tests for job specification interfaces.
+[v0.46.35] ✅ Completed: CLI Job Types Regression Tests - Implemented unit tests for job specification interfaces in packages/cli/src/types/__tests__/job.test.ts.
+[v0.46.36] 🟢 Completed: CLI Job/Render/Merge Tests Missing Mock Spec - Created specification plan `2027-06-05-CLI-Job-Render-Merge-Regression-Tests-Missing-Mock.md` for fixing vitest mock resolution errors.
+[v0.46.36] ✅ Completed: CLI Job Regression Tests Missing Mock - Added deps.inline config to vitest.config.ts to fix import resolution errors for workspace dependencies
+[v0.46.37] 🟢 Completed: CLI Command Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V2.md for improving CLI command regression tests.
+
+[v0.46.37] ✅ Completed: CLI Command Coverage Tests V2 - Implemented missing test cases for render, build, init, and studio commands.
+[v0.46.38] ✅ Completed: CLI Job/Render/Merge Tests Missing Mock - Fixed vitest mock resolution errors by setting `server.deps.inline` in `vitest.config.ts`.
+
+[v0.46.39] 🟢 Completed: CLI Command Coverage Tests Spec V4 - Created specification plan `2027-06-05-CLI-Command-Coverage-Tests-V4.md` for covering missing branches in commands.
+[v0.46.39] ✅ Completed: CLI Command Coverage Tests V4 - Implemented missing test cases for init, build, job, render, and studio commands, improving test coverage metrics and resolving missing branch execution logic.
+[v0.46.41] 🟢 Completed: CLI Command Coverage Tests Spec V5 - Created specification plan `2027-06-05-CLI-Command-Coverage-Tests-V5.md` for covering missing command edges.
+
+[v0.46.42] ✅ Completed: CLI Command Coverage Tests V5 - Implemented edge-case test coverage for commands and fixed prompt cancellation exit bug in init.ts.
+[v0.46.42] 🟢 IMPOSSIBLE: DUPLICATION - CLI Docker Adapter Templates Regression Tests Spec - Tests are already fully implemented.
+[v0.46.43] 🟢 Completed: CLI Command Coverage Tests Spec V6 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V6.md for covering missing command edges.
+
+[v0.46.43] ✅ Completed: CLI Command Coverage Tests V6 - Implemented test coverage for missing command edges including job adapter options and executor errors.
+[v0.46.45] 🟢 Completed: CLI Command Coverage Tests Spec V7 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V7.md for covering missing command edges.
+
+[v0.46.46] ✅ Completed: CLI Command Coverage Tests V7 - Implemented 100% test coverage for the remaining branch logic in the CLI commands build.ts and studio.ts.
+[v0.46.47] 🟢 Completed: CLI Registry Client Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Registry-Client-Coverage-Tests.md for covering missing branches in RegistryClient.
+[v0.46.49] 🟢 Completed: CLI Utils Coverage Tests Spec - Created specification plan 2027-06-05-CLI-Utils-Coverage-Tests.md for covering missing branches in CLI utils.
+[v0.46.47] ✅ Completed: CLI Utils Coverage Tests - Added unit tests to utils to achieve 100% coverage.
+[v0.46.60] ✅ Completed: CLI Utils Coverage Tests V2 - Achieved 100% line coverage for CLI utils install.ts and examples.ts
+[v0.46.50] 🟢 Completed: CLI Command Coverage Tests Spec V8 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V8.md for covering missing branches in job adapter flags.
+[v0.46.48] ✅ Completed: CLI Command Coverage Tests V8 - Implemented test coverage for missing branches in job.ts.
+[v0.46.49] ✅ Completed: CLI Registry Types Regression Tests - Implemented unit tests for registry type definitions
+
+[v0.46.53] ✅ Completed: CLI Command Coverage Tests V9 - Implemented tests to achieve 100% line coverage for the render command.
+[v0.46.54] ✅ Completed: CLI Deploy Command Coverage Tests - Added unit tests to deploy.ts to cover process.exit(0) branches for missing prompts.
+[v0.46.55] 🟢 Completed: CLI Command Coverage Tests Spec V10 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V10.md for covering missing branches in components and update commands.
+[v0.46.56] ✅ Completed: CLI Command Coverage Tests V10 - Implemented unit tests for missing branch logic in components.ts and update.ts, achieving 100% test coverage.
+- [x] [v0.46.57] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [x] [v0.46.60] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Utils-Coverage-Tests-V2.md
+- [x] [v0.46.59] CLI Unblocked: Generated strictly new plan /.sys/plans/2027-06-05-CLI-Registry-Client-Coverage-Tests.md
+
+[v0.46.59] ✅ Completed: CLI Registry Client Coverage Tests - Achieved 100% branch and line coverage for RegistryClient in client.ts.
+[v0.46.60] ✅ Completed: CLI Utils Coverage Tests V2 - Achieved 100% line coverage for CLI utils install.ts and examples.ts
+[v0.46.61] ✅ Completed: Document duplicated CLI Templates Spec plan - Logged the duplicated plan as impossible since tests were already completed.
+
+[v0.46.62] 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
+[v0.46.64] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
+
+- [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/

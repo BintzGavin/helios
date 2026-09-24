@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	1.954	150	76.77	81.6	keep	Chunked loops to hoist progress reporting checks
+2	1.948	150	77.00	82.1	keep	Chunked loops to hoist progress reporting checks
+3	1.950	150	76.92	81.9	keep	Chunked loops to hoist progress reporting checks

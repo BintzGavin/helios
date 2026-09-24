@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	5.400	600	111.11	50.0	keep	Merge runWorker loops in multi-worker

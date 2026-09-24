@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	19.070	600	31.46	42.9	discard	PERF-507: Inline stability check (await client.send directly)
+2	17.631	600	34.03	37.3	discard	PERF-507: Inline stability check (await client.send directly)
+3	17.778	600	33.75	38.0	discard	PERF-507: Inline stability check (await client.send directly)
+4	17.773	600	33.76	40.8	discard	PERF-507: Inline stability check (await client.send directly)

@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.835	600	55.38	44.1	keep	baseline
+2	10.805	600	55.53	43.1	keep	baseline
+3	10.889	600	55.10	43.3	discard	remove --disable-dev-shm-usage
+4	10.560	600	56.82	43.4	discard	remove --disable-dev-shm-usage
+5	11.010	600	54.50	39.8	discard	remove --disable-dev-shm-usage
+6	11.031	600	54.39	47.9	discard	remove --disable-dev-shm-usage

@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.777	150	54.02	4.4	keep	baseline
+2	2.715	150	55.25	4.4	keep	baseline
+3	2.689	150	55.78	4.4	keep	baseline
+4	2.719	150	55.17	4.4	discard	promise loop refactor
+5	2.734	150	54.86	4.4	discard	promise loop refactor
+6	2.785	150	53.87	4.4	discard	promise loop refactor

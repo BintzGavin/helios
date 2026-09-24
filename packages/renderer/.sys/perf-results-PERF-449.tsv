@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	10.390	600	57.75	42.2	keep	Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists
+2	10.516	600	57.06	42.7	keep	Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists
+3	10.553	600	56.86	38.5	keep	Skip Media Sync CDP Call in CdpTimeDriver When No Media Exists

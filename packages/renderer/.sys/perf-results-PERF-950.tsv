@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	12.500	600	48.00	500.0	keep	inline buffer allocation and base64 length calc

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	19.800	600	30.30	510.0	keep	baseline
+2	19.500	600	30.76	510.1	keep	Cached decoded Base64 buffers for unchanged frames in single-worker !hasProcessFn path
+3	19.450	600	30.84	510.2	keep	Cached decoded Base64 buffers for unchanged frames in single-worker !hasProcessFn path

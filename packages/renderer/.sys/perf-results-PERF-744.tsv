@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	2.470	150	60.73	62.8	keep	ReusableAggregator concurrency

@@ -7,18 +7,15 @@ import { useStudio, Composition } from '../../context/StudioContext';
 // Mock dependencies
 vi.mock('../../context/StudioContext');
 vi.mock('../ConfirmationModal/ConfirmationModal', () => ({
-  ConfirmationModal: ({ isOpen, onConfirm, onCancel, title, message }: any) => isOpen ? (
+  ConfirmationModal: ({ isOpen, onConfirm, onClose, title, message }: any) => isOpen ? (
     <div data-testid="confirmation-modal">
       <h1>{title}</h1>
       <p>{message}</p>
       <button onClick={onConfirm}>Confirm</button>
-      <button onClick={onCancel}>Cancel</button>
+      <button onClick={onClose}>Cancel</button>
     </div>
   ) : null
 }));
-
-// Mock icons in CompositionItem or rely on text
-// CompositionItem is likely rendering some text, let's just rely on what's in the DOM.
 
 describe('CompositionsPanel', () => {
   const mockSetActiveComposition = vi.fn();
@@ -88,6 +85,15 @@ describe('CompositionsPanel', () => {
     expect(screen.getByText('No compositions yet.')).toBeDefined();
   });
 
+  it('renders empty state when no matches found', () => {
+    render(<CompositionsPanel />);
+
+    const searchInput = screen.getByPlaceholderText('Search...');
+    fireEvent.change(searchInput, { target: { value: 'Delta' } });
+
+    expect(screen.getByText('No matches found.')).toBeDefined();
+  });
+
   it('filters compositions by search query', () => {
     render(<CompositionsPanel />);
 
@@ -136,29 +142,11 @@ describe('CompositionsPanel', () => {
     expect(mockSetDuplicateOpen).toHaveBeenCalledWith(true);
   });
 
-  it('handles delete flow', async () => {
+  it('handles delete flow with confirmation', async () => {
     render(<CompositionsPanel />);
 
-    // Find delete button for Alpha. It's usually an icon.
-    // In CompositionItem, we need to know what the delete button looks like.
-    // Assuming it has a title="Delete" or similar accessibility label.
-    // If not, we might need to look at CompositionItem.tsx.
-    // Let's assume title="Delete" based on common patterns, or class.
-
-    // Actually, let's check CompositionItem to be sure.
-    // But for now, let's try to query by title.
     const deleteBtns = screen.getAllByTitle('Delete');
-    fireEvent.click(deleteBtns[0]); // Click delete for first item (Alpha probably, or maybe Folder comes first?)
-
-    // Sort order: Folders first. So Folder is first, but does Folder have a delete button?
-    // CompositionTree implementation handles on delete for items.
-
-    // Wait, let's look at sortNodes in tree.ts: Folders first.
-    // So Folder is first. Does Folder have delete? Not in the provided CompositionTree.tsx.
-    // Only CompositionItem has onDelete passed.
-
-    // So the first Delete button should correspond to the first Composition (Alpha or Beta).
-    // Let's just click one.
+    fireEvent.click(deleteBtns[0]);
 
     expect(screen.getByTestId('confirmation-modal')).toBeDefined();
     expect(screen.getByText(/Are you sure you want to delete/)).toBeDefined();
@@ -170,4 +158,68 @@ describe('CompositionsPanel', () => {
       expect(mockDeleteComposition).toHaveBeenCalled();
     });
   });
+
+  it('handles cancel delete flow', async () => {
+    render(<CompositionsPanel />);
+
+    const deleteBtns = screen.getAllByTitle('Delete');
+    fireEvent.click(deleteBtns[0]);
+
+    expect(screen.getByTestId('confirmation-modal')).toBeDefined();
+
+    const cancelBtn = screen.getByText('Cancel');
+    fireEvent.click(cancelBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('confirmation-modal')).toBeNull();
+      expect(mockDeleteComposition).not.toHaveBeenCalled();
+    });
+  });
+
+  it('handles handleConfirmDelete without deleteTarget', async () => {
+    render(<CompositionsPanel />);
+  });
+
+  it('toggles folder expansion', () => {
+    render(<CompositionsPanel />);
+
+    const folderHeader = screen.getByText('Folder');
+    expect(screen.queryByText('Gamma Composition')).toBeNull();
+
+    fireEvent.click(folderHeader);
+
+    expect(screen.getByText('Gamma Composition')).toBeDefined();
+
+    fireEvent.click(folderHeader);
+    expect(screen.queryByText('Gamma Composition')).toBeNull();
+  });
+
+  it('renders nested folders correctly', () => {
+    (useStudio as any).mockReturnValue({
+      compositions: [
+        {
+          id: 'folder/subfolder/comp-4',
+          name: 'Delta Composition',
+          url: '/src/compositions/folder/subfolder/delta.ts'
+        }
+      ],
+      activeComposition: null,
+      setActiveComposition: mockSetActiveComposition,
+      setCreateOpen: mockSetCreateOpen,
+      setDuplicateOpen: mockSetDuplicateOpen,
+      setDuplicateTargetId: mockSetDuplicateTargetId,
+      deleteComposition: mockDeleteComposition
+    });
+
+    render(<CompositionsPanel />);
+
+    const folderHeader = screen.getByText('Folder');
+    fireEvent.click(folderHeader);
+
+    const subFolderHeader = screen.getByText('Subfolder');
+    fireEvent.click(subFolderHeader);
+
+    expect(screen.getByText('Delta Composition')).toBeDefined();
+  });
+
 });

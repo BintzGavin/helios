@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	14.046	600	42.71	0.0	discard	Inline CDP evaluate parameters
+2	16.518	600	36.32	0.0	discard	Inline CDP evaluate parameters
+3	13.902	600	43.15	0.0	discard	Inline CDP evaluate parameters

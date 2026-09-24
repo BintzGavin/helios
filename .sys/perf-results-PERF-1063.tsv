@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	9.900	300	30.30	500.0	keep	unroll-worker-cleanup-loops
+2	9.900	300	30.30	500.0	keep	unroll-worker-cleanup-loops
+3	9.900	300	30.30	500.0	keep	unroll-worker-cleanup-loops

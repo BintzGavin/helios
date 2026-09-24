@@ -32,7 +32,15 @@ async function exists(filePath: string): Promise<boolean> {
   }
 }
 
+let configuredProjectRoot: string | undefined;
+export function configureProjectRoot(root: string) {
+  const resolved = path.resolve(root);
+  if (configuredProjectRoot && configuredProjectRoot !== resolved) throw new Error('Studio is already bound to another project.');
+  configuredProjectRoot = resolved;
+}
+
 export function getProjectRoot(cwd: string): string {
+  if (configuredProjectRoot) return configuredProjectRoot;
   if (process.env.HELIOS_PROJECT_ROOT) {
     return path.resolve(process.env.HELIOS_PROJECT_ROOT);
   }

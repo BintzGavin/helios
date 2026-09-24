@@ -1,3 +1,207 @@
+## LLMS v1.122.5
+- ✅ Completed: Daily llms.txt Review
+  - Verified packages/studio/src/index.ts was already correctly absent from Key Files for Agents.
+
+### LLMS v1.122.3
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match package.json.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+### LLMS v1.122.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Improve Omnibar Test Coverage, Refine CLI Component Removal, Asset Drag and Drop; CLI: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests; Core: Generic Input Props, Active Clips, Composition Schema; Player: Document getSchema API Parity, Bridge Coverage Completeness, Bridge Coverage Expansion; Renderer: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic; Infrastructure: Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage).
+  - Verified package versions exactly match package.json.
+  - Verified all File Paths and Key Files.
+
+### LLMS v1.121.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: AudioMixerPanel Coverage, AssetsPanel Coverage, PlaybackControls Coverage; CLI: CLI Command Coverage Tests V10, CLI Deploy Command Coverage, CLI Registry Types Regression Tests; Player: Remove Unsupported EME, Document getController, Document HTMLMediaElement Constants).
+  - Verified package versions exactly match package.json.
+  - Verified all File Paths and Key Files.
+
+### LLMS v1.120.0
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match package.json.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+
+### LLMS v1.117.1
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Preview Command, CLI Build Command; CLI: Command Coverage Tests V7, Utils Coverage Tests V2; Core: WaitUntilStable, diagnose; Player: Refactor Player Control Logic, setMediaKeys; Renderer: Smart Codec Selection, CdpTimeDriver Iframe Sync; Infrastructure: CloudRun Coverage, Modal Adapter).
+  - Fixed Core API example in llms.txt (using start and duration).
+  - Verified package versions exactly match package.json.
+  - Verified all File Paths and Key Files.
+
+### LLMS v1.114.0
+- ✅ Completed: Daily llms.txt Review
+  - Added `packages/studio/src/server/render-manager.ts` to Key Files for Agents.
+  - Verified all file paths and package versions.
+
+### LLMS v1.112.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Core: Generic Input Props, Active Clips; Studio: Improve Omnibar Test Coverage, Asset Drag and Drop; Player: Document getSchema API Parity, Bridge Coverage; Renderer: Validate HW Accel, Orchestrator Plan; CLI: CLI Command Coverage V9; Infrastructure: Optimize GCS Uploads, Orchestrator Coverage Expansion).
+  - Verified package versions exactly match package.json.
+
+### LLMS v1.111.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Core: Diagnose, WaitUntilStable, Testing; Studio: CLI Build/Update, Refine Skills; Player: Sandbox, Bridge, setMediaKeys; Renderer: Smart Audio Fades, Distributed Audio Mixing; CLI: Command Coverage V4/V7, Docker Tests; Infrastructure: S3 Uploads, Orchestrator Coverage).
+  - Verified package versions exactly match package.json.
+
+### LLMS v1.110.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Quick Facts and Roadmap with true package versions (Core v5.13.0+, Studio v0.107.1+, Player v0.78.1+, Renderer v1.78.3+, CLI v0.45.2+, Infrastructure v0.25.0+).
+  - Fixed version drift in llms.txt.
+  - Updated Roadmap completions to accurately reflect progress for the aligned versions.
+  - Verified all Key Files and Agent Skills sections.
+
+### LLMS v1.109.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts and Roadmap with the current package versions (Studio v0.121.11+, Player v0.77.5+, Renderer v1.79.0+, CLI v0.46.53+, Infrastructure v0.54.26+).
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Asset Drag and Drop; CLI: Scaffold Cloudflare Sandbox Deployment, Scaffold Hetzner Deployment; Player: Document getSchema API Parity; Renderer: Canvas Image Preload; Infrastructure: CloudRun Resiliency Tests).
+
+### LLMS v1.104.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress logs (added Component Management for Studio, Tier 3 Cloud Execution Adapters for CLI and Infrastructure).
+  - Verified all file paths and key files.
+  - Verified package versions perfectly match `package.json`.
+
+## LLMS v1.103.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio, CLI, Core, Player, Renderer, Infrastructure)
+  - Verified package versions perfectly match `package.json` exactly
+  - Verified all file paths and Key Files for Agents
+  - Incremented version to 1.103.0
+
+## LLMS v1.100.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio TimelineAudioTrack Regression Tests, CLI Command Coverage Tests V4-V7, Player Bridge Coverage Expansion, Infrastructure Orchestrator Coverage Expansion)
+  - Verified package versions and API examples match `package.json` and `packages/core/src/index.ts` exactly
+  - Verified Key Files for Agents match existing paths
+  - Incremented version to 1.100.0
+
+## LLMS v1.99.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress across Studio, CLI, and Player
+  - Verified package versions matched package.json exactly
+  - Verified all agent file paths
+
+## LLMS v1.98.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated API examples for Core
+  - Synced roadmap with progress across Studio, CLI, Core, Player, Renderer, and Infrastructure
+  - Verified package versions matched package.json exactly
+  - Verified all agent file paths
+
+## LLMS v1.94.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress across Studio, CLI, and Infrastructure
+  - Verified package versions matched package.json exactly
+  - Verified all agent file paths
+## LLMS v1.93.0
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, CLI v0.45.2+, Renderer v1.78.3+, Infrastructure v0.25.0+).
+  - Verified Key Files paths.
+
+## LLMS v1.92.0
+- ✅ Completed: Daily llms.txt Review
+  - Added new Roadmap completions to Core (Enable Audio State Persistence, Audio Fade Easing)
+  - Retained factual alignment of Quick Facts to package.json exact versions
+  - Verified Key Files paths exist
+
+## LLMS v1.91.1
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (CLI Docker Adapter/Cloudflare Sandbox Execution, Player Bridge Coverage, Infrastructure Optimize S3 Uploads).
+  - Verified all package versions match package.json exactly.
+  - Verified Key Files and Agent Skills paths.
+
+## LLMS v1.91.0
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions (Studio v0.107.1+, Player v0.76.20+, CLI v0.45.2+, Renderer v1.78.3+, Infrastructure v0.25.0+).
+  - Synced Roadmap with recent verifiable completions.
+  - Verified package versions and API examples.
+
+## LLMS v1.90.0
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions.
+  - Synced Roadmap features with verified completions across domains (CLI Docker Adapter Regression Tests, Document Event Handlers, Infrastructure Coverage Expansion, etc.).
+  - Verified package versions and API examples.
+
+## LLMS v1.89.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated versions in Quick Facts and Roadmap to match current package.json versions:
+    - Studio: v0.121.22+
+    - CLI: v0.46.40+
+    - Player: v0.77.46+
+    - Renderer: v1.80.1+
+    - Infrastructure: v0.54.28+
+  - Updated Roadmap with recent completions from domain PROGRESS logs:
+    - CLI: CLI Command Coverage Tests V4, CLI Job Types Regression Tests, CLI Registry Types Regression Tests
+    - Player: Document Missing Events, Add onaudiometering event handler, Fix API Parity srcObject
+    - Infrastructure: Modal Adapter, CloudRun & Local Worker Adapter Coverage
+  - Verified Agent Skills paths
+  - Verified API examples
+
+## LLMS v1.88.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Quick Facts and Roadmap to reflect latest versions (Studio v0.121.11+, CLI v0.46.26+, Player v0.77.5+, Renderer v1.79.0+, Infrastructure v0.54.26+).
+  - Synced Roadmap features across all domains.
+  - Verified Key Files and Agent Skills section.
+
+## LLMS v1.86.7
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Refine CLI Component Removal, Bridge Coverage Completeness, Enable Audio State Persistence, Fix Verification Script Regression, Orchestrator Test Coverage Expansion).
+  - Removed invalid `docs/prompts/` link from the Links section.
+  - Verified package versions match package.json exactly.
+  - Incremented version to 1.86.7
+
+## LLMS v1.86.5
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Updated Quick Facts and package versions to match the latest status versions from domain docs.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.5
+
+## LLMS v1.86.1
+- ✅ Completed: Daily llms.txt Review
+  - Verified package versions match package.json exactly.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it is up-to-date and accurate.
+
+## LLMS v1.86.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (TimelineAudioTrack Regression Tests, Bridge Coverage Expansion).
+  - Verified package versions match package.json exactly.
+  - Incremented version to 1.86.0
+
+## LLMS v1.85.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: CLI Templates Regression Tests
+    - Infrastructure: InMemoryJobRepository Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.85.0
+
+## LLMS v1.84.4
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Asset Drag and Drop
+    - CLI: Scaffold Cloudflare Sandbox Deployment, All Worker Execution
+    - Player: Bridge Coverage Completeness, Regression Tests for Audio Fader
+    - Renderer: Validate HW Accel, Orchestrator Plan
+    - Infrastructure: Optimize GCS Uploads, CloudRun Resiliency Tests
+  - Verified package versions match `package.json` exactly.
+
+## LLMS v1.84.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated DiagnosticReport API example (audioDecoders, userAgent)
+  - Synced Roadmap with recent verifiable completions from domain PROGRESS logs.
+
+## LLMS v1.83.0
+- ✅ Completed: Daily llms.txt Review
+  - Fixed DiagnosticReport API example to match Core package
+  - Removed deprecated PROGRESS.md file path
+
 ## LLMS v1.81.0
 - ✅ Completed: Daily llms.txt Review
   - Synced Roadmap in llms.txt with recent completions from domain PROGRESS logs:
@@ -63,6 +267,15 @@
   - Verified package versions against actual package.json files.
 
 # LLMS Progress
+
+## LLMS v1.86.2
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: Cloudflare Sandbox Adapter support to job run
+    - Player: Document Undocumented Shortcuts, Document getSchema API Parity
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.2
 
 ## LLMS v1.74.0
 - ✅ Completed: Daily llms.txt Review
@@ -706,3 +919,218 @@
   - Verified package versions match `package.json` exactly.
   - Verified File Paths and Key Files.
   - Incremented version to 1.77.0
+
+## LLMS v1.82.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Verified package versions match `package.json` exactly.
+  - Incremented version to 1.82.0
+
+
+## LLMS v1.81.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Verified package versions match `package.json` exactly.
+  - Incremented version to 1.81.1
+
+## LLMS v1.84.1
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: Registry Manifest Regression Tests, CLI Utils Regression Tests
+    - Player: Bridge Coverage Expansion
+    - Infrastructure: Orchestrator Coverage Expansion, FfmpegStitcher Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.84.1
+
+## LLMS v1.84.2
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - Studio: Export Job Spec
+    - CLI: Scaffold Hetzner Deployment Command
+    - Player: Regression Tests for Media Session
+    - Renderer: Abstraction for Pluggable Execution
+    - Infrastructure: InMemoryJobRepository Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.84.2
+
+## LLMS v1.84.3
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs.
+  - Fixed Agent Skill paths to explicitly point to `.agents/skills/helios-skills/skills/*`.
+  - Verified package versions match `package.json` exactly.
+
+## LLMS v1.86.3
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: CLI Job Regression Tests Missing Mock, CLI Docker Adapter Regression Tests, CLI Cloud Templates Tests
+    - Player: Improve index.ts test coverage
+    - Renderer: WebCodecs Preference, Update Skill Documentation
+    - Infrastructure: Optimize S3 Uploads
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.3
+
+## LLMS v1.86.4
+- ✅ Completed: Daily llms.txt Review
+  - Verified package versions match package.json exactly.
+  - Verified Roadmap reflects the true project state across domains.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+## LLMS v1.86.6
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions.
+  - Added CLI Index Regression Tests to Roadmap.
+  - Verified package versions and API examples.
+
+## LLMS v1.86.8
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs:
+    - CLI: CLI Registry Types Regression Tests, CLI Docker Adapter Regression Tests, CLI Cloud Templates Tests, CLI Index Regression Tests
+    - Player: Bridge Coverage Expansion, Regression Tests for Audio Fader, Regression Tests for MediaProperties, Regression Tests for InputProps
+    - Renderer: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic, Refactor DOM Traversal, Fix Verification Script Regression, Abstraction for Pluggable Execution
+    - Infrastructure: Optimize GCS Uploads, Orchestrator Coverage Expansion, InMemoryJobRepository Coverage
+  - Verified package versions match `package.json` exactly.
+  - Verified File Paths and Key Files.
+  - Incremented version to 1.86.8
+
+### LLMS v1.86.9
+- ✅ Completed: Daily llms.txt Review
+  - Verified package versions and roadmap
+  - Checked Key Files and Agent Skills sections
+  - Confirmed llms.txt correctly matches current true state
+
+### LLMS v1.87.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with verifiable completions from domain PROGRESS logs
+  - Synced roadmap with progress for Studio
+  - Verified package versions match package.json exactly
+  - Incremented version to 1.87.0
+
+## LLMS v1.88.1
+- ✅ Completed: Daily llms.txt Review
+  - Realigned all Quick Facts and Roadmap versions to actual package.json versions.
+  - Verified package versions and API examples.
+
+## LLMS v1.88.2
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs.
+  - Verified package versions match `package.json` exactly.
+  - Incremented version to 1.88.2
+### LLMS v1.95.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio RenderManager/AudioMeter tests, CLI templates tests, Infrastructure coverage)
+  - Verified package versions and API examples
+  - Verified Key Files for Agents match existing paths
+  - Incremented version to 1.95.0
+### LLMS v1.96.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap with recent verifiable completions (Studio TimelineAudioTrack Regression Tests, CLI Templates Regression Tests, Player Bridge Coverage Expansion, Infrastructure Orchestrator Coverage Expansion)
+  - Verified package versions and API examples
+  - Verified Key Files for Agents match existing paths
+  - Incremented version to 1.96.0
+
+### LLMS v1.97.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress logs
+  - Verified all file paths and key files
+  - Verified package versions perfectly match `package.json`
+
+### LLMS v1.98.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress logs
+  - Verified all file paths and key files
+  - Verified package versions perfectly match `package.json`
+
+### LLMS v1.101.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress logs
+  - Verified all file paths and key files
+  - Verified package versions perfectly match `package.json`
+
+### LLMS v1.102.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress, clearing out completed items from active lists
+  - Verified all file paths and package versions perfectly match package.json
+
+### LLMS v1.105.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with extensive recent progress from all domain logs (Studio, CLI, Core, Player, Renderer, Infrastructure).
+  - Verified all file paths and key files.
+  - Verified package versions perfectly match `package.json`.
+
+### LLMS v1.106.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt to include recent progress in Studio (CLI Build Command, CompositionsPanel Tests, Agent Skills Tests).
+  - Updated Roadmap for Player (DOM Canvas Capture, Lock UI During Export, Bridge Documentation).
+  - Updated Roadmap for Infrastructure (FfmpegStitcher Coverage, Optimize GCS/S3 Uploads).
+  - Verified all package versions match package.json exactly.
+
+### LLMS v1.107.0
+- ✅ Completed: Daily llms.txt Review
+  - Updated Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Timeline Audio/Waveform Regression Tests, Asset Drag and Drop, Enhance MCP Server; CLI: Command Coverage Tests V9; Player: Audio Fader Regression, Bridge Coverage Completeness, Document getSchema; Renderer: Validate HW Accel; Infrastructure: Modal Adapter, Optimize GCS/S3 Uploads, Orchestrator/Stitcher Coverage).
+  - Fixed Core API clip properties in llms.txt.
+  - Verified all package versions match package.json exactly.
+
+### LLMS v1.108.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: Export Job Spec, Asset Drag and Drop, TimelineAudioTrack Tests; CLI: Command Coverage V9, Docker Adapter Tests, Registry Types Tests; Core: Generic Input Props, Active Clips, Shared Virtual Time Binding; Player: Bridge Coverage Completeness, Media Session Tests, Audio Fader Tests; Renderer: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic; Infrastructure: Optimize GCS Uploads, Orchestrator Test Coverage Expansion).
+  - Verified package versions exactly match package.json.
+
+### LLMS v1.113.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Renderer: Fix GSAP Timeline, CLI: Docker Adapter Tests, Player: Media Session Tests, Infrastructure: InMemoryJobRepository Coverage).
+  - Updated Architecture components to reflect `timeline` and `RenderExecutor`.
+  - Verified package versions exactly match package.json.
+
+### LLMS v1.115.0
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match `package.json`
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+
+### LLMS v1.116.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Core: WaitUntilStable, Diagnose, Testing; Studio: CLI Build/Update, Refine Skills; Player: Sandbox/Bridge, setMediaKeys, Refactor Control Logic; Renderer: Smart Audio Fades, Distributed Audio Mixing, CdpTimeDriver Iframe Sync; CLI: Command Coverage V7, Registry Client Coverage; Infrastructure: Optimize S3 Uploads, Orchestrator Coverage Expansion).
+  - Verified package versions exactly match package.json.
+  - Verified all File Paths and Key Files.
+
+### LLMS v1.117.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced roadmap with progress logs:
+    - Studio: Component Management, Preview Command
+    - CLI: CLI Utils Coverage Tests, Registry Client Coverage
+    - Renderer: Fix GSAP Timeline Synchronization
+    - Infrastructure: Cloudflare Sandbox Adapter, R2 Storage Adapter
+  - Verified all package versions exactly match package.json (Core v5.13.0, Studio v0.107.1, Player v0.78.1, Renderer v1.78.3, CLI v0.45.2, Infrastructure v0.25.0)
+  - Verified Key Files section (including packages/studio/src/server/render-manager.ts and packages/infrastructure/src/index.ts)
+  - Verified Agent Skills section paths
+
+### LLMS v1.119.0
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match package.json.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+
+### LLMS v1.118.0
+- ✅ Completed: Daily llms.txt Review
+  - Synced Roadmap in llms.txt with recent verifiable completions from domain PROGRESS logs (Studio: AssistantModal Coverage, RenderManager Test Coverage; CLI: Command Coverage V9, Registry Types Tests; Core: Generic Input Props, Active Clips; Player: Composition Setters, Playback Range; Renderer: Validate HW Accel, Orchestrator Plan; Infrastructure: Optimize S3/GCS Uploads).
+  - Verified package versions exactly match package.json.
+
+### LLMS v1.122.1
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match package.json.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+
+### LLMS v1.122.2
+- ✅ Completed: Daily llms.txt Review
+  - Verified all package versions perfectly match package.json.
+  - Verified File Paths and Key Files.
+  - No changes required to llms.txt as it matches the true project state perfectly.
+
+### LLMS v1.122.4
+- ✅ Completed: Daily llms.txt Review
+  - Added \`.agents/skills/skill-creator/SKILL.md\` to Agent Skills list
+  - Synced Roadmap with recent progress logs for Studio
+  - Maintained package version alignment with package.json
