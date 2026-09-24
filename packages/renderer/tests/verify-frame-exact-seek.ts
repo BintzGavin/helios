@@ -39,6 +39,9 @@ const CASES: Case[] = [
   { fixture: 'frame-exact-render-at.html', mode: 'canvas', label: 'window.renderAt(t) hook' },
   { fixture: 'frame-exact-seek-async.html', mode: 'canvas', label: 'async window.seek(t) hook' },
   { fixture: 'frame-exact-seek-dom.html', mode: 'dom', label: 'window.seek(t) hook, DOM mode' },
+  // WebGL needs a GPU or SwiftShader; the default launch flags must leave one available.
+  { fixture: 'frame-exact-webgl.html', mode: 'canvas', label: 'WebGL canvas drawn by renderAt(t)' },
+  { fixture: 'frame-exact-webgl.html', mode: 'dom', label: 'WebGL canvas drawn by renderAt(t), DOM mode' },
   // The composition runs at 10 fps; rendering it at 30 fps asks for frames between its own.
   // A short stability timeout makes a per-frame stall show up as a slow render.
   { fixture: 'frame-exact-helios-canvas.html', mode: 'canvas', label: 'Helios canvas page rendered at 30 fps', fps: 30, duration: 1, stabilityTimeout: 3000 },

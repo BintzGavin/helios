@@ -60,7 +60,9 @@ export class BrowserPool {
   public getLaunchOptions() {
     const config = this.options.browserConfig || {};
     const userArgs = config.args || [];
-    const gpuArgs = config.gpu !== true ? GPU_DISABLED_ARGS : [];
+    // GPU stays available unless explicitly disabled: without it (and with the software
+    // rasterizer disabled too) pages get no WebGL context at all.
+    const gpuArgs = config.gpu === false ? GPU_DISABLED_ARGS : [];
     const defaultArgs = this.options.mode === 'dom'
       ? DEFAULT_BROWSER_ARGS.filter(arg =>
           arg !== '--enable-begin-frame-control' &&
@@ -131,7 +133,7 @@ export class BrowserPool {
         }
 
         const page = await context.newPage();
-        const strategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
+        const strategy: RenderStrategy = this.options.mode === 'dom' ? new DomStrategy(this.options) : new CanvasStrategy(this.options);
         // Both modes seek the page to each frame's time (Helios, seek hooks, WAAPI, virtual
         // clocks). Canvas mode also flushes rAF callbacks on each seek, since capturing the
         // canvas does not produce a browser frame. CdpTimeDriver (CDP virtual time) follows the
@@ -158,6 +160,7 @@ export class BrowserPool {
           await page.addInitScript(`window.__HELIOS_PROPS__ = ${serializedProps};`);
         }
 
+        if (strategy.init) await strategy.init(page);
         await timeDriver.init(page, this.options.randomSeed);
         await page.goto(compositionUrl, { waitUntil: 'commit' });
 

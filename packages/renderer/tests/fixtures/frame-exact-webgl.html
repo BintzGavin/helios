@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script>
+// A WebGL canvas (default context attributes, so preserveDrawingBuffer is false) drawn by renderAt(t).
+const gl = document.getElementById('c').getContext('webgl');
+window.renderAt = (t) => {
+  gl.disable(gl.SCISSOR_TEST);
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.enable(gl.SCISSOR_TEST);
+  gl.scissor(Math.round(100 * t), 80, 20, 20); // WebGL's origin is bottom-left: rows 80..100 from the top too.
+  gl.clearColor(1, 1, 1, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+};
+</script>
+</body>
+</html>

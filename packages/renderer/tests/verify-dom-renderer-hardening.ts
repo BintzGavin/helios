@@ -21,6 +21,12 @@ async function verifyModeSpecificLaunchArguments(): Promise<void> {
   assert.ok(!domArgs.includes('--run-all-compositor-stages-before-draw'), 'DOM mode must not require begin-frame compositor stages');
   assert.ok(canvasArgs.includes('--enable-begin-frame-control'), 'Canvas mode must preserve its existing begin-frame launch behavior');
   assert.ok(canvasArgs.includes('--run-all-compositor-stages-before-draw'), 'Canvas mode must preserve its existing compositor launch behavior');
+
+  // GPU (or SwiftShader) stays available unless disabled explicitly; without it pages get no WebGL.
+  assert.ok(!domArgs.includes('--disable-gpu') && !canvasArgs.includes('--disable-gpu'), 'GPU must be enabled by default');
+  assert.ok(!canvasArgs.includes('--disable-software-rasterizer'), 'The software rasterizer must stay available by default');
+  const noGpuArgs = new BrowserPool({ ...baseOptions, mode: 'canvas', browserConfig: { gpu: false } }).getLaunchOptions().args;
+  assert.ok(noGpuArgs.includes('--disable-gpu'), 'browserConfig.gpu: false must disable the GPU');
 }
 
 async function verifyModeSelectsTheCorrectClock(): Promise<void> {
