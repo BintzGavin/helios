@@ -40,7 +40,7 @@ https://github.com/user-attachments/assets/6713cddb-e509-400d-bb43-9961c7dbd128
 
 
 
-(Video created with Helios)
+(Video created with Opus 5.5 + Helios)
 
 
 ---
