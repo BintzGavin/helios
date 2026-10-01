@@ -1,6 +1,6 @@
 # RFC: Helios in AI hosts
 
-**Status: Proposed · 1 October 2026**
+**Status: Phase 2 implemented on `feat/ai-host-distribution` · 1 October 2026**
 
 **Decision proposed:** Make AI assistants a primary distribution channel for Helios. Ship one plugin to the Claude directory, the ChatGPT plugin directory and the Codex marketplace. It contains skills, one Helios MCP server and one MCP App view. Render on the person's machine whenever the host can run the server there. Where it can't, play the video inside the conversation, and leave cloud rendering to a later paid tier.
 
@@ -122,10 +122,10 @@ Instead, the view runs the page with the renderer's own seek shim, the init scri
 
 The renderer and the view then share one definition of "the frame at `t`", and the preview can't drift from the MP4. The work is to extract that init script into a module both can import. That's renderer work tied to determinism, which its posture allows.
 
-**How the page enters the view.** Phase 2 tests both options in Claude and ChatGPT and picks one:
+**How the page enters the view.** The view uses a nested `srcdoc` frame. On 1 October 2026 it worked in the MCP Apps reference host (`ext-apps` `basic-host`): the view sits in a separate-origin double iframe with `frame-src 'none'`, and the `srcdoc` frame still ran the page and the seek shim. Selection reached the model context, and **Render MP4** produced a file whose frames match the preview. Claude and ChatGPT still need checking. If either host blocks the frame, use the second option:
 
-- **Nested `srcdoc` frame.** This keeps the page apart from the bridge script, but each host has to allow it.
-- **The view becomes the page.** The view writes the page into its own document with the seek shim and a small bridge in front. There's no nested frame; the page and the bridge share a realm.
+- **Nested `srcdoc` frame (current).** This keeps the page apart from the bridge script, but each host has to allow it.
+- **The view becomes the page (fallback).** The view writes the page into its own document with the seek shim and a small bridge in front. There's no nested frame; the page and the bridge share a realm.
 
 **Network.** The default MCP Apps CSP allows no network connections (`connect-src 'none'`) and only inline or same-origin scripts. Pages that load fonts or libraries from a CDN need those origins in `_meta.ui.csp.resourceDomains`. The server declares a short allowlist (cdnjs, jsdelivr, unpkg, Google Fonts), and the skill tells the model to stay within it.
 
