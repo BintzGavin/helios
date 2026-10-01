@@ -97,4 +97,24 @@ describe('CLI Entry Point (index.ts)', () => {
     // Verify parse was called
     expect(mockParse).toHaveBeenCalledWith(process.argv);
   });
+
+  it('should load only the mcp command for `helios mcp`', async () => {
+    const argv = process.argv;
+    process.argv = ['node', 'helios', 'mcp', '--root', '/tmp'];
+    try {
+      await import('../index.js');
+    } finally {
+      process.argv = argv;
+    }
+
+    const { registerStudioCommand } = await import('../commands/studio.js');
+    const { registerJobCommand } = await import('../commands/job.js');
+    const { registerMcpCommand } = await import('../commands/mcp.js');
+    const programInstance = vi.mocked(Command).mock.results[0].value;
+
+    expect(registerMcpCommand).toHaveBeenCalledWith(programInstance);
+    expect(registerStudioCommand).not.toHaveBeenCalled();
+    expect(registerJobCommand).not.toHaveBeenCalled();
+    expect(mockParse).toHaveBeenCalledWith(['node', 'helios', 'mcp', '--root', '/tmp']);
+  });
 });
