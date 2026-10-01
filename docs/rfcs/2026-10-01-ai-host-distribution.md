@@ -157,8 +157,8 @@ The in-view export spike must answer three questions:
 1. **Is it frame-exact?** `ClientSideExporter` encodes with WebCodecs through mediabunny. It captures canvas pages directly, and DOM pages by serializing an SVG `foreignObject` that `fetch()`es stylesheets and images. That fetch is blocked under the default CSP. Measure stills against `helios still` for the same page.
 2. **How does the file leave the sandbox?**
    - The exporter always delivers by clicking an `<a download>`, which a sandbox without `allow-downloads` blocks. It needs an API that returns the bytes.
-   - MCP Apps defines no download method, and ChatGPT's `openai/resources/write` is desktop-only.
-   - The candidates are an app-only upload tool on the hosted server that returns a link, or host file APIs where they exist.
+   - The 26 January 2026 spec has no download method. The `@modelcontextprotocol/ext-apps` SDK (2.0.3) adds `ui/download-file`, which hands the host an embedded resource or a resource link, behind a `downloadFile` host capability. That is the first candidate where a host advertises it.
+   - Where hosts don't advertise it: an app-only upload tool on the hosted server that returns a link, or host file APIs such as ChatGPT's desktop-only `openai/resources/write`.
 3. **Is it fast enough?** Export runs frame by frame in real time or slower.
 
 ## Hosted endpoint
