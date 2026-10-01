@@ -1,0 +1,13 @@
+export { parsePlan, evaluate, frameTime, sampleCount, PROFILE, LIMITS, RenderError } from './plan.js';
+export type { Plan, Node, Asset, AudioTrack, Scalar, Length, Paint, Fps } from './plan.js';
+export { prepareScene, renderFrame, renderVideo, probeVideo } from './render.js';
+export type { RenderOptions, PreparedScene, AssetFiles, Rasterizer } from './render.js';
+export { RenderService } from './jobs.js';
+export type { JobView, JobState, ServiceOptions } from './jobs.js';
+export { NativeBackend } from './backend.js';
+export type { RenderBackend } from './backend.js';
+export { CanvasFrameRenderer, renderCanvasVideo } from './canvas.js';
+export type { CanvasComposition, CanvasFrame, CanvasFrameTimings, CanvasRenderOptions } from './canvas.js';
+export type { SoftwareEncoderOptions } from './render.js';
+export { renderCanvasModule } from './canvas-pool.js';
+export type { CanvasPoolOptions, CanvasPoolResult } from './canvas-pool.js';

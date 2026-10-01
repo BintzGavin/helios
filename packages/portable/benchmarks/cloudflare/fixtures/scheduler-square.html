@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; width: 1280px; height: 720px; overflow: hidden; background: #101820; }
+  #square { position: absolute; left: 0; top: 0; width: 100px; height: 100px; background: orange; transform: translate(80px, 300px); }
+  #label { position: absolute; left: 80px; top: 80px; color: #ffffff; font-family: 'Inter', sans-serif; font-size: 48px; }
+</style>
+</head>
+<body>
+  <div id="square"></div>
+  <div id="label">Frame 0</div>
+  <script type="module">
+    import { Helios } from '@helios-project/core';
+    const helios = new Helios({ duration: 10, fps: 24, width: 1280, height: 720 });
+    window.helios = helios;
+    helios.bindToDocumentTimeline();
+    const square = document.getElementById('square');
+    const label = document.getElementById('label');
+    helios.subscribe((state) => {
+      const f = state.currentFrame;
+      const x = 80 + 90 * f / 24;
+      square.style.transform = 'translate(' + x + 'px, 300px)';
+      label.textContent = 'Frame ' + f;
+    });
+  </script>
+</body>
+</html>

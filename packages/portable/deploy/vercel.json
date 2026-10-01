@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "buildCommand": "node verify-runtime.mjs",
+  "functions": {
+    "api/render.mjs": {
+      "maxDuration": 300,
+      "memory": 2048,
+      "includeFiles": "{dist/**,portable-config.json,node_modules/**/package.json,node_modules/@resvg/resvg-wasm/index_bg.wasm,node_modules/ffmpeg-static/ffmpeg,node_modules/ffprobe-static/bin/linux/x64/ffprobe,node_modules/@resvg/resvg-js-linux-x64-gnu/**,node_modules/@napi-rs/canvas/js-binding.js,node_modules/@napi-rs/canvas-linux-x64-gnu/**}",
+      "excludeFiles": "{node_modules/ffprobe-static/bin/{darwin,win32}/**,node_modules/ffprobe-static/bin/linux/{arm,arm64,ia32}/**}"
+    }
+  },
+  "rewrites": [
+    { "source": "/v1/:path*", "destination": "/api/render?portablePath=/v1/:path*" },
+    { "source": "/health", "destination": "/api/render?portablePath=/health" }
+  ]
+}

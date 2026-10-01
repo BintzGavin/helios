@@ -1,0 +1,44 @@
+{
+  "name": "@helios-project/portable",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-independent rendering and durable render jobs for Helios.",
+  "license": "ELv2",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./client": "./dist/client.js",
+    "./server": "./dist/server.js",
+    "./storage": "./dist/storage.js",
+    "./s3": "./dist/s3-storage.js",
+    "./auth": "./dist/auth.js"
+  },
+  "types": "dist/index.d.ts",
+  "bin": {
+    "helios-portable": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.json && vitest run --no-file-parallelism",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "bench": "tsx benchmarks/run.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1005.0",
+    "@napi-rs/canvas": "1.0.9",
+    "@noble/hashes": "2.4.0",
+    "@resvg/resvg-js": "2.6.2",
+    "@resvg/resvg-wasm": "2.6.2",
+    "bidi-js": "1.0.3",
+    "fontkit": "2.0.4",
+    "jose": "6.2.12",
+    "svg-pathdata": "7.2.0",
+    "zod": "4.3.6"
+  }
+}
