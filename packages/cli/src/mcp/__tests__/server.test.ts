@@ -96,6 +96,16 @@ afterEach(async () => {
 });
 
 describe('helios MCP server: listing', () => {
+  it('lists schemas without a JSON Schema dialect, so hosts read them as 2020-12', async () => {
+    await connect();
+    const { tools } = await client.listTools();
+    for (const tool of tools) {
+      expect((tool.inputSchema as any).$schema, tool.name).toBeUndefined();
+      if (tool.outputSchema) expect((tool.outputSchema as any).$schema, tool.name).toBeUndefined();
+    }
+    expect(tools.filter((t) => t.outputSchema).length).toBeGreaterThan(0);
+  });
+
   it('lists the nine tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();
@@ -125,7 +135,8 @@ describe('helios MCP server: listing', () => {
       expect(byName[name]._meta).toBeUndefined();
     }
 
-    for (const name of ['preview_video', 'helios_library', 'read_page', 'list_videos', 'get_frames', 'verify_video', 'get_render_status']) {
+    expect(byName.preview_video.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: false, idempotentHint: true });
+    for (const name of ['helios_library', 'read_page', 'list_videos', 'get_frames', 'verify_video', 'get_render_status']) {
       expect(byName[name].annotations?.readOnlyHint, name).toBe(true);
     }
     expect(byName.render_video.annotations).toMatchObject({ readOnlyHint: false, idempotentHint: false });
@@ -214,6 +225,35 @@ describe('helios MCP server: preview, library, pages', () => {
       expect(result.isError, input).toBe(true);
       expect(result.content[0].text, input).toContain(message);
     }
+  });
+
+  it('preview_video saves html to path first, for hosts that cannot write files', async () => {
+    await connect();
+    const html = '<!doctype html><html><body><script>window.renderAt = () => {};</script></body></html>';
+
+    const result = await call('preview_video', { path: 'new/clip.html', html, duration: 3 });
+    expect(result.isError).toBeFalsy();
+    expect(fs.readFileSync(path.join(root, 'new/clip.html'), 'utf8')).toBe(html);
+    expect(result.structuredContent).toMatchObject({ mode: 'player', path: 'new/clip.html', duration: 3 });
+    expect(result.content[0].text).toMatch(/^Saved new\/clip\.html\. Previewing new\/clip\.html \(3 s/);
+
+    const replaced = await call('preview_video', { path: 'new/clip.html', html: '<html>v2</html>' });
+    expect(replaced.isError).toBeFalsy();
+    expect(fs.readFileSync(path.join(root, 'new/clip.html'), 'utf8')).toBe('<html>v2</html>');
+  });
+
+  it('preview_video only saves html inside the root, to .html files', async () => {
+    await connect();
+    for (const [input, message] of [
+      ['../escape.html', 'outside the project root'],
+      ['notes.txt', 'must end in .html'],
+    ] as const) {
+      const result = await call('preview_video', { path: input, html: '<html></html>' });
+      expect(result.isError, input).toBe(true);
+      expect(result.content[0].text, input).toContain(message);
+    }
+    expect(fs.existsSync(path.join(tmp, 'escape.html'))).toBe(false);
+    expect(fs.existsSync(path.join(root, 'notes.txt'))).toBe(false);
   });
 
   it('rejects invalid arguments as tool errors', async () => {

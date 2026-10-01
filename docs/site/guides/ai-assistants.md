@@ -67,7 +67,7 @@ The first render downloads a matching Chromium build. Later renders start immedi
 
 | Tool | What it does |
 | --- | --- |
-| `preview_video` | Shows the page playing in the conversation |
+| `preview_video` | Shows the page playing in the conversation. In chat apps that can't write files, it saves the page the assistant wrote first. |
 | `get_frames` | Returns a contact sheet of chosen times, so the assistant can look at its own frames |
 | `verify_video` | Checks that every frame depends only on `t` (`helios verify`) |
 | `render_video` | Renders the MP4 (`helios render`). Long renders return a job ID. |
