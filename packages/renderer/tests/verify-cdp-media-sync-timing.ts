@@ -1,13 +1,26 @@
 import { chromium } from 'playwright';
 import { CdpTimeDriver } from '../src/drivers/CdpTimeDriver.js';
 
+// CdpTimeDriver must seek media to the target time *before* it advances the
+// virtual clock, so nothing that runs at a new virtual time sees the old media
+// time.
+//
+// Every sample is tagged with the virtual clock it ran at (the driver makes
+// performance.now() virtual). Headless Chromium keeps firing
+// requestAnimationFrame on its real-time frame clock while virtual time is
+// paused, so frames at the *previous* time can land in a step's log before
+// setTime() has issued its media sync. Those frames are in sync with the clock
+// they ran at, so only samples taken after the clock moved past the previous
+// time are judged. A virtual-time interval guarantees such samples exist every
+// step, whatever the rAF cadence.
+
+type Sample = { source: 'raf' | 'timer'; virtualTimeMs: number; videoTime: number };
+
 async function verifyCdpMediaSyncTiming() {
   console.log('Starting CdpTimeDriver media sync timing verification...');
 
   const browser = await chromium.launch();
   const page = await browser.newPage();
-
-  // page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
   const driver = new CdpTimeDriver();
   await driver.init(page);
@@ -22,11 +35,16 @@ async function verifyCdpMediaSyncTiming() {
         const v1 = document.getElementById('v1');
         v1.currentTime = 0;
 
-        function loop(timestamp) {
-           window.logs.push({
-             rafTimestamp: timestamp,
-             videoTime: v1.currentTime
-           });
+        window.sample = (source) => {
+          window.logs.push({
+            source,
+            virtualTimeMs: performance.now(),
+            videoTime: v1.currentTime
+          });
+        };
+
+        function loop() {
+           window.sample('raf');
            requestAnimationFrame(loop);
         }
 
@@ -38,44 +56,39 @@ async function verifyCdpMediaSyncTiming() {
 
   await driver.prepare(page);
 
+  // Started after prepare() so the interval is scheduled on the virtual clock.
+  await page.evaluate(() => setInterval(() => (window as any).sample('timer'), 50));
+
   // Warmup
   await driver.setTime(page, 0.1);
 
-  console.log('Step 1: Setting time to 1.0s...');
-  await page.evaluate(() => window.logs = []);
-  await driver.setTime(page, 1.0);
+  let previousTime = 0.1;
+  for (const target of [1.0, 2.0]) {
+    console.log(`Setting time to ${target}s...`);
+    await page.evaluate(() => (window as any).logs = []);
+    await driver.setTime(page, target);
 
-  const step1Logs = await page.evaluate(() => window.logs);
-  console.log('Step 1 Logs:', step1Logs);
+    const logs: Sample[] = await page.evaluate(() => (window as any).logs);
+    const previousMs = Math.round(previousTime * 1000);
+    const advanced = logs.filter(l => l.virtualTimeMs > previousMs);
+    const stale = advanced.filter(l => Math.abs(l.videoTime - target) > 0.001);
 
-  // We expect videoTime to be 1.0.
-  // If we see videoTime < 0.9, it's a failure (stale frame).
-  const hasStaleFrame1 = step1Logs.some((l: any) => l.videoTime < 0.9);
+    console.log(
+      `  ${logs.length - advanced.length} sample(s) at the previous time (ignored), ` +
+      `${advanced.length} after the clock advanced ` +
+      `(${advanced.filter(l => l.source === 'raf').length} rAF)`
+    );
 
-  if (hasStaleFrame1) {
-      console.error('❌ FAILURE: Found stale frame (videoTime < 1.0) during setTime(1.0).');
+    if (stale.length > 0) {
+      console.error(`❌ FAILURE: media was not at ${target}s once the clock advanced past ${previousTime}s:`, stale);
       process.exit(1);
-  } else if (step1Logs.length === 0) {
-       console.log('⚠️ Warning: No frames captured in Step 1. This might be due to test timing, but verify-cdp-driver.ts confirms time advancement.');
-  } else {
-      console.log('✅ Step 1 OK: All captured frames had correct videoTime.');
-  }
-
-  console.log('Step 2: Setting time to 2.0s...');
-  await page.evaluate(() => window.logs = []);
-  await driver.setTime(page, 2.0);
-
-  const step2Logs = await page.evaluate(() => window.logs);
-  console.log('Step 2 Logs:', step2Logs);
-
-  const hasStaleFrame2 = step2Logs.some((l: any) => l.videoTime < 1.9);
-  if (hasStaleFrame2) {
-      console.error('❌ FAILURE: Found stale frame (videoTime < 2.0) during setTime(2.0).');
+    }
+    if (advanced.length === 0) {
+      console.error(`❌ FAILURE: nothing ran after the clock advanced to ${target}s, so media sync was not checked.`);
       process.exit(1);
-  } else if (step2Logs.length === 0) {
-      console.log('⚠️ Warning: No frames captured in Step 2.');
-  } else {
-      console.log('✅ Step 2 OK: All captured frames had correct videoTime.');
+    }
+    console.log(`✅ ${target}s OK: every sample after the clock advanced saw videoTime ${target}.`);
+    previousTime = target;
   }
 
   await browser.close();
