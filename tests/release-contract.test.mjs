@@ -5,9 +5,9 @@ import test from 'node:test';
 const targets = {
   core: '5.13.2',
   player: '0.78.1',
-  renderer: '1.78.3',
+  renderer: '1.79.0',
   studio: '0.107.3',
-  cli: '0.45.2',
+  cli: '0.46.0',
   infrastructure: '0.25.0',
 };
 

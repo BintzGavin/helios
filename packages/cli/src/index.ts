@@ -6,7 +6,7 @@ const program = new Command();
 program
   .name('helios')
   .description('Helios CLI')
-  .version('0.45.2');
+  .version('0.46.0');
 
 // AI hosts give `helios mcp` about two seconds to answer before they drop it, and loading the
 // other commands (job, studio, render...) takes ten times longer than the MCP server itself.
