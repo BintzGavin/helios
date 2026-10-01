@@ -10,6 +10,8 @@ export interface RenderJobSnapshot {
   jobId: string;
   status: RenderStatus;
   output: string;
+  /** The output as an absolute path on this machine. */
+  absoluteOutput: string;
   progress: number | null;
   elapsedSeconds: number;
   bytes?: number;
@@ -211,6 +213,7 @@ export class RenderJobs {
       jobId: job.id,
       status: job.status,
       output: job.outputRel,
+      absoluteOutput: job.output,
       progress: job.progress,
       elapsedSeconds: Math.round((end - job.startedAt) / 100) / 10,
     };

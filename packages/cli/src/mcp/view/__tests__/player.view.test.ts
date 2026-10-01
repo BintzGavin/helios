@@ -138,8 +138,12 @@ describe('player.html view with a fake MCP Apps host', { timeout: 60_000 }, () =
       }),
       get_render_status: (args) => ({
         content: [{ type: 'text', text: 'done' }],
-        structuredContent: { jobId: args.jobId, status: 'completed', output: 'out/video.mp4', progress: 1, elapsedSeconds: 3, bytes: 3_500_000 },
+        structuredContent: {
+          jobId: args.jobId, status: 'completed', output: 'out/video.mp4', absoluteOutput: '/Users/me/Movies/helios/out/video.mp4',
+          progress: 1, elapsedSeconds: 3, bytes: 3_500_000,
+        },
       }),
+      reveal_file: (args) => ({ content: [{ type: 'text', text: `shown ${args.path}` }] }),
     });
     try {
       // Handshake: ui/initialize request first, then the initialized notification.
@@ -229,6 +233,17 @@ describe('player.html view with a fake MCP Apps host', { timeout: 60_000 }, () =
         path: 'video.html', duration: 4, width: 640, height: 360, fps: 30, waitSeconds: 20,
       });
       expect(calls.find((c) => c.name === 'get_render_status')!.args).toEqual({ jobId: 'job-1', waitSeconds: 20 });
+
+      // The finished render shows where it was saved, and can be shown in its folder or opened.
+      expect(await v.isVisible('#rdone')).toBe(true);
+      expect(await v.textContent('#rpath')).toBe('/Users/me/Movies/helios/out/video.mp4');
+      await v.click('#rreveal');
+      await v.click('#ropen');
+      await waitFor(() => calls.filter((c) => c.name === 'reveal_file').length === 2, 'reveal calls');
+      expect(calls.filter((c) => c.name === 'reveal_file').map((c) => c.args)).toEqual([
+        { path: 'out/video.mp4', open: false },
+        { path: 'out/video.mp4', open: true },
+      ]);
 
       // Host requests: teardown gets {}, unknown methods get -32601.
       await page.evaluate(() => {

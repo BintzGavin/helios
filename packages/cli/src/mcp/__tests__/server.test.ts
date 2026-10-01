@@ -55,10 +55,14 @@ let root: string;
 let helios: HeliosMcp;
 let client: Client;
 
+let revealed: Array<{ path: string; open: boolean }>;
+
 async function connect(runner: CliRunner = fakeRunner().runner) {
+  revealed = [];
   helios = createHeliosMcpServer({
     root,
     runner,
+    reveal: async (absPath, open) => { revealed.push({ path: absPath, open }); },
     viewPath: path.join(tmp, 'player.html'),
     buildShim: () => SHIM,
     version: '9.9.9',
@@ -106,14 +110,14 @@ describe('helios MCP server: listing', () => {
     expect(tools.filter((t) => t.outputSchema).length).toBeGreaterThan(0);
   });
 
-  it('lists the nine tools with their view and visibility metadata', async () => {
+  it('lists the ten tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();
     const byName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
 
     expect(Object.keys(byName).sort()).toEqual([
       'cancel_render', 'get_frames', 'get_render_status', 'helios_library', 'list_videos',
-      'preview_video', 'read_page', 'render_video', 'verify_video',
+      'preview_video', 'read_page', 'render_video', 'reveal_file', 'verify_video',
     ]);
     expect(client.getServerVersion()).toEqual({ name: 'helios', version: '9.9.9' });
 
@@ -128,6 +132,7 @@ describe('helios MCP server: listing', () => {
     const appOnly = { ui: { visibility: ['app'] }, 'openai/visibility': 'private', 'openai/widgetAccessible': true };
     expect(byName.read_page._meta).toEqual(appOnly);
     expect(byName.list_videos._meta).toEqual(appOnly);
+    expect(byName.reveal_file._meta).toEqual(appOnly);
     for (const name of ['render_video', 'get_render_status', 'cancel_render']) {
       expect(byName[name]._meta).toEqual({ 'openai/widgetAccessible': true });
     }
@@ -256,6 +261,31 @@ describe('helios MCP server: preview, library, pages', () => {
     expect(fs.existsSync(path.join(root, 'notes.txt'))).toBe(false);
   });
 
+  it('reveal_file shows or opens renders and pages inside the root, nothing else', async () => {
+    write('out/clip.mp4', 'x');
+    write('page.html');
+    write('secrets.env', 'x');
+    await connect();
+
+    expect((await call('reveal_file', { path: 'out/clip.mp4' })).isError).toBeFalsy();
+    expect((await call('reveal_file', { path: 'page.html', open: true })).isError).toBeFalsy();
+    expect(revealed).toEqual([
+      { path: path.join(root, 'out/clip.mp4'), open: false },
+      { path: path.join(root, 'page.html'), open: true },
+    ]);
+
+    for (const [input, message] of [
+      ['../outside.mp4', 'outside the project root'],
+      ['secrets.env', 'Only videos, images and pages'],
+      ['missing.mp4', 'was not found'],
+    ] as const) {
+      const result = await call('reveal_file', { path: input });
+      expect(result.isError, input).toBe(true);
+      expect(result.content[0].text, input).toContain(message);
+    }
+    expect(revealed).toHaveLength(2);
+  });
+
   it('rejects invalid arguments as tool errors', async () => {
     write('a.html');
     await connect();
@@ -308,6 +338,7 @@ describe('helios MCP server: preview, library, pages', () => {
 
     const result = await call('list_videos', {});
     expect(result.structuredContent).toEqual({
+      root,
       pages: [
         { path: 'new.html', modifiedMs: 1_700_000_003_000 },
         { path: 'a/b/c/deep.html', modifiedMs: 1_700_000_002_000 },
@@ -360,14 +391,16 @@ describe('helios MCP server: rendering', () => {
     expect(result.structuredContent).toMatchObject({
       status: 'completed',
       output: 'renders/final.mp4',
+      absoluteOutput: path.join(root, 'renders/final.mp4'),
       progress: 1,
       bytes: 2048,
     });
+    expect(result.content[0].text).toContain(`It is at ${path.join(root, 'renders/final.mp4')}`);
     expect(result.structuredContent.jobId).toMatch(/^render-/);
     expect(result.structuredContent.logTail).toEqual([
       'Initializing renderer...', 'Progress: Rendered 30 / 60 frames', 'Render complete.',
     ]);
-    expect(result.content[0].text).toMatch(/^Rendered renders\/final\.mp4 \(2\.0 s requested, 2\.0 KB\) in \d+ s\.$/);
+    expect(result.content[0].text).toMatch(/^Rendered renders\/final\.mp4 \(2\.0 s requested, 2\.0 KB\) in \d+ s\. It is at \//);
   });
 
   it('defaults the output to the page name next to the page and passes no optional flags', async () => {
