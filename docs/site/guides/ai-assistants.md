@@ -36,18 +36,7 @@ Then ask for a video, for example "Make a 15-second launch video for this projec
 
 `helios mcp` runs on your machine over stdio. It renders with the same CLI and headless Chromium as `helios render`. Videos and pages stay in the folder you give it with `--root`, which defaults to the folder it starts in.
 
-**Claude Desktop.** Add this to `claude_desktop_config.json` (Settings → Developer → Edit Config), then restart Claude:
-
-```json
-{
-  "mcpServers": {
-    "helios": {
-      "command": "npx",
-      "args": ["-y", "@helios-project/cli@latest", "mcp", "--root", "/Users/you/Videos/helios"]
-    }
-  }
-}
-```
+**Claude Desktop.** Install the Helios extension: download `helios.mcpb` from the [latest release](https://github.com/BintzGavin/helios/releases/latest) and open it. Claude asks where to keep your videos; the default is `~/Movies/Helios`. The extension needs [Node.js](https://nodejs.org) 20 or newer.
 
 **Claude Code**
 
