@@ -1,3 +1,4 @@
+import { spawn } from 'child_process';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -37,6 +38,22 @@ const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
 const DEFAULT_FPS = 30;
 
+/** Files reveal_file will show or open: renders, stills and pages. */
+const REVEALABLE = /\.(mp4|mov|webm|gif|png|jpe?g|html?)$/i;
+
+/** Shows a file in Finder / Explorer / the Linux file manager, or opens it in its default app. */
+function revealWithSystem(absPath: string, open: boolean): Promise<void> {
+  const [command, args] =
+    process.platform === 'darwin' ? ['open', open ? [absPath] : ['-R', absPath]] :
+    process.platform === 'win32' ? (open ? ['cmd', ['/c', 'start', '""', absPath]] : ['explorer.exe', [`/select,${absPath}`]]) :
+    ['xdg-open', [open ? absPath : path.dirname(absPath)]];
+  return new Promise((resolve, reject) => {
+    const child = spawn(command as string, args as string[], { stdio: 'ignore', detached: true, windowsHide: true });
+    child.once('error', (err) => reject(new Error(`Could not run ${command}: ${err.message}`)));
+    child.once('spawn', () => { child.unref(); resolve(); });
+  });
+}
+
 /** Largest page preview_video will save, in characters. */
 const MAX_PAGE_CHARS = 4_000_000;
 
@@ -55,6 +72,8 @@ export interface HeliosMcpOptions {
   viewPath?: string;
   /** Builds the renderer's seek shim for the view (default: buildPageShim from the renderer). */
   buildShim?: () => string | Promise<string>;
+  /** Shows a file in the system file manager, or opens it (default: open, explorer or xdg-open). */
+  reveal?: (absPath: string, open: boolean) => Promise<void>;
   /** Grace period between SIGTERM and SIGKILL when a render is cancelled. */
   killGraceMs?: number;
 }
@@ -123,6 +142,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   const jobs = new RenderJobs(runner, root, { killGraceMs: options.killGraceMs });
   const viewPath = options.viewPath ?? defaultViewPath();
   const buildShim = options.buildShim ?? defaultBuildShim;
+  const reveal = options.reveal ?? revealWithSystem;
 
   const server = new McpServer({ name: 'helios', version: options.version ?? packageVersion() });
 
@@ -164,6 +184,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     jobId: z.string(),
     status: z.enum(['running', 'completed', 'failed', 'cancelled']),
     output: z.string(),
+    absoluteOutput: z.string(),
     progress: z.number().nullable(),
     elapsedSeconds: z.number(),
     bytes: z.number().optional(),
@@ -191,6 +212,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       outputSchema: {
         mode: z.literal('player'),
         path: z.string(),
+        absolutePath: z.string(),
         duration: z.number().nullable(),
         width: z.number(),
         height: z.number(),
@@ -212,6 +234,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       const structured = {
         mode: 'player' as const,
         path: page.rel,
+        absolutePath: page.abs,
         duration: args.duration ?? null,
         width: args.width ?? DEFAULT_WIDTH,
         height: args.height ?? DEFAULT_HEIGHT,
@@ -222,6 +245,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         content: [{
           type: 'text',
           text: `${saved ? `Saved ${page.rel}. ` : ''}Previewing ${page.rel} (${length}, ${structured.width}×${structured.height}) in the conversation. ` +
+            `The page is at ${page.abs}. ` +
             'The person can scrub it and select a moment or an element; their selection reaches you as context.',
         }],
         structuredContent: structured,
@@ -282,6 +306,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description: 'Lists the video pages (.html) and renders (.mp4) in the project, newest first.',
       inputSchema: {},
       outputSchema: {
+        root: z.string(),
         pages: z.array(z.object({ path: z.string(), modifiedMs: z.number() })),
         renders: z.array(z.object({ path: z.string(), bytes: z.number(), modifiedMs: z.number() })),
       },
@@ -292,8 +317,28 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       const { pages, renders } = await listVideos(root);
       return {
         content: [{ type: 'text', text: `Found ${pages.length} pages and ${renders.length} renders.` }],
-        structuredContent: { pages, renders },
+        structuredContent: { root, pages, renders },
       };
+    }),
+  );
+
+  server.registerTool(
+    'reveal_file',
+    {
+      title: 'Show file',
+      description: 'Shows a rendered video or page in Finder (or the system file manager), or opens it in its default app.',
+      inputSchema: {
+        path: z.string().min(1).describe('A file in the project, relative to the project root'),
+        open: z.boolean().optional().describe('Open the file in its default app instead of showing it in its folder'),
+      },
+      annotations: { title: 'Show file', readOnlyHint: true, openWorldHint: false },
+      _meta: APP_ONLY_META,
+    },
+    guard(async (args) => {
+      const file = await resolveInRoot(root, args.path, { kind: 'file' });
+      if (!REVEALABLE.test(file.abs)) throw new PathError(`Only videos, images and pages can be shown (got "${args.path}")`);
+      await reveal(file.abs, args.open === true);
+      return { content: [{ type: 'text', text: `${args.open ? 'Opened' : 'Showed'} ${file.rel}.` }] };
     }),
   );
 
@@ -328,7 +373,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     switch (job.status) {
       case 'completed':
         text = `Rendered ${job.outputRel} (${job.duration !== undefined ? `${job.duration.toFixed(1)} s requested, ` : ''}` +
-          `${formatBytes(job.bytes ?? 0)}) in ${Math.round(snapshot.elapsedSeconds)} s.`;
+          `${formatBytes(job.bytes ?? 0)}) in ${Math.round(snapshot.elapsedSeconds)} s. It is at ${job.output}`;
         break;
       case 'failed':
         text = `Render of ${job.outputRel} failed: ${job.error ?? 'unknown error'}`;

@@ -144,6 +144,16 @@ Everything here is extra `_meta["openai/ui"]` and manifest metadata on the same 
 
 Claude renders the same view inline and fullscreen. The Claude directory listing carries the same plugin. Its analytics become the channel's main metric: installs by surface and version, and the searches that lead to the listing.
 
+## What Claude Desktop taught us (1 October 2026)
+
+`helios mcp` now runs in Claude Desktop's Chat and Code tabs as an extension (`integrations/claude-desktop`). The player renders in both tabs. Five host behaviors shaped it:
+
+- **Output schemas must be JSON Schema 2020-12.** The MCP SDK (1.29 and 1.31) writes `"$schema": draft-07` into every schema converted from zod 4, and Claude refuses to call any tool whose `outputSchema` declares it. The server drops the declaration, and a test validates every listed schema with Ajv's 2020-12 mode.
+- **Answer within about 2 seconds.** Code and Cowork sessions drop a server that hasn't answered `initialize` by then, so `helios mcp` loads only its own command (about 0.1 s).
+- **Chats have no file tool.** `preview_video` takes the page as `html` and saves it, and results carry absolute paths, because the host's working directory is not the project root.
+- **Extensions run in a built-in Node runtime.** It can't run the CLI and gives children no real stdio. The launcher finds a system Node 20+ and pipes stdio itself.
+- **The Code tab pulls the selection.** It hands the model a hint to read the widget's context instead of attaching the selection to the next message, so the model sees a click only if it asks.
+
 ## Render placements
 
 | Placement | Where it runs | Cost to Helios | Phase |

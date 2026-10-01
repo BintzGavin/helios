@@ -10,6 +10,8 @@ export interface RenderJobSnapshot {
   jobId: string;
   status: RenderStatus;
   output: string;
+  /** The output as an absolute path on this machine. */
+  absoluteOutput: string;
   progress: number | null;
   elapsedSeconds: number;
   bytes?: number;
@@ -211,12 +213,14 @@ export class RenderJobs {
       jobId: job.id,
       status: job.status,
       output: job.outputRel,
+      absoluteOutput: job.output,
       progress: job.progress,
       elapsedSeconds: Math.round((end - job.startedAt) / 100) / 10,
     };
     if (job.status === 'completed' && job.bytes !== undefined) snapshot.bytes = job.bytes;
     if (job.status === 'failed' && job.error) snapshot.error = job.error;
-    if (state && state.lines.length > 0) snapshot.logTail = state.lines.slice(-LOG_TAIL_LINES);
+    // Only a failure needs the log; on success it is encoder noise in the model's context.
+    if (job.status === 'failed' && state && state.lines.length > 0) snapshot.logTail = state.lines.slice(-LOG_TAIL_LINES);
     return snapshot;
   }
 

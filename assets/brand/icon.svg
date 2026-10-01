@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Helios</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#081236"/>
+      <stop offset="0.6" stop-color="#1A3BB0"/>
+      <stop offset="1" stop-color="#3770FF"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.36" cy="0.32" r="0.78">
+      <stop offset="0" stop-color="#FFF7D6"/>
+      <stop offset="0.42" stop-color="#FFCB4D"/>
+      <stop offset="1" stop-color="#FF8A1F"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0.55" stop-color="#FFC24A" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#FFC24A" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <circle cx="628" cy="396" r="320" fill="url(#glow)"/>
+  <circle cx="348" cy="676" r="188" fill="none" stroke="#FFD15C" stroke-opacity="0.42" stroke-width="30"/>
+  <circle cx="488" cy="536" r="188" fill="none" stroke="#FFD15C" stroke-opacity="0.78" stroke-width="30"/>
+  <circle cx="628" cy="396" r="200" fill="url(#sun)"/>
+</svg>

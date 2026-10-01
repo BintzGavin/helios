@@ -1,0 +1,47 @@
+{
+  "manifest_version": "0.2",
+  "name": "helios",
+  "display_name": "Helios",
+  "version": "0.0.0",
+  "description": "Make videos from code: preview them in the chat, then render frame-exact MP4s on your computer.",
+  "long_description": "Ask Claude for a video and it writes one HTML page that draws each frame from its time. Helios plays it in the conversation, so you can scrub it and click what you want changed, then renders a frame-exact MP4 on your computer with headless Chrome. Needs Node.js 20 or newer.",
+  "author": { "name": "Gavin Bintz", "url": "https://github.com/BintzGavin" },
+  "homepage": "https://github.com/BintzGavin/helios",
+  "documentation": "https://github.com/BintzGavin/helios/blob/main/docs/site/guides/ai-assistants.md",
+  "support": "https://github.com/BintzGavin/helios/issues",
+  "repository": { "type": "git", "url": "https://github.com/BintzGavin/helios" },
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"],
+      "env": {
+        "HELIOS_ROOT": "${user_config.root}",
+        "HELIOS_CLI_VERSION": "0.0.0"
+      }
+    }
+  },
+  "tools": [
+    { "name": "preview_video", "description": "Play a video page in the chat, with a scrubber" },
+    { "name": "get_frames", "description": "Contact sheet of chosen times" },
+    { "name": "verify_video", "description": "Check that every frame depends only on its time" },
+    { "name": "render_video", "description": "Render the MP4 on your computer" },
+    { "name": "get_render_status", "description": "Follow a long render" },
+    { "name": "cancel_render", "description": "Stop a render" },
+    { "name": "helios_library", "description": "Your video pages and renders" }
+  ],
+  "keywords": ["video", "mp4", "animation", "motion graphics", "rendering"],
+  "license": "ELv2",
+  "user_config": {
+    "root": {
+      "type": "directory",
+      "title": "Video folder",
+      "description": "Where Helios saves video pages and renders.",
+      "default": "${HOME}/Movies/Helios",
+      "required": true
+    }
+  },
+  "compatibility": { "platforms": ["darwin", "win32", "linux"] }
+}

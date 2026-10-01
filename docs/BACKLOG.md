@@ -119,7 +119,8 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Problem**: `packages/cli/scripts/bundle-skills.js` copies `.agents/skills/helios`, which holds only `dummy.ts`, so both ship nothing.
   - **Goal**: bundle the `make-video` skill.
   - **Verification**: `helios skills install` in an empty directory writes `make-video/SKILL.md`.
-- [ ] **DOCS**: Directory assets: logo, composer icon, three screenshots, privacy policy, terms, support contact.
+- [x] **DOCS**: Directory assets: logo and composer icon (`assets/brand/`), screenshots, support contact (GitHub issues).
+- [ ] **DOCS**: Privacy policy and terms. Drafts are on branch `docs/legal`, awaiting the maintainer's review.
 - [ ] **Gate**: `tests/agent-eval` — the `helios` condition uses Helios in at least 7 of 8 prompts and matches or beats `baseline` on MP4 checks.
 
 ### Phase 2 — Local MCP server and in-conversation view
@@ -134,7 +135,9 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - Renders through `render_video`.
 - [x] **CLI**: ChatGPT extension metadata on the same tools: `openai/ui` entrypoints `thread` and `global` (on `helios_library`).
 - [ ] **CLI**: ChatGPT structured settings (`openai/settings` read/update tools): default size, fps, preset, output folder.
-- [ ] **SKILLS**: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+- [ ] **SKILLS** *(helios-skills#6, merges after the CLI release)*: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+- [x] **CLI**: Claude Desktop extension (`integrations/claude-desktop`, `.mcpb`), tested in the Chat and Code tabs.
+- [ ] **CLI**: Publish a CLI release with `helios mcp`, then attach `helios.mcpb` to a GitHub release.
 - [ ] **Gate**: In Claude Desktop and ChatGPT desktop, a brief becomes an inline preview, takes one revision by selection, and ends as an MP4 on disk without a terminal. Scripted in `tests/manual/`.
 
 ### Phase 3 — Hosted view for web and mobile
