@@ -37,6 +37,9 @@ const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
 const DEFAULT_FPS = 30;
 
+/** Largest page preview_video will save, in characters. */
+const MAX_PAGE_CHARS = 4_000_000;
+
 const LIST_MAX_DEPTH = 3;
 const LIST_MAX_ITEMS = 200;
 const LIST_SKIP_DIRS = new Set(['node_modules', '.git', 'dist']);
@@ -177,8 +180,14 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description:
         'Shows a Helios video page (an HTML file in the project) in an interactive player in the conversation. ' +
         'Use it after writing or changing a page so the person can watch, scrub, and select a moment or element to discuss; it renders nothing and opens no browser. ' +
-        'Pass duration, width, height and fps when the page does not declare them.',
-      inputSchema: { path: pagePath, duration: duration.optional(), width: width.optional(), height: height.optional(), fps: fps.optional() },
+        'Pass duration, width, height and fps when the page does not declare them. ' +
+        'If you cannot write files yourself, pass the page as html: it is saved to path first (replacing that file), then previewed.',
+      inputSchema: {
+        path: pagePath,
+        html: z.string().min(1).max(MAX_PAGE_CHARS).optional()
+          .describe('The complete page. When given, it is saved to path (an .html file in the project; folders are created) before previewing'),
+        duration: duration.optional(), width: width.optional(), height: height.optional(), fps: fps.optional(),
+      },
       outputSchema: {
         mode: z.literal('player'),
         path: z.string(),
@@ -187,10 +196,18 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         height: z.number(),
         fps: z.number(),
       },
-      annotations: { title: 'Preview video', readOnlyHint: true, openWorldHint: false },
+      annotations: { title: 'Preview video', readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       _meta: OPENS_VIEW_META,
     },
     guard(async (args) => {
+      let saved = false;
+      if (args.html !== undefined) {
+        if (!/\.html?$/i.test(args.path)) throw new PathError(`path "${args.path}" must end in .html to save a page there`);
+        const target = await resolveInRoot(root, args.path, { kind: 'new' });
+        await fs.promises.mkdir(path.dirname(target.abs), { recursive: true });
+        await fs.promises.writeFile(target.abs, args.html, 'utf8');
+        saved = true;
+      }
       const page = await resolveInRoot(root, args.path, { kind: 'file' });
       const structured = {
         mode: 'player' as const,
@@ -204,7 +221,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       return {
         content: [{
           type: 'text',
-          text: `Previewing ${page.rel} (${length}, ${structured.width}×${structured.height}) in the conversation. ` +
+          text: `${saved ? `Saved ${page.rel}. ` : ''}Previewing ${page.rel} (${length}, ${structured.width}×${structured.height}) in the conversation. ` +
             'The person can scrub it and select a moment or an element; their selection reaches you as context.',
         }],
         structuredContent: structured,
