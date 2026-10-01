@@ -81,6 +81,10 @@ button.icon svg { width: 16px; height: 16px; fill: currentColor; }
 #rstat { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 #rstat.err { color: var(--err); }
 #rstat.ok { color: var(--ok); }
+#rdone { margin-top: 6px; }
+#rpath { display: block; font-size: 12px; padding: 4px 6px; border-radius: 4px; background: var(--bg2); font-family: var(--mono); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+#rbtns { display: flex; gap: 8px; margin-top: 6px; }
+#renders li button { padding: 0 8px; font-size: 12px; }
 #rbar { height: 4px; margin-top: 8px; background: var(--line); border-radius: 2px; overflow: hidden; }
 #rfill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
 #rbar.indet #rfill { width: 30%; animation: indet 1.2s linear infinite; }
@@ -124,6 +128,10 @@ button.icon svg { width: 16px; height: 16px; fill: currentColor; }
   <div id="rpanel" hidden>
     <div id="rtop"><span id="rstat"></span><button id="rcancel" type="button" hidden>Cancel</button></div>
     <div id="rbar" hidden><div id="rfill"></div></div>
+    <div id="rdone" hidden>
+      <code id="rpath" title="Where the video was saved"></code>
+      <div id="rbtns"><button id="rreveal" type="button">Show in Finder</button><button id="ropen" type="button">Open</button></div>
+    </div>
     <details id="rlog" hidden><summary>Render log</summary><pre></pre></details>
   </div>
 </section>
@@ -643,8 +651,22 @@ async function followRender(st, owned) {
     if (!owned) { R.busy = false; $('render').disabled = !S.win; }
   }
 }
+/** "Show in Finder" on a Mac, "Show in Explorer" on Windows. */
+const REVEAL_LABEL = /Mac/.test(navigator.userAgent) ? 'Show in Finder' : /Windows/.test(navigator.userAgent) ? 'Show in Explorer' : 'Show in folder';
+async function revealFile(path, open) {
+  try {
+    await callTool('reveal_file', { path, open: !!open });
+  } catch (e) {
+    flash('Could not ' + (open ? 'open ' : 'show ') + path + ': ' + e.message, 'err');
+  }
+}
 function showRender(st) {
   $('rpanel').hidden = false;
+  $('rdone').hidden = !(st.status === 'completed' && st.output);
+  if (st.status === 'completed' && st.output) {
+    R.output = st.output;
+    $('rpath').textContent = st.absoluteOutput || st.output;
+  }
   const stat = $('rstat'), bar = $('rbar'), fill = $('rfill'), log = $('rlog');
   const running = st.status === 'running';
   $('rcancel').hidden = !(running && R.job);
@@ -722,7 +744,12 @@ async function openLibrary() {
     const z = document.createElement('span');
     z.className = 'muted';
     z.textContent = typeof r.bytes === 'number' ? mb(r.bytes) : '';
-    li.append(a, z);
+    const show = document.createElement('button');
+    show.type = 'button';
+    show.textContent = 'Show';
+    show.title = REVEAL_LABEL;
+    show.addEventListener('click', () => revealFile(r.path, false));
+    li.append(a, z, show);
     $('renders').appendChild(li);
   }
   $('rendersbox').hidden = !renders.length;
@@ -755,6 +782,9 @@ $('loop').addEventListener('click', () => {
 $('moment').addEventListener('click', sendMoment);
 $('render').addEventListener('click', startRender);
 $('rcancel').addEventListener('click', cancelRender);
+$('rreveal').textContent = REVEAL_LABEL;
+$('rreveal').addEventListener('click', () => R.output && revealFile(R.output, false));
+$('ropen').addEventListener('click', () => R.output && revealFile(R.output, true));
 $('libback').addEventListener('click', openLibrary);
 $('fs').addEventListener('click', async () => {
   const mode = host.ctx.displayMode === 'fullscreen' ? 'inline' : 'fullscreen';
