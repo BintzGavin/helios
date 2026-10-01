@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node scripts/bundle-skills.js",
+    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js",
     "dev": "tsc -w",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
@@ -42,12 +42,14 @@
     "@helios-project/infrastructure": "^0.25.0",
     "@helios-project/renderer": "^1.77.4",
     "@helios-project/studio": "^0.107.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "diff": "^8.0.3",
     "giget": "^3.1.2",
     "prompts": "^2.4.2",
-    "vite": "^7.1.2"
+    "vite": "^7.1.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/diff": "^7.0.2",

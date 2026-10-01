@@ -57,6 +57,7 @@ const tests = [
   'tests/verify-media-sync.ts',
   'tests/verify-orchestrator-executor.ts',
   'tests/verify-orchestrator-plan.ts',
+  'tests/verify-page-shim.ts',
   'tests/verify-probe-composition.ts',
   'tests/verify-pseudo-element-preload.ts',
   'tests/verify-random-determinism.ts',

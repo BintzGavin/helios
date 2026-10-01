@@ -9,3 +9,5 @@ export { probeComposition } from './probe.js';
 export type { CompositionInfo, ProbeOptions } from './probe.js';
 export { captureFrames, captureContactSheet } from './stills.js';
 export type { CaptureFramesOptions, ContactSheetOptions } from './stills.js';
+export { buildPageShim, PAGE_SEEK_HOOKS } from './drivers/seek-shim.js';
+export type { PageShimOptions } from './drivers/seek-shim.js';

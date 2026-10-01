@@ -23,6 +23,7 @@
       "group": "Guides",
       "pages": [
         "guides/using-studio",
+        "guides/ai-assistants",
         "guides/creating-compositions",
         "guides/rendering-videos",
         "guides/using-the-player",

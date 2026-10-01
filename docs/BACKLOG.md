@@ -109,6 +109,38 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] Implement component tracking in `helios.config.json`.
 - [x] Create initial set of core components.
 
+## AI Host Distribution
+*Helios ships as one agent plugin in the Claude directory, the ChatGPT plugin directory and the Codex marketplace. Design and gates: [`docs/rfcs/2026-10-01-ai-host-distribution.md`](rfcs/2026-10-01-ai-host-distribution.md).*
+
+### Phase 1 — List the skill plugin
+- [ ] **SKILLS**: Merge `feat/agent-video-entry-skill` in `helios-skills` (`plugins/helios`, entry skill `make-video`).
+- [ ] **SKILLS** *(done on `helios-skills` branch `feat/plugin-manifests`, unmerged)*: Add an Agent Plugins 1.0 `plugin.json`, `.codex-plugin/plugin.json` (interface metadata, `onboardingSkill`) and `.agents/plugins/marketplace.json` to `plugins/helios`.
+- [x] **CLI**: `helios skills install` and Studio's `skillsRoot` ship real skills.
+  - **Problem**: `packages/cli/scripts/bundle-skills.js` copies `.agents/skills/helios`, which holds only `dummy.ts`, so both ship nothing.
+  - **Goal**: bundle the `make-video` skill.
+  - **Verification**: `helios skills install` in an empty directory writes `make-video/SKILL.md`.
+- [ ] **DOCS**: Directory assets: logo, composer icon, three screenshots, privacy policy, terms, support contact.
+- [ ] **Gate**: `tests/agent-eval` — the `helios` condition uses Helios in at least 7 of 8 prompts and matches or beats `baseline` on MP4 checks.
+
+### Phase 2 — Local MCP server and in-conversation view
+- [x] **RENDERER**: Extract `SeekTimeDriver`'s init script (virtual time, WAAPI/GSAP seeking, `renderAt`/`__render`/`seek` hooks) into a module that runs in a plain browser.
+  - **Verification**: the renderer's frame-exact seek tests still pass.
+- [x] **CLI**: `helios mcp`, a stdio MCP server whose tools wrap existing commands.
+  - **Tools**: `preview_video`, `render_video`, `get_frames` (still/sheet as image content), `verify_video`; `read_page` is callable by the view only.
+  - **Constraints**: stdout carries only the protocol; paths stay inside the working directory; long renders return a job ID and report progress.
+- [x] **CLI**: `ui://helios/player` MCP App view, a single HTML file.
+  - Plays pages through the shared seek shim, with scrubber and frame stepping.
+  - Sends the selected time and element to the model with `ui/update-model-context`.
+  - Renders through `render_video`.
+- [x] **CLI**: ChatGPT extension metadata on the same tools: `openai/ui` entrypoints `thread` and `global` (on `helios_library`).
+- [ ] **CLI**: ChatGPT structured settings (`openai/settings` read/update tools): default size, fps, preset, output folder.
+- [ ] **SKILLS**: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+- [ ] **Gate**: In Claude Desktop and ChatGPT desktop, a brief becomes an inline preview, takes one revision by selection, and ends as an MP4 on disk without a terminal. Scripted in `tests/manual/`.
+
+### Phase 3 — Hosted view for web and mobile
+- [ ] **INFRASTRUCTURE**: A stateless streamable-HTTP deployment of the same server: no rendering, no accounts.
+- [ ] **PLAYER**: In-view export spike. Measure frame exactness against `helios still`, find how the file leaves the sandbox, and record the decision in `docs/rfcs/`.
+
 ## Product Surface (Studio, CLI, Examples)
 *Studio, CLI, and examples are first class product surfaces in V2.*
 

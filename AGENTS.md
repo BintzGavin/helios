@@ -50,6 +50,20 @@ Helios will support a Shadcn-style component registry.
 - Registry distributes source, not opaque binaries
 *The registry is part of the product surface, not core rendering logic.*
 
+#### AI HOST DISTRIBUTION
+AI assistants are a primary distribution channel for Helios. When someone asks ChatGPT, Claude, Codex or another agent for a video, the agent must reach for Helios, and the person must be able to watch, adjust and export the result without leaving the conversation.
+Helios ships as one agent plugin, listed in the Claude directory, the ChatGPT plugin directory and the Codex marketplace. The plugin contains:
+- Skills that teach the Helios video contract: one HTML page that draws any frame from its time `t`.
+- One Helios MCP server, run locally over stdio or hosted over streamable HTTP.
+- One MCP App view that plays a composition inside the conversation.
+*Key constraints:*
+- One package, many hosts. Build on the open standards (Agent Skills, MCP, MCP Apps, Agent Plugins). Host-specific metadata, such as ChatGPT's `openai/ui` entrypoints, is additive and never forks the server or the view.
+- Local rendering stays the default and stays free. Use the user's machine whenever the host can run the server there.
+- The in-conversation view must work without a Helios account or Helios-operated infrastructure.
+- Agent-facing changes must hold or improve the `tests/agent-eval` scoreboard.
+- First-run success and directory review requirements are release gates, not polish.
+*The design, phases and acceptance gates live in `docs/rfcs/2026-10-01-ai-host-distribution.md`.*
+
 #### PRODUCT SURFACE PRIORITY
 **Studio, CLI, and Examples are first-class product surfaces in V2.**
 Core and renderer stability are prerequisites, not areas for speculative refactoring.
@@ -58,6 +72,7 @@ Core and renderer stability are prerequisites, not areas for speculative refacto
 Helios V2 must be structurally compatible with future monetization.
 - No monetization logic should be implemented prematurely.
 - Architecture must not preclude paid registries, hosted rendering, or platform services.
+- Hosted rendering for AI hosts is the natural paid tier. The free plugin must never depend on it.
 
 ---
 
@@ -70,26 +85,29 @@ Helios V2 must be structurally compatible with future monetization.
 
 ### RENDERER
 **Posture: MAINTENANCE WITH V2 EXPANSION**
-- **Allowed work:** Deterministic rendering, Stateless frame seeking, Distributed execution enablement.
+- **Allowed work:** Deterministic rendering, Stateless frame seeking, Distributed execution enablement, Sharing the seek shim with in-conversation playback so the preview matches the render.
 - **Forbidden work:** Non-blocking refactors, Performance work not tied to V2 goals.
 
 ### PLAYER
 **Posture: ACTIVELY EXPANDING**
 - High activity domain focused on parity with standard HTMLMediaElement and advanced export capabilities.
-- **Allowed work:** Feature parity, Client-side export robustness, Bridge security.
+- **Allowed work:** Feature parity, Client-side export robustness, Bridge security, Playback inside MCP App views (sandboxed iframes with a strict CSP).
 
 ### STUDIO
 **Posture: ACTIVELY EXPANDING FOR V2**
 - Primary product surface.
+- Studio's MCP server stays project-oriented; the plugin's MCP server is page-oriented. Both render through `@helios-project/renderer`, and neither re-implements rendering.
 
 ### CLI
 **Posture: ACTIVELY EXPANDING FOR V2**
 - Primary interface for registry, workflows, and deployment.
+- Hosts the plugin's local MCP server (`helios mcp`) and the MCP App view it serves.
 
 ### SKILLS
 **Posture: ACTIVELY EXPANDING**
 - Critical for agent autonomy and expanding the knowledge base.
-- **Allowed work:** Creating new skills for uncovered domains, updating existing skills with new patterns.
+- The plugin's skills are how AI hosts discover Helios. `make-video` is the canonical entry skill.
+- **Allowed work:** Creating new skills for uncovered domains, updating existing skills with new patterns, Keeping plugin manifests valid for every listed host.
 
 ### LLMS
 **Posture: MAINTENANCE**
@@ -106,6 +124,7 @@ Helios V2 must be structurally compatible with future monetization.
 ### INFRASTRUCTURE
 **Posture: INCUBATING**
 - Includes cloud rendering and governance tooling.
+- Includes the hosted Helios MCP endpoint for AI hosts that cannot run local servers.
 
 ---
 
