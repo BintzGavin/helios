@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "B01",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B02",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B03",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B04",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B05",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B06",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B07",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B08",
+      "execution": "corpus.ts --full",
+      "classification": "synthetic engineering probe; repeated qualification study not run"
+    },
+    {
+      "id": "B09",
+      "execution": "plan.test.ts, path.test.ts, media.test.ts, text.test.ts, client.test.ts",
+      "classification": "rejection coverage; not a complete adversarial media-format corpus"
+    },
+    {
+      "id": "B10",
+      "execution": "core/src tests; selected existing renderer checks",
+      "classification": "partial web regression; frozen React/WAAPI/Three/Pixi video comparators not run"
+    },
+    {
+      "id": "B11",
+      "execution": "plan.test.ts rejects unsupported output profiles",
+      "classification": "4K60 is outside the profile; no throughput claim"
+    },
+    {
+      "id": "B12",
+      "execution": null,
+      "classification": "requires ten owner-selected real target-application compositions; synthetic scenes cannot establish coverage"
+    },
+    {
+      "id": "B13",
+      "execution": "examples/workflow.ts and local HTTP/CLI tests",
+      "classification": "portable API integration works; existing scheduler HTML composition handoff is not implemented or qualified"
+    },
+    {
+      "id": "B14",
+      "execution": "setup-private-vm.sh and setup-vercel-s3.sh",
+      "classification": "deployment candidates; actual VM/function qualification pending; isolate pipeline unsupported"
+    }
+  ]
+}

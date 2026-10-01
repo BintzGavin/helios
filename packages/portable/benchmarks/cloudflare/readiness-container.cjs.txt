@@ -1,0 +1,123 @@
+const { readFile, writeFile, mkdir, stat } = require('node:fs/promises');
+const { spawn, execFileSync } = require('node:child_process');
+const { createHash } = require('node:crypto');
+const { once } = require('node:events');
+const { performance } = require('node:perf_hooks');
+const { existsSync } = require('node:fs');
+const os = require('node:os');
+const root = '/workspace/helios-cpu';
+const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+const diagnostic = { stage: 'preparation', round: null, mode: null, exitCode: null };
+
+async function run(command, args) {
+  const child = spawn(command, args, { cwd: '/workspace', stdio: 'ignore' });
+  const [code] = await once(child, 'exit');
+  if (code !== 0) { diagnostic.exitCode = code; throw new Error('Controlled DOM probe command failed'); }
+}
+
+async function verify(video) {
+  const bytes = (await stat(video)).size;
+  if (bytes < 1 || bytes > 8 * 1024 * 1024) throw new Error('DOM fixture video exceeds bounded size');
+  const data = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=codec_name,pix_fmt,width,height,r_frame_rate,duration', '-of', 'json', video], { stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1024 * 1024 }));
+  const stream = data.streams[0];
+  if (stream.width !== 1280 || stream.height !== 720 || stream.r_frame_rate !== '24/1' || Number(stream.duration) !== 10 || stream.codec_name !== 'h264' || stream.pix_fmt !== 'yuv420p') throw new Error('DOM video metadata mismatch');
+  const frameBytes = 1280 * 720 * 3;
+  const help = execFileSync('ffmpeg', ['-h', 'full'], { stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 8 * 1024 * 1024 }).toString();
+  const passthrough = help.includes('-fps_mode') ? ['-fps_mode', 'passthrough'] : ['-vsync', '0'];
+  const child = spawn('ffmpeg', ['-v', 'error', '-xerror', '-i', video, '-map', '0:v:0', ...passthrough, '-pix_fmt', 'rgb24', '-threads', '1', '-f', 'rawvideo', '-'], { stdio: ['ignore', 'pipe', 'ignore'] });
+  const exited = once(child, 'exit');
+  const frameHashes = [];
+  let pending = Buffer.alloc(0);
+  for await (const chunk of child.stdout) {
+    pending = Buffer.concat([pending, chunk]);
+    let consumed = 0;
+    while (pending.length - consumed >= frameBytes) {
+      const frame = pending.subarray(consumed, consumed + frameBytes);
+      let left = -1; let right = -1;
+      for (let x = 0; x < 1280; x++) {
+        const pixel = (350 * 1280 + x) * 3;
+        if (frame[pixel] > 200 && frame[pixel + 1] > 100 && frame[pixel + 1] < 210 && frame[pixel + 2] < 80) {
+          if (left === -1) left = x;
+          right = x;
+        }
+      }
+      const expected = 80 + 90 * frameHashes.length / 24;
+      if (Math.abs(left - expected) > 2 || Math.abs(right - expected - 99) > 2) throw new Error('DOM frame motion mismatch');
+      frameHashes.push(sha(frame));
+      consumed += frameBytes;
+    }
+    pending = Buffer.from(pending.subarray(consumed));
+  }
+  const [code] = await exited;
+  if (code !== 0 || pending.length || frameHashes.length !== 240) throw new Error('DOM final decode incomplete');
+  return { width: stream.width, height: stream.height, fps: stream.r_frame_rate, duration: Number(stream.duration), codec: stream.codec_name, pixelFormat: stream.pix_fmt, frameHashes, motionVerifiedFrames: frameHashes.length, videoSha256: sha(await readFile(video)), bytes };
+}
+
+async function main() {
+  await mkdir(root, { recursive: true });
+  const htmlSha256 = sha(await readFile('/workspace/composition.html'));
+  if (htmlSha256 !== 'e24332e35e5e10e1e2f37f23a010226a3dc047e44274164c6e17064e3779b58e') throw new Error('Frozen DOM scene changed');
+  const gpuDevicePresent = existsSync('/dev/nvidia0') || existsSync('/dev/dri');
+  if (gpuDevicePresent) throw new Error('CPU-only DOM resource not established');
+  await writeFile('/workspace/vite.config.js', `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+export default defineConfig({ plugins: [react()], root: '/workspace', server: { port: 8080, host: '127.0.0.1', strictPort: true }, optimizeDeps: { include: ['react', 'react-dom', 'framer-motion', 'gsap', 'three'] } });
+`);
+  await writeFile(root + '/render-fixed.sh', `#!/bin/bash
+set -e
+export CHROMIUM_FLAGS='--disable-gpu --disable-software-rasterizer --no-sandbox --disable-dev-shm-usage'
+export PLAYWRIGHT_CHROMIUM_USE_HEADLESS_NEW=1
+chromium_path=$(command -v chromium-browser 2>/dev/null || command -v chromium 2>/dev/null || true)
+export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH="$chromium_path"
+export PLAYWRIGHT_CHROMIUM_SANDBOX=0
+export PLAYWRIGHT_LAUNCH_OPTIONS='{"args":["--disable-gpu","--no-sandbox","--disable-dev-shm-usage","--use-gl=swiftshader","--disable-software-rasterizer"]}'
+./node_modules/.bin/vite --config /workspace/vite.config.js > /workspace/helios-cpu/vite.log 2>&1 &
+vite_pid=$!
+trap 'kill "$vite_pid" 2>/dev/null || true; wait "$vite_pid" 2>/dev/null || true' EXIT
+if [ "$1" = 'fixed-delay' ]; then
+  sleep 5
+else
+  node /workspace/wait-for-vite.cjs
+fi
+DISPLAY= GALLIUM_DRIVER=llvmpipe MESA_GL_VERSION_OVERRIDE=4.5 timeout -k 15 300 ./node_modules/.bin/helios render http://127.0.0.1:8080/composition.html --mode dom --duration 10 --fps 24 --width 1280 --height 720 -o "$2"
+`);
+  const outputs = [];
+  for (const [round, mode] of [[0, 'fixed-delay'], [0, 'ready'], [1, 'ready'], [1, 'fixed-delay']]) {
+    Object.assign(diagnostic, { stage: 'render', round, mode, exitCode: null });
+    const video = `${root}/${round}-${mode}.mp4`;
+    const started = performance.now();
+    await run('bash', [root + '/render-fixed.sh', mode, video]);
+    const renderMs = performance.now() - started;
+    diagnostic.stage = 'verification';
+    const verificationStarted = performance.now();
+    const checked = await verify(video);
+    outputs.push({ round, mode, renderMs, verificationMs: performance.now() - verificationStarted, ...checked });
+  }
+  const reference = outputs[0].frameHashes;
+  diagnostic.stage = 'pixel-equality';
+  if (outputs.some(output => output.frameHashes.some((hash, index) => hash !== reference[index]))) throw new Error('Readiness changed DOM frame pixels');
+  const versions = {};
+  for (const name of ['@helios-project/core', '@helios-project/renderer', 'vite']) versions[name] = JSON.parse(await readFile(`/workspace/node_modules/${name}/package.json`, 'utf8')).version;
+  const report = { status: 'qualified', htmlSha256, gpuDevicePresent, platform: os.platform(), architecture: os.arch(), logicalCpus: os.cpus().length, memoryGiB: os.totalmem() / 2 ** 30, nodeVersion: process.version, versions, readinessScriptSha256: sha(await readFile('/workspace/wait-for-vite.cjs')), outputs, boundary: 'Two interleaved CPU-only DOM pairs, frozen scheduler composition; startup and rendering timed, final decoding separate; no authoring, upload or notification in render timer' };
+  await writeFile(root + '/readiness-result.json', JSON.stringify(report, null, 2));
+  diagnostic.stage = 'archive';
+  await run('tar', ['-czf', root + '/evidence.tar.gz', '-C', root, 'readiness-result.json', '0-fixed-delay.mp4', '0-ready.mp4', '1-ready.mp4', '1-fixed-delay.mp4']);
+  if ((await stat(root + '/evidence.tar.gz')).size > 32 * 1024 * 1024) throw new Error('DOM evidence exceeded its bounded size');
+  const archive = await readFile(root + '/evidence.tar.gz');
+  report.evidenceArchive = { bytes: archive.length, sha256: sha(archive) };
+  await writeFile(root + '/readiness-result.json', JSON.stringify(report, null, 2));
+}
+
+main().catch(async error => {
+  const categories = {
+    'Controlled DOM probe command failed': 'command-failed',
+    'DOM fixture video exceeds bounded size': 'size-limit',
+    'DOM video metadata mismatch': 'metadata-mismatch',
+    'DOM frame motion mismatch': 'motion-mismatch',
+    'DOM final decode incomplete': 'decode-incomplete',
+    'Readiness changed DOM frame pixels': 'pixels-changed',
+    'DOM evidence exceeded its bounded size': 'size-limit',
+  };
+  await writeFile(root + '/readiness-failure.json', JSON.stringify({ ...diagnostic, category: categories[error?.message] ?? 'unknown' })).catch(() => {});
+  console.error('Controlled DOM readiness qualification failed'); process.exitCode = 1;
+});
