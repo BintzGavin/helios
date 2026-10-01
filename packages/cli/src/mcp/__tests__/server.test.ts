@@ -96,6 +96,16 @@ afterEach(async () => {
 });
 
 describe('helios MCP server: listing', () => {
+  it('lists schemas without a JSON Schema dialect, so hosts read them as 2020-12', async () => {
+    await connect();
+    const { tools } = await client.listTools();
+    for (const tool of tools) {
+      expect((tool.inputSchema as any).$schema, tool.name).toBeUndefined();
+      if (tool.outputSchema) expect((tool.outputSchema as any).$schema, tool.name).toBeUndefined();
+    }
+    expect(tools.filter((t) => t.outputSchema).length).toBeGreaterThan(0);
+  });
+
   it('lists the nine tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();

@@ -546,6 +546,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     }),
   );
 
+  listSchemasWithoutDialect(server);
   return { server, jobs, root };
 }
 
@@ -553,6 +554,27 @@ interface PageEntry { path: string; modifiedMs: number }
 interface RenderEntry { path: string; bytes: number; modifiedMs: number }
 
 /** *.html and *.mp4 under root, at most LIST_MAX_DEPTH folders deep, skipping dependencies and dot-dirs. */
+/**
+ * The SDK writes `"$schema": "http://json-schema.org/draft-07/schema#"` into every tool schema it
+ * converts from zod 4, but MCP 2025-11-25 schemas are JSON Schema 2020-12, and Claude refuses to
+ * call a tool whose outputSchema declares another dialect. Our schemas use only keywords that mean
+ * the same in both, so dropping the declaration makes them valid 2020-12 schemas.
+ */
+function listSchemasWithoutDialect(server: McpServer): void {
+  const handlers: Map<string, (request: any, extra: any) => Promise<any>> | undefined =
+    (server.server as any)._requestHandlers;
+  const listTools = handlers?.get('tools/list');
+  if (!handlers || !listTools) throw new Error('helios mcp: the MCP SDK no longer exposes its tools/list handler');
+  handlers.set('tools/list', async (request, extra) => {
+    const result = await listTools(request, extra);
+    for (const tool of result.tools ?? []) {
+      delete tool.inputSchema?.$schema;
+      delete tool.outputSchema?.$schema;
+    }
+    return result;
+  });
+}
+
 export async function listVideos(root: string): Promise<{ pages: PageEntry[]; renders: RenderEntry[] }> {
   const pages: PageEntry[] = [];
   const renders: RenderEntry[] = [];
