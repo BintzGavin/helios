@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helios Player</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: var(--color-background-primary, #ffffff);
+  --bg2: var(--color-background-secondary, #f3f3f5);
+  --fg: var(--color-text-primary, #1b1b1f);
+  --fg2: var(--color-text-secondary, #62626c);
+  --line: var(--color-border-primary, #dcdce1);
+  --accent: #2f63e0;
+  --ok: #18794e;
+  --err: #c4282e;
+  --stage: #0d0d10;
+  --radius: var(--border-radius-md, 8px);
+  --font: var(--font-sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  --mono: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: var(--color-background-primary, #19191c);
+    --bg2: var(--color-background-secondary, #242428);
+    --fg: var(--color-text-primary, #ececf0);
+    --fg2: var(--color-text-secondary, #a0a0aa);
+    --line: var(--color-border-primary, #36363c);
+    --accent: #7aa2ff;
+    --ok: #4cc38a;
+    --err: #ff7b7f;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: var(--color-background-primary, #19191c);
+  --bg2: var(--color-background-secondary, #242428);
+  --fg: var(--color-text-primary, #ececf0);
+  --fg2: var(--color-text-secondary, #a0a0aa);
+  --line: var(--color-border-primary, #36363c);
+  --accent: #7aa2ff;
+  --ok: #4cc38a;
+  --err: #ff7b7f;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { padding: 16px; font: 14px/1.4 var(--font); }
+button {
+  font: inherit; color: var(--fg); background: var(--bg2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 6px 10px; cursor: pointer; white-space: nowrap;
+}
+button:hover:not(:disabled) { border-color: var(--fg2); }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, #wrap:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.icon { width: 34px; height: 32px; padding: 0; display: inline-grid; place-items: center; }
+button.icon svg { width: 16px; height: 16px; fill: currentColor; }
+.muted { color: var(--fg2); }
+.note { color: var(--fg2); margin: 0; }
+#head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; min-width: 0; }
+#title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+#wrap { position: relative; width: 100%; display: flex; justify-content: center; outline: none; }
+#stage { position: relative; overflow: hidden; background: var(--stage); border-radius: var(--radius); }
+#stage iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #fff; display: block; }
+#overlay { position: absolute; pointer-events: none; border: 2px solid var(--accent); border-radius: 2px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, .25); }
+#stagemsg { position: absolute; inset: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: #c9c9d1; background: var(--stage); }
+#stagemsg.err { color: #ff9a9d; }
+#controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; }
+#scrubrow { display: flex; align-items: center; gap: 8px; flex: 1 1 160px; min-width: 140px; }
+#scrub { flex: 1; min-width: 60px; accent-color: var(--accent); margin: 0; }
+#time { font: 12px var(--mono); color: var(--fg2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+#loop[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); }
+#statusline { margin-top: 8px; min-height: 20px; font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+#info { color: var(--fg2); }
+#msg.ok { color: var(--ok); }
+#msg.err { color: var(--err); }
+#rpanel { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg2); font-size: 13px; }
+#rtop { display: flex; align-items: center; gap: 8px; }
+#rstat { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+#rstat.err { color: var(--err); }
+#rstat.ok { color: var(--ok); }
+#rbar { height: 4px; margin-top: 8px; background: var(--line); border-radius: 2px; overflow: hidden; }
+#rfill { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+#rbar.indet #rfill { width: 30%; animation: indet 1.2s linear infinite; }
+@keyframes indet { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+#rlog { margin-top: 8px; }
+#rlog pre { margin: 6px 0 0; max-height: 200px; overflow: auto; font: 12px/1.4 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+#library h2 { font-size: 15px; margin: 0 0 8px; }
+#library h3 { font-size: 13px; margin: 16px 0 6px; color: var(--fg2); font-weight: 600; }
+#library ul { list-style: none; margin: 0; padding: 0; }
+#pages li + li, #renders li + li { margin-top: 4px; }
+#pages button { width: 100%; text-align: left; overflow: hidden; text-overflow: ellipsis; }
+#renders li { display: flex; gap: 8px; justify-content: space-between; font-size: 13px; padding: 2px 0; }
+#renders .p { overflow-wrap: anywhere; min-width: 0; }
+</style>
+</head>
+<body>
+<p id="note" class="note">Loading...</p>
+
+<section id="player" hidden>
+  <div id="head">
+    <span id="title"></span>
+    <button id="libback" type="button" hidden>All videos</button>
+    <button id="fs" type="button" hidden>Fullscreen</button>
+  </div>
+  <div id="wrap" tabindex="0" aria-label="Video preview. Space plays or pauses, arrow keys step one frame.">
+    <div id="stage"><div id="overlay" hidden></div><div id="stagemsg"></div></div>
+  </div>
+  <div id="controls">
+    <button id="back" class="icon" type="button" aria-label="Previous frame" disabled><svg viewBox="0 0 16 16"><path d="M3 2h2v12H3zM14 2v12L6 8z"/></svg></button>
+    <button id="play" class="icon" type="button" aria-label="Play" disabled><svg viewBox="0 0 16 16"><path id="playicon" d="M4 2l10 6-10 6z"/></svg></button>
+    <button id="fwd" class="icon" type="button" aria-label="Next frame" disabled><svg viewBox="0 0 16 16"><path d="M11 2h2v12h-2zM2 2v12l8-6z"/></svg></button>
+    <div id="scrubrow">
+      <input id="scrub" type="range" min="0" max="10" step="0.0333333333" value="0" aria-label="Time" disabled>
+      <span id="time">0.00 / 0.00 s</span>
+    </div>
+    <button id="loop" class="icon" type="button" aria-label="Loop" aria-pressed="true" title="Loop"><svg viewBox="0 0 16 16"><path d="M4 5h7V3l3 3-3 3V7H4a1 1 0 0 0-1 1v1H1V8a3 3 0 0 1 3-3zm8 6H5v2l-3-3 3-3v2h7a1 1 0 0 0 1-1V7h2v1a3 3 0 0 1-3 3z"/></svg></button>
+    <button id="moment" type="button" disabled>Use this moment</button>
+    <button id="render" type="button" disabled>Render MP4</button>
+  </div>
+  <div id="statusline" role="status"><span id="info"></span><span id="msg"></span></div>
+  <div id="rpanel" hidden>
+    <div id="rtop"><span id="rstat"></span><button id="rcancel" type="button" hidden>Cancel</button></div>
+    <div id="rbar" hidden><div id="rfill"></div></div>
+    <details id="rlog" hidden><summary>Render log</summary><pre></pre></details>
+  </div>
+</section>
+
+<section id="library" hidden>
+  <h2>Videos</h2>
+  <p id="libstate" class="note"></p>
+  <ul id="pages"></ul>
+  <div id="rendersbox" hidden>
+    <h3>Renders</h3>
+    <ul id="renders"></ul>
+  </div>
+</section>
+
+<script>
+(() => {
+'use strict';
+// The Helios MCP server replaces this literal with the renderer's page shim source.
+const PAGE_SHIM = "__HELIOS_PAGE_SHIM__";
+const SHIM_OK = PAGE_SHIM !== '__HELIOS_' + 'PAGE_SHIM__';
+const PROTOCOL_VERSION = '2026-01-26';
+const APP_INFO = { name: 'helios-player', version: '1.0.0' };
+
+const $ = (id) => document.getElementById(id);
+const root = document.documentElement;
+const num = (v) => (typeof v === 'number' && isFinite(v) && v > 0 ? v : null);
+const mb = (b) => (b / 1e6).toFixed(1) + ' MB';
+
+const host = { caps: {}, ctx: {}, ready: false };
+const S = {
+  mode: null, path: null, fromLibrary: false,
+  width: 1920, height: 1080, fps: 30, duration: 10, durKnown: false,
+  t: 0, playing: false, loop: true, clock: 0,
+  frame: null, win: null, loading: false, token: 0,
+  busy: false, want: null, scale: 1, sel: null, seekErr: false,
+};
+
+// ---------- JSON-RPC over postMessage (MCP Apps 2026-01-26) ----------
+let nextId = 1;
+const pending = new Map();
+const post = (m) => window.parent.postMessage(m, '*');
+function request(method, params) {
+  const id = nextId++;
+  return new Promise((resolve, reject) => {
+    pending.set(id, { resolve, reject });
+    post({ jsonrpc: '2.0', id, method, params });
+  });
+}
+function notify(method, params) {
+  const m = { jsonrpc: '2.0', method };
+  if (params !== undefined) m.params = params;
+  post(m);
+}
+window.addEventListener('message', (e) => {
+  if (e.source !== window.parent || window.parent === window) return;
+  const m = e.data;
+  if (!m || typeof m !== 'object' || m.jsonrpc !== '2.0') return;
+  if (typeof m.method !== 'string') {
+    const p = pending.get(m.id);
+    if (!p) return;
+    pending.delete(m.id);
+    if (m.error) p.reject(Object.assign(new Error(m.error.message || 'Request failed'), { code: m.error.code }));
+    else p.resolve(m.result);
+    return;
+  }
+  if (m.id !== undefined && m.id !== null) return onRequest(m);
+  onNotification(m.method, m.params || {});
+});
+function onRequest(m) {
+  if (m.method === 'ui/resource-teardown') { pause(); return post({ jsonrpc: '2.0', id: m.id, result: {} }); }
+  if (m.method === 'ping') return post({ jsonrpc: '2.0', id: m.id, result: {} });
+  post({ jsonrpc: '2.0', id: m.id, error: { code: -32601, message: 'Method not found: ' + m.method } });
+}
+function onNotification(method, p) {
+  switch (method) {
+    case 'ui/notifications/tool-input': return onToolInput(p.arguments || {});
+    case 'ui/notifications/tool-result': return onToolResult(p);
+    case 'ui/notifications/tool-cancelled': return flash('The tool call was cancelled.', 'err');
+    case 'ui/notifications/host-context-changed': return applyContext(p);
+  }
+}
+const textOf = (r) => ((r && r.content) || []).filter((c) => c && c.type === 'text').map((c) => c.text).join('\n').trim();
+async function callTool(name, args) {
+  const r = await request('tools/call', { name, arguments: args });
+  if (r && r.isError) throw new Error(textOf(r) || name + ' failed');
+  return r || {};
+}
+
+// ---------- Host context ----------
+function applyContext(c) {
+  if (!c || typeof c !== 'object') return;
+  Object.assign(host.ctx, c);
+  if (c.theme === 'light' || c.theme === 'dark') root.dataset.theme = c.theme;
+  const vars = c.styles && c.styles.variables;
+  if (vars) for (const k in vars) if (typeof vars[k] === 'string' && k.startsWith('--')) root.style.setProperty(k, vars[k]);
+  const modes = host.ctx.availableDisplayModes;
+  $('fs').hidden = !(Array.isArray(modes) && modes.includes('fullscreen'));
+  $('fs').textContent = host.ctx.displayMode === 'fullscreen' ? 'Exit fullscreen' : 'Fullscreen';
+  layout();
+}
+
+function startAutoResize() {
+  // Same measurement as the reference App's autoResize.
+  let queued = false, lastW = 0, lastH = 0;
+  const measure = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const prev = root.style.height;
+      root.style.height = 'max-content';
+      const h = Math.ceil(root.getBoundingClientRect().height);
+      root.style.height = prev;
+      const w = Math.ceil(window.innerWidth);
+      if (w !== lastW || h !== lastH) { lastW = w; lastH = h; notify('ui/notifications/size-changed', { width: w, height: h }); }
+    });
+  };
+  measure();
+  const ro = new ResizeObserver(measure);
+  ro.observe(root);
+  ro.observe(document.body);
+}
+
+// ---------- Tool input / result ----------
+function onToolInput(args) {
+  if (typeof args.path === 'string' && args.path) {
+    openPlayer({ path: args.path, duration: args.duration, width: args.width, height: args.height, fps: args.fps }, false);
+  } else if (Object.keys(args).length === 0 && !S.mode) {
+    openLibrary();
+  }
+}
+function onToolResult(r) {
+  const sc = r && r.structuredContent;
+  if (r && r.isError) {
+    if (!S.mode) showNote(textOf(r) || 'The tool call failed.');
+    else flash(textOf(r) || 'The tool call failed.', 'err');
+    return;
+  }
+  if (!sc || typeof sc !== 'object') return;
+  if (sc.mode === 'library') { if (S.mode !== 'library') openLibrary(); return; }
+  if (sc.mode === 'player' && typeof sc.path === 'string') { openPlayer(sc, false); return; }
+  if (typeof sc.jobId === 'string' && !R.busy) followRender(sc);
+}
+
+function showNote(text) {
+  $('note').textContent = text;
+  $('note').hidden = false;
+  $('player').hidden = true;
+  $('library').hidden = true;
+}
+function showSection(name) {
+  $('note').hidden = true;
+  $('player').hidden = name !== 'player';
+  $('library').hidden = name !== 'library';
+}
+
+// ---------- Player ----------
+function openPlayer(meta, fromLibrary) {
+  const same = S.mode === 'player' && S.path === meta.path;
+  S.mode = 'player';
+  showSection('player');
+  if (!same) {
+    S.path = meta.path;
+    S.fromLibrary = !!fromLibrary;
+    S.width = 1920; S.height = 1080; S.fps = 30; S.duration = 10; S.durKnown = false;
+  }
+  S.width = num(meta.width) || S.width;
+  S.height = num(meta.height) || S.height;
+  S.fps = num(meta.fps) || S.fps;
+  if (num(meta.duration)) { S.duration = meta.duration; S.durKnown = true; }
+  $('title').textContent = S.path;
+  $('title').title = S.path;
+  $('libback').hidden = !S.fromLibrary;
+  syncScrub();
+  updateInfo();
+  layout();
+  if (!same || (!S.win && !S.loading)) loadPage();
+}
+
+function withShim(html) {
+  const tag = '<script>' + PAGE_SHIM.replace(/<\/script/gi, '<\\/script') + '</scr' + 'ipt>';
+  const at = (i, s) => html.slice(0, i) + s + html.slice(i);
+  let m = /<head(?:\s[^>]*)?>/i.exec(html);
+  if (m) return at(m.index + m[0].length, tag);
+  m = /<html(?:\s[^>]*)?>/i.exec(html);
+  if (m) return at(m.index + m[0].length, '<head>' + tag + '</head>');
+  m = /<!doctype[^>]*>/i.exec(html);
+  if (m) return at(m.index + m[0].length, '<head>' + tag + '</head>');
+  return '<head>' + tag + '</head>' + html;
+}
+
+function stageMsg(text, isErr) {
+  const el = $('stagemsg');
+  el.hidden = !text;
+  el.textContent = text || '';
+  el.className = isErr ? 'err' : '';
+}
+
+async function loadPage() {
+  const token = ++S.token;
+  pause();
+  clearSel();
+  S.win = null; S.loading = true; S.busy = false; S.want = null; S.seekErr = false; S.t = 0;
+  setEnabled(false);
+  if (S.frame) { S.frame.remove(); S.frame = null; }
+  stageMsg('Loading ' + S.path + '...');
+  if (!SHIM_OK) { S.loading = false; return stageMsg('This view is missing the Helios page shim. Update the Helios MCP server.', true); }
+  let page;
+  try {
+    page = (await callTool('read_page', { path: S.path })).structuredContent;
+    if (!page || typeof page.html !== 'string') throw new Error('read_page returned no HTML');
+  } catch (e) {
+    if (token === S.token) { S.loading = false; stageMsg('Could not read ' + S.path + ': ' + e.message, true); }
+    return;
+  }
+  if (token !== S.token) return;
+  const f = document.createElement('iframe');
+  f.title = 'Video preview';
+  f.setAttribute('scrolling', 'no');
+  f.setAttribute('tabindex', '-1');
+  const timer = setTimeout(() => { if (token === S.token && !S.win) blocked(); }, 10000);
+  f.addEventListener('load', () => {
+    let href = '';
+    try { href = f.contentWindow.location.href; } catch (e) { /* cross-origin */ }
+    if (href === 'about:blank') return;
+    clearTimeout(timer);
+    if (token === S.token) onFrameLoad(f, page);
+  });
+  f.srcdoc = withShim(page.html);
+  $('stage').insertBefore(f, $('overlay'));
+  S.frame = f;
+  layout();
+}
+
+function blocked() {
+  S.loading = false;
+  stageMsg('This host blocked the nested preview frame, so the page cannot play here.', true);
+}
+
+function onFrameLoad(f, page) {
+  let w = null;
+  try { w = f.contentWindow; if (typeof w.__helios_seek !== 'function') w = null; } catch (e) { w = null; }
+  if (!w) return blocked();
+  S.win = w;
+  S.loading = false;
+  stageMsg('');
+  if (!S.durKnown) {
+    const h = w.helios;
+    const d = h && (num(h.duration) || num(h.durationInSeconds));
+    if (d) { S.duration = d; S.durKnown = true; }
+  }
+  const doc = w.document;
+  doc.addEventListener('click', onPageClick, true);
+  doc.addEventListener('keydown', onKey);
+  syncScrub();
+  const skipped = Array.isArray(page.skipped) ? page.skipped : [];
+  updateInfo(skipped.length ? 'Not inlined: ' + skipped.join(', ') : '');
+  setEnabled(true);
+  S.t = 0;
+  requestSeek(0);
+  play();
+}
+
+function setEnabled(on) {
+  for (const id of ['back', 'play', 'fwd', 'scrub', 'moment']) $(id).disabled = !on;
+  $('render').disabled = !on || R.busy;
+}
+
+function updateInfo(extra) {
+  if (extra !== undefined) S.extraInfo = extra;
+  const parts = [];
+  if (!S.durKnown) parts.push('duration unknown, showing 10 s');
+  if (S.extraInfo) parts.push(S.extraInfo);
+  $('info').textContent = parts.join(' | ');
+}
+
+const clampT = (t) => Math.min(Math.max(t, 0), S.duration);
+const snap = (t) => clampT(Math.round(t * S.fps) / S.fps);
+
+function requestSeek(t) {
+  S.want = t;
+  if (!S.busy) pump();
+}
+function pump() {
+  if (S.want === null || !S.win) return;
+  const t = S.want, w = S.win;
+  S.want = null;
+  S.busy = true;
+  let r;
+  try { r = w.__helios_seek(t, 3000); } catch (e) { seekError(e); }
+  Promise.resolve(r).catch(seekError).then(() => {
+    if (w !== S.win) return;
+    S.busy = false;
+    if (S.want !== null) pump();
+  });
+}
+function seekError(e) {
+  if (S.seekErr) return;
+  S.seekErr = true;
+  flash('The page threw while seeking: ' + ((e && e.message) || e), 'err');
+}
+
+function tick(now) {
+  requestAnimationFrame(tick);
+  if (!S.playing || !S.win || S.busy) return;
+  let t = (now - S.clock) / 1000;
+  if (t >= S.duration) {
+    if (S.loop && S.duration > 0) { t %= S.duration; S.clock = now - t * 1000; }
+    else { t = S.duration; S.playing = false; updatePlay(); }
+  }
+  t = clampT(Math.floor(t * S.fps + 1e-6) / S.fps);
+  if (t !== S.t) { S.t = t; requestSeek(t); updateTime(); }
+}
+requestAnimationFrame(tick);
+
+function play() {
+  if (!S.win) return;
+  if (S.t >= S.duration - 1e-6) S.t = 0;
+  S.playing = true;
+  S.clock = performance.now() - S.t * 1000;
+  clearSel();
+  updatePlay();
+}
+function pause() {
+  S.playing = false;
+  updatePlay();
+}
+function toggle() { S.playing ? pause() : play(); }
+function seekUser(t) {
+  pause();
+  clearSel();
+  S.t = snap(t);
+  requestSeek(S.t);
+  updateTime();
+}
+function step(dir) { if (S.win) seekUser((Math.round(S.t * S.fps) + dir) / S.fps); }
+
+function updatePlay() {
+  const b = $('play');
+  b.setAttribute('aria-label', S.playing ? 'Pause' : 'Play');
+  $('playicon').setAttribute('d', S.playing ? 'M3 2h4v12H3zM9 2h4v12H9z' : 'M4 2l10 6-10 6z');
+}
+function syncScrub() {
+  const r = $('scrub');
+  r.max = String(S.duration);
+  r.step = String(1 / S.fps);
+  updateTime();
+}
+function updateTime() {
+  $('scrub').value = String(S.t);
+  $('time').textContent = S.t.toFixed(2) + ' / ' + S.duration.toFixed(2) + ' s';
+}
+
+function layout() {
+  if (S.mode !== 'player') return;
+  const wrapW = $('wrap').clientWidth || 1;
+  const cd = host.ctx.containerDimensions || {};
+  const limit = host.ctx.displayMode === 'fullscreen' ? window.innerHeight : (cd.height || cd.maxHeight);
+  const maxH = limit ? Math.max(120, limit - 150) : 640;
+  const s = Math.min(wrapW / S.width, maxH / S.height);
+  S.scale = s;
+  const st = $('stage').style;
+  st.width = Math.floor(S.width * s) + 'px';
+  st.height = Math.floor(S.height * s) + 'px';
+  if (S.frame) {
+    const fs = S.frame.style;
+    fs.width = S.width + 'px';
+    fs.height = S.height + 'px';
+    fs.transform = 'scale(' + s + ')';
+  }
+  drawOverlay();
+}
+new ResizeObserver(layout).observe($('wrap'));
+window.addEventListener('resize', layout);
+
+// ---------- Selection -> model context ----------
+function onPageClick(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  let el = e.target;
+  if (el && el.nodeType !== 1) el = el.parentElement;
+  if (!el) return;
+  pause();
+  const canvas = el.tagName === 'CANVAS';
+  const box = canvas
+    ? { x: Math.round(e.clientX), y: Math.round(e.clientY), width: 1, height: 1 }
+    : rectOf(el);
+  const selector = selectorFor(el);
+  const text = canvas ? '' : clip((el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim(), 80);
+  const t = +S.t.toFixed(4);
+  S.sel = { box };
+  drawOverlay();
+  const what = canvas
+    ? selector + ' on the canvas at (' + box.x + ',' + box.y + ')'
+    : selector + (text ? ' ("' + text + '")' : '');
+  sendContext(
+    'In ' + S.path + ', the person selected ' + what + ' at t=' + S.t.toFixed(2) + 's. Element box in page pixels: ' +
+      box.x + ',' + box.y + ',' + box.width + ',' + box.height + '. Page size ' + S.width + 'x' + S.height + '.',
+    { path: S.path, t, selector, text, box }
+  );
+}
+function rectOf(el) {
+  const r = el.getBoundingClientRect();
+  return { x: Math.round(r.left), y: Math.round(r.top), width: Math.round(r.width), height: Math.round(r.height) };
+}
+const clip = (s, n) => (s.length > n ? s.slice(0, n - 1) + '…' : s);
+function selectorFor(el) {
+  const doc = el.ownerDocument;
+  const esc = (s) => (window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/[^\w-]/g, '\\$&'));
+  const parts = [];
+  let cur = el;
+  for (let depth = 0; cur && cur.nodeType === 1 && depth <= 4; depth++) {
+    if (cur.id) { parts.unshift('#' + esc(cur.id)); break; }
+    const tag = cur.tagName.toLowerCase();
+    if (tag === 'html') break;
+    let part = tag;
+    const cls = Array.from(cur.classList).slice(0, 2);
+    if (cls.length) part += '.' + cls.map(esc).join('.');
+    const parent = cur.parentElement;
+    if (parent && tag !== 'body') {
+      const same = Array.from(parent.children).filter((c) => c.matches(part));
+      if (same.length > 1) {
+        const peers = Array.from(parent.children).filter((c) => c.tagName === cur.tagName);
+        part += ':nth-of-type(' + (peers.indexOf(cur) + 1) + ')';
+      }
+    }
+    parts.unshift(part);
+    if (tag === 'body') break;
+    try { if (doc.querySelectorAll(parts.join(' > ')).length === 1) break; } catch (e) { /* keep climbing */ }
+    cur = parent;
+  }
+  return parts.join(' > ');
+}
+function drawOverlay() {
+  const o = $('overlay');
+  if (!S.sel) { o.hidden = true; return; }
+  const b = S.sel.box, s = S.scale;
+  o.hidden = false;
+  o.style.left = b.x * s - 2 + 'px';
+  o.style.top = b.y * s - 2 + 'px';
+  o.style.width = Math.max(4, b.width * s + 4) + 'px';
+  o.style.height = Math.max(4, b.height * s + 4) + 'px';
+}
+function clearSel() {
+  if (!S.sel) return;
+  S.sel = null;
+  drawOverlay();
+}
+
+let flashTimer = 0;
+function flash(text, kind) {
+  const m = $('msg');
+  m.textContent = text;
+  m.className = kind || '';
+  clearTimeout(flashTimer);
+  if (kind === 'ok') flashTimer = setTimeout(() => { if (m.textContent === text) m.textContent = ''; }, 4000);
+}
+async function sendContext(text, structuredContent) {
+  if (!host.caps.updateModelContext) return flash("This host can't receive selections", 'err');
+  flash('Sending...');
+  try {
+    await request('ui/update-model-context', { content: [{ type: 'text', text }], structuredContent });
+    flash('Sent to the conversation', 'ok');
+  } catch (e) {
+    flash('Could not send: ' + e.message, 'err');
+  }
+}
+function sendMoment() {
+  if (!S.path) return;
+  pause();
+  sendContext(
+    'In ' + S.path + ', the person selected the moment t=' + S.t.toFixed(2) + 's. Page size ' + S.width + 'x' + S.height + '.',
+    { path: S.path, t: +S.t.toFixed(4) }
+  );
+}
+
+// ---------- Render ----------
+const R = { busy: false, job: null };
+async function startRender() {
+  if (!S.path || R.busy) return;
+  const args = { path: S.path };
+  if (S.durKnown) args.duration = S.duration;
+  args.width = S.width; args.height = S.height; args.fps = S.fps; args.waitSeconds = 20;
+  R.busy = true;
+  $('render').disabled = true;
+  showRender({ status: 'running', progress: null, elapsedSeconds: 0 });
+  try {
+    await followRender((await callTool('render_video', args)).structuredContent, true);
+  } catch (e) {
+    showRender({ status: 'failed', error: e.message });
+  } finally {
+    R.busy = false;
+    $('render').disabled = !S.win;
+  }
+}
+async function followRender(st, owned) {
+  if (!owned) { R.busy = true; $('render').disabled = true; }
+  try {
+    for (;;) {
+      if (!st || typeof st.jobId !== 'string') throw new Error('The render tool returned no job.');
+      R.job = st.jobId;
+      showRender(st);
+      if (st.status !== 'running') return;
+      const started = Date.now();
+      try {
+        st = (await callTool('get_render_status', { jobId: st.jobId, waitSeconds: 20 })).structuredContent;
+      } catch (e) {
+        throw new Error('Could not get the render status: ' + e.message);
+      }
+      const spent = Date.now() - started;
+      if (spent < 1000) await new Promise((r) => setTimeout(r, 1000 - spent));
+    }
+  } catch (e) {
+    if (owned) throw e;
+    showRender({ status: 'failed', error: e.message });
+  } finally {
+    if (!owned) { R.busy = false; $('render').disabled = !S.win; }
+  }
+}
+function showRender(st) {
+  $('rpanel').hidden = false;
+  const stat = $('rstat'), bar = $('rbar'), fill = $('rfill'), log = $('rlog');
+  const running = st.status === 'running';
+  $('rcancel').hidden = !(running && R.job);
+  $('rcancel').disabled = false;
+  bar.hidden = !running;
+  log.hidden = true;
+  stat.className = '';
+  if (running) {
+    const p = typeof st.progress === 'number' ? Math.max(0, Math.min(1, st.progress)) : null;
+    bar.classList.toggle('indet', p === null);
+    fill.style.width = p === null ? '' : p * 100 + '%';
+    const el = typeof st.elapsedSeconds === 'number' ? ', ' + Math.round(st.elapsedSeconds) + ' s elapsed' : '';
+    stat.textContent = 'Rendering' + (p === null ? '' : ' ' + Math.round(p * 100) + '%') + el;
+  } else if (st.status === 'completed') {
+    stat.className = 'ok';
+    stat.textContent = 'Rendered ' + (st.output || 'the video') + (typeof st.bytes === 'number' ? ' (' + mb(st.bytes) + ')' : '');
+  } else if (st.status === 'cancelled') {
+    stat.textContent = 'Render cancelled.';
+  } else {
+    stat.className = 'err';
+    stat.textContent = 'Render failed: ' + (st.error || 'unknown error');
+    if (st.logTail) { log.hidden = false; log.querySelector('pre').textContent = st.logTail; }
+  }
+  if (!running) R.job = null;
+}
+async function cancelRender() {
+  if (!R.job) return;
+  $('rcancel').disabled = true;
+  try {
+    await callTool('cancel_render', { jobId: R.job });
+  } catch (e) {
+    $('rcancel').disabled = false;
+    flash('Could not cancel: ' + e.message, 'err');
+  }
+}
+
+// ---------- Library ----------
+async function openLibrary() {
+  S.mode = 'library';
+  pause();
+  showSection('library');
+  $('libstate').textContent = 'Loading...';
+  $('pages').textContent = '';
+  $('renders').textContent = '';
+  $('rendersbox').hidden = true;
+  let sc;
+  try {
+    sc = (await callTool('list_videos', {})).structuredContent || {};
+  } catch (e) {
+    $('libstate').textContent = 'Could not list videos: ' + e.message;
+    return;
+  }
+  if (S.mode !== 'library') return;
+  const pages = (Array.isArray(sc.pages) ? sc.pages : []).filter((p) => p && typeof p.path === 'string')
+    .sort((a, b) => (b.modifiedMs || 0) - (a.modifiedMs || 0));
+  const renders = (Array.isArray(sc.renders) ? sc.renders : []).filter((r) => r && typeof r.path === 'string')
+    .sort((a, b) => (b.modifiedMs || 0) - (a.modifiedMs || 0));
+  $('libstate').textContent = pages.length ? '' : 'No video pages in this project yet. Ask for a video and it will appear here.';
+  $('libstate').hidden = !!pages.length;
+  for (const p of pages) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = p.path;
+    b.title = p.modifiedMs ? 'Modified ' + new Date(p.modifiedMs).toLocaleString() : p.path;
+    b.addEventListener('click', () => openPlayer({ path: p.path, duration: null }, true));
+    li.appendChild(b);
+    $('pages').appendChild(li);
+  }
+  for (const r of renders) {
+    const li = document.createElement('li');
+    const a = document.createElement('span');
+    a.className = 'p';
+    a.textContent = r.path;
+    const z = document.createElement('span');
+    z.className = 'muted';
+    z.textContent = typeof r.bytes === 'number' ? mb(r.bytes) : '';
+    li.append(a, z);
+    $('renders').appendChild(li);
+  }
+  $('rendersbox').hidden = !renders.length;
+}
+
+// ---------- Wiring ----------
+function onKey(e) {
+  if (S.mode !== 'player' || !S.win || e.defaultPrevented) return;
+  const tg = e.target, tag = tg && tg.tagName;
+  if (tag === 'TEXTAREA' || tag === 'SELECT' || (tg && tg.isContentEditable)) return;
+  if (e.key === ' ' || e.code === 'Space') {
+    if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'SUMMARY') return;
+    e.preventDefault();
+    toggle();
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    if (tag === 'INPUT') return;
+    e.preventDefault();
+    step(e.key === 'ArrowLeft' ? -1 : 1);
+  }
+}
+document.addEventListener('keydown', onKey);
+$('play').addEventListener('click', toggle);
+$('back').addEventListener('click', () => step(-1));
+$('fwd').addEventListener('click', () => step(1));
+$('scrub').addEventListener('input', (e) => seekUser(parseFloat(e.target.value) || 0));
+$('loop').addEventListener('click', () => {
+  S.loop = !S.loop;
+  $('loop').setAttribute('aria-pressed', String(S.loop));
+});
+$('moment').addEventListener('click', sendMoment);
+$('render').addEventListener('click', startRender);
+$('rcancel').addEventListener('click', cancelRender);
+$('libback').addEventListener('click', openLibrary);
+$('fs').addEventListener('click', async () => {
+  const mode = host.ctx.displayMode === 'fullscreen' ? 'inline' : 'fullscreen';
+  try {
+    const r = await request('ui/request-display-mode', { mode });
+    applyContext({ displayMode: (r && r.mode) || mode });
+  } catch (e) {
+    flash('Could not change the display mode: ' + e.message, 'err');
+  }
+});
+
+async function init() {
+  if (window.parent === window) return showNote('This view runs inside Claude or ChatGPT.');
+  try {
+    const r = await request('ui/initialize', {
+      appInfo: APP_INFO,
+      appCapabilities: { availableDisplayModes: ['inline', 'fullscreen'] },
+      protocolVersion: PROTOCOL_VERSION,
+    });
+    host.caps = (r && r.hostCapabilities) || {};
+    applyContext((r && r.hostContext) || {});
+    notify('ui/notifications/initialized');
+    host.ready = true;
+    startAutoResize();
+  } catch (e) {
+    showNote('Could not connect to the host: ' + e.message);
+  }
+}
+init();
+})();
+</script>
+</body>
+</html>
