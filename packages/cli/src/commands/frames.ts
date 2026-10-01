@@ -106,7 +106,9 @@ export function registerFrameCommands(program: Command) {
           throw new Error(
             `Frames at ${differing.map((t) => `${Number(t.toFixed(3))}s`).join(', ')} differ depending on what was rendered before them. ` +
             'Every frame must be a function of t alone: replace counters, `x += speed`, randomness drawn per frame ' +
-            'and timers with values computed from t, or the video breaks when rendered in chunks or seeked.'
+            'and timers with values computed from t, or the video breaks when rendered in chunks or seeked. ' +
+            'If the frames differ only at the edges of text or shapes, look for CSS will-change: it makes Chrome ' +
+            'reuse rasterization from earlier frames. Remove it.'
           );
         }
         if (noisy.length > 0) {

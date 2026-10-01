@@ -219,7 +219,8 @@ export class RenderJobs {
     };
     if (job.status === 'completed' && job.bytes !== undefined) snapshot.bytes = job.bytes;
     if (job.status === 'failed' && job.error) snapshot.error = job.error;
-    if (state && state.lines.length > 0) snapshot.logTail = state.lines.slice(-LOG_TAIL_LINES);
+    // Only a failure needs the log; on success it is encoder noise in the model's context.
+    if (job.status === 'failed' && state && state.lines.length > 0) snapshot.logTail = state.lines.slice(-LOG_TAIL_LINES);
     return snapshot;
   }
 

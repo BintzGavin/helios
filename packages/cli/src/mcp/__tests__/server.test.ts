@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import type { CliChild, CliExit, CliRunner, CliSpawnOptions } from '../cli-runner.js';
@@ -110,6 +111,23 @@ describe('helios MCP server: listing', () => {
     expect(tools.filter((t) => t.outputSchema).length).toBeGreaterThan(0);
   });
 
+  it('lists schemas that a JSON Schema 2020-12 validator accepts, as Claude validates them', async () => {
+    write('a.html', '<html></html>');
+    await connect();
+    const ajv = new Ajv2020({ strict: false });
+    const { tools } = await client.listTools();
+    const validators = Object.fromEntries(tools.map((tool) => {
+      ajv.compile(tool.inputSchema);
+      return [tool.name, tool.outputSchema ? ajv.compile(tool.outputSchema) : undefined];
+    }));
+    for (const [name, args] of [
+      ['preview_video', { path: 'a.html', duration: 2 }], ['helios_library', {}], ['list_videos', {}], ['read_page', { path: 'a.html' }],
+    ] as const) {
+      const result = await call(name, args);
+      expect(validators[name]!(result.structuredContent), `${name}: ${JSON.stringify(validators[name]!.errors)}`).toBe(true);
+    }
+  });
+
   it('lists the ten tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();
@@ -202,15 +220,20 @@ describe('helios MCP server: preview, library, pages', () => {
     const result = await call('preview_video', { path: 'videos/intro.html', duration: 12 });
     expect(result.isError).toBeFalsy();
     expect(result.structuredContent).toEqual({
-      mode: 'player', path: 'videos/intro.html', duration: 12, width: 1920, height: 1080, fps: 30,
+      mode: 'player', path: 'videos/intro.html', absolutePath: path.join(root, 'videos/intro.html'),
+      duration: 12, width: 1920, height: 1080, fps: 30,
     });
     expect(result.content[0].text).toBe(
       'Previewing videos/intro.html (12 s, 1920×1080) in the conversation. ' +
+      `The page is at ${path.join(root, 'videos/intro.html')}. ` +
       'The person can scrub it and select a moment or an element; their selection reaches you as context.',
     );
 
     const sized = await call('preview_video', { path: './videos/../videos/intro.html', width: 640, height: 360, fps: 24 });
-    expect(sized.structuredContent).toEqual({ mode: 'player', path: 'videos/intro.html', duration: null, width: 640, height: 360, fps: 24 });
+    expect(sized.structuredContent).toEqual({
+      mode: 'player', path: 'videos/intro.html', absolutePath: path.join(root, 'videos/intro.html'),
+      duration: null, width: 640, height: 360, fps: 24,
+    });
   });
 
   it('preview_video rejects paths outside the root, missing files and folders', async () => {
@@ -397,9 +420,8 @@ describe('helios MCP server: rendering', () => {
     });
     expect(result.content[0].text).toContain(`It is at ${path.join(root, 'renders/final.mp4')}`);
     expect(result.structuredContent.jobId).toMatch(/^render-/);
-    expect(result.structuredContent.logTail).toEqual([
-      'Initializing renderer...', 'Progress: Rendered 30 / 60 frames', 'Render complete.',
-    ]);
+    // The log is only for failures; on success it would be encoder noise in the model's context.
+    expect(result.structuredContent.logTail).toBeUndefined();
     expect(result.content[0].text).toMatch(/^Rendered renders\/final\.mp4 \(2\.0 s requested, 2\.0 KB\) in \d+ s\. It is at \//);
   });
 

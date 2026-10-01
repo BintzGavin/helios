@@ -212,6 +212,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       outputSchema: {
         mode: z.literal('player'),
         path: z.string(),
+        absolutePath: z.string(),
         duration: z.number().nullable(),
         width: z.number(),
         height: z.number(),
@@ -233,6 +234,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       const structured = {
         mode: 'player' as const,
         path: page.rel,
+        absolutePath: page.abs,
         duration: args.duration ?? null,
         width: args.width ?? DEFAULT_WIDTH,
         height: args.height ?? DEFAULT_HEIGHT,
@@ -243,6 +245,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         content: [{
           type: 'text',
           text: `${saved ? `Saved ${page.rel}. ` : ''}Previewing ${page.rel} (${length}, ${structured.width}×${structured.height}) in the conversation. ` +
+            `The page is at ${page.abs}. ` +
             'The person can scrub it and select a moment or an element; their selection reaches you as context.',
         }],
         structuredContent: structured,
