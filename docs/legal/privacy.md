@@ -1,6 +1,6 @@
 # Helios privacy policy
 
-**Draft for review · Last updated: 1 October 2026**
+**Last updated: 1 October 2026**
 
 This policy covers the Helios agent plugin, the Helios MCP server (`helios mcp`), the Claude Desktop extension, and the Helios CLI.
 
