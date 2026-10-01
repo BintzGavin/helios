@@ -88,7 +88,7 @@ Each tool is a thin wrapper over a CLI function that already exists on `main`. T
 | Tool | Callable by | Wraps | Returns |
 | --- | --- | --- | --- |
 | `preview_video` | Model | (none) | Opens the view on a page. A short text summary for the model. |
-| `render_video` | Model, view | `helios render` (size, fps, duration, `--audio`, `--preset`) | Output path, duration, size. Opens the view on the result. |
+| `render_video` | Model, view | `helios render` (size, fps, duration, `--audio`, `--preset`) | Output path, duration, size. The view calls it from its Render button. |
 | `get_frames` | Model | `helios still`, `helios sheet` | PNG image content, so the model can look at its own frames. |
 | `verify_video` | Model | `helios verify` | Pass, or the times whose frames depend on render order. |
 | `read_page` | View only | File read inside the project root | Page source for the view. |

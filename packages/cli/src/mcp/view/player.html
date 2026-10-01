@@ -666,7 +666,7 @@ function showRender(st) {
   } else {
     stat.className = 'err';
     stat.textContent = 'Render failed: ' + (st.error || 'unknown error');
-    if (st.logTail) { log.hidden = false; log.querySelector('pre').textContent = st.logTail; }
+    if (st.logTail) { log.hidden = false; log.querySelector('pre').textContent = Array.isArray(st.logTail) ? st.logTail.join('\n') : String(st.logTail); }
   }
   if (!running) R.job = null;
 }

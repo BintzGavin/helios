@@ -15,6 +15,7 @@ import { registerJobCommand } from './commands/job.js';
 import { registerSkillsCommand } from './commands/skills.js';
 import { registerDiffCommand } from './commands/diff.js';
 import { registerDeployCommand } from './commands/deploy.js';
+import { registerMcpCommand } from './commands/mcp.js';
 
 const program = new Command();
 
@@ -39,5 +40,6 @@ registerJobCommand(program);
 registerSkillsCommand(program);
 registerDiffCommand(program);
 registerDeployCommand(program);
+registerMcpCommand(program);
 
 program.parse(process.argv);
