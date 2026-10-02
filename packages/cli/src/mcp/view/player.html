@@ -82,6 +82,7 @@ button.icon svg { width: 16px; height: 16px; fill: currentColor; }
 #rstat.err { color: var(--err); }
 #rstat.ok { color: var(--ok); }
 #rdone { margin-top: 6px; }
+#rvideo { display: block; width: 100%; max-height: 360px; border-radius: var(--radius); background: #000; margin-bottom: 6px; }
 #rpath { display: block; font-size: 12px; padding: 4px 6px; border-radius: 4px; background: var(--bg2); font-family: var(--mono); overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
 #rbtns { display: flex; gap: 8px; margin-top: 6px; }
 #renders li button { padding: 0 8px; font-size: 12px; }
@@ -129,8 +130,9 @@ button.icon svg { width: 16px; height: 16px; fill: currentColor; }
     <div id="rtop"><span id="rstat"></span><button id="rcancel" type="button" hidden>Cancel</button></div>
     <div id="rbar" hidden><div id="rfill"></div></div>
     <div id="rdone" hidden>
+      <video id="rvideo" controls playsinline preload="metadata" hidden></video>
       <code id="rpath" title="Where the video was saved"></code>
-      <div id="rbtns"><button id="rreveal" type="button">Show in Finder</button><button id="ropen" type="button">Open</button></div>
+      <div id="rbtns"><button id="rreveal" type="button">Show in Finder</button><button id="ropen" type="button">Open</button><button id="rdownload" type="button" hidden>Download MP4</button><button id="rshare" type="button" hidden>Open share page</button></div>
     </div>
     <details id="rlog" hidden><summary>Render log</summary><pre></pre></details>
   </div>
@@ -660,12 +662,32 @@ async function revealFile(path, open) {
     flash('Could not ' + (open ? 'open ' : 'show ') + path + ': ' + e.message, 'err');
   }
 }
+/** Opens a URL through the host (MCP Apps ui/open-link); the sandboxed view can't navigate itself. */
+async function openLink(url) {
+  try {
+    await request('ui/open-link', { url });
+  } catch (e) {
+    flash('Could not open the link: ' + e.message + ' — ' + url, 'err');
+  }
+}
 function showRender(st) {
   $('rpanel').hidden = false;
-  $('rdone').hidden = !(st.status === 'completed' && st.output);
-  if (st.status === 'completed' && st.output) {
-    R.output = st.output;
-    $('rpath').textContent = st.absoluteOutput || st.output;
+  const done = st.status === 'completed' && !!(st.output || st.url);
+  $('rdone').hidden = !done;
+  if (done) {
+    // A local render is a file on this computer; a hosted render is a URL.
+    const hosted = typeof st.url === 'string' && !st.absoluteOutput;
+    R.output = st.output || null;
+    R.url = hosted ? st.url : null;
+    R.shareUrl = hosted && typeof st.shareUrl === 'string' ? st.shareUrl : null;
+    $('rpath').hidden = hosted;
+    $('rpath').textContent = hosted ? '' : (st.absoluteOutput || st.output);
+    $('rreveal').hidden = hosted;
+    $('ropen').hidden = hosted;
+    $('rvideo').hidden = !hosted;
+    if (hosted && $('rvideo').getAttribute('src') !== st.url) $('rvideo').setAttribute('src', st.url);
+    $('rdownload').hidden = !hosted;
+    $('rshare').hidden = !R.shareUrl;
   }
   const stat = $('rstat'), bar = $('rbar'), fill = $('rfill'), log = $('rlog');
   const running = st.status === 'running';
@@ -746,9 +768,9 @@ async function openLibrary() {
     z.textContent = typeof r.bytes === 'number' ? mb(r.bytes) : '';
     const show = document.createElement('button');
     show.type = 'button';
-    show.textContent = 'Show';
-    show.title = REVEAL_LABEL;
-    show.addEventListener('click', () => revealFile(r.path, false));
+    show.textContent = typeof r.url === 'string' ? 'Open' : 'Show';
+    show.title = typeof r.url === 'string' ? r.url : REVEAL_LABEL;
+    show.addEventListener('click', () => (typeof r.url === 'string' ? openLink(r.url) : revealFile(r.path, false)));
     li.append(a, z, show);
     $('renders').appendChild(li);
   }
@@ -785,6 +807,8 @@ $('rcancel').addEventListener('click', cancelRender);
 $('rreveal').textContent = REVEAL_LABEL;
 $('rreveal').addEventListener('click', () => R.output && revealFile(R.output, false));
 $('ropen').addEventListener('click', () => R.output && revealFile(R.output, true));
+$('rdownload').addEventListener('click', () => R.url && openLink(R.url));
+$('rshare').addEventListener('click', () => R.shareUrl && openLink(R.shareUrl));
 $('libback').addEventListener('click', openLibrary);
 $('fs').addEventListener('click', async () => {
   const mode = host.ctx.displayMode === 'fullscreen' ? 'inline' : 'fullscreen';
