@@ -281,6 +281,40 @@ describe('player.html view with a fake MCP Apps host', { timeout: 60_000 }, () =
     }
   });
 
+  it('plays a hosted render inline and opens its download and share links', async () => {
+    const { page, sent, view } = await openHost(playerScenario, {
+      read_page: (args) => ({ content: [], structuredContent: { path: args.path, html: FIXTURE_PAGE, inlined: [], skipped: [] } }),
+      render_video: () => ({
+        content: [],
+        structuredContent: {
+          jobId: 'job-h', status: 'completed', output: 'video.mp4', progress: 1, elapsedSeconds: 9, bytes: 2_000_000,
+          url: 'https://cloud.example/r/abc.mp4', shareUrl: 'https://cloud.example/v/abc',
+        },
+      }),
+    });
+    try {
+      await waitFor(() => innerFrame(page), 'inner frame');
+      const v = view();
+      await waitFor(() => v.evaluate(() => !(document.getElementById('render') as HTMLButtonElement).disabled), 'render enabled');
+      await v.click('#render');
+      await waitFor(() => v.evaluate(() => !document.getElementById('rdone')!.hidden), 'render done');
+      expect(await v.getAttribute('#rvideo', 'src')).toBe('https://cloud.example/r/abc.mp4');
+      expect(await v.isVisible('#rvideo')).toBe(true);
+      // A hosted render has no file on this computer: no path, no Show in Finder.
+      expect(await v.isVisible('#rpath')).toBe(false);
+      expect(await v.isVisible('#rreveal')).toBe(false);
+      await v.click('#rdownload');
+      await v.click('#rshare');
+      const links = await waitFor(async () => {
+        const l = (await sent()).filter((m) => m.method === 'ui/open-link');
+        return l.length === 2 ? l : undefined;
+      }, 'open-link requests');
+      expect(links.map((m) => m.params.url)).toEqual(['https://cloud.example/r/abc.mp4', 'https://cloud.example/v/abc']);
+    } finally {
+      await page.close();
+    }
+  });
+
   it('shows the error text when the server has no render tool', async () => {
     const { page, view } = await openHost(playerScenario, {
       read_page: (args) => ({ content: [], structuredContent: { path: args.path, html: FIXTURE_PAGE, inlined: [], skipped: [] } }),
