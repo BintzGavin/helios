@@ -30,6 +30,7 @@ struct State {
     struct HeldBuffer { CVPixelBufferRef buffer = nullptr; uint32_t frame = 0; };
     std::array<HeldBuffer, 3> held{};
     uint32_t encoderPool;
+    uint32_t bitrate;
     uint32_t width, height, num, den;
     std::atomic<bool> failed{false};
     explicit State(uint32_t pool) : flight(pool), encoderPool(pool) {}
@@ -112,6 +113,7 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
     @autoreleasepool {
         auto state = std::make_unique<State>(encoderPool);
         state->width = w; state->height = h; state->num = num; state->den = den;
+        state->bitrate = bitrate;
         state->device = MTLCreateSystemDefaultDevice();
         if (!state->device) return nullptr;
         state->queue = [state->device newCommandQueue];
@@ -143,6 +145,12 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         double rate = double(num) / den;
         NSDictionary* properties = @{(id)kVTCompressionPropertyKey_AverageBitRate: @(bitrate), (id)kVTCompressionPropertyKey_ExpectedFrameRate: @(rate), (id)kVTCompressionPropertyKey_AllowFrameReordering: @NO, (id)kVTCompressionPropertyKey_MaxKeyFrameInterval: @(gop), (id)kVTCompressionPropertyKey_ColorPrimaries: (id)kCVImageBufferColorPrimaries_ITU_R_709_2, (id)kVTCompressionPropertyKey_TransferFunction: (id)kCVImageBufferTransferFunction_ITU_R_709_2, (id)kVTCompressionPropertyKey_YCbCrMatrix: (id)kCVImageBufferYCbCrMatrix_ITU_R_709_2};
         if (VTSessionSetProperties(state->encoder, (__bridge CFDictionaryRef)properties) || VTCompressionSessionPrepareToEncodeFrames(state->encoder)) return nullptr;
+        CFTypeRef configured = nullptr;
+        if (VTSessionCopyProperty(state->encoder, kVTCompressionPropertyKey_AverageBitRate, nullptr, &configured) || !configured) return nullptr;
+        int64_t configuredBitrate = 0;
+        const bool accepted = CFGetTypeID(configured) == CFNumberGetTypeID() && CFNumberGetValue((CFNumberRef)configured, kCFNumberSInt64Type, &configuredBitrate) && configuredBitrate == bitrate;
+        CFRelease(configured);
+        if (!accepted) { fprintf(stderr, "GPU_BITRATE_REJECTED\n"); return nullptr; }
         CFTypeRef used = nullptr;
         if (VTSessionCopyProperty(state->encoder, kVTCompressionPropertyKey_UsingHardwareAcceleratedVideoEncoder, nullptr, &used) || !used) return nullptr;
         const bool hardware = CFEqual(used, kCFBooleanTrue); CFRelease(used);
@@ -151,7 +159,7 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         NSDictionary* poolAttributes = @{(id)kCVPixelBufferPoolAllocationThresholdKey: @(encoderPool)};
         if (!pool || CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(nullptr, pool, (__bridge CFDictionaryRef)poolAttributes, &state->buffer) || !CVPixelBufferGetIOSurface(state->buffer)) return nullptr;
         if (CVMetalTextureCacheCreate(nullptr, nullptr, state->device, nullptr, &state->cache)) return nullptr;
-        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":3,\"gop\":%u,\"encoderPool\":true,\"poolCapacity\":%u,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), gop, encoderPool);
+        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":4,\"bitrate\":%u,\"configuredBitrate\":%u,\"gop\":%u,\"encoderPool\":true,\"poolCapacity\":%u,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), bitrate, bitrate, gop, encoderPool);
         if (path[0]) { state->output = fopen(path, "wb"); if (!state->output) return nullptr; }
         return state.release();
     }
@@ -160,6 +168,7 @@ extern "C" void* helios_device(State* state) { return (__bridge void*)state->dev
 extern "C" void* helios_queue(State* state) { return (__bridge void*)state->queue; }
 extern "C" void* helios_texture(State* state) { return (__bridge void*)state->rgba; }
 extern "C" bool helios_hardware(State*) { return true; }
+extern "C" uint32_t helios_configured_bitrate(State* state) { return state->bitrate; }
 extern "C" void helios_raster_submitted(State* state, uint32_t index) {
     if (state->trace) fprintf(state->trace, "{\"event\":\"raster-submitted\",\"frame\":%u}\n", index);
 }

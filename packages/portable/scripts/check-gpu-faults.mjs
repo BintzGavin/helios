@@ -11,7 +11,7 @@ const source = fileURLToPath(new URL('../native/fault-init.mm', import.meta.url)
 const sdk = spawnSync('xcrun', ['--show-sdk-path'], { encoding: 'utf8' });
 if (sdk.status !== 0) throw new Error('Apple SDK unavailable');
 const receipts = [];
-for (const kind of ['DEVICE', 'ENCODER']) {
+for (const kind of ['DEVICE', 'ENCODER', 'BITRATE']) {
   const library = join(scratch, `${kind.toLowerCase()}.dylib`);
   const build = spawnSync('xcrun', ['clang++', '-dynamiclib', '-fobjc-arc', '-isysroot', sdk.stdout.trim(), `-DHELIOS_FAIL_${kind}`, source, '-framework', 'Metal', '-framework', 'VideoToolbox', '-o', library], { encoding: 'utf8' });
   if (build.status !== 0) throw new Error(`Fault driver build failed: ${build.stderr}`);

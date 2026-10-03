@@ -19,7 +19,11 @@ The committed portable CPU implementation and its public TypeScript APIs remain 
 
 ## Bounded encoder overlap acceptance
 
-- Opt-in `encoderPool: 3` permits at most three retained encoder inputs; omitted/explicit1 preserves serial behavior. Native protocol3 binds the setting in the receipt and independently rejects any other capacity.
+### Bounded bitrate controls
+
+TS, native CLI and the continuity adapter independently admit integer100,000..1,000,000,000bps targets; default20,000,000 remains unchanged. Noninteger, negative, nonfinite, over-bound and native integer-overflow values reject before GPU work. VideoToolbox's configured AverageBitRate must equal the requested target; changed/unsupported configuration fails closed. Native protocol4 receipts bind both values and TS verifies them before publication. A separately compiled changed-rate fault driver verifies rejection without software fallback. Small500Mbps hardware acceptance does not qualify full4K fidelity. Existing.995/40/35/35 floors are unchanged; the comparison owner retains failed8Mbps/200Mbps screens and runs separately pinned full300-frame quality gates.
+
+- Opt-in `encoderPool: 3` permits at most three retained encoder inputs; omitted/explicit1 preserves serial behavior. Native protocol3 and later bind the setting in the receipt and independently reject any other capacity.
 - Raster/conversion remains serial on one private texture with a required GPU completion fence before encoder submission. Each pooled input has an application reference through its complete callback body; VideoToolbox may retain it longer. Only CoreVideo's encoder pool can select a recycled buffer.
 - Pool allocation has a fixed threshold. On pressure, drain through the oldest pending PTS outside the callback mutex, flush cached plane wrappers and retry exactly once. Never spin, grow the pool or overwrite an in-flight surface.
 - Install bounded frame-index accounting and retained-buffer ownership before EncodeFrame, which may synchronously invoke its callback. Serialize packet/error/accounting state under a callback mutex. Unknown, duplicate, out-of-order, dropped or failed callbacks fail closed.

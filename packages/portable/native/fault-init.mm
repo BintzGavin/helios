@@ -11,6 +11,17 @@ static OSStatus failEncoder(CFAllocatorRef, int32_t, int32_t, CMVideoCodecType,
     void*, VTCompressionSessionRef* output) { *output = nullptr; return kVTCouldNotFindVideoEncoderErr; }
 __attribute__((used)) static struct { const void* replacement; const void* replacee; } fault
 __attribute__((section("__DATA,__interpose"))) = { (const void*)&failEncoder, (const void*)&VTCompressionSessionCreate };
+#elif defined(HELIOS_FAIL_BITRATE)
+static OSStatus changedBitrate(VTSessionRef session, CFStringRef key, CFAllocatorRef allocator, CFTypeRef* output) {
+    if (CFEqual(key, kVTCompressionPropertyKey_AverageBitRate)) {
+        int64_t changed = 1;
+        *output = CFNumberCreate(allocator, kCFNumberSInt64Type, &changed);
+        return noErr;
+    }
+    return VTSessionCopyProperty(session, key, allocator, output);
+}
+__attribute__((used)) static struct { const void* replacement; const void* replacee; } fault
+__attribute__((section("__DATA,__interpose"))) = { (const void*)&changedBitrate, (const void*)&VTSessionCopyProperty };
 #else
 #error "Select exactly one task-owned initialization fault"
 #endif
