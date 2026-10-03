@@ -1,4 +1,5 @@
 use base64::Engine;
+mod binary;
 
 #[cfg(test)]
 mod boundary_tests {
@@ -177,10 +178,13 @@ impl Fonts {
         let name = command.font.as_ref().ok_or("missing font")?;
         let text = command.text.as_ref().ok_or("missing text")?;
         let size = command.size.ok_or("missing font size")?;
+        self.draw_parts(canvas, name, text, size, [command.args[0], command.args[1]], paint)
+    }
+    fn draw_parts(&mut self, canvas: &skia_safe::Canvas, name: &str, text: &str, size: f32, position: [f32; 2], paint: &Paint) -> Result<(), Box<dyn std::error::Error>> {
         if !size.is_finite() || size <= 0.0 || size > 2048.0 {
             return Err("invalid font size".into());
         }
-        let key = (name.clone(), text.clone(), size.to_bits());
+        let key = (name.to_owned(), text.to_owned(), size.to_bits());
         if !self.runs.contains_key(&key) {
             if self.runs.len() >= 20_000 {
                 self.runs.clear();
@@ -214,7 +218,7 @@ impl Fonts {
         canvas.draw_glyphs_at(
             glyphs,
             positions.as_slice(),
-            (command.args[0], command.args[1]),
+            (position[0], position[1]),
             &font,
             paint,
         );
@@ -281,12 +285,45 @@ fn draw_frame(
     Ok(())
 }
 
+fn draw_binary(canvas: &skia_safe::Canvas, bytes: &[u8], fonts: &mut Fonts) -> Result<(), Box<dyn std::error::Error>> {
+    binary::validate(bytes, |name| fonts.bytes.contains_key(name))?;
+    canvas.restore_to_count(1); canvas.reset_matrix();
+    let [r, g, b, a] = binary::background(bytes); canvas.clear(Color4f::new(r, g, b, a));
+    let mut commands = binary::Commands::new(bytes);
+    let mut paint = Paint::default(); paint.set_anti_alias(true);
+    while let Some(command) = commands.next()? {
+        use binary::Command::*;
+        match command {
+            Rect([x, y, w, h], [r, g, b, a]) => {
+                paint.set_color4f(Color4f::new(r, g, b, a), None); canvas.draw_rect(skia_safe::Rect::from_xywh(x, y, w, h), &paint);
+            },
+            Circle([x, y, radius], [a, b, c, d, e, f], [r, g, blue, alpha]) => {
+                paint.set_color4f(Color4f::new(r, g, blue, alpha), None);
+                canvas.save(); canvas.reset_matrix(); canvas.concat(&Matrix::new_all(a, c, e, b, d, f, 0.0, 0.0, 1.0));
+                canvas.draw_circle((x, y), radius, &paint); canvas.restore();
+            },
+            Text { position, size, color: [r, g, b, a], font, text } => {
+                paint.set_color4f(Color4f::new(r, g, b, a), None); fonts.draw_parts(canvas, font, text, size, position, &paint)?;
+            },
+            Translate([x, y]) => { canvas.translate((x, y)); },
+            Scale([x, y]) => { canvas.scale((x, y)); },
+            Rotate(radians) => { canvas.rotate(radians.to_degrees(), None); },
+            Save => { canvas.save(); },
+            Restore => { canvas.restore(); },
+        }
+    }
+    Ok(())
+}
+
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
-    let probe = args.get(1).map(String::as_str) == Some("probe");
-    let raster = args.get(1).map(String::as_str) == Some("raster");
-    let reference = args.get(1).map(String::as_str) == Some("reference");
-    if !probe && !raster && !reference && args.get(1).map(String::as_str) != Some("encode") {
+    let mode = args.get(1).map(String::as_str).unwrap_or("");
+    let binary_transport = mode.ends_with("-binary");
+    let mode = mode.strip_suffix("-binary").unwrap_or(mode);
+    let probe = mode == "probe" && !binary_transport;
+    let raster = mode == "raster";
+    let reference = mode == "reference";
+    if !probe && !raster && !reference && mode != "encode" {
         return Err("unsupported native mode".into());
     }
     let (width, height, num, den, bitrate, path) = if probe {
@@ -378,19 +415,26 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
     ];
     let mut stdout = io::stdout().lock();
-    while let Some(line) = read_message(&mut input, FRAME_BYTES)? {
-        let message: serde_json::Value = serde_json::from_str(&line)?;
-        if let Some(svg) = message["svg"].as_str() {
-            let dom = skia_safe::svg::Dom::from_bytes(svg.as_bytes(), FontMgr::empty())
-                .map_err(|_| "invalid SVG")?;
-            surface.canvas().clear(skia_safe::Color::TRANSPARENT);
-            dom.render(surface.canvas());
+    let mut packet = Vec::new();
+    loop {
+        if binary_transport {
+            if !binary::read(&mut input, &mut packet)? { break; }
+            draw_binary(surface.canvas(), &packet, &mut fonts)?;
         } else {
-            draw_frame(
-                surface.canvas(),
-                serde_json::from_value(message)?,
-                &mut fonts,
-            )?;
+            let Some(line) = read_message(&mut input, FRAME_BYTES)? else { break; };
+            let message: serde_json::Value = serde_json::from_str(&line)?;
+            if let Some(svg) = message["svg"].as_str() {
+                let dom = skia_safe::svg::Dom::from_bytes(svg.as_bytes(), FontMgr::empty())
+                    .map_err(|_| "invalid SVG")?;
+                surface.canvas().clear(skia_safe::Color::TRANSPARENT);
+                dom.render(surface.canvas());
+            } else {
+                draw_frame(
+                    surface.canvas(),
+                    serde_json::from_value(message)?,
+                    &mut fonts,
+                )?;
+            }
         }
         context.flush(None);
         if !context.submit(None) {
@@ -425,7 +469,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         raw.len() as u64
     };
-    let receipt = serde_json::json!({"protocol":4,"bitrate":bitrate,"configuredBitrate":if raster || reference {None} else {Some(unsafe {helios_configured_bitrate(native.0)})},"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
+    let receipt = serde_json::json!({"protocol":if binary_transport {5} else {4},"transport":if binary_transport {"binary"} else {"json"},"bitrate":bitrate,"configuredBitrate":if raster || reference {None} else {Some(unsafe {helios_configured_bitrate(native.0)})},"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
     if raster || reference {
         eprintln!("{receipt}");
     } else {

@@ -1,6 +1,40 @@
 # Native GPU comparison protocol
 
-The current optional helper uses native protocol4. Bitrate targets are bounded
+Canvas exports default to compact binary commands (native protocol5); explicit
+`transport: 'json'` retains the independently replayed protocol4 control. Plan
+SVG exports retain JSON. The continuity adapter accepts `--transport binary|json`
+and binds transport into attempts, own-reference qualification and timing gates.
+Binary modes are `encode-binary`, `raster-binary` and `reference-binary`, with
+the same positional arguments and bounded JSON font header as their JSON modes.
+The Metal surface/encoder trace configuration remains protocol4; the completion
+receipt binds the command transport separately. Frozen helpers remain unchanged.
+
+```mermaid
+flowchart LR
+  C[Public Canvas draw] --> B[Bounded typed commands]
+  B --> V[Validate complete packet]
+  V --> M[Existing Skia Metal and NV12 encoder]
+  C --> J[Retained JSON control]
+  J --> M
+```
+
+Binary frames are little-endian and four-byte aligned. The32-byte header stores
+magic `HGF5`, total bytes, command count, reserved zero and opaque RGBA background.
+Tags1/2 encode rect/circle,3/4/5 translate/scale/rotate,6/7 save/restore and8 text.
+Rect stores4 coordinates plusRGBA; circle stores3 coordinates,6 captured affine
+coefficients andRGBA. Transform tags store2/2/1 coordinates. Text stores x/y/size,
+RGBA, font/text UTF-8 byte lengths, then independently zero-padded strings. All
+numbers usef32, matching the previous JSON-to-native cast. Native validates
+length/count/finite fields/colors/stack/known font/UTF-8/text budget and padding
+before drawing. Readers bound the declared envelope before payload allocation;
+truncation or malformed packets fail without a success receipt. The recorder
+avoids per-circle objects/arrays, caches bounded RGB values and retains path
+construction transforms and fill-time paint. Binary and JSON RGBA/NV12 equality
+checks are separate from output compression quality. Changed source/helper pins
+require new full300-frame references and qualification before balanced timing;
+packet size or recorder probes alone establish no export-speed result.
+
+Bitrate targets are bounded
 to100,000..1,000,000,000bps in TS/native/adapter. The hardware encoder's configured
 AverageBitRate must equal the requested target; receipts bind both and TS
 verifies them. Parameter acceptance is not a quality or actual coded-rate claim.

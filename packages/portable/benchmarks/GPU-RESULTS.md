@@ -105,10 +105,13 @@ execution and does not attest every timed frame. Hidden driver/encoder copies,
 unhooked APIs and the intent of system pointer/buffer accesses remain unknown.
 **Total end-to-end zero-copy is not proved; `zeroCopyProved` remains false.**
 
-macOS arm64 Metal/H.264 is implemented and tested. HEVC, Vulkan hardware
-interop, macOS Intel/Windows, GPU image/video nodes, broad Canvas paths/circles
-and remote GPU execution are unsupported. The 2,000-node Plan envelope and
-bounded Canvas API do not support the 99,000-circle public-API claim scene.
+The frozen measured helper implements macOS arm64 Metal/H.264. It did not
+support the99,000-circle public-API claim scene. Later independently pinned
+helpers add bounded full-circle paths, configurable GOP/pool/bitrate and compact
+binary commands; see [GPU-PROTOCOL.md](GPU-PROTOCOL.md). These changes do not
+alter the original videos/clocks or establish new full-scene quality or speed
+results. HEVC, Vulkan hardware interop, macOS Intel/Windows, GPU image/video
+nodes, broad Canvas parity and remote GPU execution remain unsupported.
 The originating comparison chat owns the separate trusted-adapter/full
 Helios/fframes/Remotion comparison. Its M5 Max 4K single-run claim, different
 Skia/usvgr source pins, BT.601/BGRA hardware surface and clock boundaries are
