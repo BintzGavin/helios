@@ -20,7 +20,7 @@ describe.runIf(process.platform === 'darwin' && process.arch === 'arm64' && exis
     expect(result.error).toBeUndefined();
     expect(result.status, result.stderr).toBe(0);
     const receipt = JSON.parse(result.stdout);
-    expect(receipt).toMatchObject({ protocol: 2, gop: 90 });
+    expect(receipt).toMatchObject({ protocol: 3, gop: 90, encoderPool: 1 });
     expect(receipt.rasterizer).toBe('skia-metal');
     expect(receipt.encoder).toBe('videotoolbox');
     expect(receipt.hardwareRequired).toBe(true);
@@ -57,7 +57,7 @@ describe.runIf(process.platform === 'darwin' && process.arch === 'arm64' && exis
       const output = join(directory, 'gop.mp4'), trace = join(directory, 'trace.jsonl');
       await renderGpuCanvasVideo({ ...scene, frameCount: 95, draw(ctx, { index }) { ctx.fillStyle = index % 2 ? '#ff0000' : '#0000ff'; ctx.beginPath(); ctx.arc(20 + index % 20, 16, 10, 0, Math.PI * 2); ctx.fill(); } }, output, { gop: 30, trace, ffmpeg: '/opt/homebrew/bin/ffmpeg', ffprobe: '/opt/homebrew/bin/ffprobe', bitrate: 4_000_000 });
       const rows = (await readFile(trace, 'utf8')).trim().split('\n').map(line => JSON.parse(line));
-      expect(rows[0]).toMatchObject({ gop: 30, protocol: 2 });
+      expect(rows[0]).toMatchObject({ gop: 30, protocol: 3 });
       const probe = spawnSync('/opt/homebrew/bin/ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_frames', '-show_entries', 'frame=key_frame', '-of', 'json', output], { encoding: 'utf8', timeout: 30000 });
       expect(probe.status, probe.stderr).toBe(0);
       const frames = JSON.parse(probe.stdout).frames;

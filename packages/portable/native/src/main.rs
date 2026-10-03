@@ -46,6 +46,7 @@ unsafe extern "C" {
         fps_den: u32,
         bitrate: u32,
         gop: u32,
+        encoder_pool: u32,
         path: *const i8,
         hardware: bool,
         trace: *const i8,
@@ -55,6 +56,7 @@ unsafe extern "C" {
     fn helios_queue(ctx: *mut c_void) -> *mut c_void;
     fn helios_texture(ctx: *mut c_void) -> *mut c_void;
     fn helios_encode(ctx: *mut c_void, index: u32) -> bool;
+    fn helios_finish(ctx: *mut c_void, count: u32) -> bool;
     fn helios_reference(ctx: *mut c_void, index: u32) -> bool;
     fn helios_hardware(ctx: *mut c_void) -> bool;
     fn helios_raster_submitted(ctx: *mut c_void, index: u32);
@@ -289,8 +291,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let (width, height, num, den, bitrate, path) = if probe {
         (64, 64, 30, 1, 1_000_000, CString::new("")?)
     } else {
-        if args.len() < 8 || args.len() > 11 {
-            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE H264_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE] [GOP]".into());
+        if args.len() < 8 || args.len() > 12 {
+            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE H264_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE] [GOP] [ENCODER_POOL]".into());
         }
         (
             args[2].parse()?,
@@ -303,6 +305,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     };
     let gop: u32 = args.get(10).map(|value| value.parse().map_err(|_| "GOP must be an integer")).transpose()?.unwrap_or(90);
     if !(1..=300).contains(&gop) || !(100_000..=200_000_000).contains(&bitrate) { return Err("invalid native GPU bitrate or GOP".into()); }
+    let encoder_pool: u32 = args.get(11).map(|value| value.parse().map_err(|_| "encoder pool must be an integer")).transpose()?.unwrap_or(1);
+    if encoder_pool != 1 && encoder_pool != 3 { return Err("unsupported encoder pool; expected1 or3".into()); }
     if width == 0
         || height == 0
         || width % 2 != 0
@@ -325,6 +329,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             den,
             bitrate,
             gop,
+            encoder_pool,
             if reference {
                 empty.as_ptr()
             } else {
@@ -355,7 +360,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if probe {
         println!(
             "{}",
-            serde_json::json!({"protocol":2,"gop":gop,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
+            serde_json::json!({"protocol":3,"gop":gop,"encoderPool":encoder_pool,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
         );
         return Ok(());
     }
@@ -413,12 +418,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         count += 1;
     }
+    if !raster && !reference && !unsafe { helios_finish(native.0, count) } { return Err("GPU_ENCODER_DRAIN_FAILED".into()); }
     let readback = if reference {
         width as u64 * height as u64 * 3 / 2
     } else {
         raw.len() as u64
     };
-    let receipt = serde_json::json!({"protocol":2,"gop":gop,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
+    let receipt = serde_json::json!({"protocol":3,"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
     if raster || reference {
         eprintln!("{receipt}");
     } else {

@@ -5,6 +5,10 @@
 #import <IOSurface/IOSurface.h>
 #include <cstdio>
 #include <memory>
+#include <mutex>
+#include <atomic>
+#include <algorithm>
+#include "encoder-flight.hpp"
 
 // The encoder receives the exact IOSurface-backed NV12 buffer written by Metal.
 // CPU access is restricted to compressed packets; raw pixels are never mapped.
@@ -20,10 +24,18 @@ struct State {
     FILE* output = nullptr;
     FILE* trace = nullptr;
     bool capturing = false;
+    bool finished = false;
+    std::mutex callbackMutex;
+    HeliosEncoderFlight flight;
+    struct HeldBuffer { CVPixelBufferRef buffer = nullptr; uint32_t frame = 0; };
+    std::array<HeldBuffer, 3> held{};
+    uint32_t encoderPool;
     uint32_t width, height, num, den;
-    bool failed = false;
+    std::atomic<bool> failed{false};
+    explicit State(uint32_t pool) : flight(pool), encoderPool(pool) {}
     ~State() {
-        if (encoder) { VTCompressionSessionCompleteFrames(encoder, kCMTimeInvalid); VTCompressionSessionInvalidate(encoder); CFRelease(encoder); }
+        if (encoder) { if (!finished) VTCompressionSessionCompleteFrames(encoder, kCMTimeInvalid); VTCompressionSessionInvalidate(encoder); CFRelease(encoder); }
+        for (auto& slot : held) if (slot.buffer) CVPixelBufferRelease(slot.buffer);
         if (buffer) CVPixelBufferRelease(buffer);
         if (cache) CFRelease(cache);
         if (output) fclose(output);
@@ -34,8 +46,11 @@ struct State {
 
 static void packet(void* ref, void* frame, OSStatus status, VTEncodeInfoFlags flags, CMSampleBufferRef sample) {
     auto* state = static_cast<State*>(ref);
-    if (status || !sample || (flags & kVTEncodeInfo_FrameDropped)) state->failed = true;
-    if (state->trace) fprintf(state->trace, "{\"event\":\"encoder-callback\",\"frame\":%llu,\"status\":%d,\"dropped\":%s}\n", (unsigned long long)(uintptr_t(frame) - 1), (int)status, (flags & kVTEncodeInfo_FrameDropped) ? "true" : "false");
+    std::lock_guard<std::mutex> guard(state->callbackMutex);
+    const auto index = uint32_t(uintptr_t(frame) - 1);
+    const auto surface = state->flight.surface(index);
+    if (!state->flight.complete(index, !status && sample && !(flags & kVTEncodeInfo_FrameDropped))) state->failed = true;
+    if (state->trace) fprintf(state->trace, "{\"event\":\"encoder-callback\",\"frame\":%u,\"surfaceId\":%u,\"status\":%d,\"dropped\":%s}\n", index, surface.value_or(0), (int)status, (flags & kVTEncodeInfo_FrameDropped) ? "true" : "false");
     if (!state->failed && state->output) {
         auto format = CMSampleBufferGetFormatDescription(sample);
         size_t count = 0; int lengthSize = 0;
@@ -59,6 +74,13 @@ static void packet(void* ref, void* frame, OSStatus status, VTEncodeInfoFlags fl
             if (CMBlockBufferCopyDataBytes(block, cursor, length, bytes.get()) || fwrite(start, 1, 4, state->output) != 4 || fwrite(bytes.get(), 1, length, state->output) != length) state->failed = true;
             cursor += length;
         }
+    }
+    // Keep an application reference through the complete callback body. The
+    // encoder may retain it longer; only CoreVideo's pool decides final reuse.
+    for (auto& slot : state->held) if (slot.buffer && slot.frame == index) {
+        CVPixelBufferRelease(slot.buffer); slot.buffer = nullptr;
+        if (state->trace) fprintf(state->trace, "{\"event\":\"callback-owner-release\",\"frame\":%u,\"surfaceId\":%u}\n", index, surface.value_or(0));
+        break;
     }
     dispatch_semaphore_signal(state->completed);
 }
@@ -86,9 +108,9 @@ kernel void convert(texture2d<float, access::read> rgba [[texture(0)]],
 }
 )metal";
 
-extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, uint32_t gop, const char* path, bool hardware, const char* trace, const char* capture) {
+extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, uint32_t gop, uint32_t encoderPool, const char* path, bool hardware, const char* trace, const char* capture) {
     @autoreleasepool {
-        auto state = std::make_unique<State>();
+        auto state = std::make_unique<State>(encoderPool);
         state->width = w; state->height = h; state->num = num; state->den = den;
         state->device = MTLCreateSystemDefaultDevice();
         if (!state->device) return nullptr;
@@ -126,9 +148,10 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         const bool hardware = CFEqual(used, kCFBooleanTrue); CFRelease(used);
         if (!hardware) return nullptr;
         auto pool = VTCompressionSessionGetPixelBufferPool(state->encoder);
-        if (!pool || CVPixelBufferPoolCreatePixelBuffer(nullptr, pool, &state->buffer) || !CVPixelBufferGetIOSurface(state->buffer)) return nullptr;
+        NSDictionary* poolAttributes = @{(id)kCVPixelBufferPoolAllocationThresholdKey: @(encoderPool)};
+        if (!pool || CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(nullptr, pool, (__bridge CFDictionaryRef)poolAttributes, &state->buffer) || !CVPixelBufferGetIOSurface(state->buffer)) return nullptr;
         if (CVMetalTextureCacheCreate(nullptr, nullptr, state->device, nullptr, &state->cache)) return nullptr;
-        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":2,\"gop\":%u,\"encoderPool\":true,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), gop);
+        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":3,\"gop\":%u,\"encoderPool\":true,\"poolCapacity\":%u,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), gop, encoderPool);
         if (path[0]) { state->output = fopen(path, "wb"); if (!state->output) return nullptr; }
         return state.release();
     }
@@ -183,15 +206,62 @@ extern "C" bool helios_reference(State* state, uint32_t index) {
 }
 extern "C" bool helios_encode(State* state, uint32_t index) {
     @autoreleasepool {
+        if (state->failed) return false;
+        if (!state->buffer) {
+            auto pool = VTCompressionSessionGetPixelBufferPool(state->encoder);
+            NSDictionary* attributes = @{(id)kCVPixelBufferPoolAllocationThresholdKey: @(state->encoderPool)};
+            auto result = CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(nullptr, pool, (__bridge CFDictionaryRef)attributes, &state->buffer);
+            if (result == kCVReturnWouldExceedAllocationThreshold) {
+                std::optional<uint32_t> oldest;
+                { std::lock_guard<std::mutex> guard(state->callbackMutex); oldest = state->flight.oldest(); }
+                if (state->trace) fprintf(state->trace, "{\"event\":\"pool-backpressure\",\"frame\":%u,\"oldestFrame\":%lld,\"capacity\":%u}\n", index, oldest ? int64_t(*oldest) : -1LL, state->encoderPool);
+                // Drain once, outside the callback mutex. The texture cache can
+                // retain plane wrappers; release cached holds before one retry.
+                const auto until = oldest ? CMTimeMake(int64_t(*oldest) * state->den, state->num) : kCMTimeInvalid;
+                if (VTCompressionSessionCompleteFrames(state->encoder, until)) return false;
+                CVMetalTextureCacheFlush(state->cache, 0);
+                result = CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(nullptr, pool, (__bridge CFDictionaryRef)attributes, &state->buffer);
+            }
+            if (result || !state->buffer || !CVPixelBufferGetIOSurface(state->buffer)) return false;
+        }
+        if (state->encoderPool == 3 && state->trace) {
+            std::lock_guard<std::mutex> guard(state->callbackMutex);
+            fprintf(state->trace, "{\"event\":\"surface-acquire\",\"frame\":%u,\"surfaceId\":%u,\"fromEncoderPool\":true}\n", index, IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)));
+        }
         if (!helios_convert(state, index)) return false;
         auto source = CVPixelBufferGetIOSurface(state->buffer);
+        {
+            std::lock_guard<std::mutex> guard(state->callbackMutex);
+            if (!state->flight.begin(index, IOSurfaceGetID(source))) { state->failed = true; return false; }
+            if (state->encoderPool == 3) {
+                auto slot = std::find_if(state->held.begin(), state->held.end(), [](const State::HeldBuffer& entry) { return !entry.buffer; });
+                if (slot == state->held.end()) { state->failed = true; return false; }
+                slot->frame = index; slot->buffer = CVPixelBufferRetain(state->buffer);
+            }
+        }
         if (state->trace) fprintf(state->trace, "{\"event\":\"encoder-submit\",\"frame\":%u,\"surfaceId\":%u}\n", index, IOSurfaceGetID(source));
-        if (VTCompressionSessionEncodeFrame(state->encoder, state->buffer, CMTimeMake(int64_t(index) * state->den, state->num), CMTimeMake(state->den, state->num), nullptr, reinterpret_cast<void*>(uintptr_t(index) + 1), nullptr)) return false;
+        // A callback may run before this returns. Never hold callbackMutex here.
+        VTEncodeInfoFlags flags = 0;
+        if (VTCompressionSessionEncodeFrame(state->encoder, state->buffer, CMTimeMake(int64_t(index) * state->den, state->num), CMTimeMake(state->den, state->num), nullptr, reinterpret_cast<void*>(uintptr_t(index) + 1), &flags) || (flags & kVTEncodeInfo_FrameDropped)) { state->failed = true; return false; }
+        if (state->encoderPool == 3) {
+            const auto surfaceId = IOSurfaceGetID(source);
+            CVPixelBufferRelease(state->buffer); state->buffer = nullptr;
+            if (state->trace) fprintf(state->trace, "{\"event\":\"application-surface-release\",\"frame\":%u,\"surfaceId\":%u,\"encoderMayRetain\":true}\n", index, surfaceId);
+            return !state->failed;
+        }
         // CompleteFrames ensures asynchronous callbacks finish before this buffer is reused.
         if (VTCompressionSessionCompleteFrames(state->encoder, kCMTimeInvalid)) return false;
         if (dispatch_semaphore_wait(state->completed, dispatch_time(DISPATCH_TIME_NOW, 30 * NSEC_PER_SEC))) return false;
         if (state->trace) { fprintf(state->trace, "{\"event\":\"surface-recyclable\",\"frame\":%u,\"surfaceId\":%u}\n", index, IOSurfaceGetID(source)); fflush(state->trace); }
         return !state->failed;
     }
+}
+extern "C" bool helios_finish(State* state, uint32_t count) {
+    if (VTCompressionSessionCompleteFrames(state->encoder, kCMTimeInvalid)) return false;
+    std::lock_guard<std::mutex> guard(state->callbackMutex);
+    state->finished = true;
+    const bool ok = !state->failed && state->flight.finish(count);
+    if (state->trace) { fprintf(state->trace, "{\"event\":\"encoder-finish\",\"frames\":%u,\"capacity\":%u,\"peakInFlight\":%u,\"allCallbacksComplete\":%s}\n", count, state->encoderPool, state->flight.peak(), ok ? "true" : "false"); fflush(state->trace); }
+    return ok;
 }
 extern "C" bool helios_close(State* state) { if (!state) return false; bool ok = !state->failed; delete state; return ok; }
