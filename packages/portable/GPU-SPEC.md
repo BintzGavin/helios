@@ -19,6 +19,15 @@ The committed portable CPU implementation and its public TypeScript APIs remain 
 
 ## Benchmark gates
 
+### Circle/GOP extension acceptance
+
+- A Canvas path containing one full-turn arc is filled by native Skia with its construction-time affine transform and fill-time paint. Nonuniform scale, rotations, path persistence across save/restore and repeated fill preserve Canvas semantics. Partial arcs, multiple contours and other path operations fail explicitly.
+- GPU Canvas has an independent 120,000-command/32 MiB per-frame envelope, 64-state stack and 20,000 aggregate text-character budget. The native reader rejects oversized messages before unbounded allocation; it independently validates geometry, colors, command count, stack, text and decoded fonts. Encoded font headers have a separate48 MiB bound and32 MiB decoded budget. Existing Plan limits stay intact.
+- GPU GOP accepts integers1..300, defaults90, propagates to required VideoToolbox H.264 and is recorded in protocol2 receipts. Invalid native CLI values fail before GPU initialization; mismatched TS/native receipt settings reject before publication. Encoded keyframe gaps are checked against explicit30.
+- This extension has its own source/build/helper bindings. The frozen protocol1 helper and existing TextGrid videos/clocks/reference receipts remain historical, unchanged evidence.
+- Circle/GOP verification on M3 Pro:212 portable tests, two native boundary tests, six of six focused TS mutations killed, CPU Canvas geometry comparison and actual95-frameGOP30 maximum-spacing check. A separate three-frame128x128Metal capture/interposer run observes no application raw download; NV12-map and RGBA-download positive controls trigger the expected hooks. This does not qualify the full4K300-frame workload, total zero-copy or another device. Device/encoder fault injection still refuses initialization without software fallback.
+- The public4K circle scene is a scene replication: the upstream recorded renderer's checked-in scene does not match the documented measured scene/source hash. Preserve public circle math,1000x1000 viewBox scaling to3840x2160, painter order, pinned font, measured source frames3..302 and explicitGOP30. Do not claim exact-byte reproduction of the original7.225018333sM5Max run. Full300-frame quality/profiling and balanced timing belong to the comparison owner.
+
 Continuity TextGrid: 3,334 changing labels, pinned DM Sans bytes, 1920×1080,
 300 frames at 30 fps, no audio. The separate fframes 4K scene with 99,000
 circles and 1,000 digits remains separately labeled. Establish per-engine

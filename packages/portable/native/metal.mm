@@ -86,7 +86,7 @@ kernel void convert(texture2d<float, access::read> rgba [[texture(0)]],
 }
 )metal";
 
-extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, const char* path, bool hardware, const char* trace, const char* capture) {
+extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, uint32_t gop, const char* path, bool hardware, const char* trace, const char* capture) {
     @autoreleasepool {
         auto state = std::make_unique<State>();
         state->width = w; state->height = h; state->num = num; state->den = den;
@@ -119,7 +119,7 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         NSDictionary* specification = @{(id)kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder: @YES};
         if (VTCompressionSessionCreate(nullptr, w, h, kCMVideoCodecType_H264, (__bridge CFDictionaryRef)specification, (__bridge CFDictionaryRef)attributes, nullptr, packet, state.get(), &state->encoder)) return nullptr;
         double rate = double(num) / den;
-        NSDictionary* properties = @{(id)kVTCompressionPropertyKey_AverageBitRate: @(bitrate), (id)kVTCompressionPropertyKey_ExpectedFrameRate: @(rate), (id)kVTCompressionPropertyKey_AllowFrameReordering: @NO, (id)kVTCompressionPropertyKey_MaxKeyFrameInterval: @90, (id)kVTCompressionPropertyKey_ColorPrimaries: (id)kCVImageBufferColorPrimaries_ITU_R_709_2, (id)kVTCompressionPropertyKey_TransferFunction: (id)kCVImageBufferTransferFunction_ITU_R_709_2, (id)kVTCompressionPropertyKey_YCbCrMatrix: (id)kCVImageBufferYCbCrMatrix_ITU_R_709_2};
+        NSDictionary* properties = @{(id)kVTCompressionPropertyKey_AverageBitRate: @(bitrate), (id)kVTCompressionPropertyKey_ExpectedFrameRate: @(rate), (id)kVTCompressionPropertyKey_AllowFrameReordering: @NO, (id)kVTCompressionPropertyKey_MaxKeyFrameInterval: @(gop), (id)kVTCompressionPropertyKey_ColorPrimaries: (id)kCVImageBufferColorPrimaries_ITU_R_709_2, (id)kVTCompressionPropertyKey_TransferFunction: (id)kCVImageBufferTransferFunction_ITU_R_709_2, (id)kVTCompressionPropertyKey_YCbCrMatrix: (id)kCVImageBufferYCbCrMatrix_ITU_R_709_2};
         if (VTSessionSetProperties(state->encoder, (__bridge CFDictionaryRef)properties) || VTCompressionSessionPrepareToEncodeFrames(state->encoder)) return nullptr;
         CFTypeRef used = nullptr;
         if (VTSessionCopyProperty(state->encoder, kVTCompressionPropertyKey_UsingHardwareAcceleratedVideoEncoder, nullptr, &used) || !used) return nullptr;
@@ -128,7 +128,7 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         auto pool = VTCompressionSessionGetPixelBufferPool(state->encoder);
         if (!pool || CVPixelBufferPoolCreatePixelBuffer(nullptr, pool, &state->buffer) || !CVPixelBufferGetIOSurface(state->buffer)) return nullptr;
         if (CVMetalTextureCacheCreate(nullptr, nullptr, state->device, nullptr, &state->cache)) return nullptr;
-        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"encoderPool\":true,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)));
+        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":2,\"gop\":%u,\"encoderPool\":true,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), gop);
         if (path[0]) { state->output = fopen(path, "wb"); if (!state->output) return nullptr; }
         return state.release();
     }
