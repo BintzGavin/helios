@@ -1,6 +1,35 @@
 use base64::Engine;
+
+#[cfg(test)]
+mod boundary_tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn bounded_lines_admit_exact_limit_and_reject_overflow_before_consuming_it() {
+        let mut input = Cursor::new(b"1234\nlast");
+        assert_eq!(read_message(&mut input, 4).unwrap().as_deref(), Some("1234"));
+        assert_eq!(read_message(&mut input, 4).unwrap().as_deref(), Some("last"));
+        assert!(read_message(&mut input, 4).unwrap().is_none());
+        assert!(read_message(&mut Cursor::new(b"12345\n"), 4).is_err());
+        assert!(read_message(&mut Cursor::new([255, 10]), 4).is_err());
+    }
+
+    #[test]
+    fn direct_native_messages_enforce_path_matrix_and_resource_bounds() {
+        let make = |commands| serde_json::from_value::<Frame>(serde_json::json!({"background":[0,0,0,1],"commands":commands})).unwrap();
+        let valid = serde_json::json!({"op":"circle","args":[8,8,4],"matrix":[2,0,0,1,0,0],"color":[1,0,0,1]});
+        assert!(validate_frame(&make(vec![valid.clone()])).is_ok());
+        assert!(validate_frame(&make(vec![serde_json::json!({"op":"circle","args":[8,8,-4],"matrix":[1,0,0,1,0,0]})])).is_err());
+        assert!(validate_frame(&make(vec![serde_json::json!({"op":"circle","args":[8,8,4]})])).is_err());
+        assert!(validate_frame(&make(vec![valid; 120001])).is_err());
+        assert!(validate_frame(&make(vec![serde_json::json!({"op":"save"}); 65])).is_err());
+        assert!(validate_frame(&make(vec![serde_json::json!({"op":"restore"})])).is_err());
+        assert!(validate_frame(&make(vec![serde_json::json!({"op":"text","args":[0,0],"text":"x".repeat(20001),"font":"pinned","size":12})])).is_err());
+    }
+}
 use skia_safe::{
-    Color4f, ColorType, Font, FontMgr, Paint, Point, Rect, Typeface,
+    Color4f, ColorType, Font, FontMgr, Matrix, Paint, Point, Rect, Typeface,
     gpu::{self, SurfaceOrigin, mtl},
 };
 use std::{
@@ -16,6 +45,7 @@ unsafe extern "C" {
         fps_num: u32,
         fps_den: u32,
         bitrate: u32,
+        gop: u32,
         path: *const i8,
         hardware: bool,
         trace: *const i8,
@@ -41,6 +71,7 @@ impl Drop for Native {
 }
 
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Command {
     op: String,
     #[serde(default)]
@@ -49,11 +80,57 @@ struct Command {
     text: Option<String>,
     font: Option<String>,
     size: Option<f32>,
+    matrix: Option<[f32; 6]>,
 }
 #[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 struct Frame {
     background: [f32; 4],
     commands: Vec<Command>,
+}
+const FRAME_BYTES: usize = 32 * 1024 * 1024;
+const FONT_HEADER_BYTES: usize = 48 * 1024 * 1024;
+
+fn read_message<R: BufRead>(input: &mut R, limit: usize) -> Result<Option<String>, Box<dyn std::error::Error>> {
+    let mut line = Vec::new();
+    loop {
+        let chunk = input.fill_buf()?;
+        if chunk.is_empty() {
+            return if line.is_empty() { Ok(None) } else { Ok(Some(String::from_utf8(line)?)) };
+        }
+        let end = chunk.iter().position(|byte| *byte == b'\n');
+        let count = end.unwrap_or(chunk.len());
+        if count > limit.saturating_sub(line.len()) { return Err("GPU message budget exceeded".into()); }
+        line.extend_from_slice(&chunk[..count]);
+        input.consume(count + usize::from(end.is_some()));
+        if end.is_some() { return Ok(Some(String::from_utf8(line)?)); }
+    }
+}
+
+fn validate_frame(frame: &Frame) -> Result<(), Box<dyn std::error::Error>> {
+    let bounded = |value: f32| value.is_finite() && value.abs() <= 1e7;
+    let valid_color = |color: &[f32; 4]| color.iter().all(|v| v.is_finite() && (0.0..=1.0).contains(v));
+    if frame.commands.len() > 120000 || !valid_color(&frame.background) || frame.background[3] != 1.0 { return Err("GPU frame budget or background invalid".into()); }
+    let mut depth = 0_usize;
+    let mut characters = 0;
+    for command in &frame.commands {
+        if command.args.len() > 4 || command.args.iter().any(|v| !bounded(*v)) || command.color.as_ref().is_some_and(|color| !valid_color(color)) || command.matrix.as_ref().is_some_and(|matrix| matrix.iter().any(|v| !bounded(*v))) { return Err("invalid native coordinate or color".into()); }
+        match (command.op.as_str(), command.args.as_slice()) {
+            ("circle", &[_, _, r]) if r >= 0.0 && command.matrix.is_some() => {},
+            ("rect", &[_, _, w, h]) if w >= 0.0 && h >= 0.0 => {},
+            ("text", &[_, _]) => {
+                let text = command.text.as_ref().ok_or("missing text")?;
+                characters += text.encode_utf16().count();
+                if characters > 20000 || !command.size.is_some_and(|size| size.is_finite() && size > 0.0 && size <= 4096.0) || command.font.as_ref().is_none_or(|font| font.is_empty()) { return Err("GPU text budget or font invalid".into()); }
+            },
+            ("save", &[]) if depth < 64 => { depth += 1; },
+            ("restore", &[]) if depth > 0 => { depth -= 1; },
+            ("translate" | "scale", &[_, _]) | ("rotate", &[_]) => {},
+            _ => return Err("unsupported native command or GPU stack budget".into()),
+        }
+        if command.op != "circle" && command.matrix.is_some() { return Err("matrix belongs to circle commands only".into()); }
+    }
+    Ok(())
 }
 type GlyphRun = (Vec<u16>, Vec<Point>);
 struct Fonts {
@@ -71,12 +148,15 @@ impl Fonts {
             faces: HashMap::new(),
             runs: HashMap::new(),
         };
+        let mut total = 0;
         for (name, value) in message["fonts"]
             .as_object()
             .ok_or("first message must contain fonts")?
         {
             let bytes = base64::engine::general_purpose::STANDARD
                 .decode(value.as_str().ok_or("invalid font bytes")?)?;
+            total += bytes.len();
+            if total > 32 * 1024 * 1024 { return Err("GPU font budget exceeded".into()); }
             let face = manager
                 .new_from_data(&bytes, None)
                 .ok_or("invalid pinned font")?;
@@ -144,6 +224,7 @@ fn draw_frame(
     frame: Frame,
     fonts: &mut Fonts,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    validate_frame(&frame)?;
     canvas.restore_to_count(1);
     canvas.reset_matrix();
     let [r, g, b, a] = frame.background;
@@ -163,6 +244,14 @@ fn draw_frame(
         match (command.op.as_str(), command.args.as_slice()) {
             ("rect", &[x, y, w, h]) => {
                 canvas.draw_rect(Rect::from_xywh(x, y, w, h), &paint);
+            }
+            ("circle", &[x, y, radius]) => {
+                let [a, b, c, d, e, f] = command.matrix.ok_or("missing circle matrix")?;
+                canvas.save();
+                canvas.reset_matrix();
+                canvas.concat(&Matrix::new_all(a, c, e, b, d, f, 0.0, 0.0, 1.0));
+                canvas.draw_circle((x, y), radius, &paint);
+                canvas.restore();
             }
             ("text", &[_, _]) => fonts.draw(canvas, &command, &paint)?,
             ("save", &[]) => {
@@ -200,8 +289,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let (width, height, num, den, bitrate, path) = if probe {
         (64, 64, 30, 1, 1_000_000, CString::new("")?)
     } else {
-        if args.len() < 8 || args.len() > 10 {
-            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE H264_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE]".into());
+        if args.len() < 8 || args.len() > 11 {
+            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE H264_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE] [GOP]".into());
         }
         (
             args[2].parse()?,
@@ -212,6 +301,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             CString::new(args[7].as_bytes())?,
         )
     };
+    let gop: u32 = args.get(10).map(|value| value.parse().map_err(|_| "GOP must be an integer")).transpose()?.unwrap_or(90);
+    if !(1..=300).contains(&gop) || !(100_000..=200_000_000).contains(&bitrate) { return Err("invalid native GPU bitrate or GOP".into()); }
     if width == 0
         || height == 0
         || width % 2 != 0
@@ -233,6 +324,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             num,
             den,
             bitrate,
+            gop,
             if reference {
                 empty.as_ptr()
             } else {
@@ -263,13 +355,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if probe {
         println!(
             "{}",
-            serde_json::json!({"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
+            serde_json::json!({"protocol":2,"gop":gop,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
         );
         return Ok(());
     }
-    let mut lines = io::stdin().lock().lines();
-    let header: serde_json::Value =
-        serde_json::from_str(&lines.next().ok_or("missing font header")??)?;
+    let mut input = io::stdin().lock();
+    let header: serde_json::Value = serde_json::from_str(&read_message(&mut input, FONT_HEADER_BYTES)?.ok_or("missing font header")?)?;
     let mut fonts = Fonts::new(&header)?;
     let mut count = 0;
     let mut raw = vec![
@@ -281,8 +372,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
     ];
     let mut stdout = io::stdout().lock();
-    for line in lines {
-        let message: serde_json::Value = serde_json::from_str(&line?)?;
+    while let Some(line) = read_message(&mut input, FRAME_BYTES)? {
+        let message: serde_json::Value = serde_json::from_str(&line)?;
         if let Some(svg) = message["svg"].as_str() {
             let dom = skia_safe::svg::Dom::from_bytes(svg.as_bytes(), FontMgr::empty())
                 .map_err(|_| "invalid SVG")?;
@@ -327,7 +418,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         raw.len() as u64
     };
-    let receipt = serde_json::json!({"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
+    let receipt = serde_json::json!({"protocol":2,"gop":gop,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
     if raster || reference {
         eprintln!("{receipt}");
     } else {

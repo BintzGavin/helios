@@ -9,6 +9,7 @@ import { renderGpuCanvasVideo, recordGpuCanvas } from '../src/gpu.js';
 import { probeVideo, renderFrame, renderVideo } from '../src/render.js';
 import { parsePlan } from '../src/plan.js';
 import type { CanvasComposition } from '../src/canvas.js';
+import { createCanvas } from '../src/skia-binding.js';
 
 // Actual host integration. Build the release helper before running this suite.
 // No capability flag or software encoder substitutes for successful initialization.
@@ -19,6 +20,7 @@ describe.runIf(process.platform === 'darwin' && process.arch === 'arm64' && exis
     expect(result.error).toBeUndefined();
     expect(result.status, result.stderr).toBe(0);
     const receipt = JSON.parse(result.stdout);
+    expect(receipt).toMatchObject({ protocol: 2, gop: 90 });
     expect(receipt.rasterizer).toBe('skia-metal');
     expect(receipt.encoder).toBe('videotoolbox');
     expect(receipt.hardwareRequired).toBe(true);
@@ -26,6 +28,55 @@ describe.runIf(process.platform === 'darwin' && process.arch === 'arm64' && exis
     expect(receipt.surface).toBe('iosurface-nv12');
   });
   const scene: CanvasComposition = { width: 64, height: 32, frameCount: 8, fps: { num: 30000, den: 1001 }, background: '#ffffff', draw(ctx, { index }) { ctx.fillStyle = '#ff0000'; ctx.fillRect(index * 4, 8, 8, 8); } };
+  it('renders transformed circle paths with CPU Canvas geometry and fill semantics', async () => {
+    const helper = fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url));
+    const circles: CanvasComposition = { ...scene, width: 128, height: 128, draw(ctx) {
+      ctx.scale(2, 1); ctx.translate(10, 10); ctx.beginPath(); ctx.arc(20, 30, 12, 0, Math.PI * 2);
+      ctx.save(); ctx.translate(100, 100); ctx.fillStyle = '#ff0000'; ctx.fill(); ctx.restore();
+      ctx.beginPath(); ctx.arc(40, 70, 8, 0, Math.PI * 2); ctx.fillStyle = '#0000ff'; ctx.fill();
+    } };
+    const frame = await recordGpuCanvas(circles, 0);
+    const result = spawnSync(helper, ['raster', '128', '128', '30', '1', '4000000', '/unused'], { input: JSON.stringify({ fonts: {} }) + '\n' + JSON.stringify(frame) + '\n', timeout: 30000 });
+    expect(result.status, result.stderr.toString()).toBe(0);
+    const cpu = createCanvas(128, 128), ctx = cpu.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 128, 128);
+    await circles.draw(ctx, { index: 0, time: 0, fonts: {} });
+    const expected = ctx.getImageData(0, 0, 128, 128).data;
+    expect(result.stdout.length).toBe(expected.length);
+    let difference = 0;
+    for (let i = 0; i < expected.length; i++) difference += Math.abs(result.stdout[i] - expected[i]);
+    expect(difference / expected.length).toBeLessThan(1);
+    const pixel = (x: number, y: number) => [...result.stdout.subarray((y * 128 + x) * 4, (y * 128 + x) * 4 + 4)];
+    expect(pixel(60, 40)).toEqual([255, 0, 0, 255]);
+    expect(pixel(100, 80)).toEqual([0, 0, 255, 255]);
+    expect(pixel(60, 60)).toEqual([255, 255, 255, 255]);
+  });
+  it('records explicit GOP30 and encodes keyframes within that maximum interval', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'helios-gpu-gop-'));
+    try {
+      const output = join(directory, 'gop.mp4'), trace = join(directory, 'trace.jsonl');
+      await renderGpuCanvasVideo({ ...scene, frameCount: 95, draw(ctx, { index }) { ctx.fillStyle = index % 2 ? '#ff0000' : '#0000ff'; ctx.beginPath(); ctx.arc(20 + index % 20, 16, 10, 0, Math.PI * 2); ctx.fill(); } }, output, { gop: 30, trace, ffmpeg: '/opt/homebrew/bin/ffmpeg', ffprobe: '/opt/homebrew/bin/ffprobe', bitrate: 4_000_000 });
+      const rows = (await readFile(trace, 'utf8')).trim().split('\n').map(line => JSON.parse(line));
+      expect(rows[0]).toMatchObject({ gop: 30, protocol: 2 });
+      const probe = spawnSync('/opt/homebrew/bin/ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_frames', '-show_entries', 'frame=key_frame', '-of', 'json', output], { encoding: 'utf8', timeout: 30000 });
+      expect(probe.status, probe.stderr).toBe(0);
+      const frames = JSON.parse(probe.stdout).frames;
+      expect(frames).toHaveLength(95);
+      const keys = frames.flatMap((frame: any, index: number) => frame.key_frame === 1 ? [index] : []);
+      expect(keys[0]).toBe(0);
+      const ends = [...keys.slice(1), frames.length];
+      for (let i = 0; i < keys.length; i++) expect(ends[i] - keys[i]).toBeLessThanOrEqual(30);
+    } finally { await rm(directory, { recursive: true, force: true }); }
+  }, 30000);
+  it('rejects invalid GOP and oversized direct-native frame messages', () => {
+    const helper = fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url));
+    for (const gop of ['0', '301', '1.5']) {
+      const result = spawnSync(helper, ['raster', '64', '32', '30', '1', '4000000', '/unused', '', '', gop], { encoding: 'utf8', timeout: 30000 });
+      expect(result.status).toBe(1); expect(result.stderr).toMatch(/GOP|integer/);
+    }
+    const result = spawnSync(helper, ['raster', '64', '32', '30', '1', '4000000', '/unused'], { input: '{"fonts":{}}\n' + ' '.repeat(32 * 1024 * 1024 + 1) + '\n', encoding: 'utf8', timeout: 30000 });
+    expect(result.status).toBe(1); expect(result.stderr).toContain('message budget');
+  });
   it('preserves the frame-returning API with explicitly requested GPU readback', async () => {
     const plan = parsePlan({ version: 'portable-v1', width: 64, height: 32, fps: { num: 30, den: 1 }, frameCount: 2, background: '#ffffff', nodes: [{ id: 'red', type: 'rect', x: 4, y: 8, width: 8, height: 8, fill: '#ff0000' }] });
     const frame = await renderFrame(plan, 1, new Map(), { rasterizer: 'gpu' });

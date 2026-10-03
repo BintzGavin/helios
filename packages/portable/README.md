@@ -117,11 +117,15 @@ The hardware lane converts sRGB to limited-range BT.709 NV12 on Metal, writes bo
 | HEVC or other GPU codecs | Unsupported |
 | Vector/text Plan | Supported through Skia SVG; prepared text uses glyph paths |
 | Plan image/video layers | Unsupported; choose a retained CPU backend |
-| Canvas | `fillRect`, `fillText`, save/restore, translate/scale/rotate; explicit RGB colors, alpha and byte-buffer font aliases |
-| Canvas paths/images, max-width text, other baselines/styles | Unsupported; reject explicitly |
+| Canvas | `fillRect`, `fillText`, full-circle `beginPath`/`arc`/`closePath`/`fill`, save/restore, translate/scale/rotate; explicit RGB colors, alpha and byte-buffer font aliases |
+| Partial arcs, multiple path contours, stroke/clip/Path2D/images, max-width text, other baselines/styles | Unsupported; reject explicitly |
 | CPU Canvas module pool | GPU selection rejected; use `renderCanvasVideo` |
 
 Canvas GPU text accepts a single shaped run; paragraph bidi layout, fallback fonts and browser text parity are not qualified. The helper runs one frame at a time with one retained surface. Bitrate is a codec target, not a quality guarantee; dense TextGrid needed substantially more bitrate than an ordinary scene.
+
+Each circle path accepts one full-turn arc, with an optional `closePath`; `fill('nonzero')` and `fill('evenodd')` have the same result for this single contour. Paths retain the transform at construction and use color/alpha at fill time. Nonuniform scaling produces ellipses. `save`/`restore` preserve drawing state independently of the current path. GPU Canvas frames are limited to 120,000 emitted commands, 32 MiB serialized messages, 64 saved states and 20,000 aggregate text characters. The independent font header is limited to 48 MiB encoded/32 MiB decoded bytes; Plan limits remain unchanged.
+
+Set `gpu.gop` to an integer from 1 to 300 to control the maximum keyframe interval. The default is 90; an explicit `gop: 30` is required when replicating a scene configured for GOP30. Native protocol 2 receipts record this requested setting. The encoder may insert additional keyframes; the requested interval is a maximum, not a guarantee of exact placement. Rebuild the optional helper when updating its protocol; mismatched receipts reject.
 
 Profiling establishes no application-level raw-frame download in the measured hardware path. System IOSurface pointer queries and opaque driver/encoder operations remain observable limitations, so total end-to-end zero-copy is **not proved**. Metal captures snapshot resources and are excluded from timings. See [the GPU contract](GPU-SPEC.md) and [benchmark protocol](benchmarks/GPU-PROTOCOL.md) for the precise transfer boundaries and quality gates. The helper is an optional source build; a packaged native binary and remote GPU deployment are not qualified.
 
