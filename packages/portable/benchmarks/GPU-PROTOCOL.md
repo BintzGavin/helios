@@ -1,10 +1,31 @@
 # Native GPU comparison protocol
 
-The current optional helper uses native protocol2. The appended positional GOP
-argument accepts1..300 and defaults90 when omitted; receipts record `protocol`
-and requested `gop`. TS hardware exports require matching protocol/GOP receipts.
-The continuity adapter accepts `--gop` and binds it into hardware qualification.
-Frozen protocol1 results remain unchanged historical measurements.
+The current optional helper uses native protocol3. The appended positional GOP
+argument accepts1..300 and defaults90 when omitted; a following encoder-pool
+argument accepts1 or3 and defaults1. Receipts record `protocol`, requested `gop`
+and `encoderPool`. TS exports require matching protocol/GOP/pool receipts. The
+continuity adapter accepts `--gop`/`--encoder-pool` and binds both into hardware
+qualification. Frozen protocol1/2 results remain unchanged historical evidence.
+
+The three-buffer lane retains conversion completion and an application buffer
+reference through callback completion. CoreVideo controls recycling after all
+remaining encoder references are released. At allocation pressure it drains
+through the oldest pending PTS, flushes plane-cache holds and retries once. EOF
+drains and verifies all ordered callbacks. Trace each frame's acquisition,
+IOSurface plane identity, GPU conversion, submit, callback and owner release;
+verify no same surface is acquired before its previous callback owner release.
+Profile this lane independently, with actual GPU capture and raw-download
+positive controls. Capacity/overlap alone proves no speed gain or zero-copy.
+
+```mermaid
+flowchart LR
+  P[Encoder pool capacity3] --> R[Metal conversion fence]
+  R --> E[Submit ordered frame]
+  E --> C[Callback completes]
+  C --> O[Release application owner]
+  O --> P
+  E --> N[Raster next frame]
+```
 
 Canvas full-circle paths emit one compact circle command containing the affine
 transform captured at path construction. Frame messages are independently

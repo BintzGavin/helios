@@ -15,6 +15,8 @@ export interface GpuOptions {
   backend?: 'metal' | 'vulkan'; codec?: 'h264' | 'hevc'; bitrate?: number;
   /** Maximum keyframe interval, 1..300. Defaults to 90. */
   gop?: number;
+  /** 1 preserves serial submission; 3 enables bounded encoder overlap. */
+  encoderPool?: 1 | 3;
   /** Trusted worker executable, never a JSON scene field. */
   executable?: string;
   /** Optional task-owned transfer receipts and Metal capture, outside the repository. */
@@ -39,6 +41,7 @@ export function validateGpuOptions(options: GpuOptions): void {
   if (!Number.isSafeInteger(bitrate) || bitrate < 100_000 || bitrate > 200_000_000) throw new RenderError('INVALID_ENCODER', 'Invalid GPU bitrate');
   const gop = options.gop ?? 90;
   if (!Number.isSafeInteger(gop) || gop < 1 || gop > 300) throw new RenderError('INVALID_ENCODER', 'Invalid GPU GOP; expected an integer from 1 to 300');
+  if ((options.encoderPool ?? 1) !== 1 && options.encoderPool !== 3) throw new RenderError('INVALID_ENCODER', 'Invalid GPU encoder pool; expected 1 or 3');
   if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new RenderError('GPU_UNSUPPORTED', 'Metal GPU encoding requires macOS arm64');
 }
 
@@ -174,7 +177,7 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
   try {
     const elementary = join(directory, 'video.h264'), staged = join(directory, 'video.mp4');
     const nativeStarted = performance.now();
-    const worker = startProcess(executable, ['encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? '', String(options.gop ?? 90)], { signal: options.signal, timeoutMs: 300000 });
+    const worker = startProcess(executable, ['encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? '', String(options.gop ?? 90), String(options.encoderPool ?? 1)], { signal: options.signal, timeoutMs: 300000 });
     let receipt = '';
     worker.child.stdout.on('data', (bytes: Buffer) => { receipt += bytes.toString(); if (receipt.length > 8192) worker.kill(); });
     const send = async (message: unknown, limit = GPU_LIMITS.frameBytes) => {
@@ -190,7 +193,7 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
       }
       worker.child.stdin.end(); await worker.done;
       const result = JSON.parse(receipt);
-      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== 2 || result.gop !== (options.gop ?? 90)) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/GOP');
+      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== 3 || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1)) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/GOP/pool');
     } catch (error) { worker.kill(); await worker.done.catch(() => {}); throw error; }
     const nativeProcessMs = performance.now() - nativeStarted, muxStarted = performance.now();
     await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', 'h264', '-i', elementary, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });

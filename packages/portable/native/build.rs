@@ -1,5 +1,6 @@
 fn main() {
     println!("cargo:rerun-if-changed=metal.mm");
+    println!("cargo:rerun-if-changed=encoder-flight.hpp");
     cc::Build::new()
         .cpp(true)
         .file("metal.mm")
