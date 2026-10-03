@@ -29,6 +29,17 @@ timestamps otherwise cause spurious framesync repeats. Required floors on
 Reference agreement measures encoding damage; it does not establish identical
 text edges between independent rasterizers.
 
+GPU NV12 is already limited-range BT.709. Set its input frame metadata before
+FFmpeg's planar layout conversion; output codec tags alone are insufficient.
+Without `NV12_REFERENCE_FILTER`, a known red sample `[63,63,63,63,102,240]`
+changed to `[58,58,58,58,105,229]` in the FFV1 oracle. The regression checks
+pixel identity and decoded tags independently. For full-scene qualification,
+split directly exported NV12 into planar Y/U/V without color arithmetic and
+compare every decoded reference frame hash. A changed oracle invalidates old
+quality receipts; preserve completed videos and original clocks, then attach
+new qualification receipts. Do not represent a pixel-changing correction as a
+metadata-only retag.
+
 Run from a source checkout with the optional native release helper built,
 Node/tsx, Playwright, Chrome, FFmpeg and ffprobe installed. Use an external
 output directory and pass executable/font paths explicitly:
@@ -118,3 +129,8 @@ software fallback. Remote GPU execution and other devices require separate
 qualification. Current fframes hardware API and the old Metal-raster/x264
 TextGrid are distinct source pins; neither is treated as a measured hardware
 win without a working matched adapter and raw qualified runs.
+
+The measured TextGrid study and exact current limits are recorded in
+[GPU-RESULTS.md](GPU-RESULTS.md). Those export intervals exclude decode checks;
+the retained process clocks include adapter verification overhead. They do not
+establish isolated GPU throughput or superiority over a different host/scene.

@@ -98,13 +98,13 @@ The optional GPU helper uses native Skia Metal rasterization and a required Vide
 npm run build:gpu --workspace=packages/portable
 ```
 
-Use the retained Plan API with `{ rasterizer: 'gpu', gpu: { bitrate: 180_000_000 } }`, or opt into GPU encoding for a trusted Canvas composition:
+Use the retained Plan API with `{ rasterizer: 'gpu', gpu: { bitrate: 100_000_000 } }`, or opt into GPU encoding for a trusted Canvas composition:
 
 ```js
 import { renderCanvasVideo } from '@helios-project/portable';
 
 await renderCanvasVideo(composition, '/tmp/video-gpu.mp4', {
-  gpu: { backend: 'metal', codec: 'h264', bitrate: 180_000_000 }
+  gpu: { backend: 'metal', codec: 'h264', bitrate: 100_000_000 }
 });
 ```
 
