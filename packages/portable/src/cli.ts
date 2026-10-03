@@ -17,7 +17,7 @@ const help = `helios-portable (experimental)
   serve --data DIRECTORY --host 127.0.0.1 --port 8787
 
 Assets are files named by their SHA-256 digest in DIRECTORY.
-Render flags: --rasterizer native|wasm|skia --ffmpeg PATH --ffprobe PATH
+Render flags: --rasterizer native|wasm|skia|gpu --ffmpeg PATH --ffprobe PATH
 Serve flags: --auth-module PATH | --trusted-network; --chunk-frames 60
 A public listener requires an authorization module or an explicitly trusted network.
 The Wasm option replaces rasterization only; codecs still run as native processes.`;
@@ -37,7 +37,7 @@ export async function runCli(argv: string[]): Promise<void> {
     flags.set(name, args[++i]);
   }
   const rasterizer = flags.get('rasterizer') ?? 'native';
-  if (rasterizer !== 'native' && rasterizer !== 'wasm' && rasterizer !== 'skia') throw new RenderError('INVALID_ARGUMENT', 'Rasterizer must be native, wasm or skia');
+  if (rasterizer !== 'native' && rasterizer !== 'wasm' && rasterizer !== 'skia' && rasterizer !== 'gpu') throw new RenderError('INVALID_ARGUMENT', 'Rasterizer must be native, wasm, skia or gpu');
   const options: RenderOptions = { rasterizer, ffmpeg: flags.get('ffmpeg'), ffprobe: flags.get('ffprobe') };
   if (command === 'serve') {
     if (positional.length) throw new RenderError('INVALID_ARGUMENT', 'Unexpected argument');

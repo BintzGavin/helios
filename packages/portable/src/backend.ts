@@ -44,7 +44,7 @@ export class NativeBackend implements RenderBackend {
   readonly identity: string;
   private cached?: { key: string; prepared: PreparedScene };
   private build?: Promise<string>;
-  constructor(private options: Pick<RenderOptions, 'ffmpeg' | 'ffprobe' | 'rasterizer'> = {}) { this.identity = `portable-experimental-1/resvg-2.6.2/${options.rasterizer ?? 'native'}`; }
+  constructor(private options: Pick<RenderOptions, 'ffmpeg' | 'ffprobe' | 'rasterizer' | 'gpu'> = {}) { this.identity = options.rasterizer === 'gpu' ? 'portable-gpu-experimental-1/skia-143/metal/videotoolbox-h264' : `portable-experimental-1/resvg-2.6.2/${options.rasterizer ?? 'native'}`; }
   fingerprint(): Promise<string> {
     return this.build ??= (async () => {
       const hash = createHash('sha256').update(`${this.identity}/${process.platform}/${process.arch}/${process.version}`);
@@ -53,6 +53,11 @@ export class NativeBackend implements RenderBackend {
         hash.update(name).update(bytes);
       }
       hash.update(await renderingDependencies());
+      if (this.options.rasterizer === 'gpu') {
+        hash.update(await readFile(new URL('./gpu.js', import.meta.url)).catch(() => readFile(new URL('./gpu.ts', import.meta.url))));
+        hash.update(await readFile(this.options.gpu?.executable ?? new URL('../native/target/release/helios-gpu', import.meta.url)));
+        hash.update(JSON.stringify(this.options.gpu ?? {}));
+      }
       for (const executable of [this.options.ffmpeg ?? 'ffmpeg', this.options.ffprobe ?? 'ffprobe']) hash.update(await runProcess(executable, ['-version'], { timeoutMs: 10000 }));
       return `${this.identity}/${hash.digest('hex')}`;
     })();
@@ -60,7 +65,10 @@ export class NativeBackend implements RenderBackend {
   async preflight(plan: Plan, assets: AssetFiles, signal: AbortSignal): Promise<void> {
     signal.throwIfAborted();
     const prepared = await prepareScene(plan, assets, { ...this.options, signal }, true);
-    await renderFrame(plan, 0, assets, { ...this.options, signal, prepared });
+    if (this.options.rasterizer === 'gpu') {
+      const { preflightGpuPlan } = await import('./gpu.js');
+      await preflightGpuPlan(plan, { ...this.options, signal });
+    } else await renderFrame(plan, 0, assets, { ...this.options, signal, prepared });
     await runProcess(this.options.ffmpeg ?? 'ffmpeg', ['-version'], { signal, timeoutMs: 10000 });
     this.cached = { key: JSON.stringify(plan), prepared };
   }

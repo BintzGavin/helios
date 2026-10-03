@@ -24,6 +24,7 @@
     "dist"
   ],
   "scripts": {
+    "build:gpu": "node scripts/build-gpu.mjs",
     "build": "tsc -p tsconfig.json",
     "test": "tsc -p tsconfig.json && vitest run --no-file-parallelism",
     "check": "tsc -p tsconfig.json --noEmit",

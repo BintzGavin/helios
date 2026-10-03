@@ -11,3 +11,5 @@ export type { CanvasComposition, CanvasFrame, CanvasFrameTimings, CanvasRenderOp
 export type { SoftwareEncoderOptions } from './render.js';
 export { renderCanvasModule } from './canvas-pool.js';
 export type { CanvasPoolOptions, CanvasPoolResult } from './canvas-pool.js';
+export { renderGpuCanvasVideo } from './gpu.js';
+export type { GpuOptions, GpuCanvasOptions, GpuTimings } from './gpu.js';
