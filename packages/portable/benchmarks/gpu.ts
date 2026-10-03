@@ -10,6 +10,7 @@ import { recordGpuCanvas, renderGpuCanvasVideo } from '../src/gpu.js';
 import { parsePlan } from '../src/plan.js';
 import { probeVideo, videoEncoderArgs } from '../src/render.js';
 import { runProcess, startProcess } from '../src/process.js';
+import { NV12_REFERENCE_FILTER } from './gpu-reference.js';
 
 const args = process.argv.slice(2);
 const option = (name: string, fallback = '') => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
@@ -50,7 +51,7 @@ try {
     const plan = parsePlan({ version: 'portable-v1', width: 1920, height: 1080, fps: { num: 30, den: 1 }, frameCount: frames, nodes: [] });
     const filterArgs = videoEncoderArgs(plan, frames, output, 'rgba', software);
     const filter = filterArgs[filterArgs.indexOf('-vf') + 1];
-    const encoding = reference ? ['-hide_banner', '-loglevel', 'error', '-y', '-filter_threads', '1', '-f', 'rawvideo', '-pix_fmt', helperMode === 'reference' ? 'nv12' : 'rgba', '-s', '1920x1080', '-r', '30', '-i', 'pipe:0', '-vf', helperMode === 'reference' ? 'format=yuv420p' : filter, '-c:v', 'ffv1', '-level', '3', '-threads', '2', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv', '-frames:v', String(frames), output] : filterArgs;
+    const encoding = reference ? ['-hide_banner', '-loglevel', 'error', '-y', '-filter_threads', '1', '-f', 'rawvideo', '-pix_fmt', helperMode === 'reference' ? 'nv12' : 'rgba', '-s', '1920x1080', '-r', '30', '-i', 'pipe:0', '-vf', helperMode === 'reference' ? NV12_REFERENCE_FILTER : filter, '-c:v', 'ffv1', '-level', '3', '-threads', '2', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv', '-frames:v', String(frames), output] : filterArgs;
     const encoder = startProcess(ffmpeg, encoding, { timeoutMs: 300000 }); encoder.child.stdout.resume();
     const producer = startProcess(executable, [helperMode, '1920', '1080', '30', '1', String(bitrate), '/unused', join(directory, 'transfer.jsonl')], { timeoutMs: 300000 });
     const feeding = (async () => {

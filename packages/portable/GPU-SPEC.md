@@ -40,16 +40,24 @@ timing evidence. Prior portable native CPU timings are CPU-only.
 | Application raw CPU readback in hardware lane | None observed within instrumented boundary | Independent interposer; NV12-map and RGBA-download positive controls both detect intentionally exported raw pixels |
 | Total end-to-end zero-copy | Unproved | System IOSurface pointer queries occur; opaque driver/encoder copies and unhooked operations remain unknown; `zeroCopyProved` stays false |
 | Vulkan hardware encoding interop | Unsupported | Explicit refusal; no Vulkan hardware qualification on this macOS executor |
-| Chromium equivalent GPU benchmarks | In progress | Frozen native own-reference screens pass all 300 frames at x264 CRF 11 and hardware 180 Mbps; actual Chromium Graphite trace and own-reference quality pass; balanced rounds exclude warmups/screens/profiles |
+| Chromium equivalent GPU benchmarks | Passed for continuity TextGrid | Four AB/BA/BA/AB pairs, matched x264 settings/SEI, own references and every-frame fidelity/cadence/color; export medians 26.197 s native GPU and 30.199 s Chromium |
+| Hardware benchmark / oracle correctness | Passed on measured host | All 300 corrected FFV1 frame hashes match directly split GPU NV12; four separate 100 Mbps repeats pass, median export 6.385 s; old oracle/quality receipts invalidated and retained |
 | Full comparison follow-through | Scheduled | Thread heartbeat; originating comparison chat owns harness |
 
 All raw receipts and generated media stay outside the repository.
 
-Current evidence directory: `/private/tmp/helios-gpu-evidence`. This is local
+Evidence alias: `/private/tmp/helios-gpu-evidence`. This is local
 evidence, not a public artifact URL. The [protocol](benchmarks/GPU-PROTOCOL.md)
 defines reproducible adapter commands and the scope of each proof. Initial red
 checks preceded the native implementation; failing font-manager/viewport/
 instrumentation/quality attempts remain retained and excluded.
+
+The native implementation PR was externally merged as `5299bf7f9ad69f54c25b26b0b0774fbcc7d5f723`.
+The benchmark oracle correction and measured report are a separate reviewable
+change. See [the measured report](benchmarks/GPU-RESULTS.md) for durable receipt
+locations and the invalidated-reference history. Confidence is 90% for the
+measured macOS implementation; total zero-copy, Vulkan and remote hosts remain
+unqualified, not complete requirements.
 
 Hardware integration tests run only on macOS arm64 with the optional release
 helper built. A missing helper skips that suite; a Linux test pass does not
