@@ -1,5 +1,25 @@
 # Native GPU comparison protocol
 
+The current optional helper uses native protocol2. The appended positional GOP
+argument accepts1..300 and defaults90 when omitted; receipts record `protocol`
+and requested `gop`. TS hardware exports require matching protocol/GOP receipts.
+The continuity adapter accepts `--gop` and binds it into hardware qualification.
+Frozen protocol1 results remain unchanged historical measurements.
+
+Canvas full-circle paths emit one compact circle command containing the affine
+transform captured at path construction. Frame messages are independently
+bounded in TS/Rust to32 MiB/120,000 commands; font headers are bounded separately
+to48 MiB encoded/32 MiB decoded. Plan resource limits remain unchanged.
+
+The separate public4K99,000-circle/1,000-digit scene requires source frames3..302,
+the1000x1000 viewBox's nonuniform3840x2160 scale and explicitGOP30. The original
+claimed measured renderer commit does not contain the documented scene/source
+hash. Reproducing the current public scene is labeled scene replication, not an
+exact-byte reproduction of the originalM5Max7.225018333s single run. New helper
+source/build pins, direct per-engine references, actual GPU profiling, all300
+quality/cadence/color checks and separate balanced timings are required before
+any new performance claim.
+
 This adapter compares complete capture-to-video pipelines, not isolated GPU
 shader throughput. Chromium uses Canvas/Graphite plus lossless PNG/CDP capture;
 native Skia uses Metal plus raw RGBA readback for the matched software lane.

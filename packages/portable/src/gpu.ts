@@ -13,6 +13,8 @@ import { createCanvas, ImageData } from './skia-binding.js';
 
 export interface GpuOptions {
   backend?: 'metal' | 'vulkan'; codec?: 'h264' | 'hevc'; bitrate?: number;
+  /** Maximum keyframe interval, 1..300. Defaults to 90. */
+  gop?: number;
   /** Trusted worker executable, never a JSON scene field. */
   executable?: string;
   /** Optional task-owned transfer receipts and Metal capture, outside the repository. */
@@ -21,13 +23,22 @@ export interface GpuOptions {
 export interface GpuTimings { preflightMs: number; nativeProcessMs: number; muxMs: number; verificationMs: number }
 export interface GpuCanvasOptions extends CanvasRenderOptions, GpuOptions { onTimings?: (timings: GpuTimings) => void }
 type Color = [number, number, number, number];
-export interface GpuCommand { op: string; args?: number[]; color?: Color; text?: string; font?: string; size?: number }
+export interface GpuCommand { op: string; args?: number[]; matrix?: number[]; color?: Color; text?: string; font?: string; size?: number }
+export const GPU_LIMITS = Object.freeze({ commands: 120000, frameBytes: 32 * 1024 * 1024, fontHeaderBytes: 48 * 1024 * 1024, stack: 64 });
+const resourceLimit = () => { throw new RenderError('GPU_RESOURCE_LIMIT', 'GPU command, text, font or message budget exceeded'); };
+function serializeMessage(message: unknown, limit = GPU_LIMITS.frameBytes): string {
+  const line = JSON.stringify(message);
+  if (Buffer.byteLength(line) > limit) resourceLimit();
+  return line;
+}
 
 export function validateGpuOptions(options: GpuOptions): void {
   if ((options.backend ?? 'metal') !== 'metal') throw new RenderError('GPU_UNSUPPORTED', 'Vulkan encoder surface interoperability is not implemented');
   if ((options.codec ?? 'h264') !== 'h264') throw new RenderError('GPU_UNSUPPORTED', 'Unsupported GPU codec; only H.264 is implemented');
   const bitrate = options.bitrate ?? 20_000_000;
   if (!Number.isSafeInteger(bitrate) || bitrate < 100_000 || bitrate > 200_000_000) throw new RenderError('INVALID_ENCODER', 'Invalid GPU bitrate');
+  const gop = options.gop ?? 90;
+  if (!Number.isSafeInteger(gop) || gop < 1 || gop > 300) throw new RenderError('INVALID_ENCODER', 'Invalid GPU GOP; expected an integer from 1 to 300');
   if (process.platform !== 'darwin' || process.arch !== 'arm64') throw new RenderError('GPU_UNSUPPORTED', 'Metal GPU encoding requires macOS arm64');
 }
 
@@ -41,26 +52,48 @@ export async function recordGpuCanvas(composition: CanvasComposition, index: num
   if (!Number.isInteger(index) || index < 0 || index >= composition.frameCount) throw new RenderError('INVALID_FRAME', 'Frame is outside the composition');
   const commands: GpuCommand[] = [];
   let state = { fillStyle: '#000000', globalAlpha: 1, font: '', textBaseline: 'alphabetic' };
-  const stack: typeof state[] = [];
+  let matrix = [1, 0, 0, 1, 0, 0];
+  const stack: { state: typeof state; matrix: number[] }[] = [];
+  let path: { args: number[]; matrix: number[] } | undefined;
+  let characters = 0;
+  const push = (command: GpuCommand) => { if (commands.length >= GPU_LIMITS.commands) resourceLimit(); commands.push(command); };
   const fonts: Record<string, string> = Object.create(null);
   for (const name of Object.keys(composition.fonts ?? {})) fonts[name] = name;
   const unsupported = () => { throw new RenderError('GPU_UNSUPPORTED_CANVAS', 'Canvas operation is outside the native GPU subset'); };
-  const numeric = (values: number[]) => { if (values.some(value => !Number.isFinite(value))) throw new RenderError('INVALID_COMPOSITION', 'Non-finite GPU drawing coordinate'); return values; };
+  const numeric = (values: number[]) => { if (values.some(value => !Number.isFinite(value) || Math.abs(value) > 1e7)) throw new RenderError('INVALID_COMPOSITION', 'Invalid GPU drawing coordinate'); return values; };
+  const transform = (right: number[]) => {
+    const [a, b, c, d, e, f] = matrix, [g, h, i, j, k, l] = right;
+    matrix = numeric([a * g + c * h, b * g + d * h, a * i + c * j, b * i + d * j, a * k + c * l + e, b * k + d * l + f]);
+  };
   const methods: Record<string, (...args: any[]) => unknown> = {
     fillRect: (x: number, y: number, width: number, height: number) => {
       numeric([x, y, width, height]);
-      commands.push({ op: 'rect', args: numeric([width < 0 ? x + width : x, height < 0 ? y + height : y, Math.abs(width), Math.abs(height)]), color: color(state.fillStyle, state.globalAlpha) });
+      push({ op: 'rect', args: numeric([width < 0 ? x + width : x, height < 0 ? y + height : y, Math.abs(width), Math.abs(height)]), color: color(state.fillStyle, state.globalAlpha) });
     },
     fillText: (text: string, x: number, y: number, maxWidth?: number) => {
       const match = /^(\d+(?:\.\d+)?)px (.+)$/.exec(state.font);
       if (!match || !Object.hasOwn(fonts, match[2]) || state.textBaseline !== 'alphabetic' || maxWidth !== undefined || typeof text !== 'string') unsupported();
-      commands.push({ op: 'text', text, args: numeric([x, y]), color: color(state.fillStyle, state.globalAlpha), font: match![2], size: Number(match![1]) });
+      characters += text.length; if (characters > LIMITS.textCharacters) resourceLimit();
+      const size = Number(match![1]); if (!Number.isFinite(size) || size <= 0 || size > 4096) unsupported();
+      push({ op: 'text', text, args: numeric([x, y]), color: color(state.fillStyle, state.globalAlpha), font: match![2], size });
     },
-    save: () => { stack.push({ ...state }); commands.push({ op: 'save' }); },
-    restore: () => { const previous = stack.pop(); if (previous) { state = previous; commands.push({ op: 'restore' }); } },
-    translate: (x: number, y: number) => commands.push({ op: 'translate', args: numeric([x, y]) }),
-    scale: (x: number, y: number) => commands.push({ op: 'scale', args: numeric([x, y]) }),
-    rotate: (radians: number) => commands.push({ op: 'rotate', args: numeric([radians]) }),
+    beginPath: () => { path = undefined; },
+    arc: (x: number, y: number, radius: number, start: number, end: number, anticlockwise = false) => {
+      numeric([x, y, radius, start, end]);
+      if (radius < 0) throw new RenderError('INVALID_COMPOSITION', 'Negative GPU circle radius');
+      if (path || typeof anticlockwise !== 'boolean' || (anticlockwise ? start - end : end - start) < Math.PI * 2) return unsupported();
+      path = { args: [x, y, radius], matrix: [...matrix] };
+    },
+    closePath: () => {},
+    fill: (rule: unknown = 'nonzero') => {
+      if (rule !== 'nonzero' && rule !== 'evenodd') return unsupported();
+      if (path && path.args[2] > 0) push({ op: 'circle', args: [...path.args], matrix: [...path.matrix], color: color(state.fillStyle, state.globalAlpha) });
+    },
+    save: () => { if (stack.length >= GPU_LIMITS.stack) resourceLimit(); stack.push({ state: { ...state }, matrix: [...matrix] }); push({ op: 'save' }); },
+    restore: () => { const previous = stack.pop(); if (previous) { state = previous.state; matrix = previous.matrix; push({ op: 'restore' }); } },
+    translate: (x: number, y: number) => { numeric([x, y]); transform([1, 0, 0, 1, x, y]); push({ op: 'translate', args: [x, y] }); },
+    scale: (x: number, y: number) => { numeric([x, y]); transform([x, 0, 0, y, 0, 0]); push({ op: 'scale', args: [x, y] }); },
+    rotate: (radians: number) => { numeric([radians]); const c = Math.cos(radians), s = Math.sin(radians); transform([c, s, -s, c, 0, 0]); push({ op: 'rotate', args: [radians] }); },
   };
   const context = new Proxy(Object.create(null), {
     get: (_target, property) => typeof property === 'string' && Object.hasOwn(methods, property) ? methods[property] : typeof property === 'string' && Object.hasOwn(state, property) ? state[property as keyof typeof state] : unsupported(),
@@ -72,7 +105,9 @@ export async function recordGpuCanvas(composition: CanvasComposition, index: num
     },
   }) as SKRSContext2D;
   await composition.draw(context, { index, time: frameTime(composition.fps, index), fonts: Object.freeze(fonts) });
-  return { background: color(composition.background ?? '#000000', 1), commands };
+  const frame = { background: color(composition.background ?? '#000000', 1), commands };
+  serializeMessage(frame);
+  return frame;
 }
 
 export async function renderGpuCanvasVideo(composition: CanvasComposition, output: string, options: GpuCanvasOptions = {}): Promise<void> {
@@ -139,14 +174,15 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
   try {
     const elementary = join(directory, 'video.h264'), staged = join(directory, 'video.mp4');
     const nativeStarted = performance.now();
-    const worker = startProcess(executable, ['encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? ''], { signal: options.signal, timeoutMs: 300000 });
+    const worker = startProcess(executable, ['encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? '', String(options.gop ?? 90)], { signal: options.signal, timeoutMs: 300000 });
     let receipt = '';
     worker.child.stdout.on('data', (bytes: Buffer) => { receipt += bytes.toString(); if (receipt.length > 8192) worker.kill(); });
-    const send = async (message: unknown) => {
-      if (!worker.child.stdin.write(JSON.stringify(message) + '\n')) await Promise.race([once(worker.child.stdin, 'drain'), worker.done.then(() => { throw new RenderError('GPU_PROCESS', 'GPU helper stopped before receiving all frames'); })]);
+    const send = async (message: unknown, limit = GPU_LIMITS.frameBytes) => {
+      if (!worker.child.stdin.write(serializeMessage(message, limit) + '\n')) await Promise.race([once(worker.child.stdin, 'drain'), worker.done.then(() => { throw new RenderError('GPU_PROCESS', 'GPU helper stopped before receiving all frames'); })]);
     };
     try {
-      await send({ fonts: Object.fromEntries(Object.entries(fonts).map(([name, bytes]) => [name, Buffer.from(bytes).toString('base64')])) });
+      if (Object.values(fonts).reduce((sum, bytes) => sum + bytes.byteLength, 0) > LIMITS.fontBytes) resourceLimit();
+      await send({ fonts: Object.fromEntries(Object.entries(fonts).map(([name, bytes]) => [name, Buffer.from(bytes).toString('base64')])) }, GPU_LIMITS.fontHeaderBytes);
       for (let index = start; index < end; index++) {
         options.signal?.throwIfAborted();
         await send(index === start ? first : await frame(index));
@@ -154,7 +190,7 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
       }
       worker.child.stdin.end(); await worker.done;
       const result = JSON.parse(receipt);
-      if (result.frames !== end - start || result.encoder !== 'videotoolbox') throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range');
+      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== 2 || result.gop !== (options.gop ?? 90)) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/GOP');
     } catch (error) { worker.kill(); await worker.done.catch(() => {}); throw error; }
     const nativeProcessMs = performance.now() - nativeStarted, muxStarted = performance.now();
     await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', 'h264', '-i', elementary, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
