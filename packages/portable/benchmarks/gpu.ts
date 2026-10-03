@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { once } from 'node:events';
 import { pipeline } from 'node:stream/promises';
 import { createTextGrid, TEXT_GRID } from './fframes-textgrid.mjs';
-import { recordGpuCanvas, renderGpuCanvasVideo } from '../src/gpu.js';
+import { recordGpuCanvas, recordGpuCanvasBinary, renderGpuCanvasVideo } from '../src/gpu.js';
 import { parsePlan } from '../src/plan.js';
 import { probeVideo, videoEncoderArgs } from '../src/render.js';
 import { runProcess, startProcess } from '../src/process.js';
@@ -31,24 +31,26 @@ const gop = Number(option('--gop', '90'));
 if (!Number.isSafeInteger(gop) || gop < 1 || gop > 300) throw new Error('Invalid GOP');
 const encoderPool = Number(option('--encoder-pool', '1')) as 1 | 3;
 if (encoderPool !== 1 && encoderPool !== 3) throw new Error('Invalid encoder pool');
+const transport = option('--transport', 'binary') as 'binary' | 'json';
+if (transport !== 'binary' && transport !== 'json') throw new Error('Invalid command transport');
 const executable = fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url));
 const nativeSha256 = createHash('sha256').update(await readFile(executable)).digest('hex');
 const ffmpeg = option('--ffmpeg', 'ffmpeg'), ffprobe = option('--ffprobe', 'ffprobe');
 const software = { preset: 'medium' as const, crf: Number(option('--crf', '11')), threads: 2, colorConversion: 'srgb-bt709' as const };
 if (purpose === 'timed') {
   const qualification = JSON.parse(await readFile(resolve(option('--qualification')), 'utf8'));
-  if (!qualification.passed || qualification.frames !== 300 || qualification.fontSha256 !== fontSha256 || qualification.nativeSha256 !== nativeSha256 || qualification.mode !== mode || (mode === 'hardware' && (qualification.bitrate !== bitrate || qualification.gop !== gop || qualification.encoderPool !== encoderPool)) || (mode === 'software' && qualification.crf !== software.crf)) throw new Error('Timed lane lacks matching all-frame quality qualification');
+  if (!qualification.passed || qualification.frames !== 300 || qualification.fontSha256 !== fontSha256 || qualification.nativeSha256 !== nativeSha256 || qualification.mode !== mode || qualification.transport !== transport || (mode === 'hardware' && (qualification.bitrate !== bitrate || qualification.gop !== gop || qualification.encoderPool !== encoderPool)) || (mode === 'software' && qualification.crf !== software.crf)) throw new Error('Timed lane lacks matching all-frame quality qualification');
 }
 await mkdir(directory, { recursive: true });
 // Never overwrite an earlier failed/slow/interrupted attempt.
 const receiptPath = join(directory, 'attempt.json');
-const attempt: Record<string, unknown> = { status: 'running', purpose, mode, timingQualified: false, frames, width: 1920, height: 1080, fps: '30/1', nodes: 3334, fontSha256, nativeSha256, bitrate, gop, encoderPool, nativeProtocol: 4, software, rawReadback: mode !== 'hardware', zeroCopyProved: false, startedAt: new Date().toISOString() };
+const attempt: Record<string, unknown> = { status: 'running', purpose, mode, timingQualified: false, frames, width: 1920, height: 1080, fps: '30/1', nodes: 3334, fontSha256, nativeSha256, bitrate, gop, encoderPool, transport, nativeProtocol: transport === 'binary' ? 5 : 4, software, rawReadback: mode !== 'hardware', zeroCopyProved: false, startedAt: new Date().toISOString() };
 await writeFile(receiptPath, JSON.stringify(attempt, null, 2), { flag: 'wx' });
 const started = performance.now();
 try {
   const output = join(directory, mode.startsWith('reference-') ? 'reference.mkv' : 'video.mp4');
   if (mode === 'hardware') {
-    await renderGpuCanvasVideo(composition, output, { end: frames, bitrate, gop, encoderPool, ffmpeg, ffprobe, trace: join(directory, 'transfer.jsonl'), onTimings: timings => { attempt.apiTimings = timings; }, ...(option('--capture') ? { capture: resolve(option('--capture')) } : {}) });
+    await renderGpuCanvasVideo(composition, output, { end: frames, bitrate, gop, encoderPool, transport, ffmpeg, ffprobe, trace: join(directory, 'transfer.jsonl'), onTimings: timings => { attempt.apiTimings = timings; }, ...(option('--capture') ? { capture: resolve(option('--capture')) } : {}) });
   } else {
     const reference = mode.startsWith('reference-');
     const helperMode = mode === 'reference-hardware' ? 'reference' : 'raster';
@@ -57,11 +59,15 @@ try {
     const filter = filterArgs[filterArgs.indexOf('-vf') + 1];
     const encoding = reference ? ['-hide_banner', '-loglevel', 'error', '-y', '-filter_threads', '1', '-f', 'rawvideo', '-pix_fmt', helperMode === 'reference' ? 'nv12' : 'rgba', '-s', '1920x1080', '-r', '30', '-i', 'pipe:0', '-vf', helperMode === 'reference' ? NV12_REFERENCE_FILTER : filter, '-c:v', 'ffv1', '-level', '3', '-threads', '2', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709', '-color_range', 'tv', '-frames:v', String(frames), output] : filterArgs;
     const encoder = startProcess(ffmpeg, encoding, { timeoutMs: 300000 }); encoder.child.stdout.resume();
-    const producer = startProcess(executable, [helperMode, '1920', '1080', '30', '1', String(bitrate), '/unused', join(directory, 'transfer.jsonl'), '', String(gop), String(encoderPool)], { timeoutMs: 300000 });
+    const producer = startProcess(executable, [transport === 'binary' ? helperMode + '-binary' : helperMode, '1920', '1080', '30', '1', String(bitrate), '/unused', join(directory, 'transfer.jsonl'), '', String(gop), String(encoderPool)], { timeoutMs: 300000 });
     const feeding = (async () => {
-      const send = async (message: unknown) => { if (!producer.child.stdin.write(JSON.stringify(message) + '\n')) await Promise.race([once(producer.child.stdin, 'drain'), producer.done.then(() => { throw new Error('Native producer exited before all frames'); })]); };
+      const send = async (message: unknown) => { if (!producer.child.stdin.write(Buffer.isBuffer(message) ? message : JSON.stringify(message) + '\n')) await Promise.race([once(producer.child.stdin, 'drain'), producer.done.then(() => { throw new Error('Native producer exited before all frames'); })]); };
       await send({ fonts: { dm: font.toString('base64') } });
-      for (let frame = 0; frame < frames; frame++) await send(await recordGpuCanvas(composition, frame));
+      let initialBytes = 1024;
+      for (let frame = 0; frame < frames; frame++) {
+        if (transport === 'json') await send(await recordGpuCanvas(composition, frame));
+        else { const packet = await recordGpuCanvasBinary(composition, frame, initialBytes); initialBytes = packet.length; await send(packet); }
+      }
       producer.child.stdin.end();
     })();
     try { await Promise.all([feeding, pipeline(producer.child.stdout, encoder.child.stdin), producer.done, encoder.done]); }

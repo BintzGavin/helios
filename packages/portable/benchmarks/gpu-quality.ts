@@ -8,7 +8,7 @@ if (!option('--attempt') || !option('--reference')) throw new Error('--attempt a
 const directory = resolve(option('--attempt')), referenceDirectory = resolve(option('--reference'));
 const attempt = JSON.parse(await readFile(join(directory, 'attempt.json'), 'utf8'));
 const reference = JSON.parse(await readFile(join(referenceDirectory, 'attempt.json'), 'utf8'));
-if (attempt.status !== 'complete' || reference.status !== 'complete' || attempt.frames !== 300 || reference.frames !== 300 || attempt.mode !== reference.mode.replace('reference-', '') || attempt.fontSha256 !== reference.fontSha256 || attempt.nativeSha256 !== reference.nativeSha256) throw new Error('Incomplete or mismatched own-rasterizer oracle');
+if (attempt.status !== 'complete' || reference.status !== 'complete' || attempt.frames !== 300 || reference.frames !== 300 || attempt.mode !== reference.mode.replace('reference-', '') || attempt.fontSha256 !== reference.fontSha256 || attempt.nativeSha256 !== reference.nativeSha256 || (attempt.transport ?? 'json') !== (reference.transport ?? 'json')) throw new Error('Incomplete or mismatched own-rasterizer oracle');
 const ffmpeg = option('--ffmpeg', 'ffmpeg'), ffprobe = option('--ffprobe', 'ffprobe');
 const name = option('--receipt', 'quality');
 if (!/^[a-z0-9-]+$/.test(name)) throw new Error('Invalid quality receipt name');
@@ -37,7 +37,7 @@ function stats(text: string) { return text.trim().split('\n').filter(Boolean).ma
 const ssim = stats(await readFile(ssimPath, 'utf8')), psnr = stats(await readFile(psnrPath, 'utf8'));
 const minimum = (rows: Record<string, number>[], key: string) => Math.min(...rows.map(row => row[key]));
 if (attempt.engine !== reference.engine || attempt.enginePin !== reference.enginePin) throw new Error('Reference engine identity differs from candidate');
-const result = { frames: ssim.length, psnrFrames: psnr.length, minSsimY: minimum(ssim, 'Y'), minPsnrY: minimum(psnr, 'psnr_y'), minPsnrU: minimum(psnr, 'psnr_u'), minPsnrV: minimum(psnr, 'psnr_v'), mode: attempt.mode, engine: attempt.engine, enginePin: attempt.enginePin, bitrate: attempt.bitrate, gop: attempt.gop ?? 90, encoderPool: attempt.encoderPool ?? 1, nativeProtocol: attempt.nativeProtocol, crf: attempt.software.crf, nativeSha256: attempt.nativeSha256, fontSha256: attempt.fontSha256, reference: reference.output, video: attempt.output, deliveryColor: 'bt709-limited', passed: false };
+const result = { frames: ssim.length, psnrFrames: psnr.length, minSsimY: minimum(ssim, 'Y'), minPsnrY: minimum(psnr, 'psnr_y'), minPsnrU: minimum(psnr, 'psnr_u'), minPsnrV: minimum(psnr, 'psnr_v'), mode: attempt.mode, engine: attempt.engine, enginePin: attempt.enginePin, bitrate: attempt.bitrate, gop: attempt.gop ?? 90, encoderPool: attempt.encoderPool ?? 1, transport: attempt.transport ?? 'json', nativeProtocol: attempt.nativeProtocol, crf: attempt.software.crf, nativeSha256: attempt.nativeSha256, fontSha256: attempt.fontSha256, reference: reference.output, video: attempt.output, deliveryColor: 'bt709-limited', passed: false };
 result.passed = result.frames === 300 && result.psnrFrames === 300 && result.minSsimY >= 0.995 && result.minPsnrY >= 40 && result.minPsnrU >= 35 && result.minPsnrV >= 35;
 await writeFile(join(directory, `${name}.json`), JSON.stringify(result, null, 2), { flag: 'wx' });
 console.log(JSON.stringify(result)); if (!result.passed) process.exitCode = 1;
