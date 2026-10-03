@@ -90,6 +90,41 @@ Workers use separate processes and retain their canvas and fonts across assigned
 
 `encoder.colorConversion` defaults to `srgb-bt709`. The explicit `rgb-bt601` mode is for matching pipelines that convert RGB component values directly to BT.601 YUV; it does not perform the sRGB-to-BT.709 transfer conversion. These modes have different pixel semantics and must be disclosed in comparisons. Native Canvas uses Skia text rasterization, which differs at edges from SVG/fontkit paths. The Canvas API exports video only; the portable JSON service remains the complete prepared-media/audio job path. Local execution is tested; Linux and remote performance require separate qualification.
 
+## Opt into native GPU rendering
+
+The optional GPU helper uses native Skia Metal rasterization and a required VideoToolbox H.264 encoder on macOS arm64. Build it from this checkout with Rust/Cargo and Apple Command Line Tools:
+
+```sh
+npm run build:gpu --workspace=packages/portable
+```
+
+Use the retained Plan API with `{ rasterizer: 'gpu', gpu: { bitrate: 180_000_000 } }`, or opt into GPU encoding for a trusted Canvas composition:
+
+```js
+import { renderCanvasVideo } from '@helios-project/portable';
+
+await renderCanvasVideo(composition, '/tmp/video-gpu.mp4', {
+  gpu: { backend: 'metal', codec: 'h264', bitrate: 180_000_000 }
+});
+```
+
+The hardware lane converts sRGB to limited-range BT.709 NV12 on Metal, writes both planes of one encoder-pool IOSurface, waits for GPU completion, and retains that surface until the encoder callback completes. Only compressed H.264 packets cross into CPU output code. Full decoded verification precedes atomic publication; failure or cancellation preserves an existing destination. Selecting GPU never silently falls back to software. Omitting GPU selection preserves the existing CPU/Wasm paths. `renderFrame` still returns pixels/PNG/SVG and therefore explicitly reads GPU pixels back to the CPU.
+
+| Path | Current support |
+|---|---|
+| macOS arm64 Metal + VideoToolbox H.264 | Tested on M3 Pro; even dimensions up to 4096 per axis |
+| macOS Intel, Linux/Vulkan, Windows | Unsupported; explicit GPU requests reject |
+| HEVC or other GPU codecs | Unsupported |
+| Vector/text Plan | Supported through Skia SVG; prepared text uses glyph paths |
+| Plan image/video layers | Unsupported; choose a retained CPU backend |
+| Canvas | `fillRect`, `fillText`, save/restore, translate/scale/rotate; explicit RGB colors, alpha and byte-buffer font aliases |
+| Canvas paths/images, max-width text, other baselines/styles | Unsupported; reject explicitly |
+| CPU Canvas module pool | GPU selection rejected; use `renderCanvasVideo` |
+
+Canvas GPU text accepts a single shaped run; paragraph bidi layout, fallback fonts and browser text parity are not qualified. The helper runs one frame at a time with one retained surface. Bitrate is a codec target, not a quality guarantee; dense TextGrid needed substantially more bitrate than an ordinary scene.
+
+Profiling establishes no application-level raw-frame download in the measured hardware path. System IOSurface pointer queries and opaque driver/encoder operations remain observable limitations, so total end-to-end zero-copy is **not proved**. Metal captures snapshot resources and are excluded from timings. See [the GPU contract](GPU-SPEC.md) and [benchmark protocol](benchmarks/GPU-PROTOCOL.md) for the precise transfer boundaries and quality gates. The helper is an optional source build; a packaged native binary and remote GPU deployment are not qualified.
+
 ## Run the backend
 
 ```sh

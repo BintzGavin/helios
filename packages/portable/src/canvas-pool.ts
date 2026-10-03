@@ -58,6 +58,7 @@ class CanvasWorker {
 
 /** Persistent CPU workers dynamically claim contiguous ranges; each range seeks independently. */
 export async function renderCanvasModule(modulePath: string | URL, output: string, options: CanvasPoolOptions = {}): Promise<CanvasPoolResult> {
+  if (options.gpu) throw new RenderError('GPU_UNSUPPORTED', 'The CPU worker pool does not support GPU surfaces; use renderCanvasVideo');
   options.signal?.throwIfAborted();
   const concurrency = options.concurrency ?? Math.min(4, availableParallelism()), chunkFrames = options.chunkFrames ?? 90;
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 64) throw new RenderError('INVALID_CONCURRENCY', 'CPU worker count must be within 1..64');

@@ -12,10 +12,10 @@ import { Plan, Node, Paint, Fps, RenderError, LIMITS, evaluate, resolveLength, f
 import { runProcess, startProcess } from './process.js';
 
 export type AssetFiles = Map<string, string>;
-export type Rasterizer = 'native' | 'wasm' | 'skia';
+export type Rasterizer = 'native' | 'wasm' | 'skia' | 'gpu';
 export interface SoftwareEncoderOptions { preset?: 'ultrafast' | 'superfast' | 'veryfast' | 'faster' | 'fast' | 'medium' | 'slow' | 'slower' | 'veryslow' | 'placebo'; crf?: number; threads?: number; gop?: number; bframes?: number; sceneCut?: boolean; qmin?: number; qmax?: number; qcompress?: number; maxQdiff?: number; colorConversion?: 'srgb-bt709' | 'rgb-bt601' }
 export interface PreparedScene { fonts: Map<string, Font>; text: Map<string, TextLayout>; images: Map<string, Buffer>; videos: Map<string, VideoInfo>; frames: Map<string, Buffer> }
-export interface RenderOptions { ffmpeg?: string; ffprobe?: string; signal?: AbortSignal; start?: number; end?: number; rasterizer?: Rasterizer; prepared?: PreparedScene; videoOnly?: boolean; framesReady?: boolean; onFrame?: (index: number) => void | Promise<void> }
+export interface RenderOptions { ffmpeg?: string; ffprobe?: string; signal?: AbortSignal; start?: number; end?: number; rasterizer?: Rasterizer; gpu?: import('./gpu.js').GpuOptions; prepared?: PreparedScene; videoOnly?: boolean; framesReady?: boolean; onFrame?: (index: number) => void | Promise<void> }
 const xml = (s: string) => s.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c]!);
 export async function prepareScene(plan: Plan, assets: AssetFiles, options: RenderOptions = {}, checkCadence = false): Promise<PreparedScene> {
   const prepared: PreparedScene = { fonts: new Map(), text: new Map(), images: new Map(), videos: new Map(), frames: new Map() };
@@ -125,6 +125,10 @@ export async function renderFrame(plan: Plan, index: number, assets: AssetFiles,
   return rasterize(plan, index, assets, options, true);
 }
 async function rasterize(plan: Plan, index: number, assets: AssetFiles, options: RenderOptions, encodePng: boolean): Promise<{ pixels: Buffer; png: Buffer; svg: string }> {
+  if (options.rasterizer === 'gpu') {
+    const { renderGpuPlanFrame } = await import('./gpu.js');
+    return renderGpuPlanFrame(plan, index, assets, options);
+  }
   const prepared = options.prepared ?? await prepareScene(plan, assets, options);
   if (!options.framesReady) {
     prepared.frames.clear();
@@ -181,6 +185,10 @@ export async function renderVideo(plan: Plan, assets: AssetFiles, output: string
   }
   const start = options.start ?? 0, end = options.end ?? plan.frameCount;
   if (!Number.isInteger(start) || !Number.isInteger(end) || start < 0 || end > plan.frameCount || end <= start) throw new RenderError('INVALID_RANGE', 'Invalid half-open frame range');
+  if (options.rasterizer === 'gpu') {
+    const { renderGpuPlanVideo } = await import('./gpu.js');
+    await renderGpuPlanVideo(plan, assets, output, options); return;
+  }
   const prepared = options.prepared ?? await prepareScene(plan, assets, options);
   const decoders = new Map<string, VideoDecoder>();
   const process = startProcess(options.ffmpeg ?? 'ffmpeg', videoEncoderArgs(plan, end - start, output), { signal: options.signal, timeoutMs: 300000 });

@@ -19,6 +19,7 @@ export interface CanvasComposition {
 export interface CanvasRenderOptions {
   ffmpeg?: string; ffprobe?: string; signal?: AbortSignal; start?: number; end?: number;
   encoder?: SoftwareEncoderOptions; onFrame?: (index: number) => void | Promise<void>;
+  gpu?: import('./gpu.js').GpuOptions;
 }
 export interface CanvasFrameTimings { rasterizeMs: number; pixelExtractionMs: number }
 export interface CanvasRangeStats extends CanvasFrameTimings { frames: number; preparationMs: number; drawMs: number; encoderWaitMs: number; encodeMs: number; verifyMs: number }
@@ -86,6 +87,10 @@ export class CanvasFrameRenderer {
 
 /** Software-only encoding of an exact half-open range, suitable for stateless workers. */
 export async function renderCanvasVideo(composition: CanvasComposition, output: string, options: CanvasRenderOptions = {}): Promise<void> {
+  if (options.gpu) {
+    const { renderGpuCanvasVideo } = await import('./gpu.js');
+    await renderGpuCanvasVideo(composition, output, { ...options, ...options.gpu }); return;
+  }
   options.signal?.throwIfAborted();
   const renderer = new CanvasFrameRenderer(composition);
   let directory: string | undefined;
@@ -107,6 +112,7 @@ function canvasRange(renderer: CanvasFrameRenderer, options: CanvasRenderOptions
 }
 
 export async function encodeCanvasRange(renderer: CanvasFrameRenderer, output: string, options: CanvasRenderOptions = {}, internalChunk = false): Promise<CanvasRangeStats> {
+  if (options.gpu) throw new RenderError('GPU_UNSUPPORTED', 'CPU range encoding cannot accept a GPU selection; use renderCanvasVideo');
   options.signal?.throwIfAborted();
   const { start, end } = canvasRange(renderer, options);
   const encoder = startProcess(options.ffmpeg ?? 'ffmpeg', videoEncoderArgs(renderer.plan, end - start, output, 'rgba', options.encoder), { signal: options.signal, timeoutMs: 300000 });
