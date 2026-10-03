@@ -59,6 +59,7 @@ unsafe extern "C" {
     fn helios_finish(ctx: *mut c_void, count: u32) -> bool;
     fn helios_reference(ctx: *mut c_void, index: u32) -> bool;
     fn helios_hardware(ctx: *mut c_void) -> bool;
+    fn helios_configured_bitrate(ctx: *mut c_void) -> u32;
     fn helios_raster_submitted(ctx: *mut c_void, index: u32);
     fn helios_close(ctx: *mut c_void) -> bool;
 }
@@ -304,7 +305,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         )
     };
     let gop: u32 = args.get(10).map(|value| value.parse().map_err(|_| "GOP must be an integer")).transpose()?.unwrap_or(90);
-    if !(1..=300).contains(&gop) || !(100_000..=200_000_000).contains(&bitrate) { return Err("invalid native GPU bitrate or GOP".into()); }
+    if !(1..=300).contains(&gop) || !(100_000..=1_000_000_000).contains(&bitrate) { return Err("invalid native GPU bitrate or GOP".into()); }
     let encoder_pool: u32 = args.get(11).map(|value| value.parse().map_err(|_| "encoder pool must be an integer")).transpose()?.unwrap_or(1);
     if encoder_pool != 1 && encoder_pool != 3 { return Err("unsupported encoder pool; expected1 or3".into()); }
     if width == 0
@@ -360,7 +361,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if probe {
         println!(
             "{}",
-            serde_json::json!({"protocol":3,"gop":gop,"encoderPool":encoder_pool,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
+            serde_json::json!({"protocol":4,"bitrate":bitrate,"configuredBitrate":unsafe {helios_configured_bitrate(native.0)},"gop":gop,"encoderPool":encoder_pool,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
         );
         return Ok(());
     }
@@ -424,7 +425,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         raw.len() as u64
     };
-    let receipt = serde_json::json!({"protocol":3,"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
+    let receipt = serde_json::json!({"protocol":4,"bitrate":bitrate,"configuredBitrate":if raster || reference {None} else {Some(unsafe {helios_configured_bitrate(native.0)})},"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
     if raster || reference {
         eprintln!("{receipt}");
     } else {

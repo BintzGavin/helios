@@ -26,7 +26,7 @@ if (fontSha256 !== '9ae2da663d64342031e59b5fa680dd355171d021b7ebf83774efc7c0330a
 const composition = createTextGrid(font), frames = Number(option('--frames', '300'));
 if (!Number.isInteger(frames) || frames < 1 || frames > TEXT_GRID.frames || (purpose === 'timed' && frames !== TEXT_GRID.frames)) throw new Error('Invalid continuity frame range');
 const bitrate = Number(option('--bitrate', '20000000'));
-if (!Number.isSafeInteger(bitrate) || bitrate < 100000 || bitrate > 200000000) throw new Error('Invalid bitrate');
+if (!Number.isSafeInteger(bitrate) || bitrate < 100000 || bitrate > 1000000000) throw new Error('Invalid bitrate');
 const gop = Number(option('--gop', '90'));
 if (!Number.isSafeInteger(gop) || gop < 1 || gop > 300) throw new Error('Invalid GOP');
 const encoderPool = Number(option('--encoder-pool', '1')) as 1 | 3;
@@ -42,7 +42,7 @@ if (purpose === 'timed') {
 await mkdir(directory, { recursive: true });
 // Never overwrite an earlier failed/slow/interrupted attempt.
 const receiptPath = join(directory, 'attempt.json');
-const attempt: Record<string, unknown> = { status: 'running', purpose, mode, timingQualified: false, frames, width: 1920, height: 1080, fps: '30/1', nodes: 3334, fontSha256, nativeSha256, bitrate, gop, encoderPool, nativeProtocol: 3, software, rawReadback: mode !== 'hardware', zeroCopyProved: false, startedAt: new Date().toISOString() };
+const attempt: Record<string, unknown> = { status: 'running', purpose, mode, timingQualified: false, frames, width: 1920, height: 1080, fps: '30/1', nodes: 3334, fontSha256, nativeSha256, bitrate, gop, encoderPool, nativeProtocol: 4, software, rawReadback: mode !== 'hardware', zeroCopyProved: false, startedAt: new Date().toISOString() };
 await writeFile(receiptPath, JSON.stringify(attempt, null, 2), { flag: 'wx' });
 const started = performance.now();
 try {

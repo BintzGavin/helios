@@ -1,11 +1,16 @@
 # Native GPU comparison protocol
 
-The current optional helper uses native protocol3. The appended positional GOP
+The current optional helper uses native protocol4. Bitrate targets are bounded
+to100,000..1,000,000,000bps in TS/native/adapter. The hardware encoder's configured
+AverageBitRate must equal the requested target; receipts bind both and TS
+verifies them. Parameter acceptance is not a quality or actual coded-rate claim.
+Failed low-bitrate screens remain retained; unchanged full-frame floors apply
+before separately pinned timing. The appended positional GOP
 argument accepts1..300 and defaults90 when omitted; a following encoder-pool
 argument accepts1 or3 and defaults1. Receipts record `protocol`, requested `gop`
 and `encoderPool`. TS exports require matching protocol/GOP/pool receipts. The
 continuity adapter accepts `--gop`/`--encoder-pool` and binds both into hardware
-qualification. Frozen protocol1/2 results remain unchanged historical evidence.
+qualification. Frozen protocol1/2/3 results remain unchanged historical evidence.
 
 The three-buffer lane retains conversion completion and an application buffer
 reference through callback completion. CoreVideo controls recycling after all

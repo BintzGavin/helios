@@ -38,7 +38,7 @@ export function validateGpuOptions(options: GpuOptions): void {
   if ((options.backend ?? 'metal') !== 'metal') throw new RenderError('GPU_UNSUPPORTED', 'Vulkan encoder surface interoperability is not implemented');
   if ((options.codec ?? 'h264') !== 'h264') throw new RenderError('GPU_UNSUPPORTED', 'Unsupported GPU codec; only H.264 is implemented');
   const bitrate = options.bitrate ?? 20_000_000;
-  if (!Number.isSafeInteger(bitrate) || bitrate < 100_000 || bitrate > 200_000_000) throw new RenderError('INVALID_ENCODER', 'Invalid GPU bitrate');
+  if (!Number.isSafeInteger(bitrate) || bitrate < 100_000 || bitrate > 1_000_000_000) throw new RenderError('INVALID_ENCODER', 'Invalid GPU bitrate; expected100,000..1,000,000,000bps');
   const gop = options.gop ?? 90;
   if (!Number.isSafeInteger(gop) || gop < 1 || gop > 300) throw new RenderError('INVALID_ENCODER', 'Invalid GPU GOP; expected an integer from 1 to 300');
   if ((options.encoderPool ?? 1) !== 1 && options.encoderPool !== 3) throw new RenderError('INVALID_ENCODER', 'Invalid GPU encoder pool; expected 1 or 3');
@@ -193,7 +193,7 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
       }
       worker.child.stdin.end(); await worker.done;
       const result = JSON.parse(receipt);
-      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== 3 || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1)) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/GOP/pool');
+      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== 4 || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1) || result.bitrate !== (options.bitrate ?? 20_000_000) || result.configuredBitrate !== result.bitrate) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/GOP/pool/bitrate');
     } catch (error) { worker.kill(); await worker.done.catch(() => {}); throw error; }
     const nativeProcessMs = performance.now() - nativeStarted, muxStarted = performance.now();
     await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', 'h264', '-i', elementary, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
