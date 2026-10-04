@@ -17,6 +17,14 @@ The committed portable CPU implementation and its public TypeScript APIs remain 
 - Given a full hardware lane, when qualifying zero-copy, then preserve actual profiling and surface/transfer receipts. Hardware registration, capability flags and encoder success alone do not prove it. Encoded packet copies and scene/font/geometry uploads must also be disclosed.
 - Given unsupported Vulkan hardware interop or unavailable hardware, when reporting the matrix, then identify each unsupported/unverified architecture/codec cell explicitly.
 
+## HEVC codec extension acceptance
+
+- Explicit `codec: 'hevc'` uses required hardware VideoToolbox HEVC Main (8-bit) on macOS arm64. Omitted codec preserves H.264. Unknown codecs reject independently in TypeScript and native CLI before GPU initialization; unavailable HEVC hardware fails without software fallback.
+- The retained Metal raster and BT.709 limited-range NV12 conversion, pool capacities, fences, callback accounting and resource bounds are preserved. Only compressed packet extraction branches by codec: HEVC format descriptions use the HEVC parameter-set API and preserve VPS/SPS/PPS in Annex B.
+- HEVC capability and completion receipts bind `codec: 'hevc'`, required/actual hardware, bitrate, GOP, pool and transport. HEVC JSON protocol6 and binary protocol7 prevent an older H.264 helper from being accepted. H.264 protocol4/5 and earlier frozen helpers remain usable and unchanged.
+- MP4 remuxing uses the HEVC elementary demuxer and `hvc1` sample entry. Before atomic publication, decoded codec, dimensions, full frame count and rational cadence must match the request. Tests verify decoded limited BT.709 color, HEVC Main profile, range, both transports, callbacks and refusal of mismatched helper receipts.
+- Qualification uses separate source/helper/runtime pins, direct NV12 references, every decoded frame and unchanged quality floors. Small scene qualification is not a full 4K comparison or speed claim; the comparison owner retains its harness and historical clocks.
+
 ## Bounded encoder overlap acceptance
 
 ### Bounded bitrate controls
@@ -85,6 +93,8 @@ unqualified, not complete requirements.
 Hardware integration tests run only on macOS arm64 with the optional release
 helper built. A missing helper skips that suite; a Linux test pass does not
 qualify Metal. Device/encoder failure drivers are compiled separately by
-`scripts/check-gpu-faults.mjs` and never linked into production. HEVC, macOS
-Intel, Linux/Vulkan, GPU image/video nodes, broad Canvas behavior and remote
-hardware are explicitly unsupported. Existing CPU backends remain available.
+`scripts/check-gpu-faults.mjs` and never linked into production. The separate
+[HEVC qualification](benchmarks/GPU-HEVC-RESULTS.md) covers macOS arm64 HEVC Main
+on a small300-frame scene. macOS Intel, Linux/Vulkan, GPU image/video nodes,
+broad Canvas behavior and remote hardware remain unsupported. Existing CPU
+backends remain available.

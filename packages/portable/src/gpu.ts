@@ -36,7 +36,7 @@ function serializeMessage(message: unknown, limit = GPU_LIMITS.frameBytes): stri
 
 export function validateGpuOptions(options: GpuOptions): void {
   if ((options.backend ?? 'metal') !== 'metal') throw new RenderError('GPU_UNSUPPORTED', 'Vulkan encoder surface interoperability is not implemented');
-  if ((options.codec ?? 'h264') !== 'h264') throw new RenderError('GPU_UNSUPPORTED', 'Unsupported GPU codec; only H.264 is implemented');
+  if (options.codec !== undefined && options.codec !== 'h264' && options.codec !== 'hevc') throw new RenderError('GPU_UNSUPPORTED', 'Unsupported GPU codec; expected H.264 or HEVC');
   const bitrate = options.bitrate ?? 20_000_000;
   if (!Number.isSafeInteger(bitrate) || bitrate < 100_000 || bitrate > 1_000_000_000) throw new RenderError('INVALID_ENCODER', 'Invalid GPU bitrate; expected100,000..1,000,000,000bps');
   const gop = options.gop ?? 90;
@@ -169,7 +169,17 @@ function validateGpuPlan(plan: Plan): void {
 export async function preflightGpuPlan(plan: Plan, options: RenderOptions): Promise<void> {
   options.signal?.throwIfAborted(); validateGpuOptions(options.gpu ?? {}); validateGpuPlan(plan);
   if (plan.width % 2 || plan.height % 2 || plan.width > 4096 || plan.height > 4096) throw new RenderError('GPU_UNSUPPORTED', 'GPU surface dimensions must be even and at most 4096');
-  await runProcess(options.gpu?.executable ?? fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url)), ['probe'], { signal: options.signal, timeoutMs: 30000 });
+  await probeGpu(options.gpu?.executable ?? fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url)), { ...options, ...options.gpu });
+}
+
+async function probeGpu(executable: string, options: GpuCanvasOptions): Promise<void> {
+  const hevc = options.codec === 'hevc';
+  const bytes = await runProcess(executable, hevc ? ['probe', 'hevc'] : ['probe'], { signal: options.signal, timeoutMs: 30000, maxBytes: 8192 });
+  if (hevc) {
+    let result;
+    try { result = JSON.parse(bytes.toString()); } catch { throw new RenderError('INVALID_OUTPUT', 'Native HEVC capability receipt is invalid'); }
+    if (result.protocol !== 6 || result.codec !== 'hevc' || result.encoder !== 'videotoolbox' || result.hardwareRequired !== true || result.hardwareUsed !== true) throw new RenderError('INVALID_OUTPUT', 'Native HEVC capability does not match required hardware codec');
+  }
 }
 
 /** Explicit lossless readback for the existing pixel-returning API, never the hardware video lane. */
@@ -199,15 +209,16 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
   const first = await frame(start);
   const binary = Buffer.isBuffer(first);
   const executable = options.executable ?? fileURLToPath(new URL('../native/target/release/helios-gpu', import.meta.url));
-  await runProcess(executable, ['probe'], { signal: options.signal, timeoutMs: 30000 });
+  await probeGpu(executable, options);
   const preflightMs = performance.now() - preflightStarted;
   const destination = resolve(output);
   await mkdir(dirname(destination), { recursive: true });
   const directory = await mkdtemp(join(dirname(destination), '.helios-gpu-'));
   try {
-    const elementary = join(directory, 'video.h264'), staged = join(directory, 'video.mp4');
+    const codec = options.codec ?? 'h264';
+    const elementary = join(directory, `video.${codec}`), staged = join(directory, 'video.mp4');
     const nativeStarted = performance.now();
-    const worker = startProcess(executable, [binary ? 'encode-binary' : 'encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? '', String(options.gop ?? 90), String(options.encoderPool ?? 1)], { signal: options.signal, timeoutMs: 300000 });
+    const worker = startProcess(executable, [binary ? 'encode-binary' : 'encode', String(plan.width), String(plan.height), String(plan.fps.num), String(plan.fps.den), String(options.bitrate ?? 20_000_000), elementary, options.trace ?? '', options.capture ?? '', String(options.gop ?? 90), String(options.encoderPool ?? 1), ...(codec === 'hevc' ? ['hevc'] : [])], { signal: options.signal, timeoutMs: 300000 });
     let receipt = '';
     worker.child.stdout.on('data', (bytes: Buffer) => { receipt += bytes.toString(); if (receipt.length > 8192) worker.kill(); });
     const send = async (message: unknown, limit = GPU_LIMITS.frameBytes) => {
@@ -225,13 +236,13 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
       }
       worker.child.stdin.end(); await worker.done;
       const result = JSON.parse(receipt);
-      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || result.protocol !== (binary ? 5 : 4) || result.transport !== (binary ? 'binary' : 'json') || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1) || result.bitrate !== (options.bitrate ?? 20_000_000) || result.configuredBitrate !== result.bitrate) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/protocol/transport/GOP/pool/bitrate');
+      if (result.frames !== end - start || result.encoder !== 'videotoolbox' || (result.codec ?? 'h264') !== codec || result.protocol !== (codec === 'hevc' ? (binary ? 7 : 6) : (binary ? 5 : 4)) || result.transport !== (binary ? 'binary' : 'json') || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1) || result.bitrate !== (options.bitrate ?? 20_000_000) || result.configuredBitrate !== result.bitrate || (codec === 'hevc' && (result.hardwareRequired !== true || result.hardwareUsed !== true))) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/codec/protocol/transport/GOP/pool/bitrate/hardware');
     } catch (error) { worker.kill(); await worker.done.catch(() => {}); throw error; }
     const nativeProcessMs = performance.now() - nativeStarted, muxStarted = performance.now();
-    await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', 'h264', '-i', elementary, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
+    await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', codec, '-i', elementary, '-c:v', 'copy', ...(codec === 'hevc' ? ['-tag:v', 'hvc1'] : []), '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
     const muxMs = performance.now() - muxStarted, verifyStarted = performance.now();
     const info = await probeVideo(staged, options);
-    if (info.frameCount !== end - start || info.width !== plan.width || info.height !== plan.height || info.fps.num * plan.fps.den !== plan.fps.num * info.fps.den) throw new RenderError('INVALID_OUTPUT', 'Hardware video failed count, dimensions or cadence verification');
+    if (info.codec !== codec || info.frameCount !== end - start || info.width !== plan.width || info.height !== plan.height || info.fps.num * plan.fps.den !== plan.fps.num * info.fps.den) throw new RenderError('INVALID_OUTPUT', 'Hardware video failed codec, count, dimensions or cadence verification');
     options.onTimings?.({ preflightMs, nativeProcessMs, muxMs, verificationMs: performance.now() - verifyStarted });
     options.signal?.throwIfAborted(); await rename(staged, destination);
   } finally { await rm(directory, { recursive: true, force: true }); }

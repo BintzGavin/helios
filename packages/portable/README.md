@@ -92,7 +92,7 @@ Workers use separate processes and retain their canvas and fonts across assigned
 
 ## Opt into native GPU rendering
 
-The optional GPU helper uses native Skia Metal rasterization and a required VideoToolbox H.264 encoder on macOS arm64. Build it from this checkout with Rust/Cargo and Apple Command Line Tools:
+The optional GPU helper uses native Skia Metal rasterization and a required VideoToolbox H.264 or HEVC encoder on macOS arm64. Build it from this checkout with Rust/Cargo and Apple Command Line Tools:
 
 ```sh
 npm run build:gpu --workspace=packages/portable
@@ -108,13 +108,16 @@ await renderCanvasVideo(composition, '/tmp/video-gpu.mp4', {
 });
 ```
 
-The hardware lane converts sRGB to limited-range BT.709 NV12 on Metal, writes encoder-pool IOSurface planes, waits for GPU completion, and retains each surface through the encoder callback. Only compressed H.264 packets cross into CPU output code. Full decoded verification precedes atomic publication; failure or cancellation preserves an existing destination. Selecting GPU never silently falls back to software. Omitting GPU selection preserves the existing CPU/Wasm paths. `renderFrame` still returns pixels/PNG/SVG and therefore explicitly reads GPU pixels back to the CPU.
+Set `gpu.codec: 'hevc'` for HEVC Main with 8-bit NV12 input; omitted codec preserves H.264. HEVC requires the new helper's JSON protocol6 or binary protocol7 capability/completion receipts. H.264 retains protocol4/5. HEVC MP4 output uses `hvc1`; unsupported hardware fails explicitly.
+
+The hardware lane converts sRGB to limited-range BT.709 NV12 on Metal, writes encoder-pool IOSurface planes, waits for GPU completion, and retains each surface through the encoder callback. Only compressed H.264/HEVC packets cross into CPU output code. Full decoded codec/count/cadence verification precedes atomic publication; failure or cancellation preserves an existing destination. Selecting GPU never silently falls back to software. Omitting GPU selection preserves the existing CPU/Wasm paths. `renderFrame` still returns pixels/PNG/SVG and therefore explicitly reads GPU pixels back to the CPU.
 
 | Path | Current support |
 |---|---|
 | macOS arm64 Metal + VideoToolbox H.264 | Tested on M3 Pro; even dimensions up to 4096 per axis |
 | macOS Intel, Linux/Vulkan, Windows | Unsupported; explicit GPU requests reject |
-| HEVC or other GPU codecs | Unsupported |
+| macOS arm64 Metal + VideoToolbox HEVC Main | Qualified 300-frame 256×128 color/text/circle scene on M3 Pro; full 4K HEVC comparison remains unqualified |
+| Other GPU codecs or HEVC Main10 | Unsupported |
 | Vector/text Plan | Supported through Skia SVG; prepared text uses glyph paths |
 | Plan image/video layers | Unsupported; choose a retained CPU backend |
 | Canvas | `fillRect`, `fillText`, full-circle `beginPath`/`arc`/`closePath`/`fill`, save/restore, translate/scale/rotate; explicit RGB colors, alpha and byte-buffer font aliases |

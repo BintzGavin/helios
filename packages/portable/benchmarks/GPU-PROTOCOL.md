@@ -1,5 +1,13 @@
 # Native GPU comparison protocol
 
+## Separate HEVC functional qualification
+
+`gpu.codec: 'hevc'` selects required hardware VideoToolbox HEVC Main with the existing 8-bit BT.709 limited NV12 surface path. It needs a newly built helper: `probe hevc`, JSON protocol6 or binary protocol7 receipts, HEVC parameter-set extraction and HEVC/hvc1 remuxing. H.264 keeps its default and protocol4/5; historical H.264 helpers, clocks, references and invalidated receipts are unchanged.
+
+The native positional codec is the optional final argument after encoder pool: `encode-binary WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE ELEMENTARY_PATH TRACE CAPTURE GOP ENCODER_POOL hevc`. Reference modes accept the same argument and explicitly read NV12 pixels back. Binary frame packets remain HGF5; protocol7 binds the HEVC completion contract rather than changing command layout.
+
+[HEVC qualification](GPU-HEVC-RESULTS.md) binds its independent helper and sources, all300 directly split NV12/lossless frames, decoded codec/cadence/color, unchanged per-frame floors and actual hardware/GPU transfer receipts. Its 256×128 functional scene is separate from TextGrid and 4K timing lanes. Neither these checks nor codec enablement establish a fully enabled production comparison win.
+
 Canvas exports default to compact binary commands (native protocol5); explicit
 `transport: 'json'` retains the independently replayed protocol4 control. Plan
 SVG exports retain JSON. The continuity adapter accepts `--transport binary|json`
