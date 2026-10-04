@@ -48,6 +48,7 @@ unsafe extern "C" {
         bitrate: u32,
         gop: u32,
         encoder_pool: u32,
+        hevc: bool,
         path: *const i8,
         hardware: bool,
         trace: *const i8,
@@ -326,11 +327,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if !probe && !raster && !reference && mode != "encode" {
         return Err("unsupported native mode".into());
     }
+    if probe && args.len() > 3 { return Err("usage: helios-gpu probe [h264|hevc]".into()); }
+    let codec = args.get(if probe {2} else {12}).map(String::as_str).unwrap_or("h264");
+    if codec != "h264" && codec != "hevc" { return Err("unsupported native codec; expected h264 or hevc".into()); }
     let (width, height, num, den, bitrate, path) = if probe {
         (64, 64, 30, 1, 1_000_000, CString::new("")?)
     } else {
-        if args.len() < 8 || args.len() > 12 {
-            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE H264_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE] [GOP] [ENCODER_POOL]".into());
+        if args.len() < 8 || args.len() > 13 {
+            return Err("usage: helios-gpu encode|raster WIDTH HEIGHT FPS_NUM FPS_DEN BITRATE ELEMENTARY_PATH [TRACE_JSONL] [CAPTURE_GPUTRACE] [GOP] [ENCODER_POOL] [h264|hevc]".into());
         }
         (
             args[2].parse()?,
@@ -368,6 +372,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             bitrate,
             gop,
             encoder_pool,
+            codec == "hevc",
             if reference {
                 empty.as_ptr()
             } else {
@@ -398,7 +403,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if probe {
         println!(
             "{}",
-            serde_json::json!({"protocol":4,"bitrate":bitrate,"configuredBitrate":unsafe {helios_configured_bitrate(native.0)},"gop":gop,"encoderPool":encoder_pool,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
+            serde_json::json!({"protocol":if codec == "hevc" {6} else {4},"codec":codec,"bitrate":bitrate,"configuredBitrate":unsafe {helios_configured_bitrate(native.0)},"gop":gop,"encoderPool":encoder_pool,"rasterizer":"skia-metal", "encoder":"videotoolbox", "hardwareRequired":true, "hardwareUsed": unsafe {helios_hardware(native.0)}, "surface":"iosurface-nv12", "zeroCopyProved":false})
         );
         return Ok(());
     }
@@ -469,7 +474,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         raw.len() as u64
     };
-    let receipt = serde_json::json!({"protocol":if binary_transport {5} else {4},"transport":if binary_transport {"binary"} else {"json"},"bitrate":bitrate,"configuredBitrate":if raster || reference {None} else {Some(unsafe {helios_configured_bitrate(native.0)})},"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
+    let receipt = serde_json::json!({"protocol":if codec == "hevc" {if binary_transport {7} else {6}} else {if binary_transport {5} else {4}},"codec":codec,"hardwareRequired":!raster && !reference,"hardwareUsed":!raster && !reference && unsafe {helios_hardware(native.0)},"transport":if binary_transport {"binary"} else {"json"},"bitrate":bitrate,"configuredBitrate":if raster || reference {None} else {Some(unsafe {helios_configured_bitrate(native.0)})},"gop":gop,"encoderPool":encoder_pool,"frames":count,"rasterizer":"skia-metal","encoder":if raster || reference {"none"} else {"videotoolbox"},"explicitRawReadbackBytes":readback * count as u64,"zeroCopyProved":false});
     if raster || reference {
         eprintln!("{receipt}");
     } else {

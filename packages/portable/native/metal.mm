@@ -31,6 +31,7 @@ struct State {
     std::array<HeldBuffer, 3> held{};
     uint32_t encoderPool;
     uint32_t bitrate;
+    bool hevc = false;
     uint32_t width, height, num, den;
     std::atomic<bool> failed{false};
     explicit State(uint32_t pool) : flight(pool), encoderPool(pool) {}
@@ -55,21 +56,24 @@ static void packet(void* ref, void* frame, OSStatus status, VTEncodeInfoFlags fl
     if (!state->failed && state->output) {
         auto format = CMSampleBufferGetFormatDescription(sample);
         size_t count = 0; int lengthSize = 0;
-        if (CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, 0, nullptr, nullptr, &count, &lengthSize)) state->failed = true;
+        auto parameterSet = state->hevc ? CMVideoFormatDescriptionGetHEVCParameterSetAtIndex : CMVideoFormatDescriptionGetH264ParameterSetAtIndex;
+        if (!format || CMVideoFormatDescriptionGetCodecType(format) != (state->hevc ? kCMVideoCodecType_HEVC : kCMVideoCodecType_H264) || parameterSet(format, 0, nullptr, nullptr, &count, &lengthSize) || count < (state->hevc ? 3u : 2u) || count > 64 || lengthSize != 4) state->failed = true;
         const uint8_t start[] = {0, 0, 0, 1};
         for (size_t i = 0; !state->failed && i < count; ++i) {
             const uint8_t* bytes; size_t length;
-            if (CMVideoFormatDescriptionGetH264ParameterSetAtIndex(format, i, &bytes, &length, nullptr, nullptr) || fwrite(start, 1, 4, state->output) != 4 || fwrite(bytes, 1, length, state->output) != length) state->failed = true;
+            if (parameterSet(format, i, &bytes, &length, nullptr, nullptr) || !bytes || !length || fwrite(start, 1, 4, state->output) != 4 || fwrite(bytes, 1, length, state->output) != length) state->failed = true;
         }
         auto block = CMSampleBufferGetDataBuffer(sample);
-        const size_t total = CMBlockBufferGetDataLength(block);
+        if (!block) state->failed = true;
+        const size_t total = block ? CMBlockBufferGetDataLength(block) : 0;
+        if (!total) state->failed = true;
         size_t cursor = 0;
         while (!state->failed && cursor < total) {
             uint8_t prefix[4];
             if (lengthSize != 4 || total - cursor < 4 || CMBlockBufferCopyDataBytes(block, cursor, 4, prefix)) { state->failed = true; break; }
             size_t length = (size_t(prefix[0]) << 24) | (size_t(prefix[1]) << 16) | (size_t(prefix[2]) << 8) | prefix[3];
             cursor += 4;
-            if (length > total - cursor) { state->failed = true; break; }
+            if (!length || length > total - cursor) { state->failed = true; break; }
             // This copy is compressed output, explicitly outside the raw-frame claim.
             auto bytes = std::make_unique<uint8_t[]>(length);
             if (CMBlockBufferCopyDataBytes(block, cursor, length, bytes.get()) || fwrite(start, 1, 4, state->output) != 4 || fwrite(bytes.get(), 1, length, state->output) != length) state->failed = true;
@@ -109,11 +113,12 @@ kernel void convert(texture2d<float, access::read> rgba [[texture(0)]],
 }
 )metal";
 
-extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, uint32_t gop, uint32_t encoderPool, const char* path, bool hardware, const char* trace, const char* capture) {
+extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t den, uint32_t bitrate, uint32_t gop, uint32_t encoderPool, bool hevc, const char* path, bool hardware, const char* trace, const char* capture) {
     @autoreleasepool {
         auto state = std::make_unique<State>(encoderPool);
         state->width = w; state->height = h; state->num = num; state->den = den;
         state->bitrate = bitrate;
+        state->hevc = hevc;
         state->device = MTLCreateSystemDefaultDevice();
         if (!state->device) return nullptr;
         state->queue = [state->device newCommandQueue];
@@ -141,9 +146,10 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         if (!hardware) return state.release();
         NSDictionary* attributes = @{(id)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange), (id)kCVPixelBufferWidthKey: @(w), (id)kCVPixelBufferHeightKey: @(h), (id)kCVPixelBufferMetalCompatibilityKey: @YES, (id)kCVPixelBufferIOSurfacePropertiesKey: @{}};
         NSDictionary* specification = @{(id)kVTVideoEncoderSpecification_RequireHardwareAcceleratedVideoEncoder: @YES};
-        if (VTCompressionSessionCreate(nullptr, w, h, kCMVideoCodecType_H264, (__bridge CFDictionaryRef)specification, (__bridge CFDictionaryRef)attributes, nullptr, packet, state.get(), &state->encoder)) return nullptr;
+        if (VTCompressionSessionCreate(nullptr, w, h, hevc ? kCMVideoCodecType_HEVC : kCMVideoCodecType_H264, (__bridge CFDictionaryRef)specification, (__bridge CFDictionaryRef)attributes, nullptr, packet, state.get(), &state->encoder)) return nullptr;
         double rate = double(num) / den;
-        NSDictionary* properties = @{(id)kVTCompressionPropertyKey_AverageBitRate: @(bitrate), (id)kVTCompressionPropertyKey_ExpectedFrameRate: @(rate), (id)kVTCompressionPropertyKey_AllowFrameReordering: @NO, (id)kVTCompressionPropertyKey_MaxKeyFrameInterval: @(gop), (id)kVTCompressionPropertyKey_ColorPrimaries: (id)kCVImageBufferColorPrimaries_ITU_R_709_2, (id)kVTCompressionPropertyKey_TransferFunction: (id)kCVImageBufferTransferFunction_ITU_R_709_2, (id)kVTCompressionPropertyKey_YCbCrMatrix: (id)kCVImageBufferYCbCrMatrix_ITU_R_709_2};
+        NSMutableDictionary* properties = [@{(id)kVTCompressionPropertyKey_AverageBitRate: @(bitrate), (id)kVTCompressionPropertyKey_ExpectedFrameRate: @(rate), (id)kVTCompressionPropertyKey_AllowFrameReordering: @NO, (id)kVTCompressionPropertyKey_MaxKeyFrameInterval: @(gop), (id)kVTCompressionPropertyKey_ColorPrimaries: (id)kCVImageBufferColorPrimaries_ITU_R_709_2, (id)kVTCompressionPropertyKey_TransferFunction: (id)kCVImageBufferTransferFunction_ITU_R_709_2, (id)kVTCompressionPropertyKey_YCbCrMatrix: (id)kCVImageBufferYCbCrMatrix_ITU_R_709_2} mutableCopy];
+        if (hevc) properties[(id)kVTCompressionPropertyKey_ProfileLevel] = (id)kVTProfileLevel_HEVC_Main_AutoLevel;
         if (VTSessionSetProperties(state->encoder, (__bridge CFDictionaryRef)properties) || VTCompressionSessionPrepareToEncodeFrames(state->encoder)) return nullptr;
         CFTypeRef configured = nullptr;
         if (VTSessionCopyProperty(state->encoder, kVTCompressionPropertyKey_AverageBitRate, nullptr, &configured) || !configured) return nullptr;
@@ -159,7 +165,7 @@ extern "C" void* helios_create(uint32_t w, uint32_t h, uint32_t num, uint32_t de
         NSDictionary* poolAttributes = @{(id)kCVPixelBufferPoolAllocationThresholdKey: @(encoderPool)};
         if (!pool || CVPixelBufferPoolCreatePixelBufferWithAuxAttributes(nullptr, pool, (__bridge CFDictionaryRef)poolAttributes, &state->buffer) || !CVPixelBufferGetIOSurface(state->buffer)) return nullptr;
         if (CVMetalTextureCacheCreate(nullptr, nullptr, state->device, nullptr, &state->cache)) return nullptr;
-        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":4,\"bitrate\":%u,\"configuredBitrate\":%u,\"gop\":%u,\"encoderPool\":true,\"poolCapacity\":%u,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), bitrate, bitrate, gop, encoderPool);
+        if (state->trace) fprintf(state->trace, "{\"event\":\"surface-create\",\"surfaceId\":%u,\"protocol\":%u,\"codec\":\"%s\",\"hardwareRequired\":true,\"hardwareUsed\":true,\"bitrate\":%u,\"configuredBitrate\":%u,\"gop\":%u,\"encoderPool\":true,\"poolCapacity\":%u,\"format\":\"nv12-video-range\",\"rasterStorage\":\"private\",\"rawCpuMapCallsInBridge\":0}\n", IOSurfaceGetID(CVPixelBufferGetIOSurface(state->buffer)), hevc ? 6 : 4, hevc ? "hevc" : "h264", bitrate, bitrate, gop, encoderPool);
         if (path[0]) { state->output = fopen(path, "wb"); if (!state->output) return nullptr; }
         return state.release();
     }

@@ -11,7 +11,7 @@ const scene: CanvasComposition = { width: 64, height: 32, fps: { num: 30000, den
 
 it('rejects explicit unsupported hardware/codec cells without selecting a CPU fallback', () => {
   expect(() => validateGpuOptions({ backend: 'vulkan', codec: 'h264' })).toThrow(/Vulkan/);
-  expect(() => validateGpuOptions({ backend: 'metal', codec: 'hevc' })).toThrow(/codec/);
+  expect(() => validateGpuOptions({ backend: 'metal', codec: 'av1' as any })).toThrow(/codec/);
   expect(() => validateGpuOptions({ backend: 'metal', codec: 'h264', bitrate: 0 })).toThrow(/bitrate/);
 });
 
