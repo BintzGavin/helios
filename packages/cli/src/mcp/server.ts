@@ -8,6 +8,13 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol.js';
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types.js';
 import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } from './cli-runner.js';
+import {
+  ExportUploads,
+  SAVE_EXPORT_CHUNK_BYTES,
+  SAVE_EXPORT_MAX_BYTES,
+  SAVE_EXPORT_MAX_CHUNK_CHARS,
+  SAVE_EXPORT_MAX_CHUNKS,
+} from './exports.js';
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
@@ -25,7 +32,13 @@ export const VIEW_RESOURCE_DOMAINS = [
   'https://fonts.gstatic.com',
 ];
 
-const VIEW_META = { ui: { csp: { resourceDomains: VIEW_RESOURCE_DOMAINS }, prefersBorder: false } };
+/**
+ * Origins the view may fetch from: the same ones. In-view export fetches the page's fonts,
+ * stylesheets and images and inlines them as data: URIs, the only way they reach a DOM capture.
+ */
+export const VIEW_CONNECT_DOMAINS = [...VIEW_RESOURCE_DOMAINS];
+
+const VIEW_META = { ui: { csp: { resourceDomains: VIEW_RESOURCE_DOMAINS, connectDomains: VIEW_CONNECT_DOMAINS }, prefersBorder: false } };
 const OPENS_VIEW_META = { ui: { resourceUri: PLAYER_URI }, 'openai/outputTemplate': PLAYER_URI };
 const APP_ONLY_META = { ui: { visibility: ['app'] }, 'openai/visibility': 'private', 'openai/widgetAccessible': true };
 /** Model tools the view also calls (render, follow, cancel). ChatGPT's Apps SDK keys alongside MCP Apps. */
@@ -76,11 +89,15 @@ export interface HeliosMcpOptions {
   reveal?: (absPath: string, open: boolean) => Promise<void>;
   /** Grace period between SIGTERM and SIGKILL when a render is cancelled. */
   killGraceMs?: number;
+  /** How long save_export keeps an upload with no new chunk (default 10 minutes). */
+  exportIdleMs?: number;
 }
 
 export interface HeliosMcp {
   server: McpServer;
   jobs: RenderJobs;
+  /** In-view exports arriving through save_export. */
+  exports: ExportUploads;
   root: string;
 }
 
@@ -140,6 +157,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   if (!fs.statSync(root).isDirectory()) throw new Error(`--root ${options.root} is not a directory`);
   const runner = options.runner ?? createCliRunner();
   const jobs = new RenderJobs(runner, root, { killGraceMs: options.killGraceMs });
+  const exportUploads = new ExportUploads(root, { idleMs: options.exportIdleMs });
   const viewPath = options.viewPath ?? defaultViewPath();
   const buildShim = options.buildShim ?? defaultBuildShim;
   const reveal = options.reveal ?? revealWithSystem;
@@ -339,6 +357,40 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       if (!REVEALABLE.test(file.abs)) throw new PathError(`Only videos, images and pages can be shown (got "${args.path}")`);
       await reveal(file.abs, args.open === true);
       return { content: [{ type: 'text', text: `${args.open ? 'Opened' : 'Showed'} ${file.rel}.` }] };
+    }),
+  );
+
+  server.registerTool(
+    'save_export',
+    {
+      title: 'Save export',
+      description:
+        `Saves an MP4 that the Helios player encoded in the browser into the project's exports folder. ` +
+        `The file arrives in order as base64 chunks of at most ${formatBytes(SAVE_EXPORT_CHUNK_BYTES)}, ` +
+        `${formatBytes(SAVE_EXPORT_MAX_BYTES)} in all; the last chunk returns the saved file's path.`,
+      inputSchema: {
+        name: z.string().min(1).max(260).describe('File name ending in .mp4, without folders'),
+        uploadId: z.string().min(8).max(64).describe('The same random id for every chunk of one file (letters, digits, - and _)'),
+        index: z.number().int().min(0).describe('This chunk\'s position, from 0'),
+        total: z.number().int().min(1).max(SAVE_EXPORT_MAX_CHUNKS).describe('How many chunks the file has'),
+        data: z.string().min(1).max(SAVE_EXPORT_MAX_CHUNK_CHARS).describe('The chunk\'s bytes, base64'),
+      },
+      outputSchema: {
+        received: z.number(),
+        total: z.number(),
+        bytes: z.number(),
+        path: z.string().optional(),
+        absolutePath: z.string().optional(),
+      },
+      annotations: { title: 'Save export', readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+      _meta: APP_ONLY_META,
+    },
+    guard(async (args) => {
+      const progress = await exportUploads.receive(args);
+      const text = progress.absolutePath
+        ? `Saved ${progress.path} (${formatBytes(progress.bytes)}). It is at ${progress.absolutePath}`
+        : `Received chunk ${progress.received} of ${progress.total}.`;
+      return { content: [{ type: 'text', text }], structuredContent: progress };
     }),
   );
 
@@ -592,7 +644,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   );
 
   listSchemasWithoutDialect(server);
-  return { server, jobs, root };
+  return { server, jobs, exports: exportUploads, root };
 }
 
 interface PageEntry { path: string; modifiedMs: number }

@@ -128,14 +128,14 @@ describe('helios MCP server: listing', () => {
     }
   });
 
-  it('lists the ten tools with their view and visibility metadata', async () => {
+  it('lists the eleven tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();
     const byName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
 
     expect(Object.keys(byName).sort()).toEqual([
       'cancel_render', 'get_frames', 'get_render_status', 'helios_library', 'list_videos',
-      'preview_video', 'read_page', 'render_video', 'reveal_file', 'verify_video',
+      'preview_video', 'read_page', 'render_video', 'reveal_file', 'save_export', 'verify_video',
     ]);
     expect(client.getServerVersion()).toEqual({ name: 'helios', version: '9.9.9' });
 
@@ -151,6 +151,11 @@ describe('helios MCP server: listing', () => {
     expect(byName.read_page._meta).toEqual(appOnly);
     expect(byName.list_videos._meta).toEqual(appOnly);
     expect(byName.reveal_file._meta).toEqual(appOnly);
+    // Hidden from the model: only the view calls it, to hand over an MP4 it encoded.
+    expect(byName.save_export._meta).toEqual(appOnly);
+    expect(byName.save_export.annotations).toMatchObject({ readOnlyHint: false, openWorldHint: false });
+    expect((byName.save_export.inputSchema.properties as any).data.maxLength).toBe(Math.ceil((1024 * 1024) / 3) * 4);
+    expect((byName.save_export.inputSchema.properties as any).total.maximum).toBe(200);
     for (const name of ['render_video', 'get_render_status', 'cancel_render']) {
       expect(byName[name]._meta).toEqual({ 'openai/widgetAccessible': true });
     }
@@ -171,17 +176,18 @@ describe('helios MCP server: listing', () => {
     await connect();
     const { resources } = await client.listResources();
     const listed = resources.find((r) => r.uri === PLAYER_URI)!;
+    const domains = [
+      'https://cdnjs.cloudflare.com',
+      'https://cdn.jsdelivr.net',
+      'https://unpkg.com',
+      'https://fonts.googleapis.com',
+      'https://fonts.gstatic.com',
+    ];
     const meta = {
       ui: {
-        csp: {
-          resourceDomains: [
-            'https://cdnjs.cloudflare.com',
-            'https://cdn.jsdelivr.net',
-            'https://unpkg.com',
-            'https://fonts.googleapis.com',
-            'https://fonts.gstatic.com',
-          ],
-        },
+        // connectDomains lets the in-view exporter fetch the page's fonts, styles and images and
+        // inline them as data: URIs, which is the only way they reach a DOM capture.
+        csp: { resourceDomains: domains, connectDomains: domains },
         prefersBorder: false,
       },
     };
@@ -339,6 +345,46 @@ describe('helios MCP server: preview, library, pages', () => {
 
     const outside = await call('read_page', { path: '../player.html' });
     expect(outside.isError).toBe(true);
+  });
+
+  it('save_export saves an MP4 sent in 1 MB base64 chunks under exports/ and returns its absolute path', async () => {
+    await connect();
+    const file = Buffer.alloc(2.5 * 1024 * 1024, 7);
+    Buffer.from([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70]).copy(file, 0);
+    const chunk = 1024 * 1024;
+    const total = Math.ceil(file.length / chunk);
+    const results = [];
+    for (let index = 0; index < total; index++) {
+      const data = file.subarray(index * chunk, (index + 1) * chunk).toString('base64');
+      results.push(await call('save_export', { name: 'intro.mp4', uploadId: 'view-upload-1', index, total, data }));
+    }
+    for (const r of results) expect(r.isError, JSON.stringify(r.content)).toBeFalsy();
+    expect(results[0].structuredContent).toEqual({ received: 1, total: 3, bytes: chunk });
+    const last = results[2];
+    const abs = path.join(root, 'exports', 'intro.mp4');
+    expect(last.structuredContent).toEqual({ received: 3, total: 3, bytes: file.length, path: 'exports/intro.mp4', absolutePath: abs });
+    expect(last.content[0].text).toBe(`Saved exports/intro.mp4 (2.5 MB). It is at ${abs}`);
+    expect(fs.readFileSync(abs).equals(file)).toBe(true);
+  });
+
+  it('save_export turns refusals into tool errors', async () => {
+    await connect();
+    const mp4 = Buffer.from([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70, 1, 2, 3, 4]).toString('base64');
+    const cases: Array<[Record<string, unknown>, RegExp]> = [
+      [{ name: '../escape.mp4', uploadId: 'view-upload-2', index: 0, total: 1, data: mp4 }, /without folders/],
+      [{ name: 'x.webm', uploadId: 'view-upload-2', index: 0, total: 1, data: mp4 }, /must end in \.mp4/],
+      [{ name: 'x.mp4', uploadId: 'view-upload-2', index: 0, total: 1, data: Buffer.from('hello world!').toString('base64') }, /not an MP4/],
+      [{ name: 'x.mp4', uploadId: 'view-upload-2', index: 1, total: 2, data: mp4 }, /from index 0/],
+      [{ name: 'x.mp4', uploadId: 'view-upload-2', index: 0, total: 201, data: mp4 }, /Input validation error/],
+      [{ name: 'x.mp4', uploadId: 'view-upload-2', index: 0, total: 1, data: 'A'.repeat(1398108) }, /Input validation error/],
+    ];
+    for (const [args, message] of cases) {
+      const r = await call('save_export', args);
+      expect(r.isError, JSON.stringify(args).slice(0, 80)).toBe(true);
+      expect(r.content[0].text).toMatch(message);
+    }
+    expect(fs.existsSync(path.join(root, 'exports'))).toBe(false);
+    expect(fs.existsSync(path.join(tmp, 'escape.mp4'))).toBe(false);
   });
 
   it('list_videos lists pages and renders newest first, skipping dependency, build and dot folders', async () => {
