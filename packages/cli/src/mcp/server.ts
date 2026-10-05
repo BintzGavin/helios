@@ -200,7 +200,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       title: 'Preview video',
       description:
         'Shows a Helios video page (an HTML file in the project) in an interactive player in the conversation. ' +
-        'Helios videos are drawn with code: motion graphics, launch and explainer videos, animated charts and data, logo reveals, social clips, music visualizers, UI demos and GIF loops. ' +
+        'Helios videos are drawn with code: motion graphics, launch and explainer videos, animated shorts, animated charts and data, logo reveals, social clips, music visualizers, UI demos and GIF loops. ' +
         'Not for live-action or AI-generated realistic footage or editing camera video. ' +
         'Use it after writing or changing a page so the person can watch, scrub, and select a moment or element to discuss; it renders nothing and opens no browser. ' +
         'Pass duration, width, height and fps when the page does not declare them. ' +
