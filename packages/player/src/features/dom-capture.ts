@@ -1,12 +1,33 @@
-export async function captureDomToBitmap(element: HTMLElement, options?: { targetWidth?: number, targetHeight?: number }): Promise<ImageBitmap> {
+/**
+ * Fetched assets, keyed by URL: data: URIs for images and fonts, CSS text for stylesheets.
+ * Pass one Map for every frame of an export so each URL is fetched once.
+ */
+export type DomCaptureCache = Map<string, Promise<string>>;
+
+export interface DomCaptureOptions {
+  targetWidth?: number;
+  targetHeight?: number;
+  cache?: DomCaptureCache;
+}
+
+/**
+ * The SVG image has no animation timeline: a CSS animation in it restarts at 0 and a WAAPI
+ * animation is lost. Animated values are written inline on the clone (freezeAnimations), and
+ * this switches every animation and transition off inside the image.
+ */
+const FREEZE_ANIMATIONS_CSS = '*, *::before, *::after { animation: none !important; transition: none !important; }';
+
+export async function captureDomToBitmap(element: HTMLElement, options?: DomCaptureOptions): Promise<ImageBitmap> {
   const doc = element.ownerDocument || document;
+  const cache: DomCaptureCache = options?.cache ?? new Map();
 
   // 1. Clone & Inline Assets
   let clone = cloneWithShadow(element) as HTMLElement;
-  await inlineImages(element, clone);
+  await inlineImages(element, clone, cache);
   clone = inlineCanvases(element, clone);
   clone = inlineVideos(element, clone);
   inlineFormValues(element, clone);
+  freezeAnimations(element, clone);
 
   // 2. Serialize DOM
   const serializer = new XMLSerializer();
@@ -14,20 +35,21 @@ export async function captureDomToBitmap(element: HTMLElement, options?: { targe
 
   // 3. Collect styles
   // We collect all style tags to ensure CSS-in-JS and other styles are preserved.
+  // Each is serialized as XML, so CSS containing & or < can't break the SVG.
   const styleElements = Array.from(doc.querySelectorAll('style'));
   const inlineStylesPromises = styleElements.map(async (style) => {
     const css = style.textContent || '';
-    const processed = await processCss(css, doc.baseURI);
+    const processed = await processCss(css, doc.baseURI, cache);
     const styleClone = style.cloneNode(true) as HTMLStyleElement;
     styleClone.textContent = processed;
-    return styleClone.outerHTML;
+    return serializer.serializeToString(styleClone);
   });
 
   const inlineStyles = (await Promise.all(inlineStylesPromises)).join('\n');
 
   // Fetch and inline external stylesheets
-  const externalStyles = await getExternalStyles(doc);
-  const styles = externalStyles + '\n' + inlineStyles;
+  const externalStyles = await getExternalStyles(doc, cache);
+  const styles = externalStyles + '\n' + inlineStyles + `\n<style>${FREEZE_ANIMATIONS_CSS}</style>`;
 
   // 4. Determine dimensions
   // Use target dimensions if provided, otherwise scroll dimensions or defaults.
@@ -47,41 +69,64 @@ export async function captureDomToBitmap(element: HTMLElement, options?: { targe
     </svg>
   `;
 
-  // 6. Create Blob and URL
-  const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-
-  // 7. Load Image
+  // 6. Load Image
+  // From a data: URL, not a blob: URL: Chromium taints a foreignObject SVG loaded from a blob:
+  // URL, and VideoFrame refuses tainted sources.
   const img = new Image();
 
   // Return a promise that resolves when the image loads
   await new Promise<void>((resolve, reject) => {
     img.onload = () => resolve();
     img.onerror = (e) => reject(new Error('Failed to load SVG image for DOM capture'));
-    img.src = url;
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
   });
 
-  // 8. Create ImageBitmap
-  const bitmap = await createImageBitmap(img);
-
-  // 9. Cleanup
-  URL.revokeObjectURL(url);
-
-  return bitmap;
+  // 7. Create ImageBitmap
+  // Through a canvas: an ImageBitmap made straight from the image is tainted even from a data: URL.
+  const canvas = doc.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return createImageBitmap(img);
+  ctx.drawImage(img, 0, 0, width, height);
+  return createImageBitmap(canvas);
 }
 
-async function getExternalStyles(doc: Document): Promise<string> {
+/** Text safe inside an XML element or comment: the SVG is parsed as XML, so & and < must be escaped. */
+function escapeXmlText(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/** Fetches once per cache; a failure is dropped from the cache so the next frame retries. */
+function cached(cache: DomCaptureCache, key: string, load: () => Promise<string>): Promise<string> {
+  let p = cache.get(key);
+  if (!p) {
+    p = load();
+    cache.set(key, p);
+    p.catch(() => { if (cache.get(key) === p) cache.delete(key); });
+  }
+  return p;
+}
+
+function fetchText(url: string, cache: DomCaptureCache): Promise<string> {
+  return cached(cache, 'text:' + url, async () => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    return response.text();
+  });
+}
+
+async function getExternalStyles(doc: Document, cache: DomCaptureCache): Promise<string> {
   const links = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')) as HTMLLinkElement[];
   const promises = links.map(async (link) => {
     try {
       // Skip if no href
       if (!link.href) return '';
 
-      const response = await fetch(link.href);
-      if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
-      const css = await response.text();
-      const processed = await processCss(css, link.href);
-      return `<style>/* ${link.href} */\n${processed}</style>`;
+      const processed = await processCss(await fetchText(link.href, cache), link.href, cache);
+      // A Google Fonts href has '&'; "*/" in an href would end the comment early.
+      const label = escapeXmlText(link.href.replace(/\*\//g, '*\\/'));
+      return `<style>/* ${label} */\n${escapeXmlText(processed)}</style>`;
     } catch (e) {
       console.warn('Helios: Failed to inline stylesheet:', link.href, e);
       return '';
@@ -90,7 +135,39 @@ async function getExternalStyles(doc: Document): Promise<string> {
   return (await Promise.all(promises)).join('\n');
 }
 
-async function processCss(css: string, baseUrl: string): Promise<string> {
+/** @import url(x) / @import "x", with optional conditions, at the top level of a stylesheet. */
+const IMPORT_REGEX = /@import\s+(?:url\(\s*(['"]?)([^'")]+)\1\s*\)|(['"])([^'"]+)\3)\s*([^;]*);/g;
+const MAX_IMPORT_DEPTH = 4;
+
+/**
+ * Replaces each @import with the imported stylesheet's text, itself processed, so the fonts and
+ * images it names become data: URIs too. An image can't fetch anything, so an @import left in
+ * place (or turned into a data: URI with its font URLs still remote) loses the web font.
+ */
+async function inlineImports(css: string, baseUrl: string, cache: DomCaptureCache, depth: number): Promise<string> {
+  const matches = Array.from(css.matchAll(IMPORT_REGEX));
+  if (!matches.length) return css;
+  const replacements = await Promise.all(matches.map(async (match) => {
+    const href = match[2] ?? match[4];
+    const conditions = match[5].trim();
+    // layer() and supports() imports have no simple inline form: keep them.
+    if (depth >= MAX_IMPORT_DEPTH || /^(layer|supports)\b/i.test(conditions)) return null;
+    try {
+      const url = new URL(href, baseUrl).href;
+      const text = await processCss(await fetchText(url, cache), url, cache, depth + 1);
+      return { original: match[0], replacement: conditions ? `@media ${conditions} {\n${text}\n}` : text };
+    } catch (e) {
+      console.warn('Helios: Failed to inline @import:', href, e);
+      return null;
+    }
+  }));
+  let out = css;
+  for (const r of replacements) if (r) out = out.split(r.original).join(r.replacement);
+  return out;
+}
+
+async function processCss(css: string, baseUrl: string, cache: DomCaptureCache, depth = 0): Promise<string> {
+  css = await inlineImports(css, baseUrl, cache, depth);
   const urlRegex = /url\((?:['"]?)(.*?)(?:['"]?)\)/g;
   const matches = Array.from(css.matchAll(urlRegex));
 
@@ -102,7 +179,7 @@ async function processCss(css: string, baseUrl: string): Promise<string> {
 
     try {
       const absoluteUrl = new URL(url, baseUrl).href;
-      const dataUri = await fetchAsDataUri(absoluteUrl);
+      const dataUri = await fetchAsDataUri(absoluteUrl, cache);
       return {
         original: originalMatch,
         replacement: `url("${dataUri}")`,
@@ -125,19 +202,19 @@ async function processCss(css: string, baseUrl: string): Promise<string> {
   return processedCss;
 }
 
-async function inlineImages(original: HTMLElement, clone: HTMLElement): Promise<void> {
+async function inlineImages(original: HTMLElement, clone: HTMLElement, cache: DomCaptureCache): Promise<void> {
   const promises: Promise<void>[] = [];
-  inlineImagesRecursive(original, clone, promises);
+  inlineImagesRecursive(original, clone, promises, cache);
   await Promise.all(promises);
 }
 
-function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<void>[]) {
+function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<void>[], cache: DomCaptureCache) {
   // 1. Process Current Node
   if (original instanceof HTMLImageElement && clone instanceof HTMLImageElement) {
     const src = original.currentSrc || original.src;
     if (src && !src.startsWith('data:')) {
       promises.push(
-        fetchAsDataUri(src)
+        fetchAsDataUri(src, cache)
           .then((dataUri) => {
             (clone as HTMLImageElement).src = dataUri;
             (clone as HTMLImageElement).removeAttribute('srcset');
@@ -153,7 +230,7 @@ function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<vo
       const match = bg.match(/url\(['"]?(.*?)['"]?\)/);
       if (match && match[1] && !match[1].startsWith('data:')) {
         promises.push(
-          fetchAsDataUri(match[1])
+          fetchAsDataUri(match[1], cache)
             .then((dataUri) => {
               // Replace the specific URL instance to preserve other layers (gradients, etc.)
               clone.style.backgroundImage = clone.style.backgroundImage.replace(
@@ -180,7 +257,7 @@ function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<vo
       // Remove template from cloneChildren list to match originalChildren
       cloneChildren = cloneChildren.filter((n) => n !== template);
       // Recurse into shadow
-      inlineImagesRecursive(original.shadowRoot, template.content, promises);
+      inlineImagesRecursive(original.shadowRoot, template.content, promises, cache);
     }
   }
 
@@ -192,20 +269,76 @@ function inlineImagesRecursive(original: Node, clone: Node, promises: Promise<vo
   }
 
   for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
-    inlineImagesRecursive(originalChildren[i], cloneChildren[i], promises);
+    inlineImagesRecursive(originalChildren[i], cloneChildren[i], promises, cache);
   }
 }
 
-async function fetchAsDataUri(url: string): Promise<string> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
+function fetchAsDataUri(url: string, cache: DomCaptureCache): Promise<string> {
+  return cached(cache, 'data:' + url, async () => {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    const blob = await response.blob();
+    return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
   });
+}
+
+const KEYFRAME_META = new Set(['offset', 'computedOffset', 'easing', 'composite']);
+const cssPropertyName = (p: string) => (p === 'cssFloat' ? 'float' : p.startsWith('--') ? p : p.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()));
+
+/**
+ * Writes each animated property's current computed value inline on the clone, for every
+ * animation (CSS or WAAPI) the page's timeline has seeked. FREEZE_ANIMATIONS_CSS then switches
+ * animations off inside the SVG image, so the clone shows the frame at the seeked time. The live
+ * document is only read. Pseudo-element animations have no element to write to and are skipped.
+ */
+function freezeAnimations(original: HTMLElement, clone: HTMLElement): void {
+  const doc = original.ownerDocument || document;
+  const view = doc.defaultView;
+  if (!view || typeof (doc as any).getAnimations !== 'function') return;
+  const animated = new Map<Element, Set<string>>();
+  for (const anim of (doc as any).getAnimations() as Animation[]) {
+    const effect = anim.effect as KeyframeEffect | null;
+    const target = effect && effect.target;
+    if (!target || effect.pseudoElement || typeof effect.getKeyframes !== 'function') continue;
+    let props = animated.get(target);
+    if (!props) animated.set(target, (props = new Set()));
+    for (const keyframe of effect.getKeyframes()) {
+      for (const prop of Object.keys(keyframe)) if (!KEYFRAME_META.has(prop)) props.add(cssPropertyName(prop));
+    }
+  }
+  if (animated.size) freezeAnimationsRecursive(original, clone, animated, view);
+}
+
+function freezeAnimationsRecursive(original: Node, clone: Node, animated: Map<Element, Set<string>>, view: Window): void {
+  const props = animated.get(original as Element);
+  const style = (clone as HTMLElement | SVGElement).style;
+  if (props && style) {
+    const computed = view.getComputedStyle(original as Element);
+    for (const prop of props) {
+      const value = computed.getPropertyValue(prop);
+      if (value) style.setProperty(prop, value);
+    }
+  }
+
+  const originalChildren = Array.from(original.childNodes);
+  let cloneChildren = Array.from(clone.childNodes);
+  if (original instanceof Element && original.shadowRoot) {
+    const template = cloneChildren.find(
+      (n) => n instanceof HTMLTemplateElement && n.hasAttribute('shadowrootmode')
+    ) as HTMLTemplateElement | undefined;
+    if (template) {
+      cloneChildren = cloneChildren.filter((n) => n !== template);
+      freezeAnimationsRecursive(original.shadowRoot, template.content, animated, view);
+    }
+  }
+  for (let i = 0; i < Math.min(originalChildren.length, cloneChildren.length); i++) {
+    freezeAnimationsRecursive(originalChildren[i], cloneChildren[i], animated, view);
+  }
 }
 
 function inlineCanvases(original: HTMLElement, clone: HTMLElement): HTMLElement {
