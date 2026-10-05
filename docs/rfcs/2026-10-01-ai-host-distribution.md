@@ -172,6 +172,8 @@ The in-view export spike must answer three questions:
    - Where hosts don't advertise it: an app-only upload tool on the hosted server that returns a link, or host file APIs such as ChatGPT's desktop-only `openai/resources/write`.
 3. **Is it fast enough?** Export runs frame by frame in real time or slower.
 
+The answers, and the production design that shipped, are in [`2026-10-05-in-view-export.md`](2026-10-05-in-view-export.md).
+
 ## Hosted endpoint
 
 Web and mobile hosts need a public HTTPS endpoint at `/mcp` that speaks streamable HTTP.
