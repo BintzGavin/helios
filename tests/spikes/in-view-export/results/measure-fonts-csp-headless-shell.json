@@ -1,0 +1,828 @@
+{
+  "csp": "fonts",
+  "channel": "chromium-headless-shell",
+  "fps": 30,
+  "duration": 5,
+  "times": [
+    0.4,
+    1,
+    1.7,
+    2.6,
+    4.2
+  ],
+  "cases": [
+    {
+      "page": "canvas",
+      "variant": "default",
+      "size": "720p",
+      "run": 1,
+      "wallSeconds": 0.605,
+      "exportSeconds": 0.52,
+      "secondsPerVideoSecond": 0.10400000000000001,
+      "seekSeconds": 0.026,
+      "captureSeconds": 0.349,
+      "inlineSeconds": 0.001,
+      "encodeAndOtherSeconds": 0.144,
+      "bytes": 2634935,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 56,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "4213748",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    },
+    {
+      "page": "canvas",
+      "variant": "default",
+      "size": "720p",
+      "run": 2,
+      "wallSeconds": 0.841,
+      "exportSeconds": 0.751,
+      "secondsPerVideoSecond": 0.1502,
+      "seekSeconds": 0.03,
+      "captureSeconds": 0.376,
+      "inlineSeconds": 0.001,
+      "encodeAndOtherSeconds": 0.344,
+      "bytes": 2634776,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 60,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "4213494",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    },
+    {
+      "page": "canvas",
+      "variant": "default",
+      "size": "1080p",
+      "run": 1,
+      "wallSeconds": 1.25,
+      "exportSeconds": 1.135,
+      "secondsPerVideoSecond": 0.227,
+      "seekSeconds": 0.032,
+      "captureSeconds": 0.765,
+      "inlineSeconds": 0.001,
+      "encodeAndOtherSeconds": 0.337,
+      "bytes": 3037267,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 58,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "4857478",
+        "nb_read_frames": "150"
+      },
+      "frames": [
+        {
+          "t": 0.4,
+          "frame": 12,
+          "captured": {
+            "psnr": null,
+            "ssim": 1
+          },
+          "encoded": {
+            "psnr": 43.785516,
+            "ssim": 0.992934
+          }
+        },
+        {
+          "t": 1,
+          "frame": 30,
+          "captured": {
+            "psnr": null,
+            "ssim": 1
+          },
+          "encoded": {
+            "psnr": 41.481473,
+            "ssim": 0.989434
+          }
+        },
+        {
+          "t": 1.7,
+          "frame": 51,
+          "captured": {
+            "psnr": null,
+            "ssim": 1
+          },
+          "encoded": {
+            "psnr": 41.921535,
+            "ssim": 0.990524
+          }
+        },
+        {
+          "t": 2.6,
+          "frame": 78,
+          "captured": {
+            "psnr": null,
+            "ssim": 1
+          },
+          "encoded": {
+            "psnr": 41.838178,
+            "ssim": 0.990673
+          }
+        },
+        {
+          "t": 4.2,
+          "frame": 126,
+          "captured": {
+            "psnr": null,
+            "ssim": 1
+          },
+          "encoded": {
+            "psnr": 41.910295,
+            "ssim": 0.991483
+          }
+        }
+      ],
+      "consoleErrors": 2
+    },
+    {
+      "page": "canvas",
+      "variant": "default",
+      "size": "1080p",
+      "run": 2,
+      "wallSeconds": 0.976,
+      "exportSeconds": 0.888,
+      "secondsPerVideoSecond": 0.1776,
+      "seekSeconds": 0.026,
+      "captureSeconds": 0.739,
+      "inlineSeconds": 0.001,
+      "encodeAndOtherSeconds": 0.122,
+      "bytes": 3037267,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 63,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "4857478",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    },
+    {
+      "page": "dom-font",
+      "variant": "stock capture",
+      "size": "1080p",
+      "run": 1,
+      "error": "frame.evaluate: Error: Failed to capture first frame in mode: dom | frame 0: DOM capture failed: Failed to load SVG image for DOM capture",
+      "consoleErrors": 1
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted only",
+      "size": "1080p",
+      "run": 1,
+      "error": "frame.evaluate: Error: Failed to capture first frame in mode: dom | frame 0: DOM capture failed: Failed to load SVG image for DOM capture",
+      "consoleErrors": 1
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted + inline",
+      "size": "1080p",
+      "run": 1,
+      "wallSeconds": 3.946,
+      "exportSeconds": 3.85,
+      "secondsPerVideoSecond": 0.77,
+      "seekSeconds": 0.011,
+      "captureSeconds": 3.481,
+      "inlineSeconds": 0.157,
+      "encodeAndOtherSeconds": 0.201,
+      "bytes": 258328,
+      "inlineReport": [
+        "inlined stylesheet https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap (11 urls, 646 KB)"
+      ],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 10,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "411176",
+        "nb_read_frames": "150"
+      },
+      "frames": [
+        {
+          "t": 0.4,
+          "frame": 12,
+          "captured": {
+            "psnr": 22.366817,
+            "ssim": 0.965636
+          },
+          "encoded": {
+            "psnr": 22.315831,
+            "ssim": 0.961341
+          }
+        },
+        {
+          "t": 1,
+          "frame": 30,
+          "captured": {
+            "psnr": 18.475236,
+            "ssim": 0.959688
+          },
+          "encoded": {
+            "psnr": 18.444747,
+            "ssim": 0.955445
+          }
+        },
+        {
+          "t": 1.7,
+          "frame": 51,
+          "captured": {
+            "psnr": 17.680755,
+            "ssim": 0.952633
+          },
+          "encoded": {
+            "psnr": 17.650127,
+            "ssim": 0.948425
+          }
+        },
+        {
+          "t": 2.6,
+          "frame": 78,
+          "captured": {
+            "psnr": 15.569234,
+            "ssim": 0.930566
+          },
+          "encoded": {
+            "psnr": 15.533581,
+            "ssim": 0.926532
+          }
+        },
+        {
+          "t": 4.2,
+          "frame": 126,
+          "captured": {
+            "psnr": 15.565705,
+            "ssim": 0.931617
+          },
+          "encoded": {
+            "psnr": 15.528796,
+            "ssim": 0.927541
+          }
+        }
+      ],
+      "consoleErrors": 4
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted + inline + bake",
+      "size": "720p",
+      "run": 1,
+      "wallSeconds": 3.438,
+      "exportSeconds": 3.421,
+      "secondsPerVideoSecond": 0.6841999999999999,
+      "seekSeconds": 0.041,
+      "captureSeconds": 3.174,
+      "inlineSeconds": 0.179,
+      "encodeAndOtherSeconds": 0.027,
+      "bytes": 516668,
+      "inlineReport": [
+        "inlined stylesheet https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap (11 urls, 646 KB)"
+      ],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 12,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "824521",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 4
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted + inline + bake",
+      "size": "720p",
+      "run": 2,
+      "wallSeconds": 3.421,
+      "exportSeconds": 3.399,
+      "secondsPerVideoSecond": 0.6798,
+      "seekSeconds": 0.04,
+      "captureSeconds": 3.179,
+      "inlineSeconds": 0.156,
+      "encodeAndOtherSeconds": 0.024,
+      "bytes": 516010,
+      "inlineReport": [
+        "inlined stylesheet https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap (11 urls, 646 KB)"
+      ],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 16,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "823468",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 5
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted + inline + bake",
+      "size": "1080p",
+      "run": 1,
+      "wallSeconds": 4.464,
+      "exportSeconds": 4.378,
+      "secondsPerVideoSecond": 0.8756,
+      "seekSeconds": 0.042,
+      "captureSeconds": 3.979,
+      "inlineSeconds": 0.163,
+      "encodeAndOtherSeconds": 0.194,
+      "bytes": 835608,
+      "inlineReport": [
+        "inlined stylesheet https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap (11 urls, 646 KB)"
+      ],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 18,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "1334824",
+        "nb_read_frames": "150"
+      },
+      "frames": [
+        {
+          "t": 0.4,
+          "frame": 12,
+          "captured": {
+            "psnr": 51.593286,
+            "ssim": 0.998759
+          },
+          "encoded": {
+            "psnr": 45.005912,
+            "ssim": 0.994506
+          }
+        },
+        {
+          "t": 1,
+          "frame": 30,
+          "captured": {
+            "psnr": 52.410419,
+            "ssim": 0.998791
+          },
+          "encoded": {
+            "psnr": 44.813674,
+            "ssim": 0.994337
+          }
+        },
+        {
+          "t": 1.7,
+          "frame": 51,
+          "captured": {
+            "psnr": 51.033202,
+            "ssim": 0.998763
+          },
+          "encoded": {
+            "psnr": 43.974859,
+            "ssim": 0.994207
+          }
+        },
+        {
+          "t": 2.6,
+          "frame": 78,
+          "captured": {
+            "psnr": 44.780837,
+            "ssim": 0.998243
+          },
+          "encoded": {
+            "psnr": 40.711548,
+            "ssim": 0.993185
+          }
+        },
+        {
+          "t": 4.2,
+          "frame": 126,
+          "captured": {
+            "psnr": 42.731377,
+            "ssim": 0.998222
+          },
+          "encoded": {
+            "psnr": 39.79285,
+            "ssim": 0.993139
+          }
+        }
+      ],
+      "consoleErrors": 4
+    },
+    {
+      "page": "dom-font",
+      "variant": "untainted + inline + bake",
+      "size": "1080p",
+      "run": 2,
+      "wallSeconds": 3.935,
+      "exportSeconds": 3.902,
+      "secondsPerVideoSecond": 0.7804,
+      "seekSeconds": 0.04,
+      "captureSeconds": 3.666,
+      "inlineSeconds": 0.168,
+      "encodeAndOtherSeconds": 0.028,
+      "bytes": 835608,
+      "inlineReport": [
+        "inlined stylesheet https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap (11 urls, 646 KB)"
+      ],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 20,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "1334824",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 4
+    },
+    {
+      "page": "gsap",
+      "variant": "untainted only",
+      "size": "1080p",
+      "run": 1,
+      "wallSeconds": 0.941,
+      "exportSeconds": 0.901,
+      "secondsPerVideoSecond": 0.1802,
+      "seekSeconds": 0.012,
+      "captureSeconds": 0.805,
+      "inlineSeconds": 0,
+      "encodeAndOtherSeconds": 0.084,
+      "bytes": 1391544,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 26,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "2224321",
+        "nb_read_frames": "150"
+      },
+      "frames": [
+        {
+          "t": 0.4,
+          "frame": 12,
+          "captured": {
+            "psnr": 70.526313,
+            "ssim": 0.999999
+          },
+          "encoded": {
+            "psnr": 49.383493,
+            "ssim": 0.99984
+          }
+        },
+        {
+          "t": 1,
+          "frame": 30,
+          "captured": {
+            "psnr": 42.322293,
+            "ssim": 0.998556
+          },
+          "encoded": {
+            "psnr": 39.248146,
+            "ssim": 0.99273
+          }
+        },
+        {
+          "t": 1.7,
+          "frame": 51,
+          "captured": {
+            "psnr": 49.055352,
+            "ssim": 0.999647
+          },
+          "encoded": {
+            "psnr": 40.955458,
+            "ssim": 0.995397
+          }
+        },
+        {
+          "t": 2.6,
+          "frame": 78,
+          "captured": {
+            "psnr": 52.624483,
+            "ssim": 0.999936
+          },
+          "encoded": {
+            "psnr": 40.830023,
+            "ssim": 0.995286
+          }
+        },
+        {
+          "t": 4.2,
+          "frame": 126,
+          "captured": {
+            "psnr": 51.678844,
+            "ssim": 0.9999
+          },
+          "encoded": {
+            "psnr": 39.13046,
+            "ssim": 0.992145
+          }
+        }
+      ],
+      "consoleErrors": 2
+    },
+    {
+      "page": "gsap",
+      "variant": "untainted + inline + bake",
+      "size": "720p",
+      "run": 1,
+      "wallSeconds": 0.653,
+      "exportSeconds": 0.607,
+      "secondsPerVideoSecond": 0.1214,
+      "seekSeconds": 0.011,
+      "captureSeconds": 0.556,
+      "inlineSeconds": 0,
+      "encodeAndOtherSeconds": 0.04,
+      "bytes": 901263,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 21,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "1439873",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    },
+    {
+      "page": "gsap",
+      "variant": "untainted + inline + bake",
+      "size": "720p",
+      "run": 2,
+      "wallSeconds": 0.926,
+      "exportSeconds": 0.837,
+      "secondsPerVideoSecond": 0.1674,
+      "seekSeconds": 0.013,
+      "captureSeconds": 0.763,
+      "inlineSeconds": 0,
+      "encodeAndOtherSeconds": 0.061,
+      "bytes": 899746,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 49,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1280,
+        "height": 720,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "1437446",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    },
+    {
+      "page": "gsap",
+      "variant": "untainted + inline + bake",
+      "size": "1080p",
+      "run": 1,
+      "wallSeconds": 1.386,
+      "exportSeconds": 1.267,
+      "secondsPerVideoSecond": 0.25339999999999996,
+      "seekSeconds": 0.015,
+      "captureSeconds": 1.114,
+      "inlineSeconds": 0,
+      "encodeAndOtherSeconds": 0.138,
+      "bytes": 1391544,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 80,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "2224321",
+        "nb_read_frames": "150"
+      },
+      "frames": [
+        {
+          "t": 0.4,
+          "frame": 12,
+          "captured": {
+            "psnr": 70.526313,
+            "ssim": 0.999999
+          },
+          "encoded": {
+            "psnr": 49.383493,
+            "ssim": 0.99984
+          }
+        },
+        {
+          "t": 1,
+          "frame": 30,
+          "captured": {
+            "psnr": 42.322293,
+            "ssim": 0.998556
+          },
+          "encoded": {
+            "psnr": 39.248146,
+            "ssim": 0.99273
+          }
+        },
+        {
+          "t": 1.7,
+          "frame": 51,
+          "captured": {
+            "psnr": 49.055352,
+            "ssim": 0.999647
+          },
+          "encoded": {
+            "psnr": 40.955458,
+            "ssim": 0.995397
+          }
+        },
+        {
+          "t": 2.6,
+          "frame": 78,
+          "captured": {
+            "psnr": 52.624483,
+            "ssim": 0.999936
+          },
+          "encoded": {
+            "psnr": 40.830023,
+            "ssim": 0.995286
+          }
+        },
+        {
+          "t": 4.2,
+          "frame": 126,
+          "captured": {
+            "psnr": 51.678844,
+            "ssim": 0.9999
+          },
+          "encoded": {
+            "psnr": 39.13046,
+            "ssim": 0.992145
+          }
+        }
+      ],
+      "consoleErrors": 2
+    },
+    {
+      "page": "gsap",
+      "variant": "untainted + inline + bake",
+      "size": "1080p",
+      "run": 2,
+      "wallSeconds": 0.871,
+      "exportSeconds": 0.829,
+      "secondsPerVideoSecond": 0.1658,
+      "seekSeconds": 0.011,
+      "captureSeconds": 0.782,
+      "inlineSeconds": 0,
+      "encodeAndOtherSeconds": 0.036,
+      "bytes": 1391544,
+      "inlineReport": [],
+      "warningCount": 0,
+      "warnings": [],
+      "saveExport": {
+        "ok": true,
+        "ms": 29,
+        "chunks": 1
+      },
+      "probe": {
+        "codec_name": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "r_frame_rate": "30/1",
+        "avg_frame_rate": "30/1",
+        "duration": "5.000000",
+        "bit_rate": "2224321",
+        "nb_read_frames": "150"
+      },
+      "consoleErrors": 2
+    }
+  ],
+  "browserVersion": "148.0.7778.96"
+}

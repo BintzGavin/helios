@@ -1,0 +1,35 @@
+--- a/examples/basic-host/src/implementation.ts	2026-10-05 16:40:03
++++ b/examples/basic-host/src/implementation.ts	2026-10-05 16:51:46
+@@ -290,6 +290,8 @@
+     serverResources: serverCapabilities?.resources,
+     // Declare support for model context updates
+     updateModelContext: { text: {} },
++    // Spike: advertise ui/download-file
++    downloadFile: {},
+   }, {
+     // Pass initial host context with theme, display mode, and style variables
+     hostContext: {
+@@ -342,6 +344,23 @@
+     return {};
+   };
+ 
++  // Spike: save embedded resources the view hands over, from the host page (not sandboxed).
++  appBridge.ondownloadfile = async ({ contents }, _extra) => {
++    for (const c of contents) {
++      if (c.type !== "resource" || !("blob" in c.resource)) continue;
++      const bin = atob(c.resource.blob);
++      const bytes = new Uint8Array(bin.length);
++      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
++      const url = URL.createObjectURL(new Blob([bytes], { type: c.resource.mimeType || "application/octet-stream" }));
++      const a = document.createElement("a");
++      a.href = url;
++      a.download = c.resource.uri.split("/").pop() || "download";
++      a.click();
++      setTimeout(() => URL.revokeObjectURL(url), 10000);
++    }
++    return {};
++  };
++
+   appBridge.onopenlink = async (params, _extra) => {
+     log.info("Open link request:", params);
+     window.open(params.url, "_blank", "noopener,noreferrer");

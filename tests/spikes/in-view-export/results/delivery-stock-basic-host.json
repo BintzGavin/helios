@@ -1,0 +1,190 @@
+{
+  "phase": "stock",
+  "hostCaps": {
+    "openLinks": {},
+    "serverTools": {
+      "listChanged": true
+    },
+    "serverResources": {
+      "listChanged": true
+    },
+    "updateModelContext": {
+      "text": {}
+    }
+  },
+  "export": {
+    "bytes": 3037267,
+    "seconds": 0.91
+  },
+  "anchor": {
+    "downloadsFromView": 0,
+    "downloadsFromHostPageControl": 1,
+    "consoleBlocked": [
+      "[download] control.mp4"
+    ]
+  },
+  "downloadFileUnadvertised": {
+    "advertised": false,
+    "ok": false,
+    "error": "Method not found",
+    "code": -32601,
+    "ms": 11
+  },
+  "saveExport": [
+    {
+      "totalMB": 3,
+      "chunkKB": 256,
+      "ok": true,
+      "chunks": 12,
+      "seconds": 0.11,
+      "mbPerSecond": 27.3,
+      "maxArgChars": 349528,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 3,
+      "chunkKB": 1024,
+      "ok": true,
+      "chunks": 3,
+      "seconds": 0.073,
+      "mbPerSecond": 41.1,
+      "maxArgChars": 1398104,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 3,
+      "chunkKB": 4096,
+      "ok": true,
+      "chunks": 1,
+      "seconds": 0.064,
+      "mbPerSecond": 46.9,
+      "maxArgChars": 4194304,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 3,
+      "chunkKB": 6144,
+      "ok": true,
+      "chunks": 1,
+      "seconds": 0.149,
+      "mbPerSecond": 20.1,
+      "maxArgChars": 4194304,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 3,
+      "chunkKB": 8192,
+      "ok": true,
+      "chunks": 1,
+      "seconds": 0.069,
+      "mbPerSecond": 43.5,
+      "maxArgChars": 4194304,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 25,
+      "chunkKB": 256,
+      "ok": true,
+      "chunks": 100,
+      "seconds": 0.751,
+      "mbPerSecond": 33.3,
+      "maxArgChars": 349528,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 25,
+      "chunkKB": 1024,
+      "ok": true,
+      "chunks": 25,
+      "seconds": 0.628,
+      "mbPerSecond": 39.8,
+      "maxArgChars": 1398104,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 25,
+      "chunkKB": 4096,
+      "ok": true,
+      "chunks": 7,
+      "seconds": 0.522,
+      "mbPerSecond": 47.9,
+      "maxArgChars": 5592408,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 25,
+      "chunkKB": 6144,
+      "ok": true,
+      "chunks": 5,
+      "seconds": 0.544,
+      "mbPerSecond": 46,
+      "maxArgChars": 8388608,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 25,
+      "chunkKB": 8192,
+      "ok": false,
+      "chunks": 4,
+      "seconds": 0.168,
+      "mbPerSecond": null,
+      "maxArgChars": 0,
+      "error": "MCP error -32602: Input validation error: Invalid arguments for tool save_export: [\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_big\",\n    \"maximum\": 8388608,\n    \"inclusive\": true,\n    \"path\": [\n    "
+    },
+    {
+      "totalMB": 100,
+      "chunkKB": 256,
+      "ok": true,
+      "chunks": 400,
+      "seconds": 3.445,
+      "mbPerSecond": 29,
+      "maxArgChars": 349528,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 100,
+      "chunkKB": 1024,
+      "ok": true,
+      "chunks": 100,
+      "seconds": 2.261,
+      "mbPerSecond": 44.2,
+      "maxArgChars": 1398104,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 100,
+      "chunkKB": 4096,
+      "ok": true,
+      "chunks": 25,
+      "seconds": 2.231,
+      "mbPerSecond": 44.8,
+      "maxArgChars": 5592408,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 100,
+      "chunkKB": 6144,
+      "ok": true,
+      "chunks": 17,
+      "seconds": 2.598,
+      "mbPerSecond": 38.5,
+      "maxArgChars": 8388608,
+      "savedBytesMatch": true
+    },
+    {
+      "totalMB": 100,
+      "chunkKB": 8192,
+      "ok": false,
+      "chunks": 13,
+      "seconds": 0.187,
+      "mbPerSecond": null,
+      "maxArgChars": 0,
+      "error": "MCP error -32602: Input validation error: Invalid arguments for tool save_export: [\n  {\n    \"origin\": \"string\",\n    \"code\": \"too_big\",\n    \"maximum\": 8388608,\n    \"inclusive\": true,\n    \"path\": [\n    "
+    }
+  ],
+  "saveExportRefusals": {
+    "outOfOrder": "Unknown upload spike-order-1; start at index 0",
+    "notMp4": "The upload is not an MP4",
+    "pathEscape": "MCP error -32602: Input validation error: Invalid arguments for tool save_export: [\n  {\n    \"origin\": \"string\",\n    \"code\": \"invalid_format\",\n    \"format\": \"reg"
+  }
+}

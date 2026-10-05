@@ -1,0 +1,32 @@
+[
+  {
+    "page": "canvas",
+    "seconds": 60,
+    "exportSeconds": 12.044,
+    "secondsPerVideoSecond": 0.20073333333333335,
+    "bytes": 37314518,
+    "mbPerMinute": 37.314518,
+    "saveExportSeconds": 0.804,
+    "peakHostJsHeapMB": 108
+  },
+  {
+    "page": "gsap",
+    "seconds": 60,
+    "exportSeconds": 12.656,
+    "secondsPerVideoSecond": 0.21093333333333333,
+    "bytes": 3030103,
+    "mbPerMinute": 3.030103,
+    "saveExportSeconds": 0.085,
+    "peakHostJsHeapMB": 36.3
+  },
+  {
+    "page": "dom-font",
+    "seconds": 60,
+    "exportSeconds": 48.559,
+    "secondsPerVideoSecond": 0.8093166666666666,
+    "bytes": 4170464,
+    "mbPerMinute": 4.170464,
+    "saveExportSeconds": 0.134,
+    "peakHostJsHeapMB": 122.6
+  }
+]

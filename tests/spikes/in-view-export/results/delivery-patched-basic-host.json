@@ -1,0 +1,61 @@
+{
+  "phase": "patched",
+  "hostCaps": {
+    "openLinks": {},
+    "serverTools": {
+      "listChanged": true
+    },
+    "serverResources": {
+      "listChanged": true
+    },
+    "updateModelContext": {
+      "text": {}
+    },
+    "downloadFile": {}
+  },
+  "export": {
+    "bytes": 3037267,
+    "seconds": 0.873
+  },
+  "downloadFile": [
+    {
+      "payload": "export",
+      "advertised": true,
+      "ok": true,
+      "result": {},
+      "ms": 30,
+      "downloadsSeen": [
+        {
+          "name": "canvas.mp4",
+          "bytes": 3037267
+        }
+      ]
+    },
+    {
+      "payload": "25 MB synthetic",
+      "advertised": true,
+      "ok": true,
+      "result": {},
+      "ms": 255,
+      "downloadsSeen": [
+        {
+          "name": "canvas.mp4",
+          "bytes": 26214400
+        }
+      ]
+    },
+    {
+      "payload": "100 MB synthetic",
+      "advertised": true,
+      "ok": true,
+      "result": {},
+      "ms": 973,
+      "downloadsSeen": [
+        {
+          "name": "canvas.mp4",
+          "bytes": 104857600
+        }
+      ]
+    }
+  ]
+}

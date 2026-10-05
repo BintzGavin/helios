@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GSAP feature cards</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #f6f3ee; }
+  body { font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1b1b1f; }
+  .title { position: absolute; left: 7vw; top: 7vh; font-size: 5vw; font-weight: 800; letter-spacing: -0.03em; }
+  .cards { position: absolute; left: 7vw; right: 7vw; top: 32vh; display: flex; gap: 2.5vw; }
+  .card { flex: 1; height: 38vh; border-radius: 1.4vw; padding: 2vw; box-sizing: border-box;
+    box-shadow: 0 1vw 3vw rgba(0,0,0,.12); color: #fff; font-size: 2vw; font-weight: 700; }
+  .card:nth-child(1) { background: #2f63e0; }
+  .card:nth-child(2) { background: #e0532f; }
+  .card:nth-child(3) { background: #18794e; }
+  .card small { display: block; font-weight: 400; font-size: 1.3vw; margin-top: 1vw; opacity: .85; }
+  svg.line { position: absolute; left: 7vw; bottom: 8vh; width: 86vw; height: 10vh; overflow: visible; }
+  svg.line path { fill: none; stroke: #1b1b1f; stroke-width: 6; stroke-linecap: round; }
+</style>
+</head>
+<body>
+  <div class="title">Three things shipped</div>
+  <div class="cards">
+    <div class="card">Distributed rendering<small>Stateless workers</small></div>
+    <div class="card">Component registry<small>You own the code</small></div>
+    <div class="card">In-chat player<small>Scrub, select, revise</small></div>
+  </div>
+  <svg class="line" viewBox="0 0 1000 100" preserveAspectRatio="none"><path id="p" d="M0 80 C 200 0, 300 100, 500 40 S 800 0, 1000 60"/></svg>
+<script>
+  window.helios = { duration: 5, fps: 30 };
+  const len = document.getElementById('p').getTotalLength();
+  gsap.set('#p', { strokeDasharray: len, strokeDashoffset: len });
+  const tl = gsap.timeline({ paused: true });
+  tl.from('.title', { y: 60, opacity: 0, duration: 0.8, ease: 'power3.out' })
+    .from('.card', { y: 120, opacity: 0, rotation: -4, duration: 0.9, stagger: 0.25, ease: 'back.out(1.6)' }, 0.4)
+    .to('#p', { strokeDashoffset: 0, duration: 2, ease: 'power2.inOut' }, 1.4)
+    .to('.card:nth-child(2)', { scale: 1.06, duration: 0.6, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 3.2)
+    .to('.title', { color: '#2f63e0', duration: 0.8 }, 3.6);
+  window.renderAt = (t) => { tl.seek(t, false); };
+  window.renderAt(0);
+</script>
+</body>
+</html>
