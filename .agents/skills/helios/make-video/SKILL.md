@@ -1,6 +1,6 @@
 ---
 name: make-video
-description: Make a video, MP4, GIF, animation, music video, short film, explainer, chart animation, product demo, logo reveal or social clip from code. Write one HTML page that draws any frame from its time t, render it frame-exact to MP4 with Helios, check stills and contact sheets, and add a soundtrack. Use whenever the user asks for a video or an animation file.
+description: Make videos drawn with code: motion graphics, launch and explainer videos, animated charts and data, logo reveals, social clips, music visualizers, UI demos and GIF loops. Write one HTML page that draws any frame from its time t, render it frame-exact to MP4 with Helios, check stills and contact sheets, and add a soundtrack. Use when the user asks for one of these as an MP4, GIF or animation file. Not for live-action or AI-generated realistic footage or editing camera video.
 ---
 
 # Make a video with Helios

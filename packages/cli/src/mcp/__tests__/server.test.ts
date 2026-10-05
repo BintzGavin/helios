@@ -167,6 +167,17 @@ describe('helios MCP server: listing', () => {
     expect((byName.render_video.inputSchema.properties as any).waitSeconds).toMatchObject({ default: 45, minimum: 0, maximum: 100 });
   });
 
+  it('describes videos drawn with code, not camera or AI-generated footage', async () => {
+    await connect();
+    const { tools } = await client.listTools();
+    const byName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
+
+    expect(byName.preview_video.description).toContain('drawn with code');
+    expect(byName.preview_video.description).toContain('Not for live-action or AI-generated realistic footage or editing camera video.');
+    expect(byName.render_video.description).toContain('drawn with code');
+    expect(byName.render_video.description).toContain('It does not generate realistic footage or edit camera video.');
+  });
+
   it('serves the player view with the seek shim injected as a safe string literal', async () => {
     await connect();
     const { resources } = await client.listResources();
