@@ -1,0 +1,53 @@
+{
+  "helios": {
+    "label": "Helios",
+    "repo": "https://github.com/BintzGavin/helios-skills",
+    "commit": "c52a1faedd4ab1d91420dcc7b19b30caeab55265",
+    "version": "0.1.0",
+    "install": "plugin-dir",
+    "sparse": [
+      "plugins/helios",
+      ".claude-plugin"
+    ],
+    "pluginRoot": "plugins/helios",
+    "mcpConfig": ".mcp.json",
+    "maintainerInstall": "claude plugin marketplace add BintzGavin/helios-skills && claude plugin install helios@helios",
+    "runtimePackages": [
+      "@helios-project/cli",
+      "@helios-project/renderer"
+    ]
+  },
+  "hyperframes": {
+    "label": "HyperFrames",
+    "repo": "https://github.com/heygen-com/hyperframes",
+    "ref": "v0.8.133",
+    "commit": "9c7ff590fe9e1f3fa7bf06cb3bf67ae78c2a993b",
+    "version": "0.8.133",
+    "install": "plugin-dir",
+    "sparse": [
+      "skills",
+      ".claude-plugin"
+    ],
+    "pluginRoot": ".",
+    "maintainerInstall": "claude plugin marketplace add heygen-com/hyperframes && claude plugin install hyperframes@hyperframes",
+    "runtimePackages": [
+      "hyperframes"
+    ]
+  },
+  "remotion": {
+    "label": "Remotion",
+    "repo": "https://github.com/remotion-dev/skills",
+    "commit": "473352613039e718e46655a26df224851e84c4aa",
+    "version": "4.0.533",
+    "install": "project-skills",
+    "sparse": [
+      "skills"
+    ],
+    "skillsPath": "skills",
+    "maintainerInstall": "npx skills add remotion-dev/skills",
+    "runtimePackages": [
+      "remotion",
+      "@remotion/cli"
+    ]
+  }
+}
