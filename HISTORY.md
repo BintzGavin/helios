@@ -35,6 +35,12 @@ Driven by this new AI-augmented workflow, the project expanded rapidly across mu
 *   **Advanced Rendering:** The renderer evolved into a "Dual-Path" architecture, supporting both Canvas and DOM rendering strategies. "Smart Codec Selection" was implemented to optimize export performance.
 *   **Hardening:** Significant effort was put into "hardening" the Player connection, implementing end-to-end (E2E) verification pipelines, and adding rigorous diagnostic tools (`Helios.diagnose()`).
 
+## Chapter 6: The Apache License (5 October 2026)
+
+The engine's license changed for the second time.
+*   **Licensing Shift:** On 5 October 2026, the engine moved from the **Elastic License 2.0** to the **Apache License 2.0** (Apache-2.0). Every version previously released under the Elastic License 2.0 is also available under Apache-2.0.
+*   **Contributions:** Contributions are now accepted under the Developer Certificate of Origin (DCO).
+
 ## Conclusion
 
 Helios has evolved from a single developer's vision into a sophisticated, AI-accelerated video generation engine. The history shows a project that is not afraid to pivot (licensing), re-architect (dual-path rendering), and embrace novel development paradigms (agent-based workflows) to achieve its goals. The sheer volume of recent feature branches suggests a project currently in hyper-drive.

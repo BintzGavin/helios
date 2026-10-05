@@ -18,7 +18,7 @@ For project governance and roadmap, see [`docs/AGENTS.md`](./docs/AGENTS.md).
 
 ### Video is Light Over Time
 
-[![License](https://img.shields.io/badge/license-ELv2-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-beta-yellow.svg)](#project-status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
@@ -380,7 +380,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Animation** | CSS, WAAPI, any library | `interpolate()`, `spring()` hooks |
 | **Learning curve** | Use what you know | Learn Remotion APIs |
 | **Maturity** | 🟡 Beta | 🟢 Production-ready |
-| **Pricing** | Free (ELv2) | Free ≤3 devs, then $100+/mo |
+| **Pricing** | Free (Apache-2.0) | Free ≤3 devs, then $100+/mo |
 | **Studio IDE** | 🟢 Beta | 🟢 Available |
 | **Distributed rendering** | 🟡 Beta (Local Orchestrator) | 🟢 Lambda, Cloud Run |
 | **Captions/subtitles** | 🟡 Standard (SRT) | 🟢 Built-in |
@@ -628,50 +628,13 @@ A seamless local development workflow is crucial for productivity. We recommend 
 
 ## License
 
-Helios Engine is licensed under the **Elastic License 2.0 (ELv2)**. This license is designed to encourage widespread adoption while protecting our ability to build a SaaS platform.
+Helios is licensed under the [Apache License 2.0](LICENSE). You can use it for anything, including commercial products, SaaS platforms and hosted services, and you can modify and redistribute it under the license's terms.
 
-### What This Means
+Versions released under the Elastic License 2.0 (25 November 2025 to 5 October 2026) are also available under Apache-2.0; see [NOTICE](NOTICE).
 
-**You Can:**
-- ✅ **Build commercial products** - Use Helios Engine in any commercial application or product
-- ✅ **Embed in applications** - Include Helios Engine in your software, whether open source or proprietary
-- ✅ **Modify and distribute** - Fork, modify, and distribute Helios Engine
-- ✅ **Create video platforms** - Build video creation tools, editors, or platforms using Helios Engine
-- ✅ **Use internally** - Use Helios Engine for internal business purposes without restrictions
-- ✅ **Sell products** - Sell products that use or include Helios Engine
-- ✅ **Contribute** - Contribute improvements back to the open source project
+Helios Cloud, the hosted rendering service that AI assistants connect to, is a separate service with its own [terms](docs/legal/terms.md).
 
-**You Cannot:**
-- ❌ **Offer Helios as a managed service** - You cannot provide Helios Engine as a hosted/managed service (SaaS) to third parties
-- ❌ **Resell Helios infrastructure** - You cannot offer Helios Engine rendering infrastructure as a service
-
-**What This Means in Practice:**
-
-This license is **perfect for founders building video platforms**. You can:
-- Build a video editing SaaS platform using Helios Engine ✅
-- Create a video generation tool for your customers ✅
-- Build a white-label video creation platform ✅
-- Embed Helios Engine in your application ✅
-- Sell products that use Helios Engine ✅
-
-You just can't offer Helios Engine itself as a managed/hosted service to others.
-
-### Why Elastic License 2.0?
-
-We chose Elastic License 2.0 because:
-- **Encourages adoption** - Developers can build commercial products without restrictions
-- **Protects SaaS opportunity** - Prevents competitors from offering Helios as a managed service
-- **Well-established** - Used by Elasticsearch, Kibana, and other successful projects
-- **Clear boundaries** - Simple rule: build products ✅, offer managed services ❌
-- **Founder-friendly** - Perfect for founders building video platforms (our target customers!)
-
-This license allows us to build a SaaS platform around Helios while enabling a thriving ecosystem of products built on top of it.
-
-### Commercial Licensing
-
-If you need to offer Helios Engine as a managed service or have questions about commercial licensing, please [contact us](mailto:me@gavinbintz.com).
-
-See [LICENSE](LICENSE) for full text.
+What we promise about staying open is in [docs/PLEDGE.md](docs/PLEDGE.md). Contributions are accepted under the [Developer Certificate of Origin](CONTRIBUTING.md#developer-certificate-of-origin).
 
 ---
 
