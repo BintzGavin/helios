@@ -338,7 +338,9 @@ function stageMsg(text, isErr) {
 
 async function loadPage() {
   const token = ++S.token;
+  // An export of the old page ends here, even if its frame's promise never settles.
   if (E.abort) E.abort.abort();
+  E.busy = false; E.abort = null; E.token++;
   pause();
   clearSel();
   S.win = null; S.loading = true; S.busy = false; S.want = null; S.seekErr = false; S.t = 0;
@@ -430,7 +432,8 @@ function requestSeek(t) {
   if (!S.busy && !E.busy) pump();
 }
 function pump() {
-  if (S.want === null || !S.win) return;
+  // While exporting, the exporter owns the page's time; the queued seek runs afterwards.
+  if (S.want === null || !S.win || E.busy) return;
   const t = S.want, w = S.win;
   S.want = null;
   S.busy = true;
@@ -741,7 +744,10 @@ async function cancelRender() {
 // The page exporter runs inside the page's frame: it seeks with the same shim as playback and
 // encodes with WebCodecs. The file then leaves the sandbox through the host's ui/download-file,
 // or through the local server's app-only save_export tool. <a download> is blocked in hosts.
-const E = { busy: false, abort: null, noSaveExport: false };
+// The page in the srcdoc frame shares this view's origin, so it can call any tool the view can,
+// save_export included, and can replace window.__helios_export. App-only visibility only keeps
+// tools out of the model's list; the server's own limits are the boundary.
+const E = { busy: false, abort: null, noSaveExport: false, token: 0 };
 const CHUNK_BYTES = 1024 * 1024;
 const SAVE_LIMIT_BYTES = 200 * 1024 * 1024;
 const NO_DELIVERY = "This host can't receive files from the player";
@@ -796,13 +802,19 @@ async function saveExport(bytes, name, signal) {
   const total = Math.max(1, Math.ceil(bytes.length / CHUNK_BYTES));
   const id = uploadId();
   let last = null;
+  // Frees the server's copy at once instead of after its idle timeout.
+  const drop = () => callTool('save_export', { name, uploadId: id, index: 0, total, abort: true }).catch(() => {});
   for (let index = 0; index < total; index++) {
-    if (signal.aborted) return 'cancelled';
+    if (signal.aborted) {
+      if (index > 0) await drop();
+      return 'cancelled';
+    }
     const data = base64(bytes.subarray(index * CHUNK_BYTES, (index + 1) * CHUNK_BYTES));
     try {
       last = await callTool('save_export', { name, uploadId: id, index, total, data });
     } catch (e) {
       if (index === 0 && isMissingTool(e)) return 'missing';
+      if (index > 0) await drop();
       throw new Error('could not save it: ' + e.message);
     }
     showExport('Saving ' + name + ' ' + pct((index + 1) / total), 'running', { progress: (index + 1) / total });
@@ -828,6 +840,7 @@ async function startExport() {
 
   E.busy = true;
   E.abort = new AbortController();
+  const token = ++E.token;
   const signal = E.abort.signal;
   pause();
   setEnabled(true);
@@ -842,11 +855,16 @@ async function startExport() {
       s.remove();
       if (typeof w.__helios_export !== 'function') throw new Error('the export script could not run in the page');
     }
-    const r = await w.__helios_export({
+    const r = await untilAborted(w.__helios_export({
       fps: S.fps, duration: S.duration, width: S.width, height: S.height, signal,
       onProgress: (p) => { if (!signal.aborted) showExport('Exporting ' + pct(p), 'running', { progress: p }); },
-    });
+    }), signal);
     if (!r || signal.aborted) { showExport('Export cancelled.', ''); return; }
+    // Both ways out take at most what save_export does; checked before any copy or base64.
+    const size = r.bytes && typeof r.bytes.length === 'number' ? r.bytes.length : 0;
+    if (size > SAVE_LIMIT_BYTES) {
+      throw new Error('it is ' + mb(size) + ', over the 200 MB the player can save; use Render MP4');
+    }
     // Copy out of the page's realm, so the file outlives the frame.
     const bytes = new Uint8Array(r.bytes);
     const name = exportName();
@@ -857,8 +875,6 @@ async function startExport() {
       });
       if (res && res.isError) throw new Error(textOf(res) || 'the host did not take the file');
       showExport('Exported ' + name + ' (' + mb(bytes.length) + ') and passed it to the host to save.', 'ok');
-    } else if (bytes.length > SAVE_LIMIT_BYTES) {
-      throw new Error('it is ' + mb(bytes.length) + ', over the 200 MB the player can save; use Render MP4');
     } else {
       const saved = await saveExport(bytes, name, signal);
       if (saved === 'missing') { E.noSaveExport = true; fallback = NO_DELIVERY; showExport('', ''); }
@@ -868,13 +884,20 @@ async function startExport() {
   } catch (e) {
     showExport('Export failed: ' + ((e && e.message) || e), 'err');
   } finally {
-    E.busy = false;
-    E.abort = null;
-    // Another page may have loaded meanwhile: enable whatever is loaded now.
+    // loadPage may already have ended this export and another may have started.
+    if (E.token === token) { E.busy = false; E.abort = null; }
     setEnabled(!!S.win);
     if (S.win === w) requestSeek(S.t);
   }
-  if (fallback) renderInstead(fallback);
+  if (fallback && E.token === token) renderInstead(fallback);
+}
+/** Settles with null as soon as signal aborts, even if promise never settles (a detached frame's). */
+function untilAborted(promise, signal) {
+  return new Promise((resolve, reject) => {
+    if (signal.aborted) return resolve(null);
+    signal.addEventListener('abort', () => resolve(null), { once: true });
+    Promise.resolve(promise).then(resolve, reject);
+  });
 }
 function cancelExport() {
   if (!E.abort) return;

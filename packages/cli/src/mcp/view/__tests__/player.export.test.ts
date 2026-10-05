@@ -60,6 +60,7 @@ f.src = ${JSON.stringify(VIEW_URL)};
 f.style.cssText = 'width:700px;height:400px;border:0;display:block';
 document.body.appendChild(f);
 const send = (m) => f.contentWindow.postMessage(m, '*');
+window.__send = send;
 window.addEventListener('message', async (e) => {
   if (e.source !== f.contentWindow) return;
   const m = e.data;
@@ -89,6 +90,7 @@ let tmp: string;
 let root: string;
 let client: Client;
 let view: { html: string; csp: string };
+let helios: ReturnType<typeof createHeliosMcpServer>;
 
 function cspFrom(meta: any): string {
   const res = (meta?.ui?.csp?.resourceDomains ?? []).join(' ');
@@ -196,12 +198,20 @@ beforeAll(async () => {
   fs.mkdirSync(root);
   fs.writeFileSync(path.join(root, 'canvas.html'), CANVAS_PAGE);
   fs.writeFileSync(path.join(root, 'font.html'), FONT_PAGE);
+  // Pages that bring their own window.__helios_export, which the view then uses (it shares the
+  // page's origin, so it can't tell): one that never settles, one too big to deliver, one small.
+  const fake = (body: string) => `<!doctype html><html><body><p>fake exporter</p><script>window.__helios_export = ${body};</script></body></html>`;
+  fs.writeFileSync(path.join(root, 'never.html'), fake('() => new Promise(() => {})'));
+  fs.writeFileSync(path.join(root, 'huge.html'), fake(
+    'async () => { const b = new Uint8Array(201 * 1024 * 1024); b.set([0, 0, 0, 24, 102, 116, 121, 112]); return { bytes: b, mode: "dom", frames: 1 }; }'));
+  fs.writeFileSync(path.join(root, 'small.html'), fake(
+    'async () => { const b = new Uint8Array(2.5 * 1024 * 1024); b.set([0, 0, 0, 24, 102, 116, 121, 112]); return { bytes: b, mode: "dom", frames: 1 }; }'));
 
   const copyView = await import(pathToFileURL(path.join(cliRoot, 'scripts/copy-view.js')).href);
   const viewPath = path.join(tmp, 'player.html');
   fs.writeFileSync(viewPath, await copyView.buildViewHtml());
 
-  const helios = createHeliosMcpServer({ root, viewPath, buildShim: () => buildPageShim() });
+  helios = createHeliosMcpServer({ root, viewPath, buildShim: () => buildPageShim() });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: 'fake-host', version: '1.0.0' });
   await Promise.all([helios.server.connect(serverTransport), client.connect(clientTransport)]);
@@ -312,6 +322,76 @@ describe('Export MP4 in the player view', { timeout: 180_000 }, () => {
       await frame.click('#export');
       await waitFor(() => calls.slice(before).find((c) => c.name === 'render_video'), 'second render_video');
       expect(calls.slice(before).some((c) => c.name === 'save_export')).toBe(false);
+    } finally {
+      (client as any).callTool = real;
+      await page.close();
+    }
+  });
+
+  const enabled = (frame: Frame, id: string) => frame.evaluate((id) => !(document.getElementById(id) as HTMLButtonElement).disabled, id);
+
+  it('recovers when another page loads during an export whose promise never settles', async () => {
+    const { page, frame } = await openHost('never.html', { serverTools: {} });
+    try {
+      await frame.click('#export');
+      await waitFor(() => frame.isVisible('#rcancel'), 'export running');
+      expect(await enabled(frame, 'export')).toBe(false);
+      // The model opens another page: the old frame, and its export, go away.
+      await page.evaluate(() => (window as any).__send({
+        jsonrpc: '2.0', method: 'ui/notifications/tool-result',
+        params: { content: [], structuredContent: { mode: 'player', path: 'canvas.html', duration: 2, width: 320, height: 180, fps: 30 } },
+      }));
+      await waitFor(async () => (await enabled(frame, 'export')) && (await enabled(frame, 'play')) && (await enabled(frame, 'render')), 'controls enabled again', 15_000);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it('cancels an export whose promise never settles', async () => {
+    const { page, frame } = await openHost('never.html', { serverTools: {} });
+    try {
+      await frame.click('#export');
+      await waitFor(() => frame.isVisible('#rcancel'), 'export running');
+      await frame.click('#rcancel');
+      await waitFor(() => frame.evaluate(() => document.getElementById('rstat')!.textContent === 'Export cancelled.'), 'cancelled', 15_000);
+      await waitFor(() => enabled(frame, 'export'), 'export enabled', 15_000);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it('refuses to hand the host a file over 200 MB, before encoding it as base64', async () => {
+    const { page, frame, downloads } = await openHost('huge.html', { serverTools: {}, downloadFile: {} });
+    try {
+      await frame.click('#export');
+      await waitFor(() => frame.evaluate(() => document.getElementById('rstat')!.className === 'err'), 'export refused', 60_000);
+      expect(await frame.textContent('#rstat')).toMatch(/over the 200 MB the player can save; use Render MP4/);
+      expect(downloads).toHaveLength(0);
+    } finally {
+      await page.close();
+    }
+  });
+
+  it('tells the server to drop the upload when the person cancels mid-upload', async () => {
+    const { page, frame, calls } = await openHost('small.html', { serverTools: {} });
+    let release!: () => void;
+    const gate = new Promise<void>((r) => { release = r; });
+    const real = client.callTool.bind(client);
+    (client as any).callTool = async (req: any, ...rest: any[]) => {
+      if (req.name === 'save_export' && req.arguments.index === 1 && !req.arguments.abort) await gate;
+      return real(req, ...rest);
+    };
+    try {
+      await frame.click('#export');
+      await waitFor(() => calls.find((c) => c.name === 'save_export' && c.args.index === 1), 'second chunk sent');
+      expect(helios.exports.size).toBe(1);
+      await frame.click('#rcancel');
+      release();
+      await waitFor(() => frame.evaluate(() => document.getElementById('rstat')!.textContent === 'Export cancelled.'), 'cancelled');
+      const abort = await waitFor(() => calls.find((c) => c.name === 'save_export' && c.args.abort === true), 'abort call');
+      expect(abort.args).toMatchObject({ name: 'small.mp4', index: 0, total: 3 });
+      await waitFor(() => helios.exports.size === 0, 'upload freed');
+      expect(fs.existsSync(path.join(root, 'exports', 'small.mp4'))).toBe(false);
     } finally {
       (client as any).callTool = real;
       await page.close();
