@@ -9,6 +9,7 @@ const audioAddSpy = vi.fn().mockResolvedValue(undefined);
 const outputStartSpy = vi.fn().mockResolvedValue(undefined);
 const outputFinalizeSpy = vi.fn().mockResolvedValue(undefined);
 const videoSampleSources: any[] = [];
+const samples: any[] = [];
 
 // Mock Mediabunny
 vi.mock('mediabunny', () => {
@@ -36,10 +37,12 @@ vi.mock('mediabunny', () => {
             add = audioAddSpy;
         },
         VideoSample: class {
-            constructor(public frame: any, public init?: any) {}
+            constructor(public frame: any, public init?: any) { samples.push(this); }
+            close = vi.fn();
         },
         AudioSample: class {
-            constructor(public init: any) {}
+            constructor(public init: any) { samples.push(this); }
+            close = vi.fn();
         }
     };
 });
@@ -134,6 +137,8 @@ describe('ClientSideExporter', () => {
         vi.clearAllMocks();
         gainNodes.length = 0;
         videoSampleSources.length = 0;
+        samples.length = 0;
+        videoAddSpy.mockResolvedValue(undefined);
 
         mockController = {
             play: vi.fn(),
@@ -210,6 +215,45 @@ describe('ClientSideExporter', () => {
 
         // Should have stopped early
         expect(outputFinalizeSpy).not.toHaveBeenCalled();
+    });
+
+    it('closes every VideoSample and AudioSample once it is added', async () => {
+        (mockController.getAudioTracks as any).mockResolvedValue([{ buffer: new ArrayBuffer(8), mimeType: 'audio/mp3' }]);
+
+        await exporter.export({ onProgress: vi.fn(), mode: 'canvas' });
+
+        expect(samples).toHaveLength(11); // 10 frames and the audio
+        for (const sample of samples) expect(sample.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('closes the VideoSample when the encoder rejects it', async () => {
+        videoAddSpy.mockRejectedValueOnce(new Error('encoder error'));
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        await expect(exporter.export({ onProgress: vi.fn(), mode: 'canvas' })).rejects.toThrow('encoder error');
+
+        expect(samples).toHaveLength(1);
+        expect(samples[0].close).toHaveBeenCalledTimes(1);
+    });
+
+    it('returns the file as a Blob without clicking a link when download is false', async () => {
+        const blob = await exporter.export({ onProgress: vi.fn(), mode: 'canvas', download: false });
+
+        expect(blob).toBeInstanceOf(Blob);
+        expect(blob!.type).toBe('video/mp4');
+        expect(blob!.size).toBe(100);
+        expect(mockAnchor.click).not.toHaveBeenCalled();
+        expect(URL.createObjectURL).not.toHaveBeenCalled();
+    });
+
+    it('resolves with undefined when the export is aborted', async () => {
+        const controller = new AbortController();
+        mockController.captureFrame = vi.fn().mockImplementation(async () => {
+            controller.abort();
+            return { frame: new VideoFrame({} as any, {}), captions: [] };
+        });
+
+        await expect(exporter.export({ onProgress: vi.fn(), signal: controller.signal, mode: 'canvas', download: false })).resolves.toBeUndefined();
     });
 
     it('should fallback to DOM if canvas not found in auto mode', async () => {

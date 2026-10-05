@@ -15,6 +15,19 @@ import {
 } from "mediabunny";
 import { mixAudio } from "./audio-utils";
 
+/** Adds a sample to its source, then closes it whether or not the encoder took it. */
+async function addAndClose<S extends VideoSample | AudioSample>(
+  source: { add(sample: S, options?: any): Promise<void> },
+  sample: S,
+  options?: { keyFrame?: boolean }
+): Promise<void> {
+  try {
+    await source.add(sample, options);
+  } finally {
+    sample.close();
+  }
+}
+
 export class ClientSideExporter {
   constructor(
     private controller: HeliosController
@@ -37,8 +50,13 @@ export class ClientSideExporter {
     height?: number;
     bitrate?: number;
     filename?: string;
-  }): Promise<void> {
-    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, captionStyle, width: targetWidth, height: targetHeight, bitrate, filename = 'video' } = options;
+    /**
+     * Save the video with an <a download> click (default true). Pass false where downloads are
+     * blocked, such as a sandboxed iframe, and deliver the returned Blob yourself.
+     */
+    download?: boolean;
+  }): Promise<Blob | undefined> {
+    const { onProgress, signal, mode = 'auto', canvasSelector = 'canvas', format = 'mp4', includeCaptions = true, captionStyle, width: targetWidth, height: targetHeight, bitrate, filename = 'video', download = true } = options;
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
@@ -222,7 +240,7 @@ export class ClientSideExporter {
           firstFrame.close();
       }
 
-      await videoSource.add(new VideoSample(frameToEncode), { keyFrame: true });
+      await addAndClose(videoSource, new VideoSample(frameToEncode), { keyFrame: true });
       frameToEncode.close();
 
       onProgress(1 / totalFrames);
@@ -253,7 +271,7 @@ export class ClientSideExporter {
              videoFrame.close();
         }
 
-        await videoSource.add(new VideoSample(finalFrame), { keyFrame });
+        await addAndClose(videoSource, new VideoSample(finalFrame), { keyFrame });
         finalFrame.close();
 
         onProgress((i + 1) / totalFrames);
@@ -280,14 +298,18 @@ export class ClientSideExporter {
               data: planarData
           });
 
-          await audioSource.add(sample);
+          await addAndClose(audioSource, sample);
       }
 
       await output.finalize();
 
       if (target.buffer) {
-        this.download(target.buffer, format, filename);
-        console.log("Client-side rendering and download finished!");
+        const blob = new Blob([target.buffer], { type: format === 'webm' ? "video/webm" : "video/mp4" });
+        if (download) {
+          this.download(target.buffer, format, filename);
+          console.log("Client-side rendering and download finished!");
+        }
+        return blob;
       } else {
         throw new Error("Export failed: Output buffer is empty");
       }
@@ -295,7 +317,7 @@ export class ClientSideExporter {
     } catch (e: any) {
       if (e.message === "Export aborted") {
           console.log("Export aborted by user.");
-          return;
+          return undefined;
       }
       console.error("Client-side rendering failed:", e);
       throw e;
