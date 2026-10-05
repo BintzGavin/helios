@@ -6,10 +6,10 @@ These terms cover the Helios agent plugin, the Helios MCP server (`helios mcp`),
 
 ## Licenses
 
-- The Helios engine packages (`@helios-project/*`, including the CLI and the MCP server) are licensed under the [Apache License 2.0](https://github.com/BintzGavin/helios/blob/main/LICENSE).
+- The Helios engine packages (`@helios-project/*`, including the CLI and the MCP server) are licensed under the [Elastic License 2.0](https://github.com/BintzGavin/helios/blob/main/LICENSE).
 - The Helios skills and plugin manifests in [helios-skills](https://github.com/BintzGavin/helios-skills) are licensed under the [Apache License 2.0](https://github.com/BintzGavin/helios-skills/blob/main/LICENSE).
 
-Your use of the software is governed by those licenses. Helios Cloud is a service, not software you receive, and these terms govern it. Our commitments about what stays free and open are in the [Helios pledge](https://github.com/BintzGavin/helios/blob/main/docs/PLEDGE.md).
+Your use of the software is governed by those licenses. Among other things, the Elastic License 2.0 doesn't allow offering Helios to third parties as a hosted or managed service. Helios Cloud is a service, not software you receive, and these terms govern it.
 
 ## Your content
 
@@ -25,7 +25,7 @@ You can preview videos without an account. To render in the cloud, you sign in, 
 
 ### Free use and limits
 
-Helios Cloud includes free renders with limits on how many, how long and how large. The current limits are described at https://heliosrender.com/cloud. They may change. Rendering on your own computer stays free, as described in the pledge.
+Helios Cloud includes free renders with limits on how many, how long and how large. The current limits are described at https://heliosrender.com/cloud. They may change. Rendering on your own computer stays free.
 
 ### Paid plans
 
