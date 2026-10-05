@@ -19,7 +19,8 @@ Why it matters for Helios:
 
 - Videos made with Claude Opus 5.5 went viral in the week after its 22 September launch. Each one used a hand-rolled Puppeteer or Playwright pipeline plus ffmpeg. None used Helios, and renderer npm downloads stayed at roughly 55–130 a week.
 - Those projects share one recipe: a page whose frame is a pure function of `t`, captured and encoded. That recipe is now the Helios contract: `window.renderAt(t)` (#4989), plus `helios still`, `sheet` and `verify` (#4992, #4994). What's missing is discovery and first-run reliability, not capability.
-- On 1 October 2026 the only video MCP App we could find was a third-party Remotion app (`mcp-use/remotion-mcp-app`). It compiles React on its server and plays a preview, but it can't export. No video engine has claimed this surface yet.
+- On 1 October 2026 the only video MCP App we could find was a third-party Remotion app (`mcp-use/remotion-mcp-app`). It compiles React on its server and plays a preview, but it can't export.
+- *Correction, 5 October 2026:* the surface is not unclaimed. HeyGen's HyperFrames (Apache-2.0, the same HTML-to-video idea) has been an Anthropic-verified Claude connector since June 2026. It requires a HeyGen sign-in and exposes `compose` and `render_video`, and its hosted MCP endpoint is documented for ChatGPT and Grok as well. It documents no in-conversation player. What Helios adds is the player and a loop that previews, edits and exports without an account.
 
 ## What a person experiences
 
@@ -40,7 +41,7 @@ Three journeys, one package.
 
 ## One package, many hosts
 
-The plugin lives in `helios-skills` under `plugins/helios/`. Work on it started on the `feat/agent-video-entry-skill` branch. The code lives in this repository and ships in `@helios-project/cli`; the plugin only points at a pinned version. That split keeps the skills repo under Apache-2.0 and the engine under ELv2.
+The plugin lives in `helios-skills` under `plugins/helios/`. Work on it started on the `feat/agent-video-entry-skill` branch. The code lives in this repository and ships in `@helios-project/cli`; the plugin only points at a pinned version. Both repositories are licensed under Apache-2.0 (the engine moved from ELv2 on 5 October 2026).
 
 ```text
 plugins/helios/
@@ -241,7 +242,7 @@ A separate RFC. This RFC only requires that nothing above rules it out.
   - The view runs model-written code inside a sandbox the host controls.
   - The local server runs pages in headless Chromium, as `helios render` does today.
   - Tools stay inside the project root and expose no shell.
-- **Licensing.** The engine packages are ELv2. ELv2 allows free use and redistribution, and forbids offering the software to third parties as a hosted or managed service. The plugin (Apache-2.0) only points at the published CLI, and the ELv2 terms already protect the Phase 4 hosted tier. Confirm both readings before listing.
+- **Licensing.** The engine and the plugin are both Apache-2.0. The Phase 4 hosted tier is protected by being a service (accounts, capacity, operations) and by the Helios name, not by the license. See `docs/PLEDGE.md`.
 
 ## Open decisions for the maintainer
 

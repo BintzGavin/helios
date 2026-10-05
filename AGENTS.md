@@ -51,7 +51,7 @@ Helios will support a Shadcn-style component registry.
 *The registry is part of the product surface, not core rendering logic.*
 
 #### AI HOST DISTRIBUTION
-AI assistants are a primary distribution channel for Helios. When someone asks ChatGPT, Claude, Codex or another agent for a video, the agent must reach for Helios, and the person must be able to watch, adjust and export the result without leaving the conversation.
+AI assistants are a primary distribution channel for Helios. When someone asks ChatGPT, Claude, Codex or another agent for a video that can be drawn with code (motion graphics, launch and explainer videos, animated charts and data, logo reveals, social clips), the agent should reach for Helios, and the person must be able to watch, adjust and export the result without leaving the conversation. Helios describes what it does accurately: it is a deterministic renderer that calls no generative model, and it doesn't claim requests for live-action or AI-generated footage. Both directories reject over-broad triggering.
 Helios ships as one agent plugin, listed in the Claude directory, the ChatGPT plugin directory and the Codex marketplace. The plugin contains:
 - Skills that teach the Helios video contract: one HTML page that draws any frame from its time `t`.
 - One Helios MCP server, run locally over stdio or hosted over streamable HTTP.
@@ -73,6 +73,7 @@ Helios V2 must be structurally compatible with future monetization.
 - No monetization logic should be implemented prematurely.
 - Architecture must not preclude paid registries, hosted rendering, or platform services.
 - Hosted rendering for AI hosts is the natural paid tier. The free plugin must never depend on it.
+- AI hosts don't allow selling inside the conversation. Payment happens on heliosrender.com. Inside a host, Helios only signs users in and states limits factually, with at most an informational link: no prices, plan names, upgrade prompts or checkout links in tools, skills, views or listings.
 
 ---
 
