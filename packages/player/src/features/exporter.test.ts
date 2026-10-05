@@ -8,6 +8,7 @@ const videoAddSpy = vi.fn().mockResolvedValue(undefined);
 const audioAddSpy = vi.fn().mockResolvedValue(undefined);
 const outputStartSpy = vi.fn().mockResolvedValue(undefined);
 const outputFinalizeSpy = vi.fn().mockResolvedValue(undefined);
+const outputCancelSpy = vi.fn().mockResolvedValue(undefined);
 const videoSampleSources: any[] = [];
 const samples: any[] = [];
 
@@ -20,6 +21,7 @@ vi.mock('mediabunny', () => {
             addAudioTrack = vi.fn();
             start = outputStartSpy;
             finalize = outputFinalizeSpy;
+            cancel = outputCancelSpy;
         },
         BufferTarget: class {
             buffer = new ArrayBuffer(100); // Simulate success
@@ -234,6 +236,29 @@ describe('ClientSideExporter', () => {
 
         expect(samples).toHaveLength(1);
         expect(samples[0].close).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels the output, releasing the encoder, when the export is aborted or fails', async () => {
+        const controller = new AbortController();
+        mockController.captureFrame = vi.fn().mockImplementation(async () => {
+            controller.abort();
+            return { frame: new VideoFrame({} as any, {}), captions: [] };
+        });
+        await exporter.export({ onProgress: vi.fn(), signal: controller.signal, mode: 'canvas', download: false });
+        expect(outputCancelSpy).toHaveBeenCalledTimes(1);
+
+        outputCancelSpy.mockClear();
+        mockController.captureFrame = vi.fn().mockResolvedValue({ frame: new VideoFrame({} as any, {}), captions: [] });
+        videoAddSpy.mockRejectedValueOnce(new Error('encoder error'));
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        await expect(exporter.export({ onProgress: vi.fn(), mode: 'canvas' })).rejects.toThrow('encoder error');
+        expect(outputCancelSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not cancel the output of a finished export', async () => {
+        await exporter.export({ onProgress: vi.fn(), mode: 'canvas', download: false });
+        expect(outputFinalizeSpy).toHaveBeenCalled();
+        expect(outputCancelSpy).not.toHaveBeenCalled();
     });
 
     it('returns the file as a Blob without clicking a link when download is false', async () => {

@@ -60,6 +60,8 @@ export class ClientSideExporter {
 
     console.log(`Client-side rendering started! Format: ${format}`);
     this.controller.pause();
+    /** The output while it is open, so a failed or aborted export can cancel it. */
+    let unfinished: Output | null = null;
 
     try {
       const state = this.controller.getState();
@@ -202,6 +204,7 @@ export class ClientSideExporter {
           format: outputFormat,
           target
       });
+      unfinished = output;
 
       // 4. Setup Video Track
       const videoConfig: VideoEncodingConfig = {
@@ -302,6 +305,7 @@ export class ClientSideExporter {
       }
 
       await output.finalize();
+      unfinished = null;
 
       if (target.buffer) {
         const blob = new Blob([target.buffer], { type: format === 'webm' ? "video/webm" : "video/mp4" });
@@ -315,6 +319,8 @@ export class ClientSideExporter {
       }
 
     } catch (e: any) {
+      // Release the encoder and muxer of an export that won't finish.
+      if (unfinished) await unfinished.cancel().catch(() => {});
       if (e.message === "Export aborted") {
           console.log("Export aborted by user.");
           return undefined;
