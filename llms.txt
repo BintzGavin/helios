@@ -5,7 +5,7 @@
 Helios is a modern engine for creating videos programmatically using standard web technologies—HTML, CSS, and JavaScript. Unlike Remotion (React-only), Helios works with any framework or vanilla JS.
 
 ## Quick Facts
-- **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
+- **License**: Apache-2.0 (free for any use, including commercial and hosted)
 - **Status**: Beta / Self-Driving (Core: Stable v5.13.0+, Studio: Alpha v0.107.1+, Player: v0.78.1+, Renderer: v1.78.3+, CLI: Beta v0.45.2+, Infrastructure: v0.25.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library

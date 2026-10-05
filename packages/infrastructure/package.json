@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Distributed rendering orchestration and cloud execution adapters.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
-  "license": "ELv2",
+  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },

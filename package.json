@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/BintzGavin/helios.git"
   },
-  "license": "ELv2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/BintzGavin/helios/issues"
   },
