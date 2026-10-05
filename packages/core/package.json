@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Core library for Helios video engine.",
   "author": "Gavin Bintz <me@gavinbintz.com>",
-  "license": "Apache-2.0",
+  "license": "ELv2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BintzGavin/helios.git"

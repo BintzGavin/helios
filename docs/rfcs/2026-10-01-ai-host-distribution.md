@@ -41,7 +41,7 @@ Three journeys, one package.
 
 ## One package, many hosts
 
-The plugin lives in `helios-skills` under `plugins/helios/`. Work on it started on the `feat/agent-video-entry-skill` branch. The code lives in this repository and ships in `@helios-project/cli`; the plugin only points at a pinned version. Both repositories are licensed under Apache-2.0 (the engine moved from ELv2 on 5 October 2026).
+The plugin lives in `helios-skills` under `plugins/helios/`. Work on it started on the `feat/agent-video-entry-skill` branch. The code lives in this repository and ships in `@helios-project/cli`; the plugin only points at a pinned version. That split keeps the skills repo under Apache-2.0 and the engine under ELv2.
 
 ```text
 plugins/helios/
@@ -242,7 +242,7 @@ A separate RFC. This RFC only requires that nothing above rules it out.
   - The view runs model-written code inside a sandbox the host controls.
   - The local server runs pages in headless Chromium, as `helios render` does today.
   - Tools stay inside the project root and expose no shell.
-- **Licensing.** The engine and the plugin are both Apache-2.0. The Phase 4 hosted tier is protected by being a service (accounts, capacity, operations) and by the Helios name, not by the license. See `docs/PLEDGE.md`.
+- **Licensing.** The engine packages are ELv2. ELv2 allows free use and redistribution, and forbids offering the software to third parties as a hosted or managed service. The plugin (Apache-2.0) only points at the published CLI, and the ELv2 terms already protect the Phase 4 hosted tier. Confirm both readings before listing.
 
 ## Open decisions for the maintainer
 

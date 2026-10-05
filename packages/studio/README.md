@@ -130,4 +130,4 @@ To run the Studio package locally for development (contributing):
 
 ## License
 
-Apache License 2.0. See the root [LICENSE](../../LICENSE).
+Elastic License 2.0 (ELv2). See root [LICENSE](../../LICENSE) for details.
