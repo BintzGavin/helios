@@ -33,7 +33,7 @@
     { "name": "helios_library", "description": "Your video pages and renders" }
   ],
   "keywords": ["video", "mp4", "animation", "motion graphics", "rendering"],
-  "license": "Apache-2.0",
+  "license": "ELv2",
   "user_config": {
     "root": {
       "type": "directory",

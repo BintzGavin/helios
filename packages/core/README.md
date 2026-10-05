@@ -183,4 +183,4 @@ Helios.diagnose().then((report) => {
 
 ## License
 
-Apache License 2.0. See the root [LICENSE](../../LICENSE).
+Elastic License 2.0 (ELv2)
