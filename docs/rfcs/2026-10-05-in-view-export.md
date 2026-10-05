@@ -187,7 +187,7 @@ Exports of 60 s at 1080p, in headless shell (`long.mjs`):
   - for DOM pages, either add Google Fonts to `connectDomains`, or inline web fonts in `read_page` on the server, which keeps `connect-src` closed;
   - neither path adds compute.
 - **Hosted endpoint (later, storage only):**
-  - an app-only `upload_export` with the same chunk contract, which stores the file and returns a short-lived link;
+  - an app-only `upload_export` with the same chunk contract, which stores the file and returns a short-lived link (it needs its own server-side limits: app-only is not a security boundary, see [Production design](#production-design));
   - the view then opens it with `ui/open-link`.
   - This is storage, not rendering. It still means Helios holds user files, which the 1 October RFC ties to Phase 4 accounts.
 
@@ -217,20 +217,25 @@ What shipped on `feat/in-view-export`. Where it differs from the recommendation 
   1. The host advertises `downloadFile`: `ui/download-file` with one embedded resource, `file:///<page>.mp4`, in base64.
   2. Otherwise, `save_export` in 1 MB base64 chunks. The panel shows the saved file's absolute path, with Show in Finder and Open.
   3. The server has no `save_export`, so the first chunk gets "tool not found": the view says "This host can't receive files from the player, so the MP4 is being made with Render MP4 instead." and starts Render MP4. Later clicks go straight to Render MP4. A browser without `VideoEncoder` gets the same fallback.
-- An export over 200 MB is not sent to `save_export`; the view says so and points to Render MP4.
+- An export over 200 MB goes out by neither path. The view checks before encoding it as base64, says so, and points to Render MP4.
+- Cancel works at any point before delivery. During an upload it also sends `save_export` with `abort: true`, so the server frees the upload at once.
+- Loading another page ends a running export immediately. The view races the page exporter against the abort signal, so a detached frame whose promise never settles can't leave the controls disabled. Seeks queued during an export wait until it ends.
 - This differs from the recommendation: the button is never hidden. When the file can't leave the sandbox, the existing render path takes over. The view never uses `<a download>`.
 
 ### Server (`helios mcp`)
 
 - `_meta.ui.csp.connectDomains` lists the same five origins as `resourceDomains`: cdnjs, jsDelivr, unpkg, and Google Fonts' stylesheets and font files. The exporter can then fetch what the page loads. Server-side font inlining in `read_page` was not built.
-- `save_export`, in `packages/cli/src/mcp/exports.ts`, is app-only (`ui.visibility: ["app"]`, `"openai/visibility": "private"`), like `read_page`:
-  - Arguments: `name`, `uploadId` (8–64 of `A–Z a–z 0–9 - _`), `index`, `total`, and `data`, base64 of at most 1 MB.
-  - The name is a bare `.mp4` file name: no `/`, `\` or `..`, no control or Windows-reserved characters, not hidden, at most 200 characters.
+- `save_export`, in `packages/cli/src/mcp/exports.ts`, is app-only (`ui.visibility: ["app"]`, `"openai/visibility": "private"`), like `read_page`.
+  - **App-only is not a security boundary.** It keeps the tool out of the model's tool list, nothing more. The page playing in the view's `srcdoc` frame shares the view's origin. It can post `tools/call` through the host bridge, or install its own `window.__helios_export` and wait for a click on Export MP4. So the server's own limits are the boundary, and they apply whoever calls.
+  - Arguments: `name`, `uploadId` (8–64 of `A–Z a–z 0–9 - _`), `index`, `total`, and `data`, base64 of at most 1 MB. With `abort: true` instead of `data`, the upload is dropped.
+  - The name is a bare `.mp4` file name: no `/`, `\` or `..`, no control or Windows-reserved characters, no bidi controls (U+202A–U+202E, U+2066–U+2069), no Windows device name such as `CON` or `LPT1`, not hidden, at most 200 characters.
   - The first chunk must start with an `ftyp` box.
-  - Chunks arrive in order. A repeat of the last chunk with the same bytes is acknowledged as a retry; any other out-of-order chunk drops the upload.
-  - The cap is 200 MB; the spike prototyped 256 MB.
-  - Chunks stay in memory until the last one arrives. At most 256 MB and 4 uploads are held at once; making room drops the least recently active upload. An upload with no chunk for 10 minutes is dropped.
-  - The file goes to `exports/<name>` inside the project root, through the same path checks as the other tools, so a symlinked `exports` that leads outside is refused. It is written to a `.part` file and renamed. An earlier export with the same name is replaced.
+  - Chunks arrive in order. A repeat of the last chunk with the same bytes is acknowledged as a retry; any other out-of-order chunk drops the upload. For 10 minutes after the file is saved, a retried final chunk gets the saved path again.
+  - The cap is 200 MB per export; the spike prototyped 256 MB.
+  - Per server process, across sessions: at most 50 saved exports and 2 GB written. Past either limit, the tool says so and points to Render MP4.
+  - Chunks stay in memory until the file is written. At most 256 MB and 4 uploads are held at once, counting exports still being written; making room drops the least recently active upload. An upload with no chunk for 10 minutes is dropped.
+  - The file goes to `exports/<name>` inside the project root. Only the folder is resolved, through the same path checks as the other tools, so a symlinked `exports` that leads outside is refused. The bare name is then joined to the folder, and a symlink at that name is refused.
+  - An export never replaces a file. A taken name gets `-2`, `-3` and so on. The file is written to a `.part` file and renamed.
   - The last chunk returns `path` and `absolutePath`.
 
 ### Verification
@@ -239,7 +244,9 @@ What shipped on `feat/in-view-export`. Where it differs from the recommendation 
 - **View end to end** (`packages/cli/src/mcp/view/__tests__/player.export.test.ts`). It runs the built view, the real seek shim and the real server in a fake host whose CSP is built from the view's `_meta.ui.csp`, as basic-host builds it.
   - A 320×180 canvas page exports through `save_export`. Every sampled frame's color is within 4 of the page's at that time.
   - A DOM page with a routed Google Font and a CSS animation exports through a host that advertises `downloadFile`. Frame 30 is 40 dB from a screenshot of the page at t = 1 s. With `connectDomains` taken out of the CSP, the same check measured 13 dB, because the text fell back to another font.
-  - The Render MP4 fallback, and cancelling.
+  - The Render MP4 fallback, and cancelling, including mid-upload, which frees the server's upload.
+  - Another page loading during an export that never settles, which leaves the controls enabled.
+  - A 201 MB export refused before reaching a host that advertises `downloadFile`.
 - **Acceptance at 1080p.** The spike's `canvas.html` and `dom-font.html`, 5 s at 30 fps, with real Google Fonts, in the headless shell on the same M3 Pro. Export time runs from the click to the saved file. PSNR is against a screenshot of the page seeked with the shim, so it compares with the "Encoded" column above.
 
 | Page | Delivery | Export | Size | Frames | PSNR in dB, frames 12 / 30 / 51 / 78 / 126 |
@@ -256,6 +263,10 @@ What shipped on `feat/in-view-export`. Where it differs from the recommendation 
 - A streaming target. The whole MP4 is still held in memory, and the bitrate is still a fixed 5 Mbps.
 - Inlining only the font subsets a page uses.
 - Checking whether Claude and ChatGPT advertise `downloadFile`, and their argument limits for `tools/call`.
+
+### Follow-up
+
+- **Isolate the page from the view.** Sandbox the `srcdoc` frame without `allow-same-origin`, so the page gets an opaque origin and can't reach the view's bridge or its tools. The view would then drive seeking, capture and export over `postMessage` instead of calling `window.__helios_seek` and `window.__helios_export` directly. Until then, `save_export`'s server-side limits are what stand between a page and the disk.
 
 ## Remaining risks
 
