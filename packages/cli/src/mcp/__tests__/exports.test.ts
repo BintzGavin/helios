@@ -12,6 +12,9 @@ import {
   SAVE_EXPORT_MAX_BYTES,
   SAVE_EXPORT_MAX_CHUNK_CHARS,
   SAVE_EXPORT_MAX_CHUNKS,
+  ExportQuota,
+  SAVE_EXPORT_MAX_FILES,
+  SAVE_EXPORT_MAX_TOTAL_BYTES,
 } from '../exports.js';
 
 /** An MP4-shaped payload: an ftyp box, then deterministic filler. */
@@ -81,6 +84,13 @@ describe('sanitizeExportName', () => {
     ['a*b.mp4', 'a wildcard'],
     ['x'.repeat(200) + '.mp4', 'too long'],
     ['', 'empty'],
+    ['CON.mp4', 'a Windows device name'],
+    ['nul.mp4', 'a Windows device name in lower case'],
+    ['Com1.mp4', 'a COM port'],
+    ['lpt9.mp4', 'an LPT port'],
+    ['aux.final.mp4', 'a device name before the first dot'],
+    ['evil‮gnp.mp4', 'a right-to-left override'],
+    ['a⁦b.mp4', 'a bidi isolate'],
   ])('refuses %j (%s)', (name) => {
     expect(() => sanitizeExportName(name)).toThrow(ExportError);
   });
@@ -120,13 +130,97 @@ describe('ExportUploads', () => {
     expect(uploads.bufferedBytes).toBe(0);
   });
 
-  it('replaces an earlier export with the same name', async () => {
+  it('never replaces an earlier export: a taken name gets -2, -3 and so on', async () => {
     const uploads = new ExportUploads(root);
     fs.mkdirSync(path.join(root, 'exports'));
     fs.writeFileSync(path.join(root, 'exports', 'clip.mp4'), 'old');
     const file = mp4(100);
     const r = await uploads.receive({ name: 'clip.mp4', uploadId: 'upload-0002', index: 0, total: 1, data: file.toString('base64') });
+    expect(r.path).toBe('exports/clip-2.mp4');
     expect(fs.readFileSync(r.absolutePath!).equals(file)).toBe(true);
+    expect(fs.readFileSync(path.join(root, 'exports', 'clip.mp4'), 'utf8')).toBe('old');
+    const r3 = await uploads.receive({ name: 'clip.mp4', uploadId: 'upload-0003', index: 0, total: 1, data: file.toString('base64') });
+    expect(r3.path).toBe('exports/clip-3.mp4');
+  });
+
+  it('refuses a symlink at the target name instead of writing through it', async () => {
+    const outside = path.join(tmp, 'victim.mp4');
+    fs.writeFileSync(outside, 'keep me');
+    const inside = path.join(root, 'notes.txt');
+    fs.writeFileSync(inside, 'keep me too');
+    fs.mkdirSync(path.join(root, 'exports'));
+    fs.symlinkSync(outside, path.join(root, 'exports', 'out.mp4'));
+    fs.symlinkSync(inside, path.join(root, 'exports', 'in.mp4'));
+    const uploads = new ExportUploads(root);
+    for (const name of ['out.mp4', 'in.mp4']) {
+      await expect(uploads.receive({ name, uploadId: 'upload-0004', index: 0, total: 1, data: mp4(64).toString('base64') }))
+        .rejects.toThrow(/symlink/);
+    }
+    expect(fs.readFileSync(outside, 'utf8')).toBe('keep me');
+    expect(fs.readFileSync(inside, 'utf8')).toBe('keep me too');
+  });
+
+  it('caps saved exports per server process by count and by total bytes', async () => {
+    expect(SAVE_EXPORT_MAX_FILES).toBe(50);
+    expect(SAVE_EXPORT_MAX_TOTAL_BYTES).toBe(2 * 1024 * 1024 * 1024);
+
+    const byCount = new ExportUploads(root, { quota: new ExportQuota({ maxFiles: 2 }) });
+    const send = (u: ExportUploads, id: string, bytes = 64) =>
+      u.receive({ name: 'x.mp4', uploadId: id, index: 0, total: 1, data: mp4(bytes).toString('base64') });
+    await send(byCount, 'count-001');
+    await send(byCount, 'count-002');
+    await expect(send(byCount, 'count-003')).rejects.toThrow(/limit of 2 exports/);
+
+    // The quota is shared: two upload stores on one quota count together.
+    const quota = new ExportQuota({ maxBytes: 150 });
+    await send(new ExportUploads(root, { quota }), 'bytes-001', 100);
+    await expect(send(new ExportUploads(root, { quota }), 'bytes-002', 100)).rejects.toThrow(/limit of 150 bytes/);
+    expect(quota.files).toBe(1);
+    expect(quota.bytes).toBe(100);
+  });
+
+  it('frees an upload when the view cancels it', async () => {
+    const uploads = new ExportUploads(root, { chunkBytes: 100 });
+    const parts = chunksOf(mp4(200), 100);
+    await uploads.receive({ name: 'x.mp4', uploadId: 'abort-0001', index: 0, total: 2, data: parts[0] });
+    expect(uploads.bufferedBytes).toBe(100);
+    expect(uploads.abort('abort-0001')).toBe(true);
+    expect(uploads.size).toBe(0);
+    expect(uploads.bufferedBytes).toBe(0);
+    expect(uploads.abort('abort-0001')).toBe(false);
+    await expect(uploads.receive({ name: 'x.mp4', uploadId: 'abort-0001', index: 1, total: 2, data: parts[1] })).rejects.toThrow(/unknown or expired/);
+  });
+
+  it('answers a retried final chunk with the saved file instead of saving it twice', async () => {
+    const uploads = new ExportUploads(root, { chunkBytes: 100 });
+    const file = mp4(200);
+    const parts = chunksOf(file, 100);
+    await uploads.receive({ name: 'x.mp4', uploadId: 'retry-0001', index: 0, total: 2, data: parts[0] });
+    const done = await uploads.receive({ name: 'x.mp4', uploadId: 'retry-0001', index: 1, total: 2, data: parts[1] });
+    const again = await uploads.receive({ name: 'x.mp4', uploadId: 'retry-0001', index: 1, total: 2, data: parts[1] });
+    expect(again).toEqual(done);
+    expect(fs.readdirSync(path.join(root, 'exports'))).toEqual(['x.mp4']);
+    // Other bytes under the finished id are not a retry.
+    await expect(uploads.receive({ name: 'x.mp4', uploadId: 'retry-0001', index: 1, total: 2, data: parts[0] })).rejects.toThrow(/unknown or expired/);
+  });
+
+  it('forgets finished uploads after the idle timeout', async () => {
+    let now = 0;
+    const uploads = new ExportUploads(root, { idleMs: 1000, now: () => now });
+    const data = mp4(64).toString('base64');
+    await uploads.receive({ name: 'x.mp4', uploadId: 'retry-0002', index: 0, total: 1, data });
+    now = 2000;
+    // A fresh upload under the old id, not a retry: saved again, under a new name.
+    const r = await uploads.receive({ name: 'x.mp4', uploadId: 'retry-0002', index: 0, total: 1, data });
+    expect(r.path).toBe('exports/x-2.mp4');
+  });
+
+  it('counts an export toward the memory bound until it is written', async () => {
+    const uploads = new ExportUploads(root);
+    const pending = uploads.receive({ name: 'x.mp4', uploadId: 'write-0001', index: 0, total: 1, data: mp4(500).toString('base64') });
+    expect(uploads.bufferedBytes).toBe(500);
+    await pending;
+    expect(uploads.bufferedBytes).toBe(0);
   });
 
   it('refuses unsafe names before buffering anything', async () => {
@@ -219,11 +313,21 @@ describe('ExportUploads', () => {
     expect(fs.readdirSync(outside)).toEqual([]);
   });
 
-  it('refuses to replace a folder with the export', async () => {
-    fs.mkdirSync(path.join(root, 'exports', 'x.mp4'), { recursive: true });
+  it('leaves a folder with the export name alone and saves beside it', async () => {
+    fs.mkdirSync(path.join(root, 'exports', 'x.mp4', 'inner'), { recursive: true });
     const uploads = new ExportUploads(root);
-    await expect(uploads.receive({ name: 'x.mp4', uploadId: 'upload-0014', index: 0, total: 1, data: mp4(64).toString('base64') }))
-      .rejects.toThrow(/is a folder/);
+    const r = await uploads.receive({ name: 'x.mp4', uploadId: 'upload-0014', index: 0, total: 1, data: mp4(64).toString('base64') });
+    expect(r.path).toBe('exports/x-2.mp4');
+    expect(fs.statSync(path.join(root, 'exports', 'x.mp4')).isDirectory()).toBe(true);
+    expect(fs.readdirSync(path.join(root, 'exports', 'x.mp4'))).toEqual(['inner']);
+  });
+
+  it('refuses an exports path that is a file, not a folder', async () => {
+    fs.writeFileSync(path.join(root, 'exports'), 'not a folder');
+    const uploads = new ExportUploads(root);
+    await expect(uploads.receive({ name: 'x.mp4', uploadId: 'upload-0015', index: 0, total: 1, data: mp4(64).toString('base64') }))
+      .rejects.toThrow();
+    expect(fs.readFileSync(path.join(root, 'exports'), 'utf8')).toBe('not a folder');
   });
 
   it('drops an upload after the idle timeout, even with no further calls', async () => {

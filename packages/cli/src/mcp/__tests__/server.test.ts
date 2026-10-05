@@ -151,7 +151,7 @@ describe('helios MCP server: listing', () => {
     expect(byName.read_page._meta).toEqual(appOnly);
     expect(byName.list_videos._meta).toEqual(appOnly);
     expect(byName.reveal_file._meta).toEqual(appOnly);
-    // Hidden from the model: only the view calls it, to hand over an MP4 it encoded.
+    // Out of the model's tool list. Not a security boundary: anything in the view's origin can call it.
     expect(byName.save_export._meta).toEqual(appOnly);
     expect(byName.save_export.annotations).toMatchObject({ readOnlyHint: false, openWorldHint: false });
     expect((byName.save_export.inputSchema.properties as any).data.maxLength).toBe(Math.ceil((1024 * 1024) / 3) * 4);
@@ -365,6 +365,26 @@ describe('helios MCP server: preview, library, pages', () => {
     expect(last.structuredContent).toEqual({ received: 3, total: 3, bytes: file.length, path: 'exports/intro.mp4', absolutePath: abs });
     expect(last.content[0].text).toBe(`Saved exports/intro.mp4 (2.5 MB). It is at ${abs}`);
     expect(fs.readFileSync(abs).equals(file)).toBe(true);
+  });
+
+  it('save_export with abort: true frees an upload the view cancelled', async () => {
+    await connect();
+    const first = Buffer.alloc(1024, 1);
+    Buffer.from([0, 0, 0, 24, 0x66, 0x74, 0x79, 0x70]).copy(first, 0);
+    const start = await call('save_export', { name: 'c.mp4', uploadId: 'view-cancel-1', index: 0, total: 3, data: first.toString('base64') });
+    expect(start.isError).toBeFalsy();
+    expect(helios.exports.size).toBe(1);
+
+    const aborted = await call('save_export', { name: 'c.mp4', uploadId: 'view-cancel-1', index: 0, total: 3, abort: true });
+    expect(aborted.isError).toBeFalsy();
+    expect(aborted.structuredContent).toEqual({ received: 0, total: 3, bytes: 0, aborted: true });
+    expect(helios.exports.size).toBe(0);
+    expect(helios.exports.bufferedBytes).toBe(0);
+
+    // Without abort, a chunk still needs data.
+    const empty = await call('save_export', { name: 'c.mp4', uploadId: 'view-cancel-2', index: 0, total: 1 });
+    expect(empty.isError).toBe(true);
+    expect(empty.content[0].text).toMatch(/data is empty/);
   });
 
   it('save_export turns refusals into tool errors', async () => {

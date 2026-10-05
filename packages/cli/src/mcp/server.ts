@@ -293,6 +293,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   );
 
   // ---- App-only tools ---------------------------------------------------------------------
+  // Kept out of the model's tool list. That is not a security boundary: the view, and a page
+  // playing in its srcdoc frame (same origin), can call any of them, so each checks its input.
 
   server.registerTool(
     'read_page',
@@ -367,13 +369,15 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description:
         `Saves an MP4 that the Helios player encoded in the browser into the project's exports folder. ` +
         `The file arrives in order as base64 chunks of at most ${formatBytes(SAVE_EXPORT_CHUNK_BYTES)}, ` +
-        `${formatBytes(SAVE_EXPORT_MAX_BYTES)} in all; the last chunk returns the saved file's path.`,
+        `${formatBytes(SAVE_EXPORT_MAX_BYTES)} in all; the last chunk returns the saved file's path. ` +
+        'It never replaces a file: a taken name gets -2, -3 and so on. Pass abort: true to drop an upload.',
       inputSchema: {
         name: z.string().min(1).max(260).describe('File name ending in .mp4, without folders'),
         uploadId: z.string().min(8).max(64).describe('The same random id for every chunk of one file (letters, digits, - and _)'),
         index: z.number().int().min(0).describe('This chunk\'s position, from 0'),
         total: z.number().int().min(1).max(SAVE_EXPORT_MAX_CHUNKS).describe('How many chunks the file has'),
-        data: z.string().min(1).max(SAVE_EXPORT_MAX_CHUNK_CHARS).describe('The chunk\'s bytes, base64'),
+        data: z.string().max(SAVE_EXPORT_MAX_CHUNK_CHARS).optional().describe('The chunk\'s bytes, base64 (required unless abort is true)'),
+        abort: z.literal(true).optional().describe('Drop this upload instead of adding a chunk, when the person cancels'),
       },
       outputSchema: {
         received: z.number(),
@@ -381,12 +385,20 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         bytes: z.number(),
         path: z.string().optional(),
         absolutePath: z.string().optional(),
+        aborted: z.boolean().optional(),
       },
       annotations: { title: 'Save export', readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       _meta: APP_ONLY_META,
     },
     guard(async (args) => {
-      const progress = await exportUploads.receive(args);
+      if (args.abort) {
+        const dropped = exportUploads.abort(args.uploadId);
+        return {
+          content: [{ type: 'text', text: dropped ? `Dropped upload ${args.uploadId}.` : `No upload ${args.uploadId} in progress.` }],
+          structuredContent: { received: 0, total: args.total, bytes: 0, aborted: true },
+        };
+      }
+      const progress = await exportUploads.receive({ ...args, data: args.data ?? '' });
       const text = progress.absolutePath
         ? `Saved ${progress.path} (${formatBytes(progress.bytes)}). It is at ${progress.absolutePath}`
         : `Received chunk ${progress.received} of ${progress.total}.`;
