@@ -174,6 +174,8 @@ describe('player.html view with a fake MCP Apps host', { timeout: 60_000 }, () =
       const v = view();
       expect(await v.evaluate(() => document.documentElement.dataset.theme)).toBe('dark');
       expect(await v.isVisible('#fs')).toBe(true);
+      // The source view has no page exporter bundled in (scripts/copy-view.js adds it): no Export MP4.
+      expect(await v.isVisible('#export')).toBe(false);
 
       // Pause, then scrub to 2.0 s.
       await v.click('#play');
