@@ -13,7 +13,7 @@ The page is a fixed grid:
 - The **header** across the top, 40 pixels tall.
 - The **sidebar** on the left, 250 pixels wide by default, from below the header to the bottom of the window.
 - The **inspector** on the right, 300 pixels wide by default, from below the header to the bottom of the window.
-- The **stage** in the middle, taking whatever space is left.
+- The **stage** in the middle, taking whatever space is left, but never less than its toolbar's width, about 938 pixels, so a window narrower than about 1500 pixels pushes the inspector past its right edge, where it cannot be reached (seen in the automated pass of 2026-10-07; [B-77](../bug-triage.md#b-77-the-stage-never-shrinks-below-about-938-pixels-pushing-the-inspector-off-a-narrow-window)).
 - The **timeline panel** below the stage, between the sidebar and the inspector, 300 pixels tall by default.
 
 Three [panel dividers](../glossary.md#the-workspace) resize the sidebar, the inspector, and the timeline panel. Each is an invisible strip 10 pixels wide, centered on the edge it moves; hovering it shows a resize pointer and turns it blue.
@@ -60,7 +60,7 @@ stateDiagram-v2
 | Hot reload | No effect. | No effect. |
 | Project changed on disk | No effect. | No effect. |
 
-Studio has no minimum window size. In a small window the stage shrinks first, down to nothing; the remembered sizes of the other areas are kept.
+Studio has no minimum window size, and the remembered sizes of the other areas are kept in a small window. Read from the code, the stage would shrink first, down to nothing; in the automated pass of 2026-10-07 it stopped at about 938 pixels instead, and the inspector went off the page ([B-77](../bug-triage.md#b-77-the-stage-never-shrinks-below-about-938-pixels-pushing-the-inspector-off-a-narrow-window)).
 
 ## The header
 
@@ -73,7 +73,7 @@ While any [dialog](#dialogs) is open, its overlay covers the header too, so neit
 
 ## The sidebar
 
-The sidebar has six tabs, in this order, with Compositions shown first by default:
+The sidebar has six tabs, in this order, with Compositions shown first by default. At the default width of 250 pixels the row of tabs is about 507 pixels wide: Components is cut off at the sidebar's edge, and Captions, Audio, and Renders lie under the stage, where a click lands on the composition, so they can be clicked only once the sidebar is widened to about 540 pixels (seen in the automated pass of 2026-10-07; [B-76](../bug-triage.md#b-76-at-the-default-sidebar-width-the-last-sidebar-tabs-lie-under-the-stage-and-cannot-be-clicked)).
 
 | Tab | Shows | Described in |
 | --- | --- | --- |
