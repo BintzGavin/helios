@@ -58,6 +58,7 @@
         "examples/svelte-audio-visualization",
         "examples/vue-audio-visualization",
         "examples/pixi-animation",
+        "examples/shaders",
         "examples/solid-audio-visualization",
         "examples/react-components"
       ]

@@ -27,6 +27,9 @@ async function verifyModeSpecificLaunchArguments(): Promise<void> {
   assert.ok(!canvasArgs.includes('--disable-software-rasterizer'), 'The software rasterizer must stay available by default');
   const noGpuArgs = new BrowserPool({ ...baseOptions, mode: 'canvas', browserConfig: { gpu: false } }).getLaunchOptions().args;
   assert.ok(noGpuArgs.includes('--disable-gpu'), 'browserConfig.gpu: false must disable the GPU');
+
+  // Headless Chromium returns no WebGPU adapter without this flag.
+  assert.ok(domArgs.includes('--enable-unsafe-webgpu') && canvasArgs.includes('--enable-unsafe-webgpu'), 'WebGPU must be enabled by default');
 }
 
 async function verifyModeSelectsTheCorrectClock(): Promise<void> {

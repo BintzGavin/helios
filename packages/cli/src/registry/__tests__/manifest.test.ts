@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { registry, findComponent } from '../manifest.js';
 
 describe('Registry Manifest', () => {
@@ -9,6 +10,7 @@ describe('Registry Manifest', () => {
     expect(names).toContain('timer');
     expect(names).toContain('progress-bar');
     expect(names).toContain('watermark');
+    expect(names).toContain('shaders');
   });
 
   it('should have valid ComponentDefinition structure for each component', () => {
@@ -36,6 +38,11 @@ describe('Registry Manifest', () => {
     const comp = findComponent('timer');
     expect(comp).toBeDefined();
     expect(comp?.name).toBe('timer');
+  });
+
+  it('installs the same Shaders adapter the shaders-animation example runs', () => {
+    const example = readFileSync(new URL('../../../../../examples/shaders-animation/src/heliosShader.ts', import.meta.url), 'utf8');
+    expect(findComponent('shaders')?.files[0].content).toBe(example);
   });
 
   it('findComponent should return undefined for unknown components', () => {

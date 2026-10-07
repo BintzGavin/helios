@@ -30,7 +30,9 @@ const DEFAULT_BROWSER_ARGS = [
   '--disable-threaded-scrolling',
   '--disable-checker-imaging',
   '--disable-image-animation-resync',
-  '--disable-smooth-scrolling'
+  '--disable-smooth-scrolling',
+  // Headless Chromium hides navigator.gpu's adapter without it, so WebGPU pages render blank.
+  '--enable-unsafe-webgpu'
 ];
 
 const GPU_DISABLED_ARGS = [
