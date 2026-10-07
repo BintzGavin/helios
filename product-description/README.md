@@ -219,9 +219,9 @@ Status is one of `not started`, `drafted`, or `verified`.
 | panels/the-captions-panel.md | drafted |
 | panels/the-audio-mixer.md | drafted |
 | panels/the-components-panel.md | drafted |
-| help/shortcuts-and-diagnostics.md | not started |
-| help/the-assistant.md | not started |
-| cross-cutting/changes-from-outside-studio.md | not started |
+| help/shortcuts-and-diagnostics.md | drafted |
+| help/the-assistant.md | drafted |
+| cross-cutting/changes-from-outside-studio.md | drafted |
 
 ## Reference
 
