@@ -153,7 +153,7 @@ Studio keeps these values in the browser's local storage. Each is written as soo
 | Safe-area guides | Off | No | Toggled | [The stage toolbar](../stage/the-stage-toolbar.md) |
 | Timeline zoom | Fit | No | The zoom slider moves | [The timeline](../playback/the-timeline.md) |
 | Active composition | The first composition the server lists | No | A composition is opened | [When the page loads](#when-the-page-loads) |
-| Timeline state: in point, out point, loop, playhead position | In 0, out at the total frames, loop off, frame 0 | Yes, by composition ID | The in or out point or loop changes; playback pauses; the page is closed or reloaded; and, with the wrong values for a moment, a switch to another composition | [The playback range](../playback/the-playback-range.md#how-the-range-is-remembered) |
+| Timeline state: in point, out point, loop, playhead position | In 0, out at the total frames, loop off, frame 0 | Yes, by composition ID | The in or out point or loop changes; playback pauses; the page is closed or reloaded; and at a switch, under the new composition's ID with the old one's values | [The playback range](../playback/the-playback-range.md#how-the-range-is-remembered) |
 | Render settings | Canvas mode, nothing else set | No | Any render setting changes | [Server-side renders](../output/server-renders.md#the-render-settings) |
 
 Not remembered: the canvas size, the playback rate, volume, mute, the audio mix, the Omnibar's search text, the Compositions panel's search and open folders, the Assets panel's folder, search, and type filter, the client-side export format, the Props Editor's collapsed groups, the timeline's scroll position, and the contents of every dialog.
