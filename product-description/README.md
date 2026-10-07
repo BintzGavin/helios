@@ -216,9 +216,9 @@ Status is one of `not started`, `drafted`, or `verified`.
 | output/server-renders.md | drafted |
 | output/client-side-export.md | drafted |
 | output/snapshots-and-job-specs.md | drafted |
-| panels/the-captions-panel.md | not started |
-| panels/the-audio-mixer.md | not started |
-| panels/the-components-panel.md | not started |
+| panels/the-captions-panel.md | drafted |
+| panels/the-audio-mixer.md | drafted |
+| panels/the-components-panel.md | drafted |
 | help/shortcuts-and-diagnostics.md | not started |
 | help/the-assistant.md | not started |
 | cross-cutting/changes-from-outside-studio.md | not started |
