@@ -22,7 +22,7 @@ The player covers the composition with a dark, blurred panel carrying a message 
 | --- | --- | --- |
 | "Loading..." | From the moment a composition is opened until the player finds it | None |
 | "Connection Failed. Ensure window.helios is set or connectToParent() is called." | The composition's page loaded but the player found no composition in it within 5 seconds | Retry |
-| "Error: {message}" | The connected composition reported an error | Reload |
+| "Error: {message}" | Once connected, the composition's page raised an error nothing in it caught, or a promise in it failed with nobody waiting for it: an exception in its drawing code on a single frame is enough. The composition may go on running underneath. | Reload |
 | "Retrying..." | Briefly, after Retry or Reload is pressed, before "Loading..." | None |
 
 Retry and Reload both load the composition's page again from scratch and start the 5-second wait again.
@@ -121,9 +121,11 @@ What the user sees:
 2. Within 200 milliseconds Studio notices the new connection and puts back what it last saw from the composition: the playhead position, whether it was playing, and the input props (if it had any). It reads the schema again and applies loop and the playback range again.
 3. Not restored: the playback rate (back to 1x), volume and mute (back to the composition's own defaults, which the transport now shows), the per-track audio mix, and caption edits made in the Captions panel.
 
+Studio puts the three things back in order, props first, and gives up at the first failure. If the reloaded composition refuses the props it is given back (the edit changed its schema so that they no longer fit), the playhead position and the playing state are not put back either: the composition stays where its own code starts it, paused unless the code plays it, with its own props. A hot reload at frame 0 does not seek at all. Pressing Reload on an "Error: ..." message, or Retry, reloads the page in the same way and is restored the same way, since the address has not changed.
+
 In the Studio that `helios studio` serves, no toast announces the reload. When Studio itself runs in development mode, a "Composition reloaded" toast appears for 2 seconds.
 
-If the edit breaks the composition so that its page no longer creates a Helios instance, the player does not find one, and Studio keeps showing the last state it saw from the old page (see [Open questions](#open-questions-and-verification)).
+If the edit breaks the composition so that its page no longer creates a Helios instance, the player does not find one, and Studio keeps showing the last state it saw from the old page (see [Open questions](#open-questions-and-verification)). If the edit makes the page throw an error after it has connected, the player covers it with "Error: ..." and Reload.
 
 ## Switching compositions
 
@@ -131,11 +133,13 @@ Switching is opening another composition (see [Connecting](#connecting)) while o
 
 Read from the code, the first connection after a switch is not treated as a fresh open. Studio takes it for a hot reload of the new composition and:
 
-- applies the **previous composition's input props** to the new one, instead of the new one's default props, if the previous one had any input props;
+- applies the **previous composition's input props** to the new one, if the previous one had any; either way the new one's default props are not applied, so with nothing to carry over it shows the props its own code starts with;
 - seeks to the **previous composition's playhead position**, unless the new composition has a remembered position, which then wins;
 - **starts playing** if the previous composition was playing.
 
 Once the auto-save's wait is over (a second or more while the new composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)), the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
+
+When the new composition refuses the carried-over props (its schema does not accept them), the carry-over stops there, as it does for a hot reload: neither the previous playhead position nor the playing state is applied, and the new composition's default props are not applied either, so it shows the props its own code starts with. Its remembered playhead position is still sought. The auto-save then writes those code defaults into its `composition.json` if they differ from the saved ones.
 
 > Technical note: Studio keeps a record of the last frame, playing state, and input props it saw, together with the address of the composition they came from, and treats a new connection for the same address as a hot reload. At the moment of a switch, the record is updated with the new composition's address while it still holds the old composition's values, because the old connection has not been dropped yet.
 
@@ -172,7 +176,9 @@ A second effect of the switch is described with the range: if the new compositio
 
 - **First to verify:** whether a clock-bound composition (every example, every template) runs on its own clock in Studio as described in [Clock-bound compositions](#clock-bound-compositions). Nearly every playback claim depends on the answer.
 - Whether switching compositions carries the previous composition's input props, playhead position, and playing state into the next one, and whether the auto-save then writes those props into the next one's `composition.json`. Read from `Stage/Stage.tsx`; no test covers a switch.
-- Whether "Loading..." or "Connecting..." is what the user sees while a composition loads.
+- Whether "Loading..." or "Connecting..." is what the user sees while a composition loads. The player shows "Connecting..." when it is put on the page with nothing showing yet and "Loading..." when its address is set; Studio creates a new player for each composition, so which comes last decides the message.
+- Confirm that a hot reload, or a switch, whose props the composition refuses restores neither the playhead position nor the playing state (`Stage/Stage.tsx` lines 68 to 82 put back props, then the frame, then playing, inside one attempt that stops at the first error). For a switch this means the previous composition's props are dropped and the new composition's default props are not applied either; whether that is better or worse than the carry-over, it is not what either path intends.
+- Confirm that a single uncaught error in a connected composition's page covers it with "Error: ..." although it keeps drawing (the direct connection listens for every uncaught error and failed promise in the page, `packages/player/src/controllers.ts`, `onError`), and that Studio's transport, timeline, and Props Editor keep working behind the message.
 - What happens after an edit that breaks the composition: whether the player shows "Error: ..." or "Connection Failed...", and whether Studio's transport stays enabled against the dead page.
 - Whether a composition that makes its instance available only some time after its page has loaded is found again after a hot reload; the code suggests the player may stop looking because it still holds the old connection.
 - Whether framework compositions that update modules in place (React fast refresh, Vue, Svelte) cause a hot reload in the sense described here, or keep the same connection.
