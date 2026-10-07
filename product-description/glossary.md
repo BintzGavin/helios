@@ -20,6 +20,12 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Timeline panel.** The bottom-center area, titled "Timeline". It holds the *transport controls* on the left and the *timeline* on the right.
 
+**Transport controls.** The row at the left of the timeline panel: ⏮ (rewind to the in point), < and > (one frame back and forward), ▶ or ❚❚ (play or pause), 🔁 (loop), the mute button, the volume slider, and the speed menu. The [transport controls](playback/the-transport-controls.md) document owns them.
+
+**Timeline.** The part of the timeline panel to the right of the transport controls: a header row (the *timecode field*, the length, the zoom slider, and the "In:", "Out:", and "Fr:" readouts) above the track area (the ruler, the *composition track*, and one lane per audio track). Not the same as the timeline panel, which also holds the transport controls.
+
+**Props Editor.** The list of the active composition's input props in the inspector, one row per prop, with "Copy JSON" and "Reset" buttons. Every change applies to the preview at once, and the editor *auto-saves* the props into the composition's default props.
+
 **Panel divider.** One of three invisible 10-pixel strips that resize the sidebar (150 to 600 pixels wide), the inspector (200 to 600 pixels wide), and the timeline panel (100 to 800 pixels tall). It turns blue while hovered or dragged.
 
 **Empty state.** What the stage shows when no composition is open: "Welcome to Helios Studio" with a "+ Create Composition" button when the project has no compositions, or "No Composition Selected" with a "Select Composition (⌘K)" button when it has some.
@@ -58,7 +64,9 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Player.** The `<helios-player>` element in the stage that loads the active composition's page and drives it. In Studio it has no controls bar of its own; Studio's *transport controls* and *timeline* replace it.
 
-**Connected.** The player is connected when it has found the composition's Helios instance and Studio has noticed (Studio checks every 200 milliseconds). Until then the transport controls are disabled, the Props Editor says "No active controller", and the timeline shows placeholder numbers. A composition that has not connected within 5 seconds shows "Connection Failed..." in the stage.
+**Click layer.** The transparent layer the player lays in front of the composition. It catches every press on the composition: a click toggles playback and gives the player keyboard focus, a double-click enters fullscreen, and the composition's own buttons and links cannot be clicked.
+
+**Connected.** The player is connected when it has found the composition's Helios instance and Studio has noticed (Studio checks every 200 milliseconds). Until then the transport controls are disabled (except loop), the Props Editor says "No active controller", and the timeline shows a placeholder length of 100 frames (or, right after a switch, the previous composition's numbers). A composition that has not connected within 5 seconds shows "Connection Failed..." in the stage.
 
 **Clock-bound composition.** A composition that binds itself to the browser's document clock (its code calls `bindToDocumentTimeline()`), as every example and every Studio template does. In an ordinary browser tab the code makes such a composition take its frame from that clock, so it keeps advancing on its own and Studio's seeks and pauses do not hold. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) document owns this behavior; it is the first thing verification checks.
 
@@ -76,6 +84,10 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Playhead.** The vertical line on the timeline at the current frame.
 
+**Composition track.** The dark 24-pixel bar under the timeline's ruler that stands for the composition. The playback range's shading, the in and out markers, caption bars, composition markers, and time-prop markers sit on it.
+
+**Timecode field.** The current-frame timecode at the left of the timeline's header row. Clicking it turns it into a text box that takes a timecode or a frame number.
+
 **Playing / paused.** Whether the current frame is advancing on its own. When playback reaches the end of the *playback range* with *loop* off, it stops and the composition is paused there.
 
 **Playback rate.** How fast and in which direction playback advances: -4, -2, -1, 0.25, 0.5, 1, 2, or 4 times real time. Negative rates play in reverse. It belongs to the composition and goes back to 1 when the composition reloads.
@@ -91,6 +103,10 @@ The vocabulary used across these documents. When a document uses one of these wo
 **Input props.** The values the composition is drawn with, such as a title or a color. The composition declares them; the Props Editor shows and changes them. A change applies to the preview at once.
 
 **Schema.** The composition's optional description of its input props: each prop's type, label, limits, and group. With a schema, the Props Editor shows a field made for each type; without one, it guesses from each value.
+
+**Time prop.** An input prop that the schema declares as a number with the format "time", holding seconds. Each time prop with a numeric value shows on the composition track as a cyan diamond that can be dragged.
+
+**Auto-save.** The Props Editor writing the input props into the composition's default props in `composition.json`, about one second after they stop changing, with a "Composition updated" toast.
 
 **Markers.** Named points in time that the composition declares. They show on the timeline as small colored ticks.
 
@@ -117,6 +133,12 @@ The vocabulary used across these documents. When a document uses one of these wo
 **Ongoing.** An interaction is ongoing from the moment it can no longer end at once: for a mouse drag, the first mouse move with the button held (Studio has no distance threshold, so a one-pixel move counts); for a dialog, the first edit; for an inline field, the first keystroke; for playback, the first frame advance; for a render, the server accepting the job. A keyboard shortcut is never ongoing unless the key is held and repeats.
 
 **Drag.** A mouse interaction that became ongoing: the button went down on something, and the mouse moved before it came up. Studio's drags start on a press with no threshold and follow the pointer at once.
+
+**Scrub.** Pressing on the timeline's track area, which jumps the playhead to the frame under the pointer, and dragging, which keeps it under the pointer. The [timeline](playback/the-timeline.md) document owns it.
+
+**Snapping.** While seeking or dragging a marker on the timeline with the mouse, pulling the frame onto the nearest of frame 0, the total frames, the in and out points, composition markers, caption starts and ends, and time props, when one is within 10 screen pixels. Shift turns it off.
+
+**Drop target.** A place that accepts something dragged with the browser's own drag and drop: a folder or the empty area of the Assets panel, an asset or text field in the Props Editor, or the timeline's track area. It highlights while something is dragged over it.
 
 **Click.** A press and release of the mouse button on the same element. The browser fires a click even if the mouse moved in between, which matters on the composition (see [the preview player](foundations/the-preview-player.md#the-player-inside-the-stage)).
 
