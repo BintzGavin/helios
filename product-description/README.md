@@ -209,8 +209,8 @@ Status is one of `not started`, `drafted`, or `verified`.
 | compositions/the-omnibar.md | not started |
 | compositions/creating-and-duplicating.md | drafted |
 | compositions/composition-settings.md | drafted |
-| props/the-props-editor.md | not started |
-| props/prop-fields.md | not started |
+| props/the-props-editor.md | drafted |
+| props/prop-fields.md | drafted |
 | assets/the-assets-panel.md | drafted |
 | assets/asset-actions.md | drafted |
 | output/server-renders.md | drafted |
