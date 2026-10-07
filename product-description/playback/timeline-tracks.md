@@ -48,15 +48,15 @@ The time-prop drag is narrated in full. Pressing a composition marker and droppi
 
 **A time-prop marker** is pressed with any mouse button. The press does not change the prop, does not seek, and does not move keyboard focus.
 
-**A composition marker** is pressed with any mouse button. Studio seeks at once to the marker's time, without snapping. This press, unlike others on the timeline, moves keyboard focus as on any web page, so a text field that had focus loses it. It does not start a scrub.
+**A composition marker** is pressed with any mouse button. Studio seeks at once to the marker's time, without snapping and without rounding, so a marker at 1.23 seconds at 30 frames per second puts the playhead between frames, at 36.9 (the timecode shows frame 36, "Fr:" 37). This press, unlike others on the timeline, moves keyboard focus as on any web page, so a text field that had focus loses it. It does not start a scrub.
 
-**An asset drag** enters the track area. The whole track area gets a dashed blue outline and a faint blue tint while anything is dragged over it, including a desktop file or an image that will not be accepted.
+**An asset drag** enters the track area. The timeline's scrolling area gets a dashed blue outline and a faint blue tint while anything is dragged over the track area, including a desktop file or an image that will not be accepted. Only the track area takes the drop: over the empty background below it (see [the timeline](the-timeline.md#edge-cases)) the highlight goes out and the drop is refused, and read from the code the highlight can blink off and on as the pointer crosses from one lane or marker to another.
 
 ### Ending at once
 
 - **A time-prop marker pressed and released without moving** changes nothing.
 - **A composition marker** is done once pressed: the playhead is on the marker, and playing continues from there.
-- **An asset dropped** on the track area is assigned if all of these hold: the player is connected; the item came from the Assets panel; it is a video or an audio asset; and the composition's schema has a prop of that type. Studio then sets the first such prop, in the schema's order, to the asset's address, and, if the schema also has a prop with the same name plus "Time" (`backgroundVideo` and `backgroundVideoTime`) or a prop named exactly `time`, sets that one to the drop position in seconds (rounded to a whole frame, not snapped). Every other prop keeps its value. In any other case nothing happens. Either way the highlight disappears, and no toast appears. The playhead does not move.
+- **An asset dropped** on the track area is assigned if all of these hold: the player is connected; the item came from the Assets panel; it is a video or an audio asset; and the composition's schema has a prop of that type. Studio then sets the first such prop, in the schema's order, to the asset's address, and, if the schema also has a prop with the same name plus "Time" (`backgroundVideo` and `backgroundVideoTime`) or a prop named exactly `time`, sets that one to the drop position in seconds (rounded to a whole frame, not snapped); when it has both, whichever comes first in the schema gets it. Every other prop keeps its value. The composition checks the result like any other change, so the whole drop is refused, and nothing changes, if the address does not fit the prop (an extension its schema does not accept) or the time prop is not a number in the schema. In any other case nothing happens. A desktop file dropped here is taken from the browser, so it is not opened in place of Studio, but it is not uploaded either. Either way the highlight disappears, and no toast appears. The playhead does not move.
 
 ### Becoming ongoing
 
@@ -127,7 +127,9 @@ A **composition-marker press** is unaffected by every row: it has already jumped
 ## Edge cases
 
 - **Two video props.** A dropped video always goes to the first video prop in the schema's order; there is no way to choose another by dropping.
-- **The `time` fallback.** A schema prop named exactly `time` receives the drop position for any dropped video or audio, whether or not it belongs to that asset.
+- **The `time` fallback.** A schema prop named exactly `time` receives the drop position for any dropped video or audio, whether or not it belongs to that asset, and wins over a matching `{name}Time` prop that comes after it in the schema.
+- **Stale markers do nothing.** After a switch, the previous composition's composition markers stay on the timeline until the new composition connects; pressing one then seeks nothing, because no composition is connected, although it still takes focus out of a text field.
+- **A marker between frames.** A composition marker whose time does not fall on a frame leaves the playhead between frames, and the timecode and "Fr:" then disagree (see [the timeline](the-timeline.md#edge-cases)).
 - **Items outside the composition.** A marker, cue, or time prop before frame 0 or after the end is drawn at the nearest end of the timeline. Dragging a time-prop marker drawn at the end brings it back within the composition.
 - **Stale items.** After a switch, the previous composition's captions, markers, time props, and audio lanes stay on the timeline until the new composition connects; a new one that never connects keeps showing them.
 - **A replaced audio file.** The waveform of a file that changes on disk keeps its old shape until the page is reloaded.
@@ -140,7 +142,8 @@ A **composition-marker press** is unaffected by every row: it has already jumped
 - Confirm that time-prop markers, and the in and out markers in [the playback range](the-playback-range.md#while-ongoing), stick to their own position and move in steps of about 10 pixels unless Shift is held.
 - Confirm that caption bars and audio bars show no tooltip, although each is given one in the code.
 - Confirm that the previous composition's items stay on the timeline after a switch until the new composition connects.
-- Confirm the drop rules with a schema that has a video prop and a matching time prop, and with one that has neither.
+- Confirm the drop rules with a schema that has a video prop and a matching time prop, and with one that has neither. Confirm also that a schema with both `time` and `{name}Time` gives the drop position to whichever comes first (`Timeline.tsx`, `handleDrop`, finds the first key matching either name), and that a drop whose time prop is declared as text, or whose address the video prop's accepted extensions refuse, changes nothing at all.
+- Confirm that a drop on the empty background below the track area is refused (only the track area listens for drops) and whether the highlight blinks while dragging across lanes and markers (the area's drag-leave fires for every element the pointer leaves). The blinking and the dead background may be worth treating as bugs.
 - Read from `Timeline.tsx`, `Timeline.css`, `Timeline.test.tsx`, `TimelineAudioTrack.tsx`, `TimelineAudioTrack.test.tsx`, and `hooks/useAudioWaveform.ts`; not yet confirmed by hand.
 
 Verified against helios commit `c2bfddb`
