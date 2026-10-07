@@ -129,15 +129,17 @@ If the edit breaks the composition so that its page no longer creates a Helios i
 
 ## Switching compositions
 
-Switching is opening another composition (see [Connecting](#connecting)) while one is already open. The old composition's page is discarded at once: its playback and its sound stop, and nothing about it is written anywhere except its [timeline state](../glossary.md#the-preview), which was already remembered. The new composition then loads and connects as described above.
+Switching is opening another composition (see [Connecting](#connecting)) while one is already open. The old composition's page is discarded at once: its playback and its sound stop, and nothing about it is written anywhere; its [timeline state](../glossary.md#the-preview) was already remembered at its last pause. (The new composition's timeline state, on the other hand, is written at once with the old one's values; see [how the range is remembered](../playback/the-playback-range.md#how-the-range-is-remembered).) The new composition then loads and connects as described above.
 
-Read from the code, the first connection after a switch is not treated as a fresh open. Studio takes it for a hot reload of the new composition and:
+Read from the code, when the composition being left was connected, the first connection after the switch is not treated as a fresh open. Studio takes it for a hot reload of the new composition and:
 
 - applies the **previous composition's input props** to the new one, if the previous one had any; either way the new one's default props are not applied, so with nothing to carry over it shows the props its own code starts with;
 - seeks to the **previous composition's playhead position**, unless the new composition has a remembered position, which then wins;
 - **starts playing** if the previous composition was playing.
 
 Once the auto-save's wait is over (a second or more while the new composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)), the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
+
+After a switch from a composition that never connected, there is nothing to carry over, and the new composition gets a fresh open, default props included.
 
 When the new composition refuses the carried-over props (its schema does not accept them), the carry-over stops there, as it does for a hot reload: neither the previous playhead position nor the playing state is applied, and the new composition's default props are not applied either, so it shows the props its own code starts with. Its remembered playhead position is still sought. The auto-save then writes those code defaults into its `composition.json` if they differ from the saved ones.
 
