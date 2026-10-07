@@ -203,7 +203,7 @@ Status is one of `not started`, `drafted`, or `verified`.
 | Document | Status |
 | --- | --- |
 | glossary.md | drafted |
-| bug-triage.md | not started |
+| bug-triage.md | drafted |
 | verification/ (checklists) | not started |
 | foundations/input-model.md | drafted |
 | foundations/project-and-compositions.md | drafted |
