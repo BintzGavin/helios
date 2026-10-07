@@ -21,7 +21,7 @@ From left to right:
 | Volume slider | "Volume: N%" | Sets the composition's volume from 0 to 100% in steps of 5%. |
 | Speed menu | "Playback Speed" | Sets the [playback rate](../glossary.md#the-preview): ⏪ -4x, ⏪ -2x, ⏪ -1x, 0.25x, 0.5x, 1x, 2x, 4x. Does not start playback. |
 
-Disabled controls show a not-allowed pointer but, read from the code, are not dimmed: their colors are set directly on each control, which overrides the browser's grey look for disabled buttons, so before connection the row looks exactly as it does after, apart from the volume slider, which the browser draws greyed (see [Open questions](#open-questions-and-verification)). The keyboard equivalents are owned by the [input model](../foundations/input-model.md#the-shortcut-map); what they do is described below.
+Disabled controls show a not-allowed pointer but, read from the code, are not dimmed: their colors are set directly on each control, which overrides the browser's grey look for disabled buttons, so before connection the row looks exactly as it does after, apart from the volume slider, which the browser draws greyed, and the speed menu, which the automated pass of 2026-10-07 found dimmed (opacity 0.7 before connection, 1 after) (see [Open questions](#open-questions-and-verification)). The keyboard equivalents are owned by the [input model](../foundations/input-model.md#the-shortcut-map); what they do is described below.
 
 ## The simple case
 
@@ -161,8 +161,9 @@ After every interrupt except a hot reload and (read from the code) a switch, the
 
 - **Two "restart" rules.** ▶ at the end goes to the in point. Space at the end does nothing visible. A click on the composition at the end goes to frame 0. With an in point set, the three disagree.
 - **A click in the last frame.** The player's toggle restarts from frame 0 whenever the composition is within one frame of its end, playing or not. A click meant to pause during the last frame of playback therefore restarts playback from the beginning instead.
-- **A rate the menu does not list.** The speed menu shows the composition's current rate by matching it against its eight choices. A rate set some other way (by the composition's own code, for example 1.5) matches none, and the menu then shows no choice at all (read from the code).
+- **A rate the menu does not list.** The speed menu shows the composition's current rate by matching it against its eight choices. A rate set some other way (by the composition's own code, for example 1.5) matches none. Read from the code the menu would then show no choice at all; in the automated pass of 2026-10-07 it showed its first choice, "⏪ -4x", while the composition played forward at 1.5x.
 - **Reverse with the ▶ button.** After choosing a negative speed in the menu, ▶ plays in reverse. At the in point it stops at once; ▶'s "go back to the in point" check looks only at the end of the range, not the direction.
+- **Reverse with managed media.** On a composition whose `<audio>` or `<video>` elements Helios manages (with `autoSyncAnimations`), a negative rate never moves the playhead: the menu shows the reverse speed and ❚❚ shows, but the page throws "Failed to set the 'playbackRate' property on 'HTMLMediaElement'" on every frame (seen in the automated pass of 2026-10-07; [B-75](../bug-triage.md#b-75-reverse-playback-freezes-on-a-composition-whose-media-helios-manages)).
 - **The slow speeds.** 0.25x and 0.5x are reachable only from the speed menu; L from paused always starts at 1x, and J never produces a slow reverse speed.
 - **Fractional frames.** After playback the current frame is usually fractional. The timecode shows it rounded down, "Fr:" rounded to nearest, and frame steps keep the fraction, so → from 45.73 shows timecode frame 46 and "Fr: 47".
 - **Stepping at the edges.** < at frame 0 stays at 0. > at the composition's total frames stays there. The total frames is one past the last frame a render draws.
