@@ -152,7 +152,7 @@ After any interrupt that ends the export, the Renders panel is back to the forma
 - Confirm what an export does after a switch to another composition: the code suggests "Frame {n} missing during export.", or, in Canvas mode with an audio track showing on the timeline, pictures of Studio's own waveform drawing, or, in DOM mode, pictures of Studio's own page.
 - Confirm what an export does after a hot reload in the middle.
 - Confirm that a hidden tab stalls the export and that it resumes when shown.
-- Confirm what an export of a clock-bound composition (`simple-canvas-animation`) contains, and use a composition the player can drive for the rest of these checks.
+- Confirm what an export of a clock-bound composition (`simple-canvas-animation`) contains, and use a composition the player can drive for the rest of these checks. In the automated pass of 2026-10-07, an export of an unmodified Title explainer composition held what its clock showed during the export, not the range's frames: the first frame read "FRAME 0059" and the closing "READY TO PLAY" came halfway through the file (PLAYER-80).
 - Confirm whether the transport's volume and mute reach the exported audio.
 - The Video Codec setting is ignored and a bitrate with a decimal point silently becomes 5 megabits per second. This may be worth treating as a bug, or at least labeling the settings that apply.
 - Confirm the browser's behavior on an encoder that does not support VP9 or H.264 at the export size, and the message shown.
