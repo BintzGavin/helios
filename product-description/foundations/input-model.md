@@ -87,11 +87,11 @@ When the player has focus, these keys act on the player first, and then Studio a
 
 | Key | The player does | Studio then does | What the user sees |
 | --- | --- | --- | --- |
-| Space | Toggle playback; at the end, restart from frame 0 | Play or pause from its last known state | Playback toggles. At the end it restarts from frame 0, not from the in point. |
+| Space | Toggle playback; at the end, restart from frame 0 | Play or pause from its last known state | Read from the code, playback toggles, and at the end it restarts from frame 0, not from the in point. In the automated pass of 2026-10-07 nothing changed mid-way (Studio undid the player's toggle), and at the end the player went to frame 0 and played but Studio paused it at once, leaving it at frame 0, paused. |
 | K | Toggle playback; at the end, restart from frame 0 | Pause, whatever the player just did | Pause only: K never starts playback. Playing, it pauses. From paused nothing visible happens. Within one frame of the end, playing or paused, the composition jumps to frame 0 and stays paused. |
 | J | Jump back 10 seconds | Play in reverse, or faster in reverse | Both: a jump back, then reverse playback. |
 | L | Jump forward 10 seconds | Play forward, or faster; with Shift, toggle loop | Both: a jump forward, then playback. Shift+L jumps forward 10 seconds and toggles loop. |
-| ← / → (with Shift) | Step 1 (10) frames, stopping at the last frame | Step 1 (10) frames from the same starting frame | One step, not two. |
+| ← / → (with Shift) | Step 1 (10) frames, stopping at the last frame | Step 1 (10) frames from the frame Studio holds when it acts | Read from the code, one step, not two. In the automated pass of 2026-10-07 the frame moved two (twenty with Shift): Studio stepped again from the frame the player had just reached. |
 | Home | Go to frame 0 | Go to the in point | The in point. |
 | End | Go to the end: the total frames, one past the last frame a render draws | Nothing | The end of the timeline. |
 | , / . | Step one frame back or forward | Nothing | One step. |
