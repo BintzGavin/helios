@@ -55,7 +55,7 @@ Releasing the button anywhere on the page ends the drag with the point where the
 
 ## How the range limits playback, renders, and exports
 
-Studio applies the range to the composition whenever the in point, the out point, or the composition's length changes, and again every time the player connects (including after a hot reload). If the in point is 0 and the out point is at or beyond the composition's total frames, Studio clears the composition's range, and the composition plays its full length. Otherwise the composition's range is set to the in and out points.
+Studio applies the range to the composition whenever the in point, the out point, or the composition's length changes, and again every time the player connects (including after a hot reload). If the in point is 0 and the out point is at or beyond the composition's total frames, Studio clears the composition's range, and the composition plays its full length. Otherwise the composition's range is set to the in and out points exactly, even when the out point lies beyond the composition's end (see [Edge cases](#edge-cases)). Loop is applied the same way: on every change and on every connection.
 
 | What | How the range applies |
 | --- | --- |
@@ -132,7 +132,8 @@ I and O end at once, so the left column also covers them; the right column is a 
 ## Edge cases
 
 - **The out point after a switch.** Read from the code: when a composition with no remembered state is opened, its out point is set from the length Studio still holds for the previous composition, before the new one connects, and is then never corrected. Switching from a 10-second composition to a 5-second one leaves the out point at 300 for a 150-frame composition (the range is cleared because the out point is beyond the end, but "Out: 300" shows and a render from the Renders panel covers 300 frames); switching the other way leaves the range cut short at 150 frames. This may be worth treating as a bug.
-- **A length that changes.** If the composition's code changes its duration, the out point stays at the old length: shorter than the new length, it cuts playback and renders short; longer, it is ignored for playback but still used by renders.
+- **A length that changes.** If the composition's code changes its duration, the out point stays at the old length: shorter than the new length, it cuts playback and renders short; longer, it is ignored for playback while the in point is 0 (the range is cleared) but still used by renders.
+- **An out point past the end.** With the in point above 0, an out point beyond the composition's total frames (left by a switch or a shorter duration) is applied as it is, not cleared. Read from the code, playback then does not stop at the composition's end: the current frame goes on past the total frames, the timecode and "Fr:" count beyond the length while the playhead stays pinned at the right edge of the timeline, and playback stops or wraps only at the out point. What the composition draws past its end depends on its code. Setting I at frame 30 after the switch described above is enough to get here.
 - **O before the player connects** sets the out point to 1, giving a one-frame range that stays after connection.
 - **A sticky marker.** Dragging a marker slowly, it lags behind the pointer and moves in jumps of about 10 pixels, because it snaps to its own position (see [While ongoing](#while-ongoing)). Shift avoids this.
 - **Hard to grab.** The markers are 1 pixel wide plus their small triangle, and the out marker covers the in marker when they are close. Pressing next to a marker starts a scrub instead.
@@ -146,6 +147,7 @@ I and O end at once, so the left column also covers them; the right column is a 
 - Confirm the stale out point after switching to a composition with no remembered state, in both directions, and what a render from the Renders panel then produces when the out point is beyond the composition's end.
 - Confirm the write under the new ID at a switch: pause a connected composition at frame 40, switch to a Vanilla JS composition (which never connects), and check in the browser's storage that `helios-studio:timeline:{ID}` for the Vanilla JS composition now holds frame 40; then switch to a composition remembered at another frame and check that it is still sought to its own frame. Read from `context/StudioContext.tsx` lines 649 to 667, where the save effects run with the new ID before the restored values and the new composition's frame have arrived. This may be worth treating as a bug.
 - Confirm that the out point does not follow a change to the composition's length after a hot reload.
+- Confirm that, with the in point above 0 and the out point beyond the end, playback runs past the composition's last frame up to the out point (`context/StudioContext.tsx`, the range effect, clears the range only when the in point is 0; `onTick` in `packages/core/src/Helios.ts` does not stop at the composition's length while a range is set). This may be worth treating as a bug, together with the stale out point.
 - Confirm O before the player connects, and the resulting one-frame range.
 - Confirm the mismatch after I, O, or X with the player focused.
 - Confirm that the in and out markers can only be grabbed on their line and triangle, and that they stick to their own position during a slow drag unless Shift is held.
