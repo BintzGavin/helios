@@ -211,8 +211,8 @@ Status is one of `not started`, `drafted`, or `verified`.
 | compositions/composition-settings.md | not started |
 | props/the-props-editor.md | not started |
 | props/prop-fields.md | not started |
-| assets/the-assets-panel.md | not started |
-| assets/asset-actions.md | not started |
+| assets/the-assets-panel.md | drafted |
+| assets/asset-actions.md | drafted |
 | output/server-renders.md | drafted |
 | output/client-side-export.md | drafted |
 | output/snapshots-and-job-specs.md | drafted |
