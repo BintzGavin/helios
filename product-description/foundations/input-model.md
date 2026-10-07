@@ -4,7 +4,7 @@
 
 This document owns how Studio receives input: which mouse presses start what, how drags begin and end, what the wheel does, where key presses go, every keyboard shortcut and when it is ignored, what modifier keys change, how dragging and dropping works, and what each row of the "Cancel and interrupt" tables means in Studio in general. Feature documents link here instead of restating these rules.
 
-Studio listens for mouse events, keyboard events, wheel events, and the browser's native drag and drop. It does not listen for touch or pen events, for the window losing focus, or for the pointer being captured. It has no global Escape behavior and no notion of a modal state: while one thing is in progress, everything else stays live.
+Studio listens for mouse events, keyboard events, wheel events, and the browser's native drag and drop. It does not listen for touch or pen events or for the window losing focus, and it never captures the pointer. It has no global Escape behavior and no notion of a modal state: while one thing is in progress, everything else stays live.
 
 ## Mouse presses and drags
 
