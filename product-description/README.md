@@ -199,7 +199,7 @@ Status is one of `not started`, `drafted`, or `verified`.
 | foundations/project-and-compositions.md | not started |
 | foundations/the-workspace.md | not started |
 | foundations/the-preview-player.md | not started |
-| stage/the-stage-view.md | not started |
+| stage/the-stage-view.md | drafted |
 | stage/the-stage-toolbar.md | not started |
 | playback/the-transport-controls.md | not started |
 | playback/the-timeline.md | not started |
