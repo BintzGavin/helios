@@ -201,10 +201,10 @@ Status is one of `not started`, `drafted`, or `verified`.
 | foundations/the-preview-player.md | drafted |
 | stage/the-stage-view.md | drafted |
 | stage/the-stage-toolbar.md | not started |
-| playback/the-transport-controls.md | not started |
-| playback/the-timeline.md | not started |
-| playback/the-playback-range.md | not started |
-| playback/timeline-tracks.md | not started |
+| playback/the-transport-controls.md | drafted |
+| playback/the-timeline.md | drafted |
+| playback/the-playback-range.md | drafted |
+| playback/timeline-tracks.md | drafted |
 | compositions/the-compositions-panel.md | not started |
 | compositions/the-omnibar.md | not started |
 | compositions/creating-and-duplicating.md | not started |

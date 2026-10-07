@@ -96,6 +96,17 @@ Units and numbers ([glossary](glossary.md#units)):
 
 - Frames are numbered from 0; total frames is duration times frame rate; the playhead may sit anywhere from 0 to total frames inclusive. The current frame is fractional after playback. The timecode rounds down; the timeline's "Fr:" readout rounds to the nearest frame.
 
+Playback ([the transport controls](playback/the-transport-controls.md), [the timeline](playback/the-timeline.md), [the playback range](playback/the-playback-range.md), [timeline tracks](playback/timeline-tracks.md)):
+
+- Playback stops exactly on the out point (forward) or the in point (reverse) with loop off, and wraps with loop on. With the range covering the whole composition the edges are 0 and the total frames. Seeking is never limited by the range.
+- ▶ at or within one frame of the end of the range goes to the in point first; Space never does; a click on the composition goes to frame 0.
+- Studio applies the range to the composition on every change and every connection; in point 0 with the out point at or beyond the total frames clears it. Renders from the Renders panel, client-side exports, and job specs cover the in point up to but not including the out point; the Omnibar's "Start Render" ignores the range.
+- The timeline state (in, out, loop, playhead position) is written when in, out, or loop change, when playback pauses, and when the page closes; it is not written on a switch. The out point is set from the length only while it is 0 (suspected stale out point after a switch).
+- Snap points: frame 0, the total frames, the in and out points, composition markers, caption starts and ends, time-prop values; within 10 screen pixels; Shift turns snapping off, read on every move. A dragged marker snaps to its own position, so it moves in steps of about 10 pixels unless Shift is held.
+- Timeline zoom: Fit, or 0.5 times 1.04 to the power of the step pixels per frame (steps 1 to 100); never narrower than the panel; the view never follows the playhead.
+- The timecode field accepts exactly `HH:MM:SS:FF` or a frame number; Enter or leaving commits (even unchanged, which rounds a fractional playhead down); Escape cancels.
+- Dragging a time-prop marker sends only that prop, which (read from the code) replaces all the other input props (suspected high-severity bug).
+
 Which document owns which state of the playback area:
 
 - [The preview player](foundations/the-preview-player.md) owns loading, connecting, connection failed, error, hot reload, and switching compositions.
