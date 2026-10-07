@@ -29,7 +29,7 @@ The list is fixed text; it does not change with the platform, the keyboard layou
 | General | Switch Composition | ⌘, K | Opens the Omnibar, which does more than switch compositions, and also pauses. The ⌘ cap is shown on every platform; Ctrl+K works too. |
 | General | Show Shortcuts | ? | Opens this dialog. |
 
-Not listed: ' (safe-area guides, see `stage/the-stage-toolbar.md`), Escape, the Omnibar's ↑, ↓, and Enter, and the keys the player adds when it has keyboard focus (see [the input model](../foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)).
+Not listed: ' (safe-area guides, see [the stage toolbar](../stage/the-stage-toolbar.md)), Escape, the Omnibar's ↑, ↓, and Enter, and the keys the player adds when it has keyboard focus (see [the input model](../foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)).
 
 ## What System Diagnostics shows
 
@@ -38,7 +38,7 @@ Not listed: ' (safe-area guides, see `stage/the-stage-toolbar.md`), Escape, the 
 | 🖥️ Studio Preview (Client) | WebCodecs, WAAPI (Web Animations), OffscreenCanvas, each ✓ or ✗; User Agent in a dark box | "Loading client diagnostics..." | None in practice (see [Edge cases](#edge-cases)) |
 | 🎬 Production Renderer (Server) | The same four rows, for the server's headless browser | "Loading server diagnostics... (This launches a headless browser)" | A red box: "Error: {message}", a blank line, then "Ensure you have installed browser binaries via \`npx playwright install chromium\`." with the backticks shown as typed |
 
-The client column describes the browser showing the Studio page, not the composition and not the renderer. WebCodecs is what client-side export needs (`output/client-side-export.md`); the server column is meant to predict whether server-side renders can start (`output/server-renders.md`). Neither column says anything about FFmpeg, codecs, WebGL, or hardware acceleration, although the checks behind them collect some of that.
+The client column describes the browser showing the Studio page, not the composition and not the renderer. WebCodecs is what [client-side export](../output/client-side-export.md) needs; the server column is meant to predict whether [server-side renders](../output/server-renders.md) can start. Neither column says anything about FFmpeg, codecs, WebGL, or hardware acceleration, although the checks behind them collect some of that.
 
 ## The interaction, event by event
 

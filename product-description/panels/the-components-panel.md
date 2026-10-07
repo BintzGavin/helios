@@ -87,7 +87,7 @@ What removal does when it is reached, as it is by the MCP server's `uninstall_co
 | Shift | No effect; Shift+click on a button is a click. | No effect. |
 | Ctrl/Cmd | No effect. | No effect. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | The buttons can be reached with Tab and pressed with Enter; Space may also toggle playback (see [the input model](../foundations/input-model.md#open-questions-and-verification)). While the Remove prompt is open, it takes every key. | No effect; keys go wherever focus is. |
+| Keyboard focus | The buttons can be reached with Tab but not pressed with Enter or Space: Studio cancels both, and Space toggles playback instead (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). While the Remove prompt is open, it takes every key. | No effect; keys go wherever focus is. |
 | Playback | No effect; playback continues while the server works. While the Remove prompt is open the whole page waits, the composition included. | No effect, unless the action rewrites a file the composition imports, which hot-reloads it (see [the preview player](../foundations/the-preview-player.md#hot-reload)). |
 | Player connection | No effect; the panel works with no composition open and before the player connects. | No effect. |
 
@@ -125,9 +125,9 @@ After every interrupt the user is in the panel with nothing in progress, and the
 
 **Notifications.** Green toasts `Component "{name}" installed`, `updated`, and `removed`; red toasts with the server's message or "Installation failed", "Update failed", "Removal failed"; and "Failed to load components" when the list cannot be read. The Remove confirmation is a browser prompt, not a Studio [dialog](../glossary.md#the-workspace).
 
-**Other tabs and agents.** Each tab reads the list when its panel appears and does not notice changes made elsewhere until then. Two tabs can run actions on the same files at the same time. An [agent](../glossary.md#compositions-and-files) connected to Studio's MCP server can install, update, and remove components, and its removal does reach the server; the panel shows the result the next time it appears. See `cross-cutting/changes-from-outside-studio.md`.
+**Other tabs and agents.** Each tab reads the list when its panel appears and does not notice changes made elsewhere until then. Two tabs can run actions on the same files at the same time. An [agent](../glossary.md#compositions-and-files) connected to Studio's MCP server can install, update, and remove components, and its removal does reach the server; the panel shows the result the next time it appears. See [changes from outside Studio](../cross-cutting/changes-from-outside-studio.md).
 
-**Keyboard and accessibility.** Every button can be reached with Tab and is labeled with words. Progress shows only as the button's label, and the result only as a toast. The panel has no shortcut.
+**Keyboard and accessibility.** Every button can be reached with Tab and is labeled with words, but none can be pressed from the keyboard, so installing and updating need the mouse. Progress shows only as the button's label, and the result only as a toast. The panel has no shortcut.
 
 ## Edge cases
 

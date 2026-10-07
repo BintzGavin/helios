@@ -65,7 +65,7 @@ The edit becomes ongoing at the first keystroke that changes the field. Nothing 
 
 ### While ongoing
 
-The field takes keys as any text box does. Enter does not apply anything: in a time field it does nothing, and in the text box it starts a new line, which becomes part of the cue's text. Escape does nothing, so there is no way to put the field back except retyping it. Ctrl/Cmd+Z undoes typing inside the field, as in any text box.
+The field takes keys as any text box does, with two exceptions that hold everywhere in Studio (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)): Enter does nothing at all, in a time field or in the text box, so a cue's text cannot be given a second line by typing (a line break pasted in is kept), and ↑ and ↓ do not move between the text box's lines. Enter does not apply the field either. Escape does nothing, so there is no way to put the field back except retyping it. Ctrl/Cmd+Z undoes typing inside the field, as in any text box.
 
 Everything else continues: playback, the timeline, and the cues already applied. A press on the timeline's track area does not take focus from the field (see [the input model](../foundations/input-model.md#presses-and-keyboard-focus)), so the user can scrub to check a time and go on typing.
 
@@ -105,7 +105,7 @@ The columns are for editing a field: "before it is ongoing" is while the field h
 | Escape | No effect; the field keeps focus. | No effect. The typed text stays and is applied when the field is left. |
 | Another shortcut, click, or command | Shortcuts are ignored while the field has focus, except Ctrl/Cmd+K, which opens the Omnibar and applies the unchanged field. A click elsewhere applies it. | A click on anything that takes focus applies the edit, then does what it does. A press on the timeline's track area does not take focus, so the edit continues. Ctrl/Cmd+K applies the edit and opens the Omnibar. |
 | Composition switched | Switching needs the Omnibar or the Compositions tab, and reaching either takes focus from the field, so the field is applied to the old composition first. The new composition's cues appear when it connects. | Same: the edit is applied to the old composition and then lost with it, since nothing is saved. |
-| Window loses focus | The browser takes focus out of the field, which applies the unchanged value. The field gets focus back when the window does. | The edit is applied as the window loses focus. The field gets focus back when the window does, and further typing is applied when it is left again. |
+| Window loses focus | The browser reports the field as left, which applies the unchanged value (Chromium's usual behavior, to confirm; see [the input model](../foundations/input-model.md#the-interrupt-rows)). The field gets focus back when the window does. | The edit is applied as the window loses focus. The field gets focus back when the window does, and further typing is applied when it is left again. |
 | Pointer leaves the window | No effect. | No effect. |
 | Server request fails or server stops | No effect; the panel makes no requests to the Studio server. | No effect. A composition already loaded keeps running if the server stops, so edits still apply. |
 | Reload or tab closed | Every caption edit is lost, applied or not. After the reload the composition has its own captions again. | Same; the text being typed is lost too. |
@@ -132,7 +132,7 @@ After every interrupt the user is in the panel with no field being edited, excep
 
 **Other tabs and agents.** Each Studio tab has its own copy of the composition, so edits in one tab are not seen in another. Studio's MCP server offers no way to read or change captions.
 
-**Keyboard and accessibility.** Every field and button can be reached with Tab. The time fields have no label or tooltip; only their order says which is the start and which the end. The words "Import SRT" are not tied to the file chooser, so clicking them does nothing. Enter does not apply a time field; leaving it does. The panel has no shortcut, and nothing announces a change.
+**Keyboard and accessibility.** Every field and button can be reached with Tab, but the buttons (+ Add, Export SRT, Clear, ×) cannot be pressed from the keyboard, and a cue's text cannot get a line break by typing (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). The time fields have no label or tooltip; only their order says which is the start and which the end. The words "Import SRT" are not tied to the file chooser, so clicking them does nothing. Enter does not apply a time field; leaving it does. The panel has no shortcut, and nothing announces a change.
 
 ## Edge cases
 
@@ -145,14 +145,15 @@ After every interrupt the user is in the panel with no field being edited, excep
 - **Export numbering.** Each cue is exported with its own number: imported cues keep their file's numbers, and cues added in Studio get a long number taken from the clock (such as 1759830000000), so after sorting the numbers need not run 1, 2, 3. Cue text containing a blank line is exported as it is, and the file then cannot be imported again.
 - **A file of blank lines.** Importing a file that contains only spaces or blank lines removes every cue, without a message.
 - **Stale cues after a switch.** Until the new composition connects, the panel shows the previous composition's cues. Typing into them looks as if it works but changes nothing, and Export SRT downloads them.
-- **Compositions that never connect** (every template except Title explainer; see [the preview player](../foundations/the-preview-player.md#connecting)) leave the panel unusable for them.
+- **Compositions that never connect** (those made from the Vanilla JS, React, and Three.js templates, and in the verification project the Vue, Svelte, and Solid ones too; see [the preview player](../foundations/the-preview-player.md#connecting)) leave the panel unusable for them.
 - **Clock-bound compositions.** + Add uses whatever frame the composition's own clock has reached at the click (see [the preview player](../foundations/the-preview-player.md#clock-bound-compositions)).
-- **A focused button.** After a click, + Add keeps keyboard focus, so Enter adds another cue; Space may too (see [the input model](../foundations/input-model.md#open-questions-and-verification)).
+- **A focused button.** After a click, + Add keeps keyboard focus, but neither Enter nor Space adds another cue: Studio cancels both, and Space toggles playback instead (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)).
 - **Long lists.** Every cue is drawn as fields. There is no search, no paging, and no way to jump to the cue at the playhead.
 
 ## Open questions and verification
 
 - The verification project has no composition with captions and no template adds any. Use + Add on a Title explainer composition, and an SRT file written by hand, for most checks.
+- Confirm that Enter adds no line break to a cue's text box, and that + Add, Clear, and Export SRT cannot be pressed from the keyboard (read from the code, Studio cancels Enter everywhere and Space outside text fields; see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). Multi-line cues are common in SRT files; if confirmed, this may be worth treating as a bug.
 - Confirm that leaving a field always applies it, even unchanged, and that the window losing focus applies a field being edited (read from how Chromium reports focus leaving a field; the panel listens only for that).
 - Confirm the negative-time and `NaN` displays, and what the timeline draws for a cue whose time is not a number.
 - Confirm that edits never appear on the picture unless the composition draws captions itself or C has turned on the player's caption display.

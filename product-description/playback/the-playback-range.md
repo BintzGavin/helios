@@ -62,10 +62,10 @@ Studio applies the range to the composition whenever the in point, the out point
 | Playback | Stops at, or with loop on wraps between, the in and out points. See [the transport controls](the-transport-controls.md#finishing). |
 | Seeking (scrubbing, frame steps, the timecode field, markers) | Not limited: the playhead can be put anywhere from 0 to the total frames, inside or outside the range. |
 | ⏮, Home, and ▶ at the end of the range | Go to the in point. |
-| Server-side render from the Renders panel | Frames from the in point up to, but not including, the out point. The panel shows "Range: {in} - {out}" above the job list, and each job made this way shows "({in}-{out})". See `output/server-renders.md`. |
+| Server-side render from the Renders panel | Frames from the in point up to, but not including, the out point. The panel shows "Range: {in} - {out}" above the job list, and each job made this way shows "({in}-{out})". See [server-side renders](../output/server-renders.md). |
 | Server-side render from the Omnibar's "Start Render" | Ignores the range and renders the full length. |
-| Client-side export | Frames from the in point up to, but not including, the out point when a range is in effect; the full length when it covers the whole composition. See `output/client-side-export.md`. |
-| Job spec | The in and out points, the same frames as a server-side render. See `output/snapshots-and-job-specs.md`. |
+| Client-side export | Frames from the in point up to, but not including, the out point when a range is in effect; the full length when it covers the whole composition. See [client-side export](../output/client-side-export.md). |
+| Job spec | The in and out points, the same frames as a server-side render. See [snapshots and job specs](../output/snapshots-and-job-specs.md). |
 
 Because the out point is excluded from renders and exports, the default range (0 to the total frames) renders exactly the composition's frames: 150 frames, 0 to 149, for 5 seconds at 30 frames per second.
 
@@ -77,7 +77,8 @@ The in point, the out point, loop, and the playhead position are remembered toge
 - **Restored** whenever the composition is opened: the in point, the out point, and loop at once (the readouts change immediately), the playhead position as soon as the player connects.
 - **A composition with no remembered state** starts with the in point at 0, loop off, and the out point at 0 until its length is known; then the out point becomes the total frames.
 - **Not followed afterwards:** the out point is set from the length only while it is 0. If the composition's length changes later (its code is edited and it hot-reloads with a new duration), the out point stays where it was.
-- **Not written on a switch:** switching to another composition does not record where the playhead of the one being left was; reopening it later returns to the position at its last pause.
+- **Not written on a switch, for the composition being left:** switching to another composition does not record where the playhead of the one being left was; reopening it later returns to the position at its last pause.
+- **Written under the wrong ID on a switch, for the composition being opened.** Read from the code, at the moment of a switch Studio writes a timeline state for the composition being opened made of the values it still holds for the one being left: its in point, out point, loop, and playhead position. A moment later, once the new composition's own in point, out point, and loop are restored, Studio writes those over them, but with the playhead position still that of the composition being left, because the player has not reported the new composition's frame yet. The new composition is still sought to its own remembered position when it connects, because Studio read that before overwriting it; the record is put right at the next write after the connection (a change of in, out, or loop, a pause, or the page closing). Until then, and for good if the new composition never connects, a reload reopens it at the previous composition's frame. A composition with no remembered state gets in point 0, loop off, and an out point taken from the previous composition's length (see [Edge cases](#edge-cases)).
 
 Renaming a composition gives it a new ID, so its timeline state is forgotten. Another composition with the same ID, in this project or another project served at the same address, shares it.
 
@@ -143,6 +144,7 @@ I and O end at once, so the left column also covers them; the right column is a 
 ## Open questions and verification
 
 - Confirm the stale out point after switching to a composition with no remembered state, in both directions, and what a render from the Renders panel then produces when the out point is beyond the composition's end.
+- Confirm the write under the new ID at a switch: pause a connected composition at frame 40, switch to a Vanilla JS composition (which never connects), and check in the browser's storage that `helios-studio:timeline:{ID}` for the Vanilla JS composition now holds frame 40; then switch to a composition remembered at another frame and check that it is still sought to its own frame. Read from `context/StudioContext.tsx` lines 649 to 667, where the save effects run with the new ID before the restored values and the new composition's frame have arrived. This may be worth treating as a bug.
 - Confirm that the out point does not follow a change to the composition's length after a hot reload.
 - Confirm O before the player connects, and the resulting one-frame range.
 - Confirm the mismatch after I, O, or X with the player focused.

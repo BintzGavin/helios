@@ -97,11 +97,11 @@ These were decided without the user (who was not available), from the code and t
 - **Where this description lives.** It is the top-level `product-description/` directory inside the Helios repository, on the branch `claude/global-skill-repos-wcchad`, rather than a separate repository, because a new repository could not be created. Everything outside `product-description/` is the read-only source of truth and is never modified by this project.
 - **The source commit.** Commits to this directory move the repository's `HEAD`, so the source is pinned once: `git log -1 --format=%h -- . ':!product-description'`, which is `c2bfddb`. Every document's footer cites it. A later session that finds a newer source commit decides explicitly whether to re-verify; it does not mix commits silently.
 - **The surface.** Helios Studio as served by `helios studio` (`packages/cli/src/commands/studio.ts`): the built Studio UI on `http://127.0.0.1:5173/` (the next free port if 5173 is taken), with the folder the command was started in as the project root, no `helios.config.json` registry override, no remote MCP flags, in a desktop Chromium-based browser with a fresh profile (empty local storage), used with a mouse and keyboard. Studio is the surface because the root `AGENTS.md` names it the primary product surface and it is by far the richest interactive one; reconnaissance found about forty components and a server with a dozen routes.
-- **The verification project.** The repository's `examples/` folder, started with `helios studio`, with `simple-canvas-animation` open. Where a document needs input props, it uses a composition created in Studio from the "Title explainer" template, which is the only Studio template whose compositions connect to the player (see [the preview player](foundations/the-preview-player.md#connecting)). A freshly scaffolded `helios init` project is not used because its templates contain no `composition.html`, so Studio would open on its empty state.
+- **The verification project.** The repository's `examples/` folder, started with `helios studio`, with `simple-canvas-animation` open. Where a document needs input props, it uses a composition created in Studio from the "Title explainer" template, which is the only Studio template whose compositions connect to the player in this project: Vanilla JS, React, and Three.js compositions never connect, and Vue, Svelte, and Solid ones need a framework Vite configuration that `examples/` does not have (see [templates](foundations/project-and-compositions.md#templates)). `examples/` has no `public/` folder, so every example folder is also an asset folder: deleting, renaming, or moving one in the Assets panel deletes, renames, or moves that composition on disk, and a verification pass must work on a copy of `examples/` it can afford to lose. A freshly scaffolded `helios init` project is not used because its templates contain no `composition.html`, so Studio would open on its empty state.
 - **Clock-bound compositions.** Every example in `examples/` and every Studio template binds itself to the browser's document clock. The code says such a composition takes its frame from that clock rather than from Studio's transport. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) owns this behavior and flags it for verification first. The playback documents describe what Studio does when the player can drive the composition, and link there for the difference.
 - **Out of scope: other CLI subcommands.** `init`, `render`, `build`, `preview`, `add`, `remove`, `components`, `diff`, `deploy`, `job`, `merge`, `frames`, `list`, `skills`, `update`, and `mcp` are separate surfaces. They may get their own description later.
 - **Out of scope: other ways to start Studio.** The standalone `helios-studio` binary (which resolves the project root differently) and Studio's development mode (`npm run dev` inside `packages/studio`, which shows a "Composition reloaded" toast that the built Studio does not) are mentioned only where they differ.
-- **Out of scope: the libraries and the platform.** The core, renderer, and player library APIs, distributed rendering beyond downloading a job spec, the infrastructure and cloud adapters, Studio's `/mcp` endpoint and authenticated remote MCP listener, the `helios mcp` plugin server, and the AI-host plugin. What an agent connected through Studio's MCP server does to the files under the user is described in `cross-cutting/changes-from-outside-studio.md`.
+- **Out of scope: the libraries and the platform.** The core, renderer, and player library APIs, distributed rendering beyond downloading a job spec, the infrastructure and cloud adapters, Studio's `/mcp` endpoint and authenticated remote MCP listener, the `helios mcp` plugin server, and the AI-host plugin. What an agent connected through Studio's MCP server does to the files under the user is described in [changes from outside Studio](cross-cutting/changes-from-outside-studio.md).
 - **The player inside Studio.** The `<helios-player>` element's own controls bar, settings menu, and export menu are hidden in Studio and are not described. Its behaviors that do reach the Studio user (the click layer over the composition, its status overlay, its keys when it has keyboard focus, fullscreen) are described in [the preview player](foundations/the-preview-player.md) and [the input model](foundations/input-model.md).
 - **What a composition draws.** Out of scope. Documents say what Studio shows around the composition and what it asks of it, not what an example animates.
 - **Touch and pen.** Studio listens only for mouse events. Touch and pen are not described beyond saying so where it matters.
@@ -119,21 +119,26 @@ These were decided without the user (who was not available), from the code and t
 README.md                        this file
 goal.md                          the standing instructions for whoever drafts
 AGENTS.md, CLAUDE.md             entry points for agents: read README.md, then goal.md
+.gitignore                       keeps output/ tracked although the repository's root .gitignore ignores it
 glossary.md                      shared vocabulary
-bug-triage.md                    suspected defects collected from every document, with repro steps and decisions needed
+bug-triage.md                    (not started) suspected defects collected from every document, with
+                                 repro steps and decisions needed
 
-verification/
+verification/                    (not started)
   README.md                      how to run a hand-verification pass and record results
   {cluster}.md                   checklists, one per cluster of documents
   ...
 
 foundations/
   input-model.md                 mouse presses and drags, the wheel, keyboard focus and who receives
-                                 each key, the full shortcut map, drag and drop, the interrupt rows
+                                 each key, the full shortcut map, the keys Studio cancels everywhere,
+                                 drag and drop, the interrupt rows
   project-and-compositions.md    the project folder, what a composition is, IDs and names,
-                                 composition.json, thumbnails, assets, renders, what is saved where
-  the-workspace.md               the layout and its dividers, sidebar tabs, empty states, dialogs,
-                                 toasts, and everything Studio remembers in the browser
+                                 composition.json, thumbnails, templates, assets, renders, what is
+                                 saved where, failed requests, and changes made on disk
+  the-workspace.md               the layout and its dividers, sidebar tabs, empty states, dialogs
+                                 and how they stack, toasts, page load, and everything Studio
+                                 remembers in the browser
   the-preview-player.md          loading a composition into the player, connecting, clock-bound
                                  compositions, hot reload, switching compositions
 
@@ -143,7 +148,8 @@ stage/
                                  the snapshot and settings buttons
 
 playback/
-  the-transport-controls.md      play, pause, frame step, rewind, loop, J/K/L shuttle, speed, volume
+  the-transport-controls.md      play, pause, frame step, rewind, loop, J/K/L shuttle, speed, volume,
+                                 mute, and how playback ends at the edges of the range
   the-timeline.md                the ruler and playhead, scrubbing, snapping, hover guide, zoom,
                                  and the timecode field
   the-playback-range.md          in and out points: I and O, dragging the markers, how the range
@@ -152,14 +158,16 @@ playback/
                                  and dropping an asset onto the timeline
 
 compositions/
-  the-compositions-panel.md      browsing, folders, search, selecting, opening in an editor, deleting
+  the-compositions-panel.md      browsing, folders, search, opening a composition, opening its folder
+                                 in an editor, and the delete button (which never reaches the server)
   the-omnibar.md                 the Ctrl/Cmd+K palette: commands, switching compositions, asset paths
   creating-and-duplicating.md    the New Composition and Duplicate dialogs and the templates
   composition-settings.md        renaming, size, frame rate, duration, and the thumbnail
 
 props/
   the-props-editor.md            the Properties panel: rows, groups, Copy JSON, Reset, and auto-save
-  prop-fields.md                 each kind of field, schema-driven or inferred, and its validation
+  prop-fields.md                 each kind of field, schema-driven or inferred, its validation, and
+                                 dropping assets and text onto fields
 
 assets/
   the-assets-panel.md            listing, folders, type filter, search, uploading, new folders
@@ -174,12 +182,14 @@ output/
 
 panels/
   the-captions-panel.md          viewing and editing caption cues, importing and exporting SRT
-  the-audio-mixer.md             per-track volume, mute, solo, and level meters
-  the-components-panel.md        browsing the component registry and installing, updating, removing
+  the-audio-mixer.md             per-track volume, mute, and solo, and the master level meter
+  the-components-panel.md        browsing the component registry, installing and updating components,
+                                 and the Remove button (which never reaches the server)
 
 help/
   shortcuts-and-diagnostics.md   the Keyboard Shortcuts dialog and the System Diagnostics dialog
-  the-assistant.md               the Helios Assistant dialog: prompt building and documentation search
+  the-assistant.md               the Helios Assistant dialog: building a prompt to paste into an outside
+                                 AI chat (it asks no AI itself) and browsing the documentation
 
 cross-cutting/
   changes-from-outside-studio.md files changed on disk, a second Studio tab, and an agent working

@@ -116,7 +116,7 @@ The first keystroke. In a field that applies as it goes, that keystroke's value 
 
 ### While ongoing
 
-In a field that applies as it goes, every keystroke sends the field's whole new value. The browser's own editing keys work: the arrows move the caret, ↑ and ↓ step a number box, paste replaces the selection, and undo puts back earlier text, each change being sent like a keystroke. If the prop is changed from elsewhere while the user types (a hot reload putting the props back, for instance), a text or number box takes the new value; a time field does not.
+In a field that applies as it goes, every keystroke sends the field's whole new value. The browser's own editing keys work: ← and → move the caret, paste replaces the selection, and undo puts back earlier text, each change being sent like a keystroke. ↑ and ↓ do nothing, not even in a number box, a date or clock-time picker, or a slider, because Studio cancels them everywhere (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)); a number box still steps with the small arrows that appear in it under the pointer. If the prop is changed from elsewhere while the user types (a hot reload putting the props back, for instance), a text or number box takes the new value; a time field does not.
 
 In a time field and a JSON box, typing changes only the text. Nothing is checked until the field is left.
 
@@ -146,7 +146,7 @@ A time prop's field is a dark box showing the prop as a [timecode](../glossary.m
 
 A JSON box is a text area in a monospace font, at least 80 pixels tall, that can be made taller by dragging its bottom-right corner. Long lines do not wrap; the box scrolls sideways. It holds the prop as JSON indented with two spaces.
 
-Typing changes only the text. On leaving the box:
+Typing changes only the text. Enter does not start a new line, because Studio cancels Enter everywhere (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)), and ↑ and ↓ do not move between lines; a multi-line value has to be pasted or typed on one line, and the box re-formats it when it is left. On leaving the box:
 
 - **Text that is not valid JSON** turns the box red (border and background). The text is kept, nothing is applied, and the box stays red until it is left with valid JSON.
 - **Valid JSON equal to the current value** is only re-formatted.
@@ -160,7 +160,7 @@ A **typed-array box** shows the typed array as a plain list (`[1, 2, 3]`). On le
 
 An asset field is a text box with the placeholder "Select {type} or enter URL..." (`Select image or enter URL...`). It holds an address. Typing into it applies on every keystroke, as in a text box.
 
-**Suggestions.** The browser offers the project's [assets](../foundations/project-and-compositions.md#assets) of the field's type as suggestions, each showing the asset's address and file name, filtered by what has been typed; in Chromium the list opens on clicking into the box or pressing ↓. When the schema lists accepted extensions (`accept`), only assets whose address ends in one of them are offered. The suggestions come from the same asset list as [the Assets panel](../assets/the-assets-panel.md), from every folder at once, read when the page loads and after every asset change made in Studio, so a file added on disk is not offered until then. Choosing a suggestion applies its address.
+**Suggestions.** The browser offers the project's [assets](../foundations/project-and-compositions.md#assets) of the field's type as suggestions, each showing the asset's address and file name, filtered by what has been typed; in Chromium the list opens on clicking into the box; ↓, which would normally open it, is cancelled by Studio (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). When the schema lists accepted extensions (`accept`), only assets whose address ends in one of them are offered. The suggestions come from the same asset list as [the Assets panel](../assets/the-assets-panel.md), from every folder at once, read when the page loads and after every asset change made in Studio, so a file added on disk is not offered until then. Choosing a suggestion applies its address.
 
 **What is stored** is the asset's address as Studio serves it: `/logo.png` for `public/logo.png` in a project with a `public/` folder, otherwise `/@fs/` followed by the file's absolute path on disk. An address typed by hand is accepted whether or not the file exists.
 
@@ -198,10 +198,10 @@ Other fields (number boxes, the time field, JSON boxes, the color field's text b
 
 | Modifier | Set at the start | Changed while ongoing |
 | --- | --- | --- |
-| Shift | No effect from Studio. Shift+Tab moves to the previous field; Shift with the arrows selects text in a text box. | No effect from Studio. |
+| Shift | No effect from Studio. Shift+Tab moves to the previous field; Shift with ← and → selects text in a text box. | No effect from Studio. |
 | Ctrl/Cmd | Ctrl/Cmd+K opens the Omnibar from any field, which takes focus and so leaves the field: a time field commits the time it shows. Paste (Ctrl/Cmd+V) is the way to enter a complete color or address in one change. | Ctrl/Cmd+K leaves the field the same way, committing what was typed in a time field or JSON box. The browser's editing keys act on the text. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | Every field counts as a text field, so Studio's shortcuts are ignored while it has focus, except Ctrl/Cmd+K. Space toggles a focused check box and opens a focused menu or swatch instead of playing; the arrows move a focused slider or number box, or the caret, instead of stepping frames. | Leaving the field (Tab, a click elsewhere, Enter in a time field) gives the shortcuts back. |
+| Keyboard focus | Every field counts as a text field, so Studio's shortcuts are ignored while it has focus, except Ctrl/Cmd+K. Space toggles a focused check box and opens a focused menu or swatch instead of playing; ← and → move a focused slider or the caret, or change a closed menu's choice on Windows and Linux, instead of stepping frames; ↑ and ↓ do nothing. The list buttons ("+ Add Item", ↑, ↓, Remove) are buttons, not fields: Enter and Space do not press them, and Space plays or pauses. | Leaving the field (Tab, a click elsewhere, Enter in a time field) gives the shortcuts back. |
 | Playback | Fields work the same while playing; a change shows on the next frame drawn. A time field shows its prop, not the playhead. | No effect. |
 | Player connection | No field exists before connection; the Props Editor shows "No active controller". | A hot reload keeps the field, its focus, and its text; Studio puts back the props it last saw (see [the preview player](../foundations/the-preview-player.md#hot-reload)). |
 
@@ -214,7 +214,7 @@ Other fields (number boxes, the time field, JSON boxes, the color field's text b
 | Escape | No effect; the field keeps focus. | In a time field, puts back the time it showed and discards what was typed; focus stays, and leaving later commits that time. In any other field, no effect: what was typed has already been applied (or, in a JSON box, waits for leaving). |
 | Another shortcut, click, or command | Shortcuts are ignored except Ctrl/Cmd+K. A click anywhere that takes focus leaves the field; a time field commits the time it shows. A press on the timeline's track area or on a time-prop marker does not take focus. | Same, committing what was typed in a time field or JSON box. If a time-prop marker is dragged on the timeline while that prop's time field has focus, the field keeps its old text, and leaving it afterwards puts the old time back over the drag (suspected bug). |
 | Composition switched | Switching takes focus (the Omnibar, a click in the sidebar), so the field is left first: a time field commits to the composition being left. The fields then disappear until the new composition connects. | Same; a time field or JSON box commits what was typed to the composition being left, if that composition accepts it. What happens to the pending save is in [the Props Editor](the-props-editor.md#cancel-and-interrupt). |
-| Window loses focus | Studio does not notice. If the browser reports the field as left, a time field commits (to confirm). | Same; a time field or JSON box would commit what was typed. |
+| Window loses focus | Studio does not notice, but the browser reports the field as left, so a time field commits the time it shows (Chromium's usual behavior, to confirm; see [the input model](../foundations/input-model.md#the-interrupt-rows)). | Same; a time field or JSON box commits what was typed. |
 | Pointer leaves the window | No effect. | No effect. A slider being dragged follows the browser's own rules. |
 | Server request fails or server stops | No effect; fields talk only to the composition. | No effect on the field. Only the auto-save fails. |
 | Reload or tab closed | Nothing to lose. | Text typed in a time field or JSON box is lost; changes already applied are lost too unless the auto-save had run. |
@@ -241,7 +241,7 @@ After any interrupt the field shows the prop as the composition holds it, except
 
 **Other tabs and agents.** Each tab's fields show that tab's copy of the props.
 
-**Keyboard and accessibility.** Every field, swatch, menu, and list button can be reached with Tab and used with the browser's usual keys. A drop has no keyboard equivalent other than pasting the address. Errors are shown only as a red color and a tooltip, never as text; the time field shows no error at all. Field names are not tied to their fields (see [the Props Editor](the-props-editor.md#interactions-with-other-systems)).
+**Keyboard and accessibility.** Every field, swatch, menu, and list button can be reached with Tab and used with the browser's usual keys, except that ↑ and ↓ do nothing, Enter adds no line break, and the list buttons cannot be pressed from the keyboard (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). A drop has no keyboard equivalent other than pasting the address. Errors are shown only as a red color and a tooltip, never as text; the time field shows no error at all. Field names are not tied to their fields (see [the Props Editor](the-props-editor.md#interactions-with-other-systems)).
 
 ## Edge cases
 
@@ -265,7 +265,8 @@ After any interrupt the field shows the prop as the composition holds it, except
 - Confirm that a refused change shows nothing to the user, and in particular that the player does not show "Error: ..." for it. For a composition connected through `connectToParent` the refusal happens inside the composition's page, which might reach the player's error panel.
 - Confirm how Chromium shows an asset field's suggestions (on click, on ↓, filtered by address and file name) and what it does with text dropped on a number box, the time field, or a JSON box.
 - Confirm that the slider moves in hundredths of the range without a `step`, and that the number box beside it steps by 1.
-- Confirm whether Chromium reports a field as left when the window loses focus, which would commit a time field or JSON box.
+- Confirm that Chromium reports a field as left when the window loses focus, which commits a time field or JSON box (the input model's open question).
+- Confirm that ↑ and ↓ do not step a number box or move a slider, and that Enter adds no line break to a JSON box (the input model's first open question). If confirmed, a JSON box can only be edited on one line or by pasting.
 - No example in `examples/` declares a schema; every schema-driven field needs a throwaway composition with one. Read from `SchemaInputs.tsx`, `SchemaInputs.test.tsx`, `PropsEditor.tsx`, `PropsEditor.css`, `PropsEditor.test.tsx`, `Controls/TimecodeInput.tsx`, `Controls/TimecodeInput.test.tsx`, `Controls/TimecodeInput.css`, `AssetsPanel/AssetItem.tsx`, `AssetsPanel/FolderItem.tsx`, `packages/core/src/schema.ts`, `color.ts`, `timecode.ts`, and `setInputProps` in `Helios.ts`; not yet confirmed by hand.
 
 Verified against helios commit `c2bfddb`

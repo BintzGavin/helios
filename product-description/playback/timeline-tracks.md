@@ -23,7 +23,7 @@ Items are stacked: the in and out markers above time-prop markers, above composi
 
 ## The simple case
 
-A composition's schema declares a time prop "Title In", currently 1.0 second. A cyan diamond sits at one second on the composition track. The user drags it to two seconds: the composition redraws with the title coming in later, the diamond's tooltip reads "Title In (00:00:02:00)", and the Props Editor's field for it shows the new time. About a second after the drag ends, the change is saved into the composition's default props.
+A composition's schema declares a time prop "Title In", currently 1.0 second. A cyan diamond sits at one second on the composition track. The user drags it to two seconds: the composition redraws with the title coming in later, the diamond's tooltip reads "Title In (00:00:02:00)", and the Props Editor's field for it shows the new time. Once the composition is paused and a second passes with nothing else changing in Studio, the [auto-save](../glossary.md#the-preview) writes the change into the composition's default props.
 
 Pressing an orange diamond moves the playhead to that marker. Dragging a song from the Assets panel and dropping it on the timeline at three seconds gives the composition's audio prop the song's address, and its matching time prop the value 3.
 
@@ -73,7 +73,7 @@ Two things follow from how the value is sent and snapped, both read from the cod
 
 ### Finishing
 
-Releasing the button anywhere on the page ends the drag with the prop at its last value. About one second later, if the props have not changed again, the Props Editor's auto-save writes all the current input props into the composition's `composition.json` as its default props and shows a "Composition updated" toast (see `props/the-props-editor.md`). There is no undo.
+Releasing the button anywhere on the page ends the drag with the prop at its last value. The Props Editor's auto-save later writes all the current input props into the composition's `composition.json` as its default props and shows a "Composition updated" toast: read from the code, one to a few seconds after the last move while the composition is paused, not at all while it plays, and never for a clock-bound composition while its tab is visible (see [the Props Editor](../props/the-props-editor.md#while-ongoing)). There is no undo.
 
 ## Modifiers
 
@@ -98,7 +98,7 @@ The columns are for the time-prop drag. A composition-marker press and an asset 
 | Window loses focus | No effect. | Studio does not notice. If the button is released in another window, the drag continues when the pointer comes back, with no button held, until the next release anywhere on the page. |
 | Pointer leaves the window | No effect. | The drag continues while the browser keeps reporting the pointer, pinned at frame 0 or the total frames beyond the timeline's ends. |
 | Server request fails or server stops | No effect. | No effect on the drag. The auto-save after it fails, with an error toast. |
-| Reload or tab closed | Nothing to lose. | The value is lost unless a second passed after the last move, in which case the auto-save has already written it. |
+| Reload or tab closed | Nothing to lose. | The value is lost unless the auto-save has already written it, which needs the composition paused and a second or more since the last move. |
 | Hot reload | No effect. | The composition reloads with the last props Studio saw, including the dragged value; the drag continues. |
 | Project changed on disk | No effect. | No effect. |
 
@@ -106,7 +106,7 @@ A **composition-marker press** is unaffected by every row: it has already jumped
 
 ## Interactions with other systems
 
-**Files on disk.** A time-prop drag and an asset drop change input props, which the Props Editor auto-saves into the composition's `composition.json` about a second after they stop changing. See [the project and compositions](../foundations/project-and-compositions.md#composition-metadata).
+**Files on disk.** A time-prop drag and an asset drop change input props, which the Props Editor's auto-save writes into the composition's `composition.json` once its wait is over. See [the project and compositions](../foundations/project-and-compositions.md#composition-metadata).
 
 **Browser storage.** None. Waveforms are kept in memory for the page's life only.
 

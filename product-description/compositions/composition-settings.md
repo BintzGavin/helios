@@ -64,7 +64,7 @@ The first change to a field makes the dialog ongoing. Nothing is decided at that
 
 Nothing is checked while typing: the number boxes take zero, negative numbers, and fractions, a cleared number box holds 0, and the name is not compared with the folders on disk until Save.
 
-The dialog fills itself in again, from scratch, whenever Studio's copy of the active composition changes while it is open, and the edits are lost. That happens when "Set from Current Frame" finishes (see [Setting the thumbnail](#setting-the-thumbnail)), when the Props Editor's [auto-save](../glossary.md#the-preview) writes the input props (about a second after they change, so typically just after a composition with props has been opened or edited), and when another composition is chosen in the Omnibar over the dialog. In the last case the dialog then shows the other composition, and Save, "Set from Current Frame", and Duplicate act on that one.
+The dialog fills itself in again, from scratch, whenever Studio's copy of the active composition changes while it is open, and the edits are lost. That happens when "Set from Current Frame" finishes (see [Setting the thumbnail](#setting-the-thumbnail)), when the Props Editor's [auto-save](../glossary.md#the-preview) writes the input props (a second or more after they change, while the composition is paused, so typically just after a composition with props has been opened or edited), and when another composition is chosen in the Omnibar over the dialog. In the last case the dialog then shows the other composition, and Save, "Set from Current Frame", and Duplicate act on that one.
 
 ### Finishing
 
@@ -172,8 +172,8 @@ After any interrupt the user is either still in the dialog, with its values unle
 
 ## Open questions and verification
 
-- **Enter does not save.** Read from the code, the Omnibar's always-active Enter, ↑, and ↓ listener cancels those keys' default actions everywhere (see the technical note in [creating and duplicating](creating-and-duplicating.md#finishing)), so Enter does not save and does not press a focused button, contradicting [keys inside fields and dialogs](../foundations/input-model.md#keys-inside-fields-and-dialogs). Confirm; if confirmed, this may be worth treating as a bug.
-- **The Omnibar behind the dialog.** This dialog comes after the Omnibar in the page at the same stacking level, so Ctrl/Cmd+K may open the Omnibar hidden behind it, with keyboard focus in its search. This contradicts [the input model](../foundations/input-model.md#edge-cases). Confirm.
+- **Enter does not save.** Read from the code, the Omnibar's always-active Enter, ↑, and ↓ listener cancels those keys' default actions everywhere (see the technical note in [creating and duplicating](creating-and-duplicating.md#finishing)), so Enter does not save and does not press a focused button ([keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere) owns the rule). Confirm; if confirmed, this may be worth treating as a bug.
+- **The Omnibar behind the dialog.** This dialog comes after the Omnibar in the page at the same stacking level, so Ctrl/Cmd+K may open the Omnibar hidden behind it, with keyboard focus in its search (see the stacking order in [the workspace](../foundations/the-workspace.md#dialogs)). Confirm.
 - **Edits lost when the dialog refills.** "Set from Current Frame" and the Props Editor's auto-save each refill the dialog from Studio's copy and discard unsaved edits. This looks like a bug.
 - **Leftover numbers.** For a composition without `composition.json`, the number boxes show the previous use's values, including numbers typed and cancelled, and Save writes them. This looks like a bug.
 - Confirm the case-insensitive refusal on macOS with a top-level folder that has a capital letter, and that on Linux the same Save renames the folder to lowercase.

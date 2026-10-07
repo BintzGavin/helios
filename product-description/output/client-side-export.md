@@ -59,7 +59,7 @@ Otherwise the export asks the composition for its audio tracks, fetches their fi
 For each following frame, in order, the export seeks the composition to that frame, waits for it to draw twice, takes the picture, and hands it to the encoder; then the bar grows. The composition in the stage shows each frame as it is captured, and the playhead and the timecode follow it across the range. How long each frame takes depends on how quickly the composition draws and how large the pictures are; DOM mode is usually much slower than Canvas mode.
 
 - **Size.** In Canvas mode, a canvas whose pixel size differs from the export size is stretched to the export size, without keeping its proportions. In DOM mode, the page is drawn at the export size.
-- **Captions.** If the composition has caption cues showing at a frame, they are drawn onto that frame's picture: white text, centered near the bottom, on a 70% black box, with a font size of 5% of the picture's height (at least 16 pixels), several cues stacked upward. This always happens; there is no setting for it. See `panels/the-captions-panel.md`.
+- **Captions.** If the composition has caption cues showing at a frame, they are drawn onto that frame's picture: white text, centered near the bottom, on a 70% black box, with a font size of 5% of the picture's height (at least 16 pixels), several cues stacked upward. This always happens; there is no setting for it. See [the Captions panel](../panels/the-captions-panel.md).
 - **Key frames.** One every two seconds' worth of frames.
 
 Everything else in Studio stays live, and nothing protects the export from the user. Seeking, playing, frame steps, scrubbing, and changes to the input props act on the very composition the export is capturing (see [Cancel and interrupt](#cancel-and-interrupt)). Changing the format menu is not possible; changing the render settings, the in and out points, or the canvas size affects only the next export. A server-side render can be started and runs alongside.
@@ -70,7 +70,7 @@ Everything else in Studio stays live, and nothing protects the export from the u
 
 After the last frame:
 
-1. **Audio.** If the composition has audio tracks, the export mixes them for the length of the range, starting at the in point's time, at 48,000 samples per second in stereo, applying each track's volume and mute as set in the Audio panel (`panels/the-audio-mixer.md`), and adds the mix to the file. The bar stays full meanwhile.
+1. **Audio.** If the composition has audio tracks, the export mixes them for the length of the range, starting at the in point's time, at 48,000 samples per second in stereo, applying each track's volume and mute as set in the Audio panel (see [the audio mixer](../panels/the-audio-mixer.md)), and adds the mix to the file. The bar stays full meanwhile.
 2. **The file.** The export finishes the file in the browser's memory and hands it to the browser as a download named `video.mp4` or `video.webm`, whatever the composition is called. The browser saves it to its downloads folder or asks where to save it, depending on its settings; a second export in the same folder is renamed by the browser ("video (1).mp4").
 3. **Studio.** The bar disappears, Cancel turns back into Export, the format menu is enabled again with the format that was chosen, and no toast appears. The composition is left paused on the last frame of the range.
 
@@ -85,7 +85,7 @@ Nothing is written to the project, and nothing is recorded anywhere.
 | Shift | No effect. | No effect on the export. Shift+← and Shift+→ step the composition the export is capturing (see Keyboard focus). |
 | Ctrl/Cmd | No effect on the click. | No effect on the export. Ctrl/Cmd+K opens the Omnibar and pauses playback, which is already paused. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | The format menu is a [text field](../glossary.md#interactions): after a format has been chosen with it, focus stays there, and Space and the arrow keys change the format instead of playback until focus moves. After the click, the Export button keeps focus as it turns into Cancel; whether Space then presses it as well as toggling playback is an [open question of the input model](../foundations/input-model.md#open-questions-and-verification), and if it does, Space cancels the export. | Shortcuts act wherever focus is. With focus anywhere but a text field, Space plays the composition and ←, →, Home, J, and L move it, all under the export's feet. |
+| Keyboard focus | The format menu is a [text field](../glossary.md#interactions): after a format has been chosen with it, focus stays there, and Space and ← and → act on the menu instead of on playback until focus moves; ↑ and ↓ do nothing. After the click, the Export button keeps focus as it turns into Cancel, but neither Enter nor Space presses it: Studio cancels both, and Space toggles playback instead, which plays the composition under the export (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). So an export cannot be cancelled from the keyboard. | Shortcuts act wherever focus is. With focus anywhere but a text field, Space plays the composition and ←, →, Home, J, and L move it, all under the export's feet. |
 | Playback | Playing is paused before the first frame is captured. Paused stays paused. | Playing during an export makes the composition advance between the export's seek and its picture, so frames may be captured late (read from the code). The export does not pause it again. |
 | Player connection | Before connection, Export does nothing. | The export is tied to the connection it started with. A [hot reload](../glossary.md#the-preview) or a switch to another composition breaks it (see [Cancel and interrupt](#cancel-and-interrupt)). |
 
@@ -121,13 +121,13 @@ After any interrupt that ends the export, the Renders panel is back to the forma
 
 **Input props.** The export takes pictures of the composition as it is, with its current input props. Changing a prop during the export changes every frame captured afterwards.
 
-**Rendering and export.** The export shares the Mode, Video Bitrate, and Resolution Scale settings with [server-side renders](server-renders.md) and ignores the others. It can run at the same time as server-side renders. Only one export runs at a time per tab, because the button is Cancel while one runs. A [snapshot](../glossary.md#rendering-and-output) taken during an export moves the composition the export is capturing (`output/snapshots-and-job-specs.md`).
+**Rendering and export.** The export shares the Mode, Video Bitrate, and Resolution Scale settings with [server-side renders](server-renders.md) and ignores the others. It can run at the same time as server-side renders. Only one export runs at a time per tab, because the button is Cancel while one runs. A [snapshot](../glossary.md#rendering-and-output) taken during an export moves the composition the export is capturing (see [snapshots and job specs](snapshots-and-job-specs.md)).
 
 **Notifications.** Only failures show a toast (red), with the message described under [Finishing](#finishing). Success and Cancel show nothing.
 
 **Other tabs and agents.** Each Studio tab exports on its own, with its own player. A file saved by an editor or an agent during an export hot-reloads the composition and spoils the rest of the export (see [Cancel and interrupt](#cancel-and-interrupt)).
 
-**Keyboard and accessibility.** The format menu and the Export and Cancel button can be reached with Tab and used with the keyboard; the menu has no label. There is no keyboard shortcut and no Omnibar command for a client-side export. The progress bar has no text, percentage, or time estimate, and the end of an export is announced only by the browser's download.
+**Keyboard and accessibility.** The format menu and the Export and Cancel button can be reached with Tab. The menu can be used from the keyboard; the button cannot be pressed with Enter or Space (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)), so starting and cancelling an export need the mouse. The menu has no label. There is no keyboard shortcut and no Omnibar command for a client-side export. The progress bar has no text, percentage, or time estimate, and the end of an export is announced only by the browser's download.
 
 ## Edge cases
 
@@ -148,7 +148,7 @@ After any interrupt that ends the export, the Renders panel is back to the forma
 - No toast or message announces a finished export; only the browser's download shows it. This may be a product call.
 - Captions are drawn one frame late (in the player, `DirectController.captureFrame` reads the active captions before seeking). This may be worth treating as a bug.
 - Cancel is ignored once the last frame has been captured; confirm on a composition with audio, where mixing takes long enough to try.
-- Nothing stops the user from playing, seeking, or editing props during an export. Confirm what a press of Space during an export does to the captured frames, and whether a focused Export or Cancel button is also pressed by Space.
+- Nothing stops the user from playing, seeking, or editing props during an export. Confirm what a press of Space during an export does to the captured frames, and that it does not press the focused Cancel button (read from the code, Studio cancels Space's browser action outside text fields).
 - Confirm what an export does after a switch to another composition: the code suggests "Frame {n} missing during export.", or, in Canvas mode with an audio track showing on the timeline, pictures of Studio's own waveform drawing, or, in DOM mode, pictures of Studio's own page.
 - Confirm what an export does after a hot reload in the middle.
 - Confirm that a hidden tab stalls the export and that it resumes when shown.

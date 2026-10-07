@@ -97,7 +97,7 @@ When a request fails, Studio does not look at the server's answer: a file the se
 | Shift | No effect in Studio. In the file picker, Shift selects a range of files, as the operating system decides. | No effect. |
 | Ctrl/Cmd | No effect in Studio. In the file picker, it adds a file to the selection. Ctrl/Cmd+K opens the Omnibar even from the search box. | No effect. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | The search box and the type menu are [text fields](../glossary.md#interactions): while either has focus, Studio's shortcuts are ignored except Ctrl/Cmd+K, and the arrow keys change the type menu's choice. After Upload or New Folder is clicked, focus stays on that button, so Enter presses it again (reopening the picker or the prompt), and Space may both press it and toggle playback (see [the input model](../foundations/input-model.md#open-questions-and-verification)). Folder tiles and breadcrumbs never take focus. | No effect; uploads continue wherever focus goes. |
+| Keyboard focus | The search box and the type menu are [text fields](../glossary.md#interactions): while either has focus, Studio's shortcuts are ignored except Ctrl/Cmd+K, and ← and → (on Windows and Linux) change the type menu's choice; ↑ and ↓ do nothing. After Upload or New Folder is clicked, focus stays on that button, but neither Enter nor Space presses it again: Studio cancels both, and Space toggles playback instead (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). Folder tiles and breadcrumbs never take focus. | No effect; uploads continue wherever focus goes. |
 | Playback | No effect. Playback continues while the picker is open. The New Folder prompt freezes the page, so the composition stops drawing until the prompt is answered. | No effect; playback continues during an upload. |
 | Player connection | No effect. The panel lists, uploads, and makes folders with no composition open and before the player connects. | No effect. |
 
@@ -133,15 +133,15 @@ Browsing ends at once, so most rows do not touch it. Reloading or hiding the pan
 
 **Playback range and loop.** No interaction.
 
-**Input props.** None directly. The same asset list feeds the [asset fields](../glossary.md#the-preview) in [the Props Editor](../props/the-props-editor.md), so an uploaded file is offered there as soon as the list is re-read (see `props/prop-fields.md`), and a tile can be dragged onto a field (see [asset actions](asset-actions.md)).
+**Input props.** None directly. The same asset list feeds the [asset fields](../glossary.md#the-preview) in [the Props Editor](../props/the-props-editor.md), so an uploaded file is offered there as soon as the list is re-read (see [prop fields](../props/prop-fields.md)), and a tile can be dragged onto a field (see [asset actions](asset-actions.md)).
 
 **Rendering and export.** None directly. In a project without `public/`, the [renders folder](../glossary.md#compositions-and-files) and its MP4 files and every composition's `thumbnail.png` appear in the panel like any other folder and files.
 
 **Notifications.** "Asset uploaded successfully" for each file (green), "Failed to upload asset" (red), "Folder created" (green), and a red toast with the server's message when a folder cannot be made. See [toasts](../foundations/the-workspace.md#toasts).
 
-**Other tabs and agents.** Each Studio tab has its own list, read when it loads and after its own asset changes. A file uploaded by another tab, or written by an agent through Studio's MCP server, appears here only after a reload or after the next asset change made in this tab. Two tabs uploading the same name to the same folder: the last one wins. See `cross-cutting/changes-from-outside-studio.md`.
+**Other tabs and agents.** Each Studio tab has its own list, read when it loads and after its own asset changes. A file uploaded by another tab, or written by an agent through Studio's MCP server, appears here only after a reload or after the next asset change made in this tab. Two tabs uploading the same name to the same folder: the last one wins. See [changes from outside Studio](../cross-cutting/changes-from-outside-studio.md).
 
-**Keyboard and accessibility.** Upload, New Folder, the search box, and the type menu can be reached with Tab. Folder tiles and breadcrumbs cannot: they are not focusable and do not respond to Enter, so folders can only be opened with the mouse (a search reaches any file without opening folders). The overlay is the only sign that a drop will be accepted; nothing announces an upload in progress.
+**Keyboard and accessibility.** Upload, New Folder, the search box, and the type menu can be reached with Tab, but Upload and New Folder cannot be pressed from the keyboard (Enter and Space are cancelled; see [the input model](../foundations/input-model.md#keys-studio-cancels-everywhere)), so uploading and making folders need the mouse. Folder tiles and breadcrumbs cannot be reached at all: they are not focusable and do not respond to Enter, so folders can only be opened with the mouse (a search reaches any file without opening folders). The overlay is the only sign that a drop will be accepted; nothing announces an upload in progress.
 
 ## Edge cases
 

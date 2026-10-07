@@ -74,7 +74,7 @@ If the out point was 0, it is set to the composition's total frames. The composi
 
 **Failed.** After 5 seconds with nothing found, the player shows "Connection Failed..." with Retry. Studio stays disconnected for as long as the composition is open, and would pick up a connection made later (after Retry).
 
-**Which compositions connect.** The player finds a composition whose code assigns its Helios instance to `window.helios`, or calls the player's `connectToParent`, while its page loads. All the examples in `examples/` that animate do this. Of Studio's templates, only Title explainer does; a composition made from the Vanilla JS, React, Vue, Svelte, Solid, or Three.js template never connects (see [the project and compositions](project-and-compositions.md#templates)).
+**Which compositions connect.** The player finds a composition whose code assigns its Helios instance to `window.helios`, or calls the player's `connectToParent`, while its page loads. All the examples in `examples/` that animate do this. Of Studio's templates, Title explainer, Vue, Svelte, and Solid do; Vanilla JS, React, and Three.js never connect. The Vue, Svelte, and Solid templates also need the project to compile their framework, which the verification project does not, so there only Title explainer connects (see [the project and compositions](project-and-compositions.md#templates)).
 
 ### What works before the player is connected
 
@@ -135,7 +135,7 @@ Read from the code, the first connection after a switch is not treated as a fres
 - seeks to the **previous composition's playhead position**, unless the new composition has a remembered position, which then wins;
 - **starts playing** if the previous composition was playing.
 
-About a second later the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
+Once the auto-save's wait is over (a second or more while the new composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)), the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
 
 > Technical note: Studio keeps a record of the last frame, playing state, and input props it saw, together with the address of the composition they came from, and treats a new connection for the same address as a hot reload. At the moment of a switch, the record is updated with the new composition's address while it still holds the old composition's values, because the old connection has not been dropped yet.
 

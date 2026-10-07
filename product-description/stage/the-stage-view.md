@@ -121,7 +121,7 @@ After any interrupt the user is back in the ordinary stage with no pan in progre
 
 **Other tabs and agents.** Each Studio tab keeps its own view while it is open. Every change writes the shared remembered values, so a tab that is reloaded picks up the view last changed in any tab.
 
-**Keyboard and accessibility.** There is no keyboard way to pan, and no shortcut for zoom or Fit. The toolbar buttons can be reached with Tab and pressed with Enter; they are labeled only by their tooltips ("Fit to Screen", "Zoom Out", "Zoom In"). The zoom percentage is plain text. There is no grab cursor while panning.
+**Keyboard and accessibility.** There is no keyboard way to pan, and no shortcut for zoom or Fit. The toolbar buttons can be reached with Tab, but read from the code neither Enter nor Space presses them, because Studio cancels both keys' browser action (Space toggles playback instead; see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)), so zoom and Fit need the mouse. The buttons are labeled only by their tooltips ("Fit to Screen", "Zoom Out", "Zoom In"). The zoom percentage is plain text. There is no grab cursor while panning.
 
 ## Edge cases
 

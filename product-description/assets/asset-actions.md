@@ -102,7 +102,7 @@ On success no toast appears: the list is re-read, and the tile reappears under i
 | --- | --- |
 | A folder tile | The asset is moved into that folder. |
 | Anywhere else in the Assets panel: the empty area, another tile, the buttons, the search box, the breadcrumbs | The asset is moved into the [current folder](../glossary.md#compositions-and-files). If it is already there, the move is refused (see below). |
-| An [asset field](../glossary.md#the-preview) in the Props Editor (the prop field for an image, video, audio, font, model, JSON, or shader prop) | An asset of the same type sets the field to its address. A folder or an asset of another type does nothing. See `props/prop-fields.md`. |
+| An [asset field](../glossary.md#the-preview) in the Props Editor (the prop field for an image, video, audio, font, model, JSON, or shader prop) | An asset of the same type sets the field to its address. A folder or an asset of another type does nothing. See [prop fields](../props/prop-fields.md). |
 | A [prop field](../glossary.md#the-preview) that is a text box | The field's value is replaced with the asset's address. A folder does nothing. |
 | The timeline's track area | A video or audio asset is given to the composition's first prop of that type. See [timeline tracks](../playback/timeline-tracks.md#ending-at-once). |
 | Any other text field on the page, including a Props Editor JSON box | The browser types the asset's address into it where it is dropped, as it does with any dragged text. |
@@ -110,7 +110,7 @@ On success no toast appears: the list is re-read, and the tile reappears under i
 
 A move asks the server to move the file or folder, with everything in it, into the target folder under the same name. It is refused with a red toast giving the server's reason when the target already has something of that name (`Asset "logo.png" already exists in target folder`), or when a folder would go into itself or into one of its own folders (`Cannot move folder "{absolute path}" into itself "{absolute path}"`). On success an "Asset moved" toast appears, for a folder too, the list is re-read, and the tile leaves the current view. The move is saved on disk at once, with no undo, and, unlike a rename, it gives no warning that references to the old path will break.
 
-A drop on the Props Editor or the timeline changes input props, not files; [the Props Editor](../props/the-props-editor.md)'s auto-save then writes them into `composition.json` about a second later.
+A drop on the Props Editor or the timeline changes input props, not files; [the Props Editor](../props/the-props-editor.md)'s auto-save then writes them into `composition.json` once its wait is over (a second or more while the composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)).
 
 ## Modifiers
 
@@ -119,7 +119,7 @@ A drop on the Props Editor or the timeline changes input props, not files; [the 
 | Shift | Renaming: types capitals. Deleting, dragging, previews: no effect. | Renaming: types capitals. Dragging: Studio does not read it; the browser may change the badge on the drag pointer. |
 | Ctrl/Cmd | Renaming: the field's own editing keys (select all, copy, paste, undo typing) work. Ctrl/Cmd+K opens the Omnibar, which takes focus away from the field (see [Cancel and interrupt](#cancel-and-interrupt)). Deleting, dragging, previews: no effect. | Renaming: as at the start. Dragging: Studio does not read it; the browser may show a copy badge on the drag pointer. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | ✎ moves focus into the rename field. The Rename Asset confirmation focuses Rename; Delete Asset focuses Cancel. With one of those buttons focused, Enter presses it, and Space presses it and is also Studio's play-or-pause key, so playback may toggle as well (see [the input model](../foundations/input-model.md#open-questions-and-verification)). A press on a tile takes focus out of any other text field, as on any web page. | Renaming: shortcuts stay ignored while the field has focus. Dragging: the browser passes no key presses to the page except Escape. |
+| Keyboard focus | ✎ moves focus into the rename field. The Rename Asset confirmation focuses Rename; Delete Asset focuses Cancel. Neither Enter nor Space presses the focused button: Studio cancels both, and Space toggles playback instead (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). Escape is the only key that answers a confirmation, as Cancel. A press on a tile takes focus out of any other text field, as on any web page. | Renaming: shortcuts stay ignored while the field has focus. Dragging: the browser passes no key presses to the page except Escape. |
 | Playback | No effect. Playback continues through every action, and an audio preview plays on top of the composition's own sound. | No effect. |
 | Player connection | Previews, renaming, deleting, moving, and Open in Editor work with no composition open and before the player connects. A drop on the Props Editor or the timeline needs the player connected; before that, the Props Editor says "No active controller" and the timeline ignores the drop. | A drop goes to whatever composition is connected when the button is released. |
 
@@ -159,9 +159,9 @@ After any of these the user is back in the Assets panel with the tile as it was,
 
 **Notifications.** "Asset deleted" (also for folders), "Failed to delete asset", "Failed to rename asset", "Failed to rename folder", "Asset moved" (also for folders), and a red toast with the server's reason when a move is refused. A successful rename and Open in Editor show nothing. See [toasts](../foundations/the-workspace.md#toasts).
 
-**Other tabs and agents.** Each tab has its own copy of the asset list. A file renamed, moved, or deleted in one tab stays under its old name in another until that tab reloads or makes an asset change of its own; acting on the stale tile there fails as described in the "Project changed on disk" row. See `cross-cutting/changes-from-outside-studio.md`.
+**Other tabs and agents.** Each tab has its own copy of the asset list. A file renamed, moved, or deleted in one tab stays under its old name in another until that tab reloads or makes an asset change of its own; acting on the stale tile there fails as described in the "Project changed on disk" row. See [changes from outside Studio](../cross-cutting/changes-from-outside-studio.md).
 
-**Keyboard and accessibility.** None of these actions can be reached from the keyboard. The tile buttons appear only while the pointer is over a tile, and neither the tiles nor their buttons can take focus; previews and drags are mouse-only. The buttons are labeled only by their tooltips ("Open in Editor", "Rename Asset", "Delete Asset"; "Rename" and "Delete" on folders). In the rename field, Enter commits and Escape cancels; in the confirmations, Escape cancels and Enter presses the focused button.
+**Keyboard and accessibility.** None of these actions can be reached from the keyboard. The tile buttons appear only while the pointer is over a tile, and neither the tiles nor their buttons can take focus; previews and drags are mouse-only. The buttons are labeled only by their tooltips ("Open in Editor", "Rename Asset", "Delete Asset"; "Rename" and "Delete" on folders). In the rename field, Enter asks for confirmation and Escape cancels; in the confirmations, Escape cancels, and nothing confirms from the keyboard.
 
 ## Edge cases
 
@@ -171,7 +171,7 @@ After any of these the user is back in the Assets panel with the tile as it was,
 - **Folders with a dot in the name.** The extension rule applies to folders too: renaming a folder `v1.5` to "v2" makes `v2.5`.
 - **Changing the type by renaming.** Renaming `clip.mp4` to "clip.webm" keeps the same contents under a new extension, so the panel lists it as a video it may not be able to play. A name ending in "." or with an unknown extension makes the file disappear from the panel.
 - **Slashes in a new name.** A new name such as "../logo" or "sub/logo" renames the file into another folder, if that folder exists and is inside Home; otherwise the rename fails with the generic toast.
-- **Holding Enter.** Enter in the field opens the confirmation with Rename focused; if Enter is held long enough to repeat, the repeat presses Rename.
+- **Holding Enter.** Enter in the field opens the confirmation with Rename focused. Holding Enter does not go on to press Rename, because Studio cancels Enter on buttons; the rename still needs a click.
 - **Folders in search results.** A matching folder appears as a file tile with a 📄 preview and all three file buttons. 📝 asks the editor to open the folder. × asks "Are you sure you want to delete "{name}"? This action cannot be undone and may break compositions referencing this file." and then deletes the whole folder with its contents.
 - **Compositions as assets.** In a project without `public/` (the verification project is one), every composition folder is an asset folder. Deleting one from the Assets panel deletes the composition; renaming or moving one, or moving its `composition.json`, changes it on disk while the Compositions panel keeps listing it under its old ID until the page is reloaded (see [when the project changes underneath Studio](../foundations/project-and-compositions.md#when-the-project-changes-underneath-studio)). Deleting a composition's `src` folder deletes its code.
 - **Dragging by an image preview.** Pressing on an image's preview may make the browser drag the picture alone rather than the whole tile; the drop works the same way.
@@ -190,7 +190,7 @@ After any of these the user is back in the Assets panel with the tile as it was,
 - Confirm that during the browser's drag Studio receives no key presses except Escape, and the size of Chromium's drag threshold.
 - Confirm whether pressing on an image preview drags the picture alone, and what another application receives when a tile is dropped on it.
 - Confirm that an audio preview ignores Studio's mute and volume, and that several can play at once.
-- The input model says a dragged folder carries the asset's address as plain text, like a file; read from `FolderItem.tsx`, a folder carries only its details and its path.
+- Read from `FolderItem.tsx` (lines 24 to 29), a dragged folder carries only its details and its path, not its address as plain text, so dropping it on a text field or in another application gives nothing. Confirm.
 - The user guide (`docs/site/guides/using-studio.md`) says Studio "will attempt to update references" when an asset is renamed; it does not, and the Rename Asset confirmation says references must be updated by hand.
 - Read from `components/AssetsPanel/AssetItem.tsx`, `AssetItem.css`, `AssetItem.test.tsx`, `FolderItem.tsx`, `FolderItem.css`, `AssetsPanel.tsx`, `AssetsPanel.test.tsx`, `ConfirmationModal/ConfirmationModal.tsx`, the asset functions and `openInEditor` in `context/StudioContext.tsx`, the `/api/assets` routes in `server/plugin.ts`, `moveAsset`, `renameAsset`, and `deleteAsset` in `server/discovery.ts` and `server/discovery.test.ts`, the drop handlers in `SchemaInputs.tsx`, `PropsEditor.tsx`, and `Timeline.tsx`, and `scripts/verify-asset-move.ts`; not yet confirmed by hand.
 

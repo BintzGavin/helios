@@ -30,11 +30,11 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Empty state.** What the stage shows when no composition is open: "Welcome to Helios Studio" with a "+ Create Composition" button when the project has no compositions, or "No Composition Selected" with a "Select Composition (⌘K)" button when it has some.
 
-**Dialog.** A box shown over a dark overlay that covers the whole page: the Omnibar, Keyboard Shortcuts, New Composition, Duplicate Composition, Composition Settings, System Diagnostics, Helios Assistant, Render Preview, and the confirmation dialogs. Clicking the overlay closes any of them. Only the Omnibar, Keyboard Shortcuts, and the confirmation dialogs close on Escape. A dialog does not block Studio's keyboard shortcuts unless keyboard focus is in one of its text fields.
+**Dialog.** A box shown over a dark overlay that covers the whole page: the Omnibar, Keyboard Shortcuts, New Composition, Duplicate Composition, Composition Settings, System Diagnostics, Helios Assistant, Render Preview, and the confirmation dialogs. Clicking the overlay closes any of them. Only the Omnibar, Keyboard Shortcuts, and the confirmation dialogs close on Escape, and nothing in a dialog can be submitted or pressed with Enter or Space. A dialog does not block Studio's keyboard shortcuts unless keyboard focus is in one of its text fields. Dialogs stack in a fixed order with the Omnibar at the bottom, so an Omnibar opened over another dialog is hidden behind it (see [dialogs](foundations/the-workspace.md#dialogs)).
 
 **Omnibar.** Studio's command palette (the UI's name for it), opened with Ctrl/Cmd+K or the composition button. It searches commands, compositions, and assets.
 
-**Toast.** A short notification that slides in at the bottom right of the page and disappears by itself after 3 seconds (2 seconds for "Composition reloaded"), or when its × is clicked. Toasts stack upward, newest at the bottom; a colored stripe on the left marks the kind: green for success, blue for info, orange for warning, red for error.
+**Toast.** A short notification that slides in at the bottom right of the page, above every dialog, and disappears by itself after 3 seconds (2 seconds for "Composition reloaded", which appears only in Studio's development mode), or when its × is clicked. Toasts stack upward, newest at the bottom; a colored stripe on the left marks the kind: green for success, blue for info, orange for warning, red for error.
 
 **Browser prompt.** A message box drawn by the browser itself rather than by Studio, with the browser's own look and buttons: the Assets panel's "Enter folder name:" box, the confirmation before removing a component in the Components panel, and the "Failed to parse SRT file." message in the Captions panel. It is not a *dialog*: it has no overlay, Escape answers it as Cancel (or as OK when OK is its only button), and it blocks the whole Studio page, keys and clicks included, until it is answered.
 
@@ -50,21 +50,23 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Composition ID.** The composition folder's path relative to the project root, with forward slashes (`simple-canvas-animation`, `scenes/intro`). It is what Studio uses to remember things per composition. A `composition.html` directly in the project root has an empty ID.
 
-**Composition name.** The name Studio shows. It is derived from the composition folder's own name, never stored: the folder name is split at hyphens and each part is capitalized ("simple-canvas-animation" becomes "Simple Canvas Animation"). Renaming a composition therefore renames its folder.
+**Composition name.** The name Studio shows. It is derived from the composition folder's own name, never stored: the folder name is split at hyphens and each part is capitalized ("simple-canvas-animation" becomes "Simple Canvas Animation"). Renaming a composition therefore renames its folder. After its settings are saved or its props auto-saved, a composition in a subfolder is named from its whole ID instead ("Scenes/intro Card") until the page is reloaded (see [the project and compositions](foundations/project-and-compositions.md#edge-cases)).
 
 **Active composition.** The composition open in the stage. There is at most one. It is *remembered* and reopened when the page loads.
 
-**Composition metadata.** The optional `composition.json` file in a composition folder: `width`, `height`, `fps`, `duration` (in seconds), and `defaultProps`. Studio uses the width and height as the *canvas size* when the composition opens and applies the default props to it. The frame rate and duration in this file do not change how long the composition plays; the composition's own code decides that.
+**Composition metadata.** The optional `composition.json` file in a composition folder: `width`, `height`, `fps`, `duration` (in seconds), and `defaultProps`. Studio uses the width and height as the *canvas size* when the composition opens, and again whenever its copy of the composition changes, and applies the default props when it opens. Studio reads the file when it lists the compositions, not again by itself. The frame rate and duration in this file do not change how long the composition plays; the composition's own code decides that.
 
-**Default props.** The `defaultProps` object in `composition.json`. Studio applies it to the composition when it opens, and the Props Editor rewrites it automatically about a second after the input props stop changing.
+**Default props.** The `defaultProps` object in `composition.json`. Studio applies it to the composition when it opens, and the Props Editor rewrites it automatically with the *auto-save*.
+
+**Studio's copy.** What Studio last read or was told about a composition: its ID, name, and description, its *composition metadata* (size, frame rate, duration, default props), and its thumbnail. It is replaced for every composition when Studio lists the compositions again (page load, creating, duplicating, setting a thumbnail), and for one composition when its settings are saved or its props are auto-saved. An edit made to `composition.json` outside Studio does not reach it until then, and Studio's next save writes its copy over that edit.
 
 **Thumbnail.** A `thumbnail.png` file in the composition folder, shown in the Compositions panel and the Omnibar. Studio writes it from the current frame when asked (Composition Settings, "Set from Current Frame").
 
 **Composition tile.** One composition's entry in the Compositions panel: a card 140 pixels wide with the composition's thumbnail (cropped to 16:9, or 🎬 on gray when it has none) above its name, and a blue border when it is the *active composition*. While the pointer is over the thumbnail, three buttons appear on it: 📝 (Open in Editor), 📑 (Duplicate), and × (Delete). Clicking anywhere else on the tile opens the composition. The [Compositions panel](compositions/the-compositions-panel.md) document owns what a tile does.
 
-**Template.** One of the starting points the New Composition dialog offers: Title explainer, Vanilla JS (the default choice), React, Vue, Svelte, Solid, and Three.js.
+**Template.** One of the starting points the New Composition dialog offers: Title explainer, Vanilla JS (the default choice), React, Vue, Svelte, Solid, and Three.js. Only Title explainer, Vue, Svelte, and Solid compositions can connect to the player, and the last three only in a project that compiles their framework; in the verification project only Title explainer does (see [templates](foundations/project-and-compositions.md#templates)).
 
-**Asset.** A file Studio lists in the Assets panel: an image, video, audio, font, 3D model, JSON, or shader file, recognized by its extension, or a folder. Assets are taken from the project's `public/` folder if it exists, otherwise from the whole project.
+**Asset.** A file Studio lists in the Assets panel: an image, video, audio, font, 3D model, JSON, or shader file, recognized by its extension, or a folder. Assets are taken from the project's `public/` folder if it exists, otherwise from the whole project, in which case every composition folder is an asset folder too (as in the verification project).
 
 **Asset tile.** One square in the Assets panel's list, standing for one asset. A folder's tile is 100 pixels square and shows 📁 above the folder's name; clicking it opens the folder. A file's tile is 100 pixels wide and shows a preview made for the asset's type above the file name, and, while the pointer is over it, three small round buttons at its top right: 📝 (Open in Editor), ✎ (Rename Asset), and × (Delete Asset). Every tile can be dragged. The [asset actions](assets/asset-actions.md) document owns what a tile does.
 
@@ -90,7 +92,7 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Hot reload.** The player reloading the composition's page because a file the composition uses changed on disk. Studio notices the new connection and puts back the frame, the playing state, and the input props it last saw.
 
-**Canvas size.** The width and height, in composition pixels, at which the player is laid out in the stage and at which renders and exports are made. It is set from the composition's metadata when the composition opens and can be changed from the stage toolbar. It is not remembered.
+**Canvas size.** The width and height, in composition pixels, at which the player is laid out in the stage and at which renders, exports, and job specs are made. It is set from the composition's metadata when the composition opens, and again whenever Studio's copy of the composition changes (its settings are saved, its props are auto-saved, or a thumbnail is set), and can be changed from the stage toolbar in between. It is not remembered.
 
 **Frame.** One still image of the composition. Frames are numbered from 0. A composition with a duration of 5 seconds at 30 frames per second has *total frames* of 150, and Studio lets the playhead go anywhere from frame 0 to frame 150 inclusive.
 
@@ -100,7 +102,11 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Timecode.** A position written as hours, minutes, seconds, and frames, `HH:MM:SS:FF`, two digits each. At 30 frames per second, frame 45 is `00:00:01:15`.
 
-**Playhead.** The vertical line on the timeline at the current frame.
+**Playhead.** The red vertical line on the timeline at the current frame. It cannot be grabbed; a press anywhere on the timeline's track area moves it.
+
+**Ruler.** The strip at the top of the timeline's track area with tick marks labeled in timecodes.
+
+**Hover guide.** The faint dashed vertical line that follows the pointer over the timeline's track area, with a small timecode label above it. During a scrub or a marker drag it stays where the drag began. The [timeline](playback/the-timeline.md#the-hover-guide) owns it.
 
 **Composition track.** The dark 24-pixel bar under the timeline's ruler that stands for the composition. The playback range's shading, the in and out markers, caption bars, composition markers, and time-prop markers sit on it.
 
@@ -112,7 +118,9 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **In point / out point.** The first and last frame of the *playback range*, set with I and O or by dragging the blue markers on the timeline. The out point is never less than the in point plus 1.
 
-**Playback range.** The span from the in point to the out point. Playback stops or loops at its ends; server-side renders and client-side exports cover exactly this span. When it covers the whole composition, Studio clears it in the composition and plays the full length.
+**Playback range.** The span from the in point to the out point. Playback stops or loops at its ends. Server-side renders started from the Renders panel, client-side exports, and job specs cover it from the in point up to, but not including, the out point; the Omnibar's "Start Render" ignores it. When it covers the whole composition, Studio clears it in the composition and plays the full length.
+
+**In and out markers.** The two thin blue lines with small triangles on the composition track at the in point and the out point, which can be dragged. The [playback range](playback/the-playback-range.md) owns them.
 
 **Loop.** Whether playback wraps from the end of the playback range back to its start (or, in reverse, from the start to the end) instead of stopping. Off by default; remembered per composition.
 
@@ -126,9 +134,11 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Prop field.** The control in a Props Editor row that shows one input prop and changes it. When the *schema* lists the prop, the field is made for the type it declares: a text box, a number box (with a slider when the schema gives both limits), a check box, a color field (a swatch and a text box), a drop-down menu, a date or clock-time picker, a *time field* (a box that shows a time prop as a timecode, not to be confused with the timeline's *timecode field*), an *asset field* (a text box that suggests the project's assets of one type and accepts one dropped on it), a *JSON box* (a text area that is applied only when it is left), or a nested list or object of further fields. A prop the schema does not list gets an *inferred* field, chosen from the kind of value it holds. Most fields apply every keystroke at once; the time field and the JSON box wait until they are left. The [prop fields](props/prop-fields.md) document owns them.
 
-**Auto-save.** The Props Editor writing the input props into the composition's default props in `composition.json`, about one second after they stop changing, with a "Composition updated" toast.
+**Auto-save.** The Props Editor writing the input props into the composition's default props in `composition.json`, with a "Composition updated" toast, once one second has passed with nothing in Studio changing. Read from the code, that is not simply a second after the props stop changing: the wait starts again on every change anywhere in Studio, including the once-a-second check on render jobs and every frame of playback, so while paused the save comes one to a few seconds after the last edit, and while playing, or for a *clock-bound composition*, it does not come. The [Props Editor](props/the-props-editor.md#while-ongoing) owns the details.
 
-**Markers.** Named points in time that the composition declares. They show on the timeline as small colored ticks.
+**Composition marker.** A named point in time that the composition declares (in seconds). It shows on the composition track as a small diamond in its own color, orange if it has none; pressing it seeks there. The documents say "composition marker" to tell it from the *in and out markers* and the *time-prop markers*.
+
+**Time-prop marker.** The cyan diamond on the composition track at the value of a *time prop*, which can be dragged to change that prop. [Timeline tracks](playback/timeline-tracks.md) owns composition markers and time-prop markers.
 
 **Captions.** Timed text cues the composition carries. They show on the timeline as bars and can be edited in the Captions panel.
 
@@ -148,9 +158,11 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Zoom (stage).** The scale at which the composition is drawn in the stage, shown in the stage toolbar as a percentage. 100% draws one composition pixel as one screen pixel. It ranges from 10% to 500%.
 
+**Zoom (timeline).** How wide the timeline draws each frame, set with the slider in the timeline's header row: "Fit" at its left end makes the whole composition exactly as wide as the timeline, and each of its 100 other steps gives a fixed width per frame. It is remembered for all compositions. The [timeline](playback/the-timeline.md#zooming-the-timeline) owns it.
+
 **Pan.** How far, in screen pixels, the composition is moved from the center of the stage, horizontally and vertically.
 
-**Fit.** The stage toolbar button titled "Fit to Screen". It sets the zoom to 100% and the pan to zero; it does not scale the composition to the stage's size.
+**Fit.** The stage toolbar button titled "Fit to Screen". It sets the zoom to 100% and the pan to zero; it does not scale the composition to the stage's size. Not to be confused with the "Fit" end of the timeline's zoom slider (see *zoom (timeline)*).
 
 **Transparency grid.** The checkerboard drawn behind the composition (on by default), toggled with 🏁.
 
@@ -162,11 +174,11 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Ongoing.** An interaction is ongoing from the moment it can no longer end at once: for a mouse drag, the first mouse move with the button held (Studio has no distance threshold, so a one-pixel move counts); for a dialog, the first edit; for an inline field, the first keystroke; for playback, the first frame advance; for a render, the server accepting the job. A keyboard shortcut is never ongoing unless the key is held and repeats.
 
-**Drag.** A mouse interaction that became ongoing: the button went down on something, and the mouse moved before it came up. Studio's drags start on a press with no threshold and follow the pointer at once.
+**Drag.** A mouse interaction that became ongoing: the button went down on something, and the mouse moved before it came up. Studio's drags start on a press with no threshold and follow the pointer at once. They come in three kinds: bound to an area (the stage pan, which ends when the pointer leaves the stage), bound to the page (the scrub, the marker drags, and the panel dividers, which follow the pointer anywhere on the page), and the browser's own drag and drop (assets and desktop files). The [input model](foundations/input-model.md#three-kinds-of-drag) owns the difference.
 
 **Scrub.** Pressing on the timeline's track area, which jumps the playhead to the frame under the pointer, and dragging, which keeps it under the pointer. The [timeline](playback/the-timeline.md) document owns it.
 
-**Snapping.** While seeking or dragging a marker on the timeline with the mouse, pulling the frame onto the nearest of frame 0, the total frames, the in and out points, composition markers, caption starts and ends, and time props, when one is within 10 screen pixels. Shift turns it off.
+**Snapping.** While seeking or dragging a marker on the timeline with the mouse, pulling the frame onto the nearest of frame 0, the total frames, the in and out points, composition markers, caption starts and ends, and time props, when one is within 10 screen pixels. Shift turns it off. A dragged marker snaps to its own position too, so it moves in steps of about 10 pixels unless Shift is held.
 
 **Drop target.** A place that accepts something dragged with the browser's own drag and drop: a folder or the empty area of the Assets panel, an asset or text field in the Props Editor, or the timeline's track area. It highlights while something is dragged over it.
 
@@ -174,9 +186,9 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Shortcut.** A key, with or without modifiers, that Studio acts on wherever the pointer is. The [input model](foundations/input-model.md#the-shortcut-map) owns the full list.
 
-**Keyboard focus.** Where key presses go. For these documents it is one of three places: a *text field*, the *player*, or elsewhere (the page, a button, a slider). Most shortcuts are ignored while focus is in a text field.
+**Keyboard focus.** Where key presses go. For these documents it is one of three places: a *text field*, the *player*, or elsewhere (the page, a button, a link). Most shortcuts are ignored while focus is in a text field.
 
-**Text field.** Any text input, number input, text area, drop-down menu (`select`), or editable text. Studio treats them all the same when deciding whether to ignore a shortcut.
+**Text field.** Any input element, whatever its kind (text and number boxes, but also check boxes, color swatches, sliders, date and clock-time pickers, and file choosers), any text area, any drop-down menu (`select`), and any editable text. Studio treats them all the same when deciding whether to ignore a shortcut, so a focused check box or slider turns the shortcuts off just as a text box does. Buttons and links are not text fields.
 
 **Commit.** To make an interaction's result durable: an in point set, a field's value applied, a file written. **Discard** is the opposite: the interaction ends and leaves things as they were before it started.
 
@@ -184,13 +196,13 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 These are the rows of every "Cancel and interrupt" table. The [input model](foundations/input-model.md#the-interrupt-rows) defines what each one does in Studio in general; each document says what it does to that feature.
 
-**Escape.** The Escape key. Studio has no general Escape behavior: it closes the Omnibar, the Keyboard Shortcuts dialog, and the confirmation dialogs, and cancels editing in the timecode field and the inline rename fields. It does not stop drags, playback, renders, or exports.
+**Escape.** The Escape key. Studio has no general Escape behavior: it closes the Omnibar, the Keyboard Shortcuts dialog, and the confirmation dialogs (every one of them that is open), cancels editing in the timecode field and the Assets panel's inline rename fields, and puts back the time shown in a Props Editor time field. It does not stop drags, playback, renders, or exports, and it does not close the other dialogs.
 
 **Another shortcut, click, or command.** The user doing something else before the interaction is over: pressing a shortcut, clicking another control, running an Omnibar command, or opening a dialog.
 
 **Composition switched.** The active composition changing, from the Compositions panel, the Omnibar, or as a side effect of creating, duplicating, renaming, or deleting a composition. The player is replaced and must connect again.
 
-**Window loses focus.** Another window or application takes focus, or the Studio tab is hidden. Studio does not listen for this; whatever was in progress continues, and a mouse button released elsewhere is never seen.
+**Window loses focus.** Another window or application takes focus, or the Studio tab is hidden. Studio does not listen for this; whatever was in progress continues, and a mouse button released elsewhere is never seen. The browser does report a focused field as left (and focuses it again on return), so a field that commits when it is left commits (Chromium's usual behavior, to confirm; see [the input model](foundations/input-model.md#the-interrupt-rows)).
 
 **Pointer leaves the window.** The pointer leaves the element an interaction started on, or the browser window, or the mouse button is released outside it.
 
@@ -210,9 +222,9 @@ These are the rows of every "Cancel and interrupt" table. The [input model](foun
 
 ## Rendering and output
 
-**Render job.** A server-side render of the active composition, started from the Renders panel or the Omnibar. Its status is one of queued, rendering, completed, failed, or cancelled, shown in the UI in those lowercase words. Jobs are saved in the renders folder and survive a restart; a job that was queued or rendering when the server stopped comes back as failed with "Server restarted during render".
+**Render job.** A server-side render of the active composition, started from the Renders panel or the Omnibar (or of any composition, by an *agent*). Its status is one of queued, rendering, completed, failed, or cancelled, shown in the Renders panel as a badge in capitals (QUEUED, RENDERING, COMPLETED, FAILED, CANCELLED). Jobs are saved in the renders folder and survive a restart; a job that was queued or rendering when the server stopped comes back as failed with "Server restarted during render".
 
-**Render settings.** The options in the Renders panel that shape a server-side render and a client-side export: mode (canvas or DOM), codec, bitrate, scale, and the like. They are remembered for all compositions.
+**Render settings.** The options under "Server-Side Render" in the Renders panel: preset, mode (canvas or DOM), video bitrate, video codec, concurrency, hardware acceleration, WebCodecs preference, and resolution scale. Server-side renders use them all; a job spec records the mode, the video codec, and the WebCodecs preference, and uses the concurrency and the scale for its chunks and size; a client-side export uses the mode, the bitrate, and the scale; snapshots and thumbnails use the mode. They are remembered for all compositions. The [server-side renders](output/server-renders.md#the-render-settings) document owns them.
 
 **Render mode.** The render setting shown as "Mode" in the Renders panel, which decides how a picture of a frame is taken from the composition. Canvas (the default) takes the picture from the first `<canvas>` element in the composition's page, so anything the composition draws outside that canvas is left out, and a composition with no canvas cannot be captured. DOM takes a picture of the composition's whole page. The same setting applies to server-side renders, client-side exports, snapshots, and thumbnails. The [server-side renders](output/server-renders.md#the-render-settings) document owns it.
 
@@ -220,7 +232,7 @@ These are the rows of every "Cancel and interrupt" table. The [input model](foun
 
 **Snapshot.** A PNG of the current frame as captured from the composition, downloaded by the browser as `snapshot-{composition name}-{frame}.png`.
 
-**Job spec.** A JSON file describing how to render the playback range in chunks with the `helios` CLI, downloaded as `job-{timestamp}.json`.
+**Job spec.** A JSON file describing how to render the playback range in chunks with the `helios` CLI, downloaded as `job-{timestamp}.json`. It records the frames, the size, the frame rate, and some of the render settings, but not the input props.
 
 **Chunk.** One part of a job spec: a run of consecutive frames of the playback range, with the `helios render` command that renders them into a file of their own. A job spec has as many chunks as the Concurrency (Workers) render setting asks for (one by default), or fewer when there are fewer frames, all the same length except a shorter last one, and one `helios merge` command that joins the chunk files into the final video. The [snapshots and job specs](output/snapshots-and-job-specs.md) document owns it.
 

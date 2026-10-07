@@ -4,7 +4,7 @@
 
 A server-side render turns the active composition into an MP4 file on disk. The Studio server opens the composition in its own headless browser, steps it frame by frame, encodes the frames with FFmpeg, and writes the result into the project's [renders folder](../glossary.md#compositions-and-files), independently of the preview in the stage. It lives in the Renders panel, the last of the sidebar's six tabs, under the heading "Server-Side Render": the [render settings](../glossary.md#rendering-and-output), a "Start Render Job" button, an "Export Spec" button, a "Range: {in} - {out}" readout, and below them the list of [render jobs](../glossary.md#rendering-and-output), newest first. Each job shows its status, its progress while it renders, and, once it has finished, buttons to cancel, delete, preview, and download. The Omnibar's "Start Render" command starts a render too. Renders can be started before the player is [connected](../glossary.md#the-preview), and they keep running on the server when the page is reloaded or closed.
 
-The Renders panel also holds the [client-side export](client-side-export.md) at its top and the "Export Spec" button that downloads a [job spec](../glossary.md#rendering-and-output) (`output/snapshots-and-job-specs.md`). This document owns the render settings, the job list, and the Render Preview dialog.
+The Renders panel also holds the [client-side export](client-side-export.md) at its top and the "Export Spec" button that downloads a [job spec](../glossary.md#rendering-and-output) (see [snapshots and job specs](snapshots-and-job-specs.md)). This document owns the render settings, the job list, and the Render Preview dialog.
 
 ## The simple case
 
@@ -84,7 +84,7 @@ A job ends in one of three states, and Studio shows no toast for any of them; th
 
 Each change of status is saved in `renders/jobs.json`; the progress is not. Finished jobs stay in the list, for every composition, until they are deleted, and come back after the server restarts.
 
-**The Omnibar's "Start Render".** It renders the whole composition, ignoring the playback range: from frame 0 for the composition's length as Studio last read it, or for 10 seconds if Studio has not read a length. Its entry shows no "({in}-{out})". Everything else is the same as "Start Render Job". See `compositions/the-omnibar.md`.
+**The Omnibar's "Start Render".** It renders the whole composition, ignoring the playback range: from frame 0 for the composition's length as Studio last read it, or for 10 seconds if Studio has not read a length. Its entry shows no "({in}-{out})". Everything else is the same as "Start Render Job". See [the Omnibar](../compositions/the-omnibar.md).
 
 ## The render settings
 
@@ -146,7 +146,7 @@ The server serves a render only while its job is COMPLETED and its file is a non
 | Shift | No effect on Start Render Job, Cancel, Delete, or Preview. On the Download link the browser's own Shift+click applies, which may open the file in a new window instead of saving it. | No effect. |
 | Ctrl/Cmd | No effect on Studio's buttons. Ctrl/Cmd+click on the Download link may open the file in a new tab instead of saving it. Ctrl/Cmd+K opens the Omnibar, from which "Start Render" renders the full length. | No effect. |
 | Alt/Option | No effect. Alt/Option+click on the Download link saves the file, as a plain click does. | No effect. |
-| Keyboard focus | Shortcuts are ignored while typing in Video Bitrate, Video Codec, or Concurrency, and while a settings menu has focus, where Space and the arrow keys change the menu's choice. After a click, Start Render Job keeps keyboard focus; whether Space then presses it again as well as toggling playback is an [open question of the input model](../foundations/input-model.md#open-questions-and-verification). | No effect; the render runs on the server. |
+| Keyboard focus | Shortcuts are ignored while typing in Video Bitrate, Video Codec, or Concurrency, and while a settings menu has focus, where Space opens the menu and ← and → change its choice (on Windows and Linux); ↑ and ↓ do nothing, so Concurrency cannot be stepped from the keyboard. After a click, Start Render Job keeps keyboard focus, but neither Enter nor Space presses it again: Studio cancels both, and Space toggles playback instead (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). | No effect; the render runs on the server. |
 | Playback | No effect. The render does not use the playhead, and playback continues. | No effect. Playing, pausing, and seeking do not touch the render. |
 | Player connection | Works before the player is connected, but uses what Studio last read from a composition: on a first open, a frame rate of 30, no input props, and, for a composition with no remembered timeline state, an out point of 0 until the length is known; right after a switch, the previous composition's frame rate and input props (see [Edge cases](#edge-cases)). | No effect. A connection, a failed connection, or a hot reload in the player does not reach the render. |
 
@@ -182,13 +182,13 @@ After any of these, the user stays in the Renders panel with whatever jobs the s
 
 **Input props.** A render uses the input props as they are at the click, whether or not they have been auto-saved into the composition's default props. Changing them afterwards does not change a running render.
 
-**Rendering and export.** This document owns server-side renders and the render settings. The [client-side export](client-side-export.md) uses the mode, the bitrate, and the scale. The job spec, downloaded with "Export Spec", uses the same settings, size, and range (`output/snapshots-and-job-specs.md`). A server-side render, a client-side export, and other server-side renders can all run at once.
+**Rendering and export.** This document owns server-side renders and the render settings. The [client-side export](client-side-export.md) uses the mode, the bitrate, and the scale. The job spec, downloaded with "Export Spec", uses the same settings, size, and range (see [snapshots and job specs](snapshots-and-job-specs.md)). A server-side render, a client-side export, and other server-side renders can all run at once.
 
 **Notifications.** Toasts: "Render started" (green), even if the server refused the job; "Failed to start render" (red), only when the request could not be sent; "Render cancelled" (blue), whether or not the job was still running; "Failed to cancel render" (red); "Render job deleted" (green), whether or not the server deleted it; "Failed to delete render" (red). No toast announces that a render completed or failed; the entry changes in the list, which may not be visible if another tab is shown.
 
-**Other tabs and agents.** Every tab shows the same job list within a second, and any tab can cancel or delete any job, including one started by an agent through Studio's MCP server. Each tab reads the remembered render settings when it loads and writes all of them on every change, so the last tab to change a setting decides what the others see after a reload. See `cross-cutting/changes-from-outside-studio.md`.
+**Other tabs and agents.** Every tab shows the same job list within a second, and any tab can cancel or delete any job, including one started by an agent through Studio's MCP server. Each tab reads the remembered render settings when it loads and writes all of them on every change, so the last tab to change a setting decides what the others see after a reload. See [changes from outside Studio](../cross-cutting/changes-from-outside-studio.md).
 
-**Keyboard and accessibility.** Every button, field, and menu in the panel can be reached with Tab and used from the keyboard; each setting has a visible label. There is no keyboard shortcut for starting a render; the Omnibar's "Start Render" is the keyboard route, and it renders the full length. The progress bar has no text, the status is plain text, and the Render Preview dialog's × has no label and Escape does not close it.
+**Keyboard and accessibility.** Every button, field, and menu in the panel can be reached with Tab, and the fields and menus can be used from the keyboard, but none of the buttons (Start Render Job, Export Spec, Cancel, Delete, Preview, Show Error) or the Download link can be pressed with Enter or Space (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)). Each setting has a visible label. There is no keyboard shortcut for starting a render; the Omnibar's "Start Render" is the only keyboard route, and it renders the full length. The progress bar has no text, the status is plain text, and the Render Preview dialog's × has no label and Escape does not close it.
 
 ## Edge cases
 
@@ -219,7 +219,6 @@ After any of these, the user stays in the Renders panel with whatever jobs the s
 - Confirm what the Download link does with `target="_blank"` in Chromium: save directly, or open a tab first.
 - Confirm that a file saved during a render does not reload the renderer's own page through the development server.
 - Confirm how often a hidden tab polls the job list.
-- The glossary says job statuses are shown in lowercase; the panel styles them in capitals.
 - Read from `RendersPanel/RendersPanel.tsx`, `RendersPanel/RenderConfig.tsx`, `RendersPanel/RendersPanel.css`, `RendersPanel/RendersPanel.test.tsx`, `RendersPanel/RenderConfig.test.tsx`, `RenderPreviewModal.tsx`, `RenderPreviewModal.css`, `Omnibar.tsx`, `context/StudioContext.tsx`, `server/render-manager.ts`, `server/render-manager.test.ts`, `server/render-lifecycle.test.ts`, `server/render-access.ts`, `server/render-access.test.ts`, `server/plugin.ts`, `server/mcp.ts`, and `packages/renderer/src/Orchestrator.ts`; not yet confirmed by hand.
 
 Verified against helios commit `c2bfddb`

@@ -52,7 +52,7 @@ stateDiagram-v2
 
 ### Starting
 
-The left mouse button goes down on a track's slider. A press on the slider's bar away from its handle moves the handle there and applies that volume at once; a press on the handle itself changes nothing yet. The slider takes keyboard focus, which takes it out of any text field (applying that field) and means Studio's shortcuts are ignored until focus moves on (see [the input model](../foundations/input-model.md#keyboard-focus-and-who-receives-a-key)). With the slider focused, the arrow keys change this track's volume by 1%, and Home and End set it to 0 and 100%.
+The left mouse button goes down on a track's slider. A press on the slider's bar away from its handle moves the handle there and applies that volume at once; a press on the handle itself changes nothing yet. The slider takes keyboard focus, which takes it out of any text field (applying that field) and means Studio's shortcuts are ignored until focus moves on (see [the input model](../foundations/input-model.md#keyboard-focus-and-who-receives-a-key)). With the slider focused, ← and → change this track's volume by 1%, and Home and End set it to 0 and 100%; ↑ and ↓ do nothing, because Studio cancels them everywhere (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)).
 
 ### Ending at once
 
@@ -78,7 +78,7 @@ The handle follows the pointer between 0 and 100%, in steps of 1%. On every chan
 
 ### Finishing
 
-Releasing the button ends the drag at the last volume. Nothing is saved or remembered, and there is no undo. The slider keeps keyboard focus, so Space and the arrow keys go on acting on it rather than on playback until something else is focused.
+Releasing the button ends the drag at the last volume. Nothing is saved or remembered, and there is no undo. The slider keeps keyboard focus, so Space does nothing and ← and → go on changing the volume rather than playback until something else is focused.
 
 ## Modifiers
 
@@ -87,7 +87,7 @@ Releasing the button ends the drag at the last volume. Nothing is saved or remem
 | Shift | No effect. Shift+click on a button is a click. | No effect. |
 | Ctrl/Cmd | No effect. | No effect. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | The press moves focus to the slider, out of any text field (which applies that field). While the slider has focus, Studio's shortcuts are ignored except Ctrl/Cmd+K, and the arrow keys, Home, and End change the volume. | No effect. |
+| Keyboard focus | The press moves focus to the slider, out of any text field (which applies that field). While the slider has focus, Studio's shortcuts are ignored except Ctrl/Cmd+K, and ←, →, Home, and End change the volume; ↑ and ↓ do nothing. On a focused S, 🔊, or ↻ button, Enter does nothing and Space toggles playback instead of pressing it. | No effect. |
 | Playback | Volume, mute, and solo apply at once, playing or paused. The level meter moves only while sound plays. | Same. |
 | Player connection | Before connection the panel says "Connect to player...", or, after a switch, keeps showing the previous composition's tracks; their controls move but do nothing until the new composition connects and the list is replaced. The meter stays empty. | If the composition reconnects during a drag (a hot reload), the next move applies to the reloaded composition. |
 
@@ -127,7 +127,7 @@ The columns are for a slider drag: "before it is ongoing" is the press, "while o
 
 **Other tabs and agents.** Each tab has its own copy of the composition and its own mix. Studio's MCP server has no way to read or change the mix.
 
-**Keyboard and accessibility.** Every button and slider can be reached with Tab. The buttons are labeled only by tooltips and symbols (S, 🔊, 🔇, ↻); the sliders have no label of their own, only the track name and percentage beside them. The level meter has only colors and a tooltip, no numbers. There are no shortcuts for the mixer; M with the player focused mutes the whole composition, not a track.
+**Keyboard and accessibility.** Every button and slider can be reached with Tab. The sliders work with ←, →, Home, and End; the buttons cannot be pressed from the keyboard, because Studio cancels Enter and Space on them (see [keys Studio cancels everywhere](../foundations/input-model.md#keys-studio-cancels-everywhere)), so mute and solo need the mouse. The buttons are labeled only by tooltips and symbols (S, 🔊, 🔇, ↻); the sliders have no label of their own, only the track name and percentage beside them. The level meter has only colors and a tooltip, no numbers. There are no shortcuts for the mixer; M with the player focused mutes the whole composition, not a track.
 
 ## Edge cases
 

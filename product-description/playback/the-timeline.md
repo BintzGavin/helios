@@ -16,7 +16,7 @@ This document owns scrubbing, snapping, the hover guide, the ruler, the timeline
 - **The composition track**, a dark bar 24 pixels tall (tooltip "Composition Track"), on which sit the shaded playback range (blue, faint), the caption bars, the composition markers, the time-prop markers, and the in and out markers.
 - **One lane per audio track**, 24 pixels tall each, with a waveform.
 - **The playhead**: a red vertical line with a small red triangle at its top, through the whole height, at the current frame. It cannot be grabbed; pressing anywhere on the track area moves it.
-- **The hover guide**: a faint dashed vertical line at the pointer, with a small label of the timecode under it.
+- **The hover guide**: a faint dashed vertical line at the pointer, with a small label of the timecode above it (see [The hover guide](#the-hover-guide)).
 
 Positions are linear: the left edge of the track area is frame 0 and the right edge of its content is the composition's [total frames](../glossary.md#the-preview). Before the player is connected the total frames is a placeholder of 100 (at 30 frames per second the length reads `00:00:03:10`); after a switch it keeps the previous composition's length until the new one connects.
 
@@ -100,7 +100,7 @@ The zoom slider runs from "Fit" (all the way left) to "Zoom" (all the way right)
 
 When the timeline is wider than the panel, the track area scrolls horizontally with its scrollbar, the wheel (Shift and the wheel, or a sideways trackpad gesture), or the trackpad. Moving the slider keeps the scroll position in pixels, so the visible part of the timeline shifts; the zoom does not center on the playhead or the pointer, and nothing scrolls the playhead into view during playback or scrubbing.
 
-The zoom is remembered for every composition (see [what Studio remembers](../foundations/the-workspace.md#what-studio-remembers)). The slider is a text field in the [input model](../foundations/input-model.md#keyboard-focus-and-who-receives-a-key)'s sense: once it has focus, the arrow keys move it instead of stepping frames.
+The zoom is remembered for every composition (see [what Studio remembers](../foundations/the-workspace.md#what-studio-remembers)). The slider is a text field in the [input model](../foundations/input-model.md#keyboard-focus-and-who-receives-a-key)'s sense: once it has focus, ← and → move it instead of stepping frames, and ↑ and ↓ do nothing at all.
 
 ## The hover guide
 
@@ -131,7 +131,7 @@ For the timecode field, "before it is ongoing" means the box is open and nothing
 | Escape | Closes the box; nothing changes. | Closes the box; what was typed is discarded. |
 | Another shortcut, click, or command | Shortcuts are ignored except Ctrl/Cmd+K, which opens the Omnibar and takes focus, committing the box. A click anywhere that takes focus commits it. A press on the timeline's track area does not take focus, so the box stays open while the user scrubs; when it is committed later, the typed or shown value overrides the scrub. | Same, committing what was typed. |
 | Composition switched | Switching takes focus (the Omnibar, a click in the sidebar), which commits the box against the composition being left. | Same. |
-| Window loses focus | The box stays open; nothing is committed. | Same. |
+| Window loses focus | The browser reports the box as left, so it commits the timecode it shows and closes (Chromium's usual behavior, to confirm; see [the input model](../foundations/input-model.md#the-interrupt-rows)). | The same, committing what was typed; text that is not a valid timecode or frame number closes the box and changes nothing. |
 | Pointer leaves the window | No effect. | No effect. |
 | Server request fails or server stops | No effect; no request is made. | No effect. |
 | Reload or tab closed | The box is lost; nothing changes. | What was typed is lost. |
@@ -183,7 +183,7 @@ These are the rows for the scrub; the timecode field's are in [its section](#the
 
 **Other tabs and agents.** Each tab has its own playhead.
 
-**Keyboard and accessibility.** There is no keyboard scrubbing beyond the frame steps and Home of the [transport controls](the-transport-controls.md) and typing into the timecode field. The zoom slider can be reached with Tab and moved with the arrow keys. The ruler labels, the hover label, and the readouts are plain text; the playhead and markers have no text equivalent except their tooltips.
+**Keyboard and accessibility.** There is no keyboard scrubbing beyond the frame steps and Home of the [transport controls](the-transport-controls.md) and typing into the timecode field. The zoom slider can be reached with Tab and moved with ← and →. The ruler labels, the hover label, and the readouts are plain text; the playhead and markers have no text equivalent except their tooltips.
 
 ## Edge cases
 
@@ -204,6 +204,7 @@ These are the rows for the scrub; the timecode field's are in [its section](#the
 - Confirm the right-click behavior: whether the release after the context menu reaches the page, and whether the scrub keeps following the pointer.
 - Confirm that a scrub continues, and ends correctly, when the button is released outside the browser window.
 - Confirm that leaving the timecode field unchanged moves a fractional playhead to the whole frame shown.
+- Confirm that switching to another window while the timecode field is open commits it and closes the box, as Chromium reports the field as left (the input model's open question).
 - Confirm that seeking on every mouse move keeps up with fast scrubbing on a heavy composition, and whether frames are skipped.
 - Read from `Timeline.tsx`, `Timeline.css`, `Timeline.test.tsx`, `Controls/TimecodeDisplay.tsx`, `Controls/TimecodeDisplay.test.tsx`, and `packages/core/src/timecode.ts`; not yet confirmed by hand.
 
