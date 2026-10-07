@@ -197,8 +197,8 @@ Status is one of `not started`, `drafted`, or `verified`.
 | verification/ (checklists) | not started |
 | foundations/input-model.md | drafted |
 | foundations/project-and-compositions.md | drafted |
-| foundations/the-workspace.md | not started |
-| foundations/the-preview-player.md | not started |
+| foundations/the-workspace.md | drafted |
+| foundations/the-preview-player.md | drafted |
 | stage/the-stage-view.md | drafted |
 | stage/the-stage-toolbar.md | not started |
 | playback/the-transport-controls.md | not started |
