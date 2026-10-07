@@ -22,7 +22,7 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Transport controls.** The row at the left of the timeline panel: ⏮ (rewind to the in point), < and > (one frame back and forward), ▶ or ❚❚ (play or pause), 🔁 (loop), the mute button, the volume slider, and the speed menu. The [transport controls](playback/the-transport-controls.md) document owns them.
 
-**Timeline.** The part of the timeline panel to the right of the transport controls: a header row (the *timecode field*, the length, the zoom slider, and the "In:", "Out:", and "Fr:" readouts) above the track area (the ruler, the *composition track*, and one lane per audio track). Not the same as the timeline panel, which also holds the transport controls.
+**Timeline.** The part of the timeline panel to the right of the transport controls: a header row (the *timecode field*, the length, the zoom slider, and the "In:", "Out:", and "Fr:" readouts) above the track area (the ruler, the *composition track*, and one lane per audio track), which takes only the height those need; the rest of the panel below it is empty background that does nothing. Not the same as the timeline panel, which also holds the transport controls.
 
 **Props Editor.** The list of the active composition's input props in the inspector, one row per prop, with "Copy JSON" and "Reset" buttons. Every change applies to the preview at once, and the editor *auto-saves* the props into the composition's default props.
 

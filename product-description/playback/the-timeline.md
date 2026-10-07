@@ -10,13 +10,19 @@ This document owns scrubbing, snapping, the hover guide, the ruler, the timeline
 
 **The header row**, in a small monospace font. On the left: the timecode field (the current frame as `HH:MM:SS:FF`), a slash, and the composition's length as a timecode; then the zoom control, a slider between the words "Fit" and "Zoom". On the right: "In: {in point}", "Out: {out point}", and "Fr: {current frame}", all in frames, the last rounded to the nearest frame.
 
-**The track area**, below it, from top to bottom:
+**The track area**, below it, which scrolls inside the panel when it is larger than the panel. From top to bottom:
 
 - **The ruler**, 24 pixels tall: short tick marks at regular intervals, each labeled with its timecode. It stays at the top when the track area is scrolled vertically.
 - **The composition track**, a dark bar 24 pixels tall (tooltip "Composition Track"), on which sit the shaded playback range (blue, faint), the caption bars, the composition markers, the time-prop markers, and the in and out markers.
 - **One lane per audio track**, 24 pixels tall each, with a waveform.
-- **The playhead**: a red vertical line with a small red triangle at its top, through the whole height, at the current frame. It cannot be grabbed; pressing anywhere on the track area moves it.
+- **A margin** of 24 pixels below the last lane.
+
+Across the track area run:
+
+- **The playhead**: a red vertical line with a small red triangle at its top, at the current frame, from the ruler to the bottom of the margin. It cannot be grabbed; pressing anywhere on the track area moves it.
 - **The hover guide**: a faint dashed vertical line at the pointer, with a small label of the timecode above it (see [The hover guide](#the-hover-guide)).
+
+Below the track area the panel shows **empty background** down to its bottom. The track area takes only as much height as it needs (76 pixels with no audio track, 28 more for each audio track), so in a timeline panel of the default height most of the space under the header is this empty background, which does nothing (see [Edge cases](#edge-cases)).
 
 Positions are linear: the left edge of the track area is frame 0 and the right edge of its content is the composition's [total frames](../glossary.md#the-preview). Before the player is connected the total frames is a placeholder of 100 (at 30 frames per second the length reads `00:00:03:10`); after a switch it keeps the previous composition's length until the new one connects.
 
@@ -49,7 +55,7 @@ The interaction narrated here is the scrub. The timecode field has its own secti
 
 ### Starting
 
-A scrub starts when any mouse button goes down anywhere on the track area that is not an in or out marker, a time-prop marker, or a composition marker (those are owned by [the playback range](the-playback-range.md) and [timeline tracks](timeline-tracks.md)). That includes the ruler, the composition track, the shaded range, the caption bars, the audio lanes, and the empty space below them.
+A scrub starts when any mouse button goes down anywhere on the track area that is not an in or out marker, a time-prop marker, or a composition marker (those are owned by [the playback range](the-playback-range.md) and [timeline tracks](timeline-tracks.md)). That includes the ruler, the composition track, the shaded range, the caption bars, the audio lanes, and the margin below the last lane. It does not include the empty background below the track area, where a press does nothing at all.
 
 At the press, Studio works out the frame under the pointer, [snaps](#snapping) it unless Shift is held, and seeks there at once. The playhead jumps and the composition shows that frame as soon as it answers. The press does not move keyboard focus and does not start a text selection, so a text field that had focus keeps it, and so does the player.
 
@@ -104,7 +110,7 @@ The zoom is remembered for every composition (see [what Studio remembers](../fou
 
 ## The hover guide
 
-While the pointer is over the track area and no scrub or marker drag is in progress, a faint dashed vertical line follows it, with a small label above it showing the timecode at the pointer, rounded to a whole frame and not snapped. It disappears when the pointer leaves the track area. During a drag it stays where the drag began (see [While ongoing](#while-ongoing)).
+While the pointer is over the track area and no scrub or marker drag is in progress, a faint dashed vertical line follows it, with a small label above it showing the timecode at the pointer, rounded to a whole frame and not snapped. It disappears when the pointer leaves the track area, including when it moves down into the empty background below it. During a drag it stays where the drag began (see [While ongoing](#while-ongoing)).
 
 ## The timecode field
 
@@ -190,6 +196,7 @@ These are the rows for the scrub; the timecode field's are in [its section](#the
 - **Placeholder length.** Before the player connects, the length reads `00:00:03:10` (100 frames at 30 per second), and pressing on the timeline does nothing.
 - **Two roundings.** The timecode rounds the current frame down and "Fr:" rounds it to the nearest frame, so after playback they can disagree by one (timecode frame 45, "Fr: 46").
 - **The very end.** The right edge of the timeline, and the snap point there, is the total frames, which is one past the last frame a render draws.
+- **Dead space below the track area.** With no audio track, the track area is 76 pixels tall, and the timeline panel is 300 pixels tall by default, so most of the space under the header is empty background. A press there does not seek or start a scrub, the hover guide goes away, the playhead line stops above it, and an asset dropped there is not taken (see [timeline tracks](timeline-tracks.md#edge-cases)). Making the timeline panel shorter, or adding audio tracks, shrinks it. Read from the code: the track area is a box of fixed height inside a scrolling container that fills the panel, and only that box listens for presses, moves, and drops.
 - **Right-click.** A right-button press seeks and starts a scrub, and the browser's context menu opens. Studio may never see that button's release, which then goes to the menu; the scrub keeps following the pointer until the next release anywhere on the page.
 - **A frozen hover guide.** During a scrub the hover guide stays where the press happened. If the release happens outside the track area, the guide stays there until the pointer next enters and leaves the track area.
 - **Snapping at low zoom.** At the first few zoom steps the timeline is stretched to the panel's width, but snapping still measures 10 pixels at the narrower width the step would give, so it reaches further than 10 pixels on screen.
@@ -200,7 +207,9 @@ These are the rows for the scrub; the timecode field's are in [its section](#the
 ## Open questions and verification
 
 - Everything here assumes a composition the player can drive. With a clock-bound composition, seeks may hold for only one animation frame (see [the preview player](../foundations/the-preview-player.md#clock-bound-compositions)).
-- Confirm that the hover guide's timecode label is visible at all. It is drawn above the top of the track area, which clips what falls outside it.
+- Confirm that the hover guide's timecode label is visible at all. It is drawn above the top of the track area, which is the top of the scrolling container, and that container clips what falls outside it, so read from the stylesheet it is probably never visible (`Timeline.css`, `.timeline-hover-tooltip` at `bottom: 100%`). If so, the label may be worth treating as a bug.
+- Confirm that a press in the empty background below the track area does nothing, and how much of the default timeline panel that background takes.
+- Confirm that Escape discards what was typed in the timecode field. Escape closes the box by removing it while it still has keyboard focus, and Chromium has been known to report a focused field as left when it is removed, which here would run the commit with the typed text (`Controls/TimecodeDisplay.tsx` commits on leaving). If that happens, Escape commits instead of cancelling.
 - Confirm the right-click behavior: whether the release after the context menu reaches the page, and whether the scrub keeps following the pointer.
 - Confirm that a scrub continues, and ends correctly, when the button is released outside the browser window.
 - Confirm that leaving the timecode field unchanged moves a fractional playhead to the whole frame shown.
