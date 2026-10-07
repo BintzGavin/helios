@@ -1,10 +1,10 @@
 # Bug triage
 
-A consolidated list of the defects and inconsistencies that the feature documents raised in their "Open questions and verification" sections and in their bodies. Each entry is read from the Helios repository at commit `c2bfddb` (the source commit every document cites) and its tests; none has been confirmed in the running product yet, so no entry about Studio carries a **Status** line. An entry gets one when a pass in [`verification/`](README.md#verification) touches it. The one exception is B-73, about building Helios, which was observed when the protocol's build was run and carries a Status line for that. Questions the documents could not settle from the code (how Chromium reports focus, what a clock-bound composition draws, how long a check takes) stay in those documents and are not repeated here. The list exists so the product team can decide, item by item, whether to fix, to document as intended, or to leave. Nothing here is a work item until a person has decided it (see the README's [Purpose](README.md#purpose)).
+A consolidated list of the defects and inconsistencies that the feature documents raised in their "Open questions and verification" sections and in their bodies. Each entry was first read from the Helios repository at commit `c2bfddb` (the source commit every document cites) and its tests. An entry gets a **Status** line when a pass in [`verification/`](README.md#verification) touches it. The first pass, an automated one on 2026-10-07 (see [Results so far](verification/README.md#results-so-far)), ran part of the checklists: the entries it touched say what it confirmed and with which items, and it added B-74 to B-87 from what it observed. B-73, about building Helios, was observed earlier, when the protocol's build was run. Questions the documents could not settle from the code (how Chromium reports focus, what a clock-bound composition draws, how long a check takes) stay in those documents and are not repeated here. The list exists so the product team can decide, item by item, whether to fix, to document as intended, or to leave. Nothing here is a work item until a person has decided it (see the README's [Purpose](README.md#purpose)).
 
 ## Summary
 
-The 27 feature and foundation documents raised 147 suspected defects, counting each document once per defect (225 links to the sections that raise them). Merged by root cause they come to 72 entries: 12 high, 40 medium, and 20 low, one of the low ones a list of ten small copy and rendering slips. A seventy-third, [B-73](#b-73-the-repositorys-npm-run-build-fails-because-it-never-builds-packagesinfrastructure) (medium), was added afterwards from the verification protocol rather than from a document: the repository's own build fails at this commit, which is about building Helios, not about Studio's behavior. It sits among the medium entries by its area, `build`; IDs are never renumbered. The largest clusters are the keyboard ([B-04](#b-04-enter--and--lose-their-browser-action-on-the-whole-page-and-space-never-presses-a-button), raised by 10 documents, with B-05, B-25, B-52, and B-60, 14 documents in all), switching compositions (B-08, B-10, and B-42, 9 documents), and the Props Editor's auto-save and what it writes to `composition.json` (B-03, B-09, B-10, and B-19, 8 documents). Most of the high entries have one of two shapes: Studio silently writes the wrong thing to disk (B-01, B-03, B-06, B-08, B-09, B-10), or one key or pointer action does two things, or none (B-04, B-05, B-11, B-12). The other two are buttons that never reach the server (B-02) and a transport that cannot drive any composition Studio ships (B-07). Every entry is read from the code; none has been confirmed in the running product. B-07 should be checked first, because most playback entries assume a composition the player can drive.
+The 27 feature and foundation documents raised 147 suspected defects, counting each document once per defect (225 links to the sections that raise them). Merged by root cause they come to 72 entries: 12 high, 40 medium, and 20 low, one of the low ones a list of ten small copy and rendering slips. A seventy-third, [B-73](#b-73-the-repositorys-npm-run-build-fails-because-it-never-builds-packagesinfrastructure) (medium), was added afterwards from the verification protocol rather than from a document: the repository's own build fails at this commit, which is about building Helios, not about Studio's behavior. It sits among the medium entries by its area, `build`; IDs are never renumbered. The automated pass of 2026-10-07 added fourteen more from what it observed in the running product. From the P1 items: three high ([B-74](#b-74-studio-serves-composition-pages-untouched-so-the-title-explainer-template-never-connects-and-nothing-hot-reloads), Studio serves composition pages untouched, so its default template never connects and nothing hot reloads; [B-78](#b-78-cancelling-a-server-side-render-stops-the-helios-studio-process), Cancel stops the server; [B-81](#b-81-server-side-renders-ignore-the-input-props), server-side renders ignore the input props), five medium (B-75, B-76, B-77, B-79, and B-82, the last a suspected defect the documents raised that had not been filed), and one low (B-80). From the P2 items it ran afterwards: one high ([B-85](#b-85-client-side-exports-never-contain-audio), client-side exports never contain audio), two medium ([B-84](#b-84-zooming-the-timeline-in-widens-the-whole-middle-column-instead-of-scrolling-the-track-area), zooming the timeline widens the whole middle column; [B-86](#b-86-snapshots-and-client-side-exports-in-dom-mode-fail-in-chromium), DOM-mode snapshots and exports fail in Chromium), and two low ([B-83](#b-83-a-canvas-wider-than-the-stage-is-drawn-no-wider-than-the-compositions-page), a canvas wider than the stage is drawn no wider than the composition's page; [B-87](#b-87-two-component-installs-at-once-leave-only-one-of-them-in-heliosconfigjson), two installs at once lose one from `helios.config.json`). Each is placed by its severity and area. The largest clusters are the keyboard ([B-04](#b-04-enter--and--lose-their-browser-action-on-the-whole-page-and-space-never-presses-a-button), raised by 10 documents, with B-05, B-25, B-52, and B-60, 14 documents in all), switching compositions (B-08, B-10, and B-42, 9 documents), and the Props Editor's auto-save and what it writes to `composition.json` (B-03, B-09, B-10, and B-19, 8 documents). Most of the high entries have one of two shapes: Studio silently writes the wrong thing to disk (B-01, B-03, B-06, B-08, B-09, B-10), or one key or pointer action does two things, or none (B-04, B-05, B-11, B-12). The other two are buttons that never reach the server (B-02) and a transport that cannot drive any composition Studio ships (B-07). The automated pass checked B-07 first and confirmed it: a clock-bound composition runs on its own clock whatever Studio does, so the playback items were run on copies without the clock binding. It confirmed every high entry (B-01 to B-11, though for B-12 only the cause could be seen) and most of the others; see each entry's Status line. Five entries have none, because every item that shows them needs a file picker or a file dragged in from the desktop, which the pass did not use: B-13, B-14, B-15, B-26, and B-67.
 
 | ID | Title | Severity | Area | Decision needed | Issue |
 | --- | --- | --- | --- | --- | --- |
@@ -13,9 +13,13 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-03 | Studio writes its own stale copy of `composition.json` over changes made outside it | high | cross-cutting | fix | — |
 | B-04 | Enter, ↑, and ↓ lose their browser action on the whole page, and Space never presses a button | high | input | fix | — |
 | B-05 | With the player focused, keys act twice: once in the player, then again in Studio | high | input | fix | — |
+| B-78 | Cancelling a server-side render stops the `helios studio` process | high | output | fix | — |
+| B-81 | Server-side renders ignore the input props | high | output | fix | — |
+| B-85 | Client-side exports never contain audio | high | output | fix | — |
 | B-06 | Dragging a time-prop marker throws away every other input prop | high | playback | fix | — |
 | B-07 | Studio's transport and timeline cannot control a clock-bound composition, which is every template and nearly every example | high | preview | fix | — |
 | B-08 | Switching compositions carries the previous composition's input props, playhead, and playing state into the new one | high | preview | fix | — |
+| B-74 | Studio serves composition pages untouched, so the Title explainer template never connects and nothing hot reloads | high | preview | fix | — |
 | B-09 | The Props Editor's auto-save never comes while playing or for a clock-bound composition | high | props | fix | — |
 | B-10 | A pending auto-save is written into the composition being opened instead of the one that was edited | high | props | fix | — |
 | B-11 | A pan that starts and ends on the composition toggles playback, and one that starts and ends on a toolbar button presses it | high | stage | fix | — |
@@ -28,6 +32,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-17 | New Composition accepts names whose folders Studio cannot list or name properly | medium | compositions | fix | — |
 | B-18 | New Composition replaces all four numbers with defaults when any one of them is 0 | medium | compositions | fix | — |
 | B-19 | A composition at the project root cannot be saved, duplicated, deleted, or auto-saved | medium | compositions | fix | — |
+| B-82 | Compositions made from the Vanilla JS, React, and Three.js templates never connect | medium | compositions | fix | — |
 | B-20 | The Compositions panel cannot be used from the keyboard | medium | compositions | fix | — |
 | B-21 | Renders started by an agent and from the Renders panel use different frame rates and lengths | medium | cross-cutting | fix | — |
 | B-22 | System Diagnostics reports a capable server renderer as unable to do anything | medium | help | fix | — |
@@ -38,6 +43,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-27 | Client-side exports draw each caption one frame late | medium | output | fix | — |
 | B-28 | A client-side export keeps running against a composition that was switched away | medium | output | fix | — |
 | B-29 | Client-side export ignores the Video Codec setting and turns a decimal bitrate into 5 megabits per second | medium | output | fix | — |
+| B-86 | Snapshots and client-side exports in DOM mode fail in Chromium | medium | output | fix | — |
 | B-30 | A render or job spec started before the composition's length is known covers zero frames | medium | output | fix | — |
 | B-31 | The "Transparent (WebM)" preset writes an MP4 file with no transparency | medium | output | fix | — |
 | B-32 | A job spec does not reproduce "Start Render Job", and with a WebCodecs preference every chunk command fails | medium | output | fix | — |
@@ -46,10 +52,13 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-35 | The Captions panel writes cues into a `captions` input prop for compositions connected through `connectToParent` | medium | panels | fix | — |
 | B-36 | With a remote registry in the index format, every component shows "Installed" | medium | panels | fix | — |
 | B-37 | A component install reports success when the package manager fails | medium | panels | fix | — |
+| B-79 | Two Components panel failures stop the `helios studio` process | medium | panels | fix | — |
 | B-38 | The out point does not follow a change in the composition's length, and playback can run past the end | medium | playback | fix | — |
 | B-39 | Dragged in, out, and time-prop markers stick to their own position | medium | playback | fix | — |
 | B-40 | A click on the composition within a frame of the end restarts from frame 0, even while playing | medium | playback | fix | — |
 | B-41 | A hot reload resets the playback rate, and refused props cancel the rest of the restore | medium | playback | fix | — |
+| B-75 | Reverse playback freezes on a composition whose media Helios manages | medium | playback | fix | — |
+| B-84 | Zooming the timeline in widens the whole middle column instead of scrolling the track area | medium | playback | fix | — |
 | B-42 | After a switch, Studio goes on using the previous composition's length, frame rate, props, playhead, and schema | medium | preview | fix | — |
 | B-43 | Five requests report success without looking at the server's answer | medium | project | fix | — |
 | B-44 | The Props Editor's time field undoes a marker drag and never shows its error style | medium | props | fix | — |
@@ -61,6 +70,8 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-50 | The transparency grid never shows through a transparent composition | medium | stage | fix | — |
 | B-51 | One unexpected error blanks the whole Studio page | medium | workspace | fix | — |
 | B-52 | The Omnibar opens beneath every other dialog and takes keyboard focus there | medium | workspace | fix | — |
+| B-76 | At the default sidebar width the last sidebar tabs lie under the stage and cannot be clicked | medium | workspace | fix | — |
+| B-77 | The stage never shrinks below about 938 pixels, pushing the inspector off a narrow window | medium | workspace | fix | — |
 | B-53 | Two asset moves that should work are refused | low | assets | fix | — |
 | B-54 | 📝 on a composition tile opens its folder rather than its page | low | compositions | fix | — |
 | B-55 | Searching the Compositions panel shows a matching folder closed, and leaves folders it opened open | low | compositions | product call | — |
@@ -76,8 +87,11 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 | B-65 | Deleting a render job has no confirmation | low | output | product call | — |
 | B-66 | Every render starts at once; there is no queue | low | output | product call | — |
 | B-67 | Import SRT accepts only strict SRT and refuses WebVTT | low | panels | product call | — |
+| B-87 | Two component installs at once leave only one of them in `helios.config.json` | low | panels | fix | — |
 | B-68 | The empty background below the timeline's track area takes no presses or drops, and the drop highlight blinks | low | playback | fix | — |
+| B-80 | The `d3-animation` example never connects | low | preview | fix | — |
 | B-69 | A size typed in the stage toolbar is replaced by the metadata's at every save | low | stage | product call | — |
+| B-83 | A canvas wider than the stage is drawn no wider than the composition's page | low | stage | fix | — |
 | B-70 | Fit sets 100% rather than fitting the composition to the stage | low | stage | product call | — |
 | B-71 | Clipboard copies report success without checking | low | workspace | fix | — |
 | B-72 | Small copy and rendering slips | low | various | fix | — |
@@ -93,6 +107,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Silently does something different from what was confirmed, and loses the remembered timeline state.
 - **Decision needed:** `fix`. Send a name only when the user changed it, and keep a renamed composition in its parent folder.
 - **Raised by:** [composition settings](compositions/composition-settings.md#edge-cases), [composition settings](compositions/composition-settings.md#open-questions-and-verification), [project and compositions](foundations/project-and-compositions.md#edge-cases)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPSETTINGS-25 (Save with nothing changed moved `scenes/intro` to `intro`).
 
 ### B-02: Deleting a composition from the Compositions panel, and removing a component from the Components panel, never reach the server
 
@@ -103,6 +118,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Two buttons do not work at all.
 - **Decision needed:** `fix`. Compare the path without its query in both handlers, as the assets handler does.
 - **Raised by:** [project and compositions](foundations/project-and-compositions.md#when-a-request-fails), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification), [the Compositions panel](compositions/the-compositions-panel.md#finishing), [the Compositions panel](compositions/the-compositions-panel.md#open-questions-and-verification), [the Components panel](panels/the-components-panel.md#finishing), [the Components panel](panels/the-components-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROJECT-60, COMPOSPANEL-26, COMPONENTS-18, and PROJECT-61, and in the items that delete from the Compositions panel, COMPOSPANEL-25, COMPOSPANEL-50, COMPOSPANEL-53, and COMPOSPANEL-61. Both DELETE requests were answered 404 with an empty body, and the toast read "Failed to execute 'json' on 'Response': Unexpected end of JSON input"; the folder, the component's files, and `helios.config.json` stayed.
 
 ### B-03: Studio writes its own stale copy of `composition.json` over changes made outside it
 
@@ -113,6 +129,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Loses work silently.
 - **Decision needed:** `fix`. The auto-save should send only `defaultProps`, and only after an edit; Settings should send only changed fields. Whether two tabs editing one composition should be reconciled is a separate product call.
 - **Raised by:** [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#finishing), [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification), [project and compositions](foundations/project-and-compositions.md#when-the-project-changes-underneath-studio), [composition settings](compositions/composition-settings.md#cancel-and-interrupt), [the Props Editor](props/the-props-editor.md#edge-cases), [the Props Editor](props/the-props-editor.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPSEDITOR-57 (the auto-save wrote Studio's copy of the size and time fields over an edit made to `composition.json` on disk), with PROJECT-67, COMPSETTINGS-11, OUTSIDE-07, and STAGETOOLBAR-78 showing that Studio does not read the edited file again. Those items' expected results are this behavior, so they passed.
 
 ### B-04: Enter, ↑, and ↓ lose their browser action on the whole page, and Space never presses a button
 
@@ -123,6 +140,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. A missing global handler that affects every form and button in Studio.
 - **Decision needed:** `fix`. Register the Omnibar's keys only while it is open, and let Space reach a focused button.
 - **Raised by:** [the input model](foundations/input-model.md#keys-studio-cancels-everywhere), [the input model](foundations/input-model.md#open-questions-and-verification), [the workspace](foundations/the-workspace.md#open-questions-and-verification), [the stage toolbar](stage/the-stage-toolbar.md#open-questions-and-verification), [composition settings](compositions/composition-settings.md#open-questions-and-verification), [creating and duplicating](compositions/creating-and-duplicating.md#finishing), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification), [the Compositions panel](compositions/the-compositions-panel.md#interactions-with-other-systems), [the Compositions panel](compositions/the-compositions-panel.md#open-questions-and-verification), [the Omnibar](compositions/the-omnibar.md#interactions-with-other-systems), [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification), [prop fields](props/prop-fields.md#open-questions-and-verification), [the Captions panel](panels/the-captions-panel.md#open-questions-and-verification), [client-side export](output/client-side-export.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): INPUT-29, INPUT-30, INPUT-76 to INPUT-80, WORKSPACE-42, CREATEDUP-25, CREATEDUP-40, COMPSETTINGS-22, COMPSETTINGS-44, CAPTIONS-37, PROPFIELDS-28, PROPFIELDS-37, and OMNIBAR-70. The same behavior was also the expected result of ASSETPANEL-58, ASSETACTIONS-68, CAPTIONS-96, AUDIOMIXER-40, COMPONENTS-30, SERVERRENDER-64, and SERVERRENDER-83, which passed.
 
 ### B-05: With the player focused, keys act twice: once in the player, then again in Studio
 
@@ -133,6 +151,40 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. One common action does two things at once.
 - **Decision needed:** `fix`. Turn off the player's own key handling inside Studio, or have Studio ignore keys the player handled.
 - **Raised by:** [the input model](foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus), [the input model](foundations/input-model.md#edge-cases), [the input model](foundations/input-model.md#open-questions-and-verification), [the playback range](playback/the-playback-range.md#edge-cases), [the playback range](playback/the-playback-range.md#open-questions-and-verification), [the stage view](stage/the-stage-view.md#open-questions-and-verification), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): INPUT-61 (→ stepped two frames, Shift+→ twenty) and SHORTCUTS-57 (the first Escape closed only the player's list). INPUT-55 showed a form the entry does not describe: with the player focused at the last frame, Space went to frame 0 but stayed paused, because the player restarts and plays and Studio, already seeing it playing, pauses it. TRANSPORT-66 showed the same, and RANGE-48 and RANGE-49 had to start playback another way, since Space with the player focused changes nothing mid-way.
+
+### B-78: Cancelling a server-side render stops the `helios studio` process
+
+- **Where the user meets it:** Cancel on a rendering job in the Renders panel, or an agent's `cancel_render`.
+- **What happens / what was expected:** The cancel is accepted, and about a second later the `helios studio` process exits: the terminal shows "Render aborted via signal. Killing FFmpeg..." and then an unhandled "page.evaluate: Target page, context or browser has been closed". Every open Studio tab loses its server until the process is started again. Expected: the render stops, the job reads CANCELLED, and the server keeps running.
+- **Reproduce:** Start a render of a composition several seconds long and press Cancel while it reads RENDERING.
+- **Why (from the code):** The cancel closes the render's browser while the capture loop is waiting on the page (`packages/renderer/src/core/CaptureLoop.ts` from line 118), and the resulting rejection is not caught on the way back through `packages/renderer/src/Renderer.ts` and `packages/studio/src/server/render-manager.ts`, so Node exits on it.
+- **Severity:** `high`. A routine button stops the whole application.
+- **Decision needed:** `fix`. Wait for the capture loop to stop before closing the browser, and treat the aborted capture as a cancellation.
+- **Raised by:** the automated pass: [stage-and-output.md](verification/stage-and-output.md) (SERVERRENDER-25, SERVERRENDER-26), [help-and-cross-cutting.md](verification/help-and-cross-cutting.md) (OUTSIDE-44); described in [server-side renders](output/server-renders.md#cancel-and-interrupt)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), twice: Cancel in the Renders panel at 40% (SERVERRENDER-25, SERVERRENDER-26) and an agent's `cancel_render` at the start of a render (OUTSIDE-44). Both times the process exited and had to be started again. It happened again in SERVERRENDER-27, where, with Concurrency 4, the process stopped before it could clean up and left an empty `temp_…_part_1.mov` in `renders/`, and in SERVERRENDER-85, where a Delete pressed right after Cancel never reached a server (recorded `blocked`).
+
+### B-81: Server-side renders ignore the input props
+
+- **Where the user meets it:** "Start Render Job" in the Renders panel (and the Omnibar's Start Render) after changing a prop in the Props Editor, saved or not.
+- **What happens / what was expected:** Studio sends the props with the request, but the video shows the composition's own props: a title changed to "RENDER PROPS" renders as the composition's default title. Expected: the video shows the props the preview shows, as the documents say.
+- **Reproduce:** On a composition with a `title` prop, type a new title, press "Start Render Job", and look at the finished video.
+- **Why (from the code):** `packages/renderer/src/core/BrowserPool.ts` lines 159 to 162 hand the props to the page only as `window.__HELIOS_PROPS__`, and nothing in Helios reads that name, so the composition starts with its own defaults.
+- **Severity:** `high`. Silently renders something other than what the user set up.
+- **Decision needed:** `fix`. Have Helios read the injected props when it starts, or set them through the instance once the page has loaded.
+- **Raised by:** the automated pass: [stage-and-output.md](verification/stage-and-output.md) (SERVERRENDER-13, SERVERRENDER-66); described in [server-side renders](output/server-renders.md#starting)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SERVERRENDER-13 (the request carried "RENDER PROPS"; the video drew "Verify Driveable", although the composition's `composition.json` also held a saved title, "AAA", left by SERVERRENDER-66, so saved default props do not reach the video either) SERVERRENDER-66, and PROPSEDITOR-62 (the rendered video lacks the prop typed just before the render). The documents' sentences that say a render uses the current props are corrected.
+
+### B-85: Client-side exports never contain audio
+
+- **Where the user meets it:** Export in the Renders panel's Client-Side Export, on any composition with sound.
+- **What happens / what was expected:** The video downloads with no audio stream at all, and no message says so; the browser's console shows "Failed to setup audio: TypeError: config.bitrate must be provided for compressed audio codecs." The Audio panel's volumes and mutes therefore have nothing to apply to. Expected: the composition's audio mixed in, as [client-side export](output/client-side-export.md#finishing) describes.
+- **Reproduce:** Export a composition with an `<audio>` element (the protocol's Verify Audio) as WebM and probe the file: one VP9 stream, no Opus.
+- **Why (from the code):** `packages/player/src/features/exporter.ts` lines 200 to 212 create the audio encoder source with only a codec (`{ codec: 'opus' }` or `{ codec: 'aac' }`); the media library refuses a compressed audio codec without a bitrate, and the `catch` turns that into a console warning and carries on without the audio track.
+- **Severity:** `high`. Every client-side export silently loses its sound.
+- **Decision needed:** `fix`. Pass a bitrate with the audio configuration, and report a failure to set up audio instead of dropping it.
+- **Raised by:** the automated pass: [stage-and-output.md](verification/stage-and-output.md) (CLIENTEXPORT-12, CLIENTEXPORT-27); described in [client-side export](output/client-side-export.md#finishing)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-12 and CLIENTEXPORT-27. This Chromium can encode Opus but not AAC, so MP4 exports could not be tried at all (no H.264 either); the error is raised before any encoder is asked. CLIENTEXPORT-29, -49, -54, -64, and -67 were recorded `blocked` because of it.
 
 ### B-06: Dragging a time-prop marker throws away every other input prop
 
@@ -143,6 +195,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Loses work, then saves the loss.
 - **Decision needed:** `fix`. Send the current props with the dragged one changed.
 - **Raised by:** [timeline tracks](playback/timeline-tracks.md#while-ongoing), [timeline tracks](playback/timeline-tracks.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): TRACKS-34, TRACKS-35, TRACKS-46, and PROPSEDITOR-61.
 
 ### B-07: Studio's transport and timeline cannot control a clock-bound composition, which is every template and nearly every example
 
@@ -153,6 +206,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Affects every playback feature on every template and on every example Studio can connect to.
 - **Decision needed:** `fix`. Follow the document clock only while a renderer drives it, or unbind when the player connects.
 - **Raised by:** [the preview player](foundations/the-preview-player.md#clock-bound-compositions), [the preview player](foundations/the-preview-player.md#open-questions-and-verification), [the transport controls](playback/the-transport-controls.md#open-questions-and-verification), [the timeline](playback/the-timeline.md#open-questions-and-verification), [the playback range](playback/the-playback-range.md#open-questions-and-verification), [client-side export](output/client-side-export.md#open-questions-and-verification), [snapshots and job specs](output/snapshots-and-job-specs.md#open-questions-and-verification), [composition settings](compositions/composition-settings.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), the first thing it checked: PLAYER-43 to PLAYER-46, TRANSPORT-02, TIMELINE-82, and RANGE-66. On Verify Title and on unmodified `simple-canvas-animation` the frame ran in real time from the composition's own clock whatever Studio did: ▶ shown, seeks, steps, the range, loop, and rate held for a moment at most. PLAYER-49 passed on the copy without `bindToDocumentTimeline()`, so the playback items ran on such copies.
 
 ### B-08: Switching compositions carries the previous composition's input props, playhead, and playing state into the new one
 
@@ -163,6 +217,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Silently writes one composition's props into another's file.
 - **Decision needed:** `fix`. Record and restore state only for the composition it came from.
 - **Raised by:** [the preview player](foundations/the-preview-player.md#switching-compositions), [the preview player](foundations/the-preview-player.md#open-questions-and-verification), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification), [the Compositions panel](compositions/the-compositions-panel.md#interactions-with-other-systems), [the Omnibar](compositions/the-omnibar.md#interactions-with-other-systems)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PLAYER-67 to PLAYER-70, PLAYER-72 to PLAYER-74, COMPOSPANEL-65, CREATEDUP-42, and OMNIBAR-68.
+
+### B-74: Studio serves composition pages untouched, so the Title explainer template never connects and nothing hot reloads
+
+- **Where the user meets it:** Every composition, because the player loads each one from a `/@fs/` address. Most visibly, a composition made with New Composition's Title explainer template, and any edit saved to a composition's files.
+- **What happens / what was expected:** The page arrives exactly as it is on disk, without the development server's processing. An inline module script that imports a package by its bare name, as the Title explainer template's does (`import { Helios } from '@helios-project/core'`), stops with "Failed to resolve module specifier", so the player shows "Connection Failed..." after 5 seconds and the transport stays disabled. The page also gets no hot-reload client, so saving `composition.html` or a script it loads reloads nothing: the terminal prints "page reload", but the composition runs the old code until the Studio page is reloaded. Expected: Studio's own default template connects, and a saved change reloads the composition, as the documents describe.
+- **Reproduce:** Create a composition from Title explainer; it ends on "Connection Failed...". Or open `simple-canvas-animation`, append a comment to its `composition.html`, and save; the player does not reload.
+- **Why (from the code):** `packages/studio/src/server/discovery.ts` lines 97 to 99 give every composition the address `/@fs` plus its absolute path, which Vite's development server answers straight from the file system, skipping its HTML transform (no rewritten imports in inline scripts, no `/@vite/client`). `packages/studio/src/server/templates/title-explainer.ts` lines 12 and 13 import Helios by its package name in an inline script. A script loaded with `src` is still transformed, which is why the pass's copies of the Title explainer compositions, with the script moved into `main.js`, connect; and a script that uses `import.meta.hot` gets the client and does reload.
+- **Severity:** `high`. The default way to make a composition gives one Studio cannot control, and hot reload, which many documents rely on, never happens.
+- **Decision needed:** `fix`. Serve composition pages through the development server's HTML transform, for example by addressing them from the project root rather than by `/@fs/`, or make the templates load their script from a file.
+- **Raised by:** the automated pass: [foundations.md](verification/foundations.md) (PROJECT-39, PLAYER-50), [compositions-and-props.md](verification/compositions-and-props.md) (CREATEDUP-03, CREATEDUP-16), [help-and-cross-cutting.md](verification/help-and-cross-cutting.md) (OUTSIDE-01, OUTSIDE-03); described in [the preview player](foundations/the-preview-player.md#hot-reload) and [project and compositions](foundations/project-and-compositions.md#templates)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROJECT-39, PROJECT-41, PLAYER-50, CREATEDUP-03, CREATEDUP-16, CREATEDUP-55, CREATEDUP-56, OUTSIDE-01, and OUTSIDE-03; also PLAYER-27 (the inline script never runs, so editing it changes nothing), and OMNIBAR-57, SERVERRENDER-02, SERVERRENDER-33, and SERVERRENDER-65, where a server-side render of a composition with such a script fails with "Failed to resolve module specifier". Every item that needs a hot reload is recorded `blocked`; where the pass could, it reran the item on a fixture whose script carries an `import.meta.hot` line and recorded what it saw in the note.
 
 ### B-09: The Props Editor's auto-save never comes while playing or for a clock-bound composition
 
@@ -173,6 +239,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Loses work.
 - **Decision needed:** `fix`. Restart the timer only when the props change (memoize the save function and compare by value).
 - **Raised by:** [project and compositions](foundations/project-and-compositions.md#composition-metadata), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification), [the Props Editor](props/the-props-editor.md#while-ongoing), [the Props Editor](props/the-props-editor.md#open-questions-and-verification), [timeline tracks](playback/timeline-tracks.md#cancel-and-interrupt)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): no save while playing or for a clock-bound composition (PROJECT-31, PROJECT-32, PROPSEDITOR-21, PROPSEDITOR-22, PROPSEDITOR-48). Paused, the save is slower than this entry says: edits were saved between about 4 and more than 30 seconds after the last keystroke (PROJECT-30, PROPSEDITOR-04, PROPSEDITOR-20; 9 to 18 seconds in several other items), because the one-second quiet time is also broken by Studio's own redraws, such as the render jobs poll every second. A failing save repeated its toast 3 to 11 seconds apart, not every second (PROJECT-17). A time-prop drag on the timeline was saved 18 to 31 seconds after the release (TRACKS-38, TRACKS-39, TRACKS-50, TRACKS-52). Other saves came 13 to 25 seconds after the last change (PROPSEDITOR-18, STAGETOOLBAR-23, STAGETOOLBAR-81, PROJECT-33, PROJECT-78). With the server stopped, the failing save repeated 1 to 2 seconds apart (PROPSEDITOR-28).
 
 ### B-10: A pending auto-save is written into the composition being opened instead of the one that was edited
 
@@ -183,6 +250,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. Loses one composition's edit and writes it into another.
 - **Decision needed:** `fix`. Bind each pending save to the composition whose props changed, and flush or drop it on a switch.
 - **Raised by:** [the Props Editor](props/the-props-editor.md#cancel-and-interrupt), [the Props Editor](props/the-props-editor.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPSEDITOR-51 and PROPSEDITOR-50 (Schema Check's props, its edited `titleIn` included, were written into Verify Unbound's file). COMPOSPANEL-57 shows the same save without any edit: with the server stopped, opening Lottie Animation from Simple Canvas Animation brought red "Failed to fetch" toasts, in pairs, about every second from 1.2 seconds after the click, as the auto-save tried to write the props Studio last saw into the composition being opened.
 
 ### B-11: A pan that starts and ends on the composition toggles playback, and one that starts and ends on a toolbar button presses it
 
@@ -193,6 +261,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. One common action does two things at once.
 - **Decision needed:** `fix`. Swallow the click after a press that moved, and do not start a pan from the toolbar.
 - **Raised by:** [the stage view](stage/the-stage-view.md#edge-cases), [the stage view](stage/the-stage-view.md#open-questions-and-verification), [the input model](foundations/input-model.md#clicks-after-drags), [the preview player](foundations/the-preview-player.md#the-player-inside-the-stage), [the stage toolbar](stage/the-stage-toolbar.md#edge-cases)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): STAGEVIEW-31 and INPUT-16 (a 100 px pan that started and ended on the composition also started playback).
 
 ### B-12: Ctrl/Cmd and the wheel zoom the whole page as well as the stage
 
@@ -203,6 +272,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `high`. One common action does two things at once.
 - **Decision needed:** `fix`. Add a non-passive wheel listener to the stage element directly.
 - **Raised by:** [the stage view](stage/the-stage-view.md#modifiers), [the stage view](stage/the-stage-view.md#open-questions-and-verification)
+- **Status:** Cause confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), effect not observed: Chromium logged "Unable to preventDefault inside passive event listener invocation" at every Ctrl+wheel notch over the stage (STAGEVIEW-37), so Studio cannot stop the browser's zoom; scripted wheel events do not reach the browser's page zoom, so whether the page zooms needs a real wheel. STAGEVIEW-37 is recorded `blocked`.
 
 ## Medium
 
@@ -256,6 +326,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Loses a few typed fields, and can write wrong numbers that the user saw before saving.
 - **Decision needed:** `fix`. Fill the fields when the dialog opens, and reset them when there is no metadata.
 - **Raised by:** [composition settings](compositions/composition-settings.md#while-ongoing), [composition settings](compositions/composition-settings.md#edge-cases), [composition settings](compositions/composition-settings.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPSETTINGS-12, COMPSETTINGS-19, and COMPSETTINGS-20.
 
 ### B-17: New Composition accepts names whose folders Studio cannot list or name properly
 
@@ -266,6 +337,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A composition the user just made disappears.
 - **Decision needed:** `fix`. Refuse names that map to a skipped folder, and check for an empty name before adding the suffix.
 - **Raised by:** [creating and duplicating](compositions/creating-and-duplicating.md#edge-cases), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CREATEDUP-59 ("Build") and CREATEDUP-61 ("!!!" with Solid wrote `-solid`, shown " Solid").
 
 ### B-18: New Composition replaces all four numbers with defaults when any one of them is 0
 
@@ -276,6 +348,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result in an uncommon path.
 - **Decision needed:** `fix`. Validate each number on its own and report the invalid one.
 - **Raised by:** [creating and duplicating](compositions/creating-and-duplicating.md#edge-cases), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CREATEDUP-29.
 
 ### B-19: A composition at the project root cannot be saved, duplicated, deleted, or auto-saved
 
@@ -286,6 +359,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. An uncommon layout, but nothing about it works and the error repeats.
 - **Decision needed:** `fix`. Give the root composition a non-empty ID such as `.`, or refuse to list it with a message.
 - **Raised by:** [project and compositions](foundations/project-and-compositions.md#composition-ids-and-names), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification), [creating and duplicating](compositions/creating-and-duplicating.md#edge-cases), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification), [composition settings](compositions/composition-settings.md#edge-cases), [the Compositions panel](compositions/the-compositions-panel.md#edge-cases), [the Omnibar](compositions/the-omnibar.md#edge-cases), [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification), [the Props Editor](props/the-props-editor.md#edge-cases)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), in a root project (Studio started inside `verify-unbound`) and with a `composition.html` copied to the copy's root: PROJECT-16, PROJECT-17, COMPOSPANEL-74, COMPSETTINGS-74, CREATEDUP-68, and OMNIBAR-77 (bare root project, "undefinedxundefined @ undefinedfps"). Two details differ from the text: the auto-save's "ID is required" toast repeated 3 to 11 seconds apart, not every second; and 📑 on the root tile prefilled the root composition's own name ("Copy of Verify Unbound") while it copied the active one.
+
+### B-82: Compositions made from the Vanilla JS, React, and Three.js templates never connect
+
+- **Where the user meets it:** New Composition with the Vanilla JS template (the dialog's default), React, or Three.js, and an agent's `create_composition` without a template.
+- **What happens / what was expected:** The composition loads, but the player never finds its Helios instance: "Connection Failed..." after 5 seconds, the transport disabled, no props. Expected: every template Studio offers makes a composition Studio can control.
+- **Reproduce:** Create a composition with the default template and wait 6 seconds.
+- **Why (from the code):** `packages/studio/src/server/templates/vanilla.ts`, `react.ts`, and `threejs.ts` create a Helios instance but neither set `window.helios` nor call `connectToParent`.
+- **Severity:** `medium`. The dialog's default template gives a composition Studio cannot drive.
+- **Decision needed:** `fix`. Expose the instance in all three templates, as Title explainer and Solid do.
+- **Raised by:** [project and compositions](foundations/project-and-compositions.md#templates), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification)
+- **Status:** confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROJECT-38, CREATEDUP-16, and OUTSIDE-37. The suspected defect was in the documents but had not been filed here.
 
 ### B-20: The Compositions panel cannot be used from the keyboard
 
@@ -296,6 +381,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. An accessibility gap; the Omnibar is a keyboard route to open a composition.
 - **Decision needed:** `fix`. Make tiles and folders buttons, and show the actions on focus as well as hover.
 - **Raised by:** [the Compositions panel](compositions/the-compositions-panel.md#interactions-with-other-systems), [the Compositions panel](compositions/the-compositions-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPOSPANEL-68.
 
 ### B-21: Renders started by an agent and from the Renders panel use different frame rates and lengths
 
@@ -306,6 +392,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. An inconsistency between two features that should match.
 - **Decision needed:** `fix`. Pick one source of truth for a render's frame rate and length.
 - **Raised by:** [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): OUTSIDE-41 (the panel's render of `simple-canvas-animation` had 150 frames, the agent's 300).
 
 ### B-22: System Diagnostics reports a capable server renderer as unable to do anything
 
@@ -316,6 +403,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result that sends the user looking for a problem that is not there.
 - **Decision needed:** `fix`. Read the fields from `browser`, and update the test's mock.
 - **Raised by:** [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#the-simple-case), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SHORTCUTS-11.
 
 ### B-23: The first diagnostics check or render on a machine without the renderer's Chromium freezes the Studio server while it downloads
 
@@ -326,6 +414,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong but recoverable; it happens once per machine.
 - **Decision needed:** `fix`. Install asynchronously and report progress.
 - **Raised by:** [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#while-ongoing), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SHORTCUTS-40. With `PLAYWRIGHT_BROWSERS_PATH` pointing at an empty folder, 🩺 made the server download Chrome Headless Shell and Playwright's FFmpeg (8 seconds, 265 MB, here); a second tab's reload and a `/api/compositions` request waited until the download ended.
 
 ### B-24: The Helios Assistant's Documentation tab finds almost none of the documentation
 
@@ -336,6 +425,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. The tab's main content is missing.
 - **Decision needed:** `fix`. Resolve READMEs from the package entry point's folder, and point the skills lookup at where the skills live.
 - **Raised by:** [the Helios Assistant](help/the-assistant.md#what-the-prompt-contains), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): ASSISTANT-22 and ASSISTANT-26.
 
 ### B-25: Studio's letter shortcuts also fire with Ctrl/Cmd held, on top of the browser's own shortcut
 
@@ -346,6 +436,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Two actions at once, but on keys users press for the browser rather than for Studio.
 - **Decision needed:** `fix`. Skip letter shortcuts when Ctrl, Cmd, or Alt is held.
 - **Raised by:** [the input model](foundations/input-model.md#modifier-keys), [the input model](foundations/input-model.md#open-questions-and-verification)
+- **Status:** Confirmed for Studio's side by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): TRANSPORT-59, INPUT-94, INPUT-95, and RANGE-45, whose expected results are this behavior, passed: Ctrl+L played forward, Ctrl+J in reverse, and Ctrl+I and Ctrl+O set the points. Whether the browser also ran its own shortcut cannot be seen from a script.
 
 ### B-26: A desktop file dropped outside a drop target replaces Studio in the tab
 
@@ -366,6 +457,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result in the output.
 - **Decision needed:** `fix`. Read the captions after the seek has settled.
 - **Raised by:** [client-side export](output/client-side-export.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-63 (exported as WebM; this Chromium has no H.264 encoder).
 
 ### B-28: A client-side export keeps running against a composition that was switched away
 
@@ -376,6 +468,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result in an uncommon path.
 - **Decision needed:** `fix`. Abort the export when the controller changes, and never fall back to the host page.
 - **Raised by:** [client-side export](output/client-side-export.md#cancel-and-interrupt), [client-side export](output/client-side-export.md#open-questions-and-verification)
+- **Status:** Confirmed in part by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-46. In Canvas mode, after another composition was opened, the export never ended: Cancel stayed for 90 seconds, with no toast and no file. Neither of the outcomes this entry reads from the code (the "missing during export" error, or Studio's own drawing captured) was seen. DOM mode could not be tried, because DOM-mode exports fail at their first frame in this Chromium ([B-86](#b-86-snapshots-and-client-side-exports-in-dom-mode-fail-in-chromium)).
 
 ### B-29: Client-side export ignores the Video Codec setting and turns a decimal bitrate into 5 megabits per second
 
@@ -386,6 +479,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Silently differs from the settings, though the video is valid.
 - **Decision needed:** `fix`. Parse decimals, pass the codec or label the settings that apply only to server renders.
 - **Raised by:** [client-side export](output/client-side-export.md#open-questions-and-verification)
+- **Status:** Bitrate confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-15 ("2.5M" gave 4.10 Mbps, the same as the default). The codec part could not be checked as written, because this Chromium cannot encode H.264 (CLIENTEXPORT-16, `blocked`; as WebM, "mpeg4" still gave VP9 with no message).
+
+### B-86: Snapshots and client-side exports in DOM mode fail in Chromium
+
+- **Where the user meets it:** 📷, or Export in Client-Side Export, with Mode set to DOM in the Renders panel, the mode a composition built from page elements rather than a canvas needs.
+- **What happens / what was expected:** Nothing is captured. A snapshot gives no file and no toast; an export stops at its first frame with no file. The console shows "DOM capture failed: SecurityError: Failed to construct 'VideoFrame': VideoFrames can't be created from tainted sources." and, for an export, "Failed to capture first frame in mode: dom". Expected: a picture of the composition's page, as [snapshots](output/snapshots-and-job-specs.md#while-ongoing) and [client-side export](output/client-side-export.md#starting) describe.
+- **Reproduce:** Open Simple Animation, set Mode to DOM in the Renders panel, and press 📷.
+- **Why (from the code):** `packages/player/src/features/dom-capture.ts` lines 37 to 69 draw the page into an SVG image with a `<foreignObject>` and turn it into a bitmap; Chromium treats such an image as tainted, so `new VideoFrame(bitmap)` in `packages/player/src/controllers.ts` lines 193 to 196 throws. The snapshot path catches the error and logs it without a toast.
+- **Severity:** `medium`. DOM mode in the browser is unusable; Canvas mode and server-side DOM renders still work.
+- **Decision needed:** `fix`. Capture DOM pages another way (or report the failure), and show a toast when a snapshot fails.
+- **Raised by:** the automated pass: [stage-and-output.md](verification/stage-and-output.md) (SNAPSPEC-14, CLIENTEXPORT-13, CLIENTEXPORT-21); described in [snapshots and job specs](output/snapshots-and-job-specs.md#while-ongoing)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SNAPSPEC-14, CLIENTEXPORT-13, CLIENTEXPORT-21, and CLIENTEXPORT-46 (DOM half).
 
 ### B-30: A render or job spec started before the composition's length is known covers zero frames
 
@@ -396,6 +501,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result in an uncommon path.
 - **Decision needed:** `fix`. Disable both until the player has connected, and refuse an empty range on the server.
 - **Raised by:** [server-side renders](output/server-renders.md#edge-cases), [server-side renders](output/server-renders.md#open-questions-and-verification), [snapshots and job specs](output/snapshots-and-job-specs.md#open-questions-and-verification)
+- **Status:** Confirmed in part by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): in SERVERRENDER-65, a render started on a first open, before the composition's length was known, was sent for frames 0 to 0. It then failed for another reason ([B-74](#b-74-studio-serves-composition-pages-untouched-so-the-title-explainer-template-never-connects-and-nothing-hot-reloads)), so what a zero-frame render produces was not seen.
 
 ### B-31: The "Transparent (WebM)" preset writes an MP4 file with no transparency
 
@@ -406,6 +512,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Silently differs from what the preset promises.
 - **Decision needed:** `fix`. Set an alpha pixel format and a `.webm` output for this preset, or rename it.
 - **Raised by:** [server-side renders](output/server-renders.md#the-render-settings), [server-side renders](output/server-renders.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SERVERRENDER-45.
 
 ### B-32: A job spec does not reproduce "Start Render Job", and with a WebCodecs preference every chunk command fails
 
@@ -416,6 +523,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong or failing result in a path outside the main flow.
 - **Decision needed:** `fix`. Add the missing options to `helios render` and emit them, or drop the unsupported flag.
 - **Raised by:** [snapshots and job specs](output/snapshots-and-job-specs.md#while-ongoing), [snapshots and job specs](output/snapshots-and-job-specs.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SNAPSPEC-23 (`--webcodecs-preference` refused as an unknown option) and SNAPSPEC-26 (no props in the spec).
 
 ### B-33: The Audio panel lists and controls tracks that the composition never applies the controls to
 
@@ -426,6 +534,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. An inconsistency between the panel and the sound.
 - **Decision needed:** `fix`. Use one naming rule in both places.
 - **Raised by:** [the Audio mixer](panels/the-audio-mixer.md#what-the-panel-shows), [the Audio mixer](panels/the-audio-mixer.md#open-questions-and-verification)
+- **Status:** Confirmed in part by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): in AUDIOMIXER-53 the panel's mutes reached only the element with `data-helios-track-id`; the `sfx` and unnamed elements were never muted. What is heard was not judged (AUDIOMIXER-12 was not run).
 
 ### B-34: Solo lives in the Audio panel and comes apart from the composition's mutes
 
@@ -436,6 +545,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong but recoverable by hand.
 - **Decision needed:** `fix`. Keep the solo with the composition's audio state, or end it whenever the panel or the composition goes away.
 - **Raised by:** [the Audio mixer](panels/the-audio-mixer.md#cancel-and-interrupt), [the Audio mixer](panels/the-audio-mixer.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): AUDIOMIXER-53 and AUDIOMIXER-55, and AUDIOMIXER-54 with a fixture that can hot reload. AUDIOMIXER-55 happens only when the switch keeps the Audio tab shown (through the Omnibar); opened from the Compositions tab, the panel is rebuilt and forgets the solo, mute buttons enabled.
 
 ### B-35: The Captions panel writes cues into a `captions` input prop for compositions connected through `connectToParent`
 
@@ -446,6 +556,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result in an uncommon path.
 - **Decision needed:** `fix`. Send the captions through the connection.
 - **Raised by:** [the Captions panel](panels/the-captions-panel.md#finishing), [the Captions panel](panels/the-captions-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CAPTIONS-49 (`defaultProps.captions` written 12.9 seconds after the click).
 
 ### B-36: With a remote registry in the index format, every component shows "Installed"
 
@@ -456,6 +567,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. The panel cannot install anything from such a registry.
 - **Decision needed:** `fix`. Treat a component with no known files as not installed, or fetch its files first.
 - **Raised by:** [the Components panel](panels/the-components-panel.md#edge-cases), [the Components panel](panels/the-components-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPONENTS-50.
 
 ### B-37: A component install reports success when the package manager fails
 
@@ -466,6 +578,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Silently reports success for a broken install.
 - **Decision needed:** `fix`. Let the failure reach the request's answer.
 - **Raised by:** [the Components panel](panels/the-components-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPONENTS-27 (with `npm_config_registry=http://127.0.0.1:9/`, npm's ECONNREFUSED in the terminal and a green `Component "progress-bar" installed` 71 seconds later). A package manager that cannot be started at all stops the server instead; see [B-79](#b-79-two-components-panel-failures-stop-the-helios-studio-process).
+
+### B-79: Two Components panel failures stop the `helios studio` process
+
+- **Where the user meets it:** The Components panel, when `helios.config.json` has become unreadable while Studio runs, or when the project's lockfile names a package manager that is not installed (an empty `bun.lockb` on a machine without Bun).
+- **What happens / what was expected:** In the first case, opening the Components tab makes the server throw "Failed to parse helios.config.json: ..." outside any error handling and exit; the panel shows "No components found in registry.", and every later request fails ("Failed to fetch"). In the second, Install writes the component's files, then the server dies on an unhandled "spawn bun ENOENT"; no toast appears. Expected: an error message, and the server keeps running.
+- **Reproduce:** In a project with a configuration, replace `helios.config.json`'s contents with `{` and open the Components tab. Or put an empty `bun.lockb` at the root of a project on a machine without Bun and press Install.
+- **Why (from the code):** `packages/studio/src/server/plugin.ts` lines 121 to 128 call `onCheckInstalled` for every component with no `try`, and `packages/cli/src/utils/config.ts` throws on unreadable JSON. `packages/cli/src/utils/package-manager.ts` lines 51 to 62 spawn the package manager without listening for its `error` event.
+- **Severity:** `medium`. Both need an unusual project, but both take the whole application down.
+- **Decision needed:** `fix`. Catch both errors and answer the request with them.
+- **Raised by:** the automated pass: [assets-and-panels.md](verification/assets-and-panels.md) (COMPONENTS-52, COMPONENTS-53); described in [the Components panel](panels/the-components-panel.md#edge-cases)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPONENTS-52 (the document had expected the panel to wait on "Loading registry..."; corrected) and COMPONENTS-53 (Bun removed from the server's `PATH`).
 
 ### B-38: The out point does not follow a change in the composition's length, and playback can run past the end
 
@@ -476,6 +600,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A wrong result after a common edit, recoverable by setting the points again.
 - **Decision needed:** `fix`. Clamp the range to the length, and move an out point that was at the end when the length changes.
 - **Raised by:** [the playback range](playback/the-playback-range.md#edge-cases), [the playback range](playback/the-playback-range.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): RANGE-64.
 
 ### B-39: Dragged in, out, and time-prop markers stick to their own position
 
@@ -486,6 +611,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong but workable with Shift.
 - **Decision needed:** `fix`. Leave the dragged item out of the snap points.
 - **Raised by:** [the playback range](playback/the-playback-range.md#edge-cases), [the playback range](playback/the-playback-range.md#open-questions-and-verification), [timeline tracks](playback/timeline-tracks.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): RANGE-20 and TRACKS-36, whose expected results are this behavior, passed: the out marker held "Out: 450" for the first 10 pixels and then moved in jumps of 10 to 11 pixels, and Title In did the same.
 
 ### B-40: A click on the composition within a frame of the end restarts from frame 0, even while playing
 
@@ -496,6 +622,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong in a narrow window, and inconsistent with the transport.
 - **Decision needed:** `fix`. Pause when playing; restart from the playback range's start.
 - **Raised by:** [the transport controls](playback/the-transport-controls.md#edge-cases), [the transport controls](playback/the-transport-controls.md#open-questions-and-verification), [the input model](foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): TRANSPORT-83.
 
 ### B-41: A hot reload resets the playback rate, and refused props cancel the rest of the restore
 
@@ -506,6 +633,29 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong but recoverable with a key press.
 - **Decision needed:** `fix`. Record and restore the rate, and restore each part separately.
 - **Raised by:** [the transport controls](playback/the-transport-controls.md#open-questions-and-verification), [the preview player](foundations/the-preview-player.md#hot-reload), [the preview player](foundations/the-preview-player.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input) with a fixture that can hot reload (hot reload does not happen otherwise, [B-74](#b-74-studio-serves-composition-pages-untouched-so-the-title-explainer-template-never-connects-and-nothing-hot-reloads)): PLAYER-57 (the speed menu read 1x after the reload) and PLAYER-61 (refused props left it at frame 0, paused). Both are recorded `blocked` as written.
+
+### B-75: Reverse playback freezes on a composition whose media Helios manages
+
+- **Where the user meets it:** J, ⏪ in the speed menu, or the Omnibar, on a composition with `autoSyncAnimations` and `<audio>` or `<video>` elements, such as the protocol's Verify Media.
+- **What happens / what was expected:** The speed menu shows the reverse rate and ❚❚ shows, but the playhead never moves: every frame the page throws "Failed to set the 'playbackRate' property on 'HTMLMediaElement'" for the negative rate, and the frame is not advanced. Expected: reverse playback moves the playhead backward, with the media paused or silent.
+- **Reproduce:** Open Verify Media, press J (or choose ⏪ -1x) and watch the playhead.
+- **Why (from the code):** `packages/core/src/drivers/DomDriver.ts` lines 512 to 514 copy the playback rate onto every managed media element; browsers refuse a negative `playbackRate` and throw.
+- **Severity:** `medium`. A transport feature fails on exactly the compositions with sound, with no message.
+- **Decision needed:** `fix`. Pause the media, or keep a rate of at least 0, while playing in reverse.
+- **Raised by:** the automated pass: [foundations.md](verification/foundations.md) (INPUT-35, INPUT-58); described in [the transport controls](playback/the-transport-controls.md#edge-cases)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): INPUT-35 and INPUT-58. Reverse playback works on Verify Unbound, which has no media.
+
+### B-84: Zooming the timeline in widens the whole middle column instead of scrolling the track area
+
+- **Where the user meets it:** The timeline's zoom slider, moved past the point where the timeline is wider than its panel (on a 20-second composition in a 1600-pixel window, from about step 18; on a 5-second one, past the middle).
+- **What happens / what was expected:** The timeline does not scroll. The timeline panel grows to the timeline's full width, and the stage above it grows with it, since both share the layout's middle column: the inspector and the header's "In:", "Out:", and "Fr:" readouts are pushed off the right of the window, the page does not scroll to them, and the later part of the timeline cannot be brought into view by the scrollbar or the wheel. At the far right the column is about 15,000 pixels wide for 20 seconds. The zoom is remembered, so a reload keeps the layout broken until the slider goes back toward Fit. Expected: the track area scrolls inside a panel that keeps its width, as [the timeline](playback/the-timeline.md#zooming-the-timeline) describes the code's intent.
+- **Reproduce:** Open a 20-second composition and move the timeline's zoom slider to the middle. The Props Editor leaves the window.
+- **Why (from the code):** `packages/studio/src/components/Timeline.tsx` lines 88 to 89 and 386 give the timeline content a fixed pixel width when zoomed. Its container is a flex item with the default minimum width (`packages/studio/src/App.tsx` lines 115 to 118), and the layout's middle column is `1fr` (`packages/studio/src/components/Layout/StudioLayout.css` line 19), whose minimum is its content's width, so the content's width passes up to the column instead of overflowing the track area, which is the element that scrolls (`Timeline.css` lines 56 to 64). The same `1fr` minimum is behind [B-77](#b-77-the-stage-never-shrinks-below-about-938-pixels-pushing-the-inspector-off-a-narrow-window).
+- **Severity:** `medium`. Zooming, the only way to see frames in detail on a long composition, breaks the layout and cannot show the end of the timeline; Fit still works.
+- **Decision needed:** `fix`. Give the timeline's container and the middle column a minimum width of 0 (`min-width: 0`, `minmax(0, 1fr)`), so the track area scrolls.
+- **Raised by:** the automated pass: [playback.md](verification/playback.md) (TIMELINE-36, TIMELINE-37), [foundations.md](verification/foundations.md) (INPUT-22); described in [the timeline](playback/the-timeline.md#zooming-the-timeline)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headless Chromium 141 on Linux, with real mouse and keyboard input, and confirmed headed): TIMELINE-36, TIMELINE-37, and INPUT-22; TIMELINE-22 and TIMELINE-38 passed only because nothing scrolls.
 
 ### B-42: After a switch, Studio goes on using the previous composition's length, frame rate, props, playhead, and schema
 
@@ -516,6 +666,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong results after a switch, mostly corrected once the composition connects.
 - **Decision needed:** `fix`. Reset the player state and schema on a switch, and do not save the timeline state until the new composition's has been loaded, on a switch or a page load.
 - **Raised by:** [the playback range](playback/the-playback-range.md#edge-cases), [the playback range](playback/the-playback-range.md#open-questions-and-verification), [server-side renders](output/server-renders.md#edge-cases), [server-side renders](output/server-renders.md#open-questions-and-verification), [the Props Editor](props/the-props-editor.md#edge-cases), [the Props Editor](props/the-props-editor.md#open-questions-and-verification), [the Helios Assistant](help/the-assistant.md#modifiers), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification), [timeline tracks](playback/timeline-tracks.md#edge-cases), [timeline tracks](playback/timeline-tracks.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): RANGE-39, RANGE-40, RANGE-41, RANGE-67, SERVERRENDER-66, SERVERRENDER-84, SNAPSPEC-41, CREATEDUP-54, PROPSEDITOR-69, TRACKS-46, and ASSISTANT-57. TIMELINE-63 and TRACKS-41 showed it on the timeline: after a tile switch from Drive Long, Drive Test's header read "Out: 600", and after Tracks Test, Slow Drive kept Tracks Test's cyan Title In diamond for good. In SNAPSPEC-41 the stale out point outlasted the connection: a job spec of Simple Canvas Animation, made after it connected, still covered Verify Driveable's 300 frames. In SERVERRENDER-66 the request carried the previous composition's frame rate, range, and props as described, but the video drew the composition's own title because server renders apply no props at all ([B-81](#b-81-server-side-renders-ignore-the-input-props)).
 
 ### B-43: Five requests report success without looking at the server's answer
 
@@ -526,6 +677,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Misleading, but nothing is lost by the message itself.
 - **Decision needed:** `fix`. Check the answer and show the server's error, as rename and move do.
 - **Raised by:** [project and compositions](foundations/project-and-compositions.md#when-a-request-fails), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification), [the input model](foundations/input-model.md#the-interrupt-rows), [asset actions](assets/asset-actions.md#cancel-and-interrupt), [asset actions](assets/asset-actions.md#open-questions-and-verification), [the Assets panel](assets/the-assets-panel.md#cancel-and-interrupt), [the Assets panel](assets/the-assets-panel.md#open-questions-and-verification), [server-side renders](output/server-renders.md#cancel-and-interrupt), [server-side renders](output/server-renders.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROJECT-59 and OUTSIDE-49 ("Asset deleted" after a DELETE answered 500), SERVERRENDER-59, and SERVERRENDER-81. In SERVERRENDER-59 the server answered 200 for a job that was already gone.
 
 ### B-44: The Props Editor's time field undoes a marker drag and never shows its error style
 
@@ -536,6 +688,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Silently undoes the user's drag.
 - **Decision needed:** `fix`. Mark the field as editing only after a keystroke, and keep the error until the next edit.
 - **Raised by:** [prop fields](props/prop-fields.md#the-time-field), [prop fields](props/prop-fields.md#cancel-and-interrupt), [prop fields](props/prop-fields.md#edge-cases), [prop fields](props/prop-fields.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPFIELDS-33 and PROPFIELDS-68.
 
 ### B-45: An inferred color field changes kind mid-typing and loses keyboard focus
 
@@ -546,6 +699,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Loses focus and fires shortcuts while typing.
 - **Decision needed:** `fix`. Decide the kind once per prop, not per keystroke.
 - **Raised by:** [prop fields](props/prop-fields.md#edge-cases), [prop fields](props/prop-fields.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPFIELDS-77.
 
 ### B-46: Typing into a typed-array box is undone at the next redraw
 
@@ -556,6 +710,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. The field cannot be edited by typing.
 - **Decision needed:** `fix`. Compare by value before replacing the text, as the inferred JSON box does.
 - **Raised by:** [prop fields](props/prop-fields.md#json-boxes), [prop fields](props/prop-fields.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPFIELDS-41.
 
 ### B-47: Asset fields with accepted extensions, and color text boxes, refuse every partly typed value
 
@@ -566,6 +721,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Typing does not work in these fields.
 - **Decision needed:** `fix`. Keep local text and commit on leaving or on a valid value.
 - **Raised by:** [prop fields](props/prop-fields.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPFIELDS-17 and PROPFIELDS-18.
 
 ### B-48: Reset removes props the schema does not list, and silently does nothing when one default is refused
 
@@ -576,6 +732,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Removes props without warning.
 - **Decision needed:** `fix`. Merge the defaults into the current props, and show an error when refused.
 - **Raised by:** [the Props Editor](props/the-props-editor.md#reset), [the Props Editor](props/the-props-editor.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PROPSEDITOR-36 and PROPSEDITOR-37.
 
 ### B-49: Safe-area guides are positioned from the stage's corner, not the composition's
 
@@ -586,6 +743,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. A framing aid in the wrong place.
 - **Decision needed:** `fix`. Position the guides with the player, for example in the same centered wrapper.
 - **Raised by:** [the stage toolbar](stage/the-stage-toolbar.md#ending-at-once), [the stage toolbar](stage/the-stage-toolbar.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): STAGETOOLBAR-32, STAGETOOLBAR-28 (the guides grow with the composition but their top-left sat 178 pixels right of and 107 below the composition's), and STAGETOOLBAR-30 (at Fit the crosshair's crossing lay under the stage toolbar, so a click there pressed the toolbar).
 
 ### B-50: The transparency grid never shows through a transparent composition
 
@@ -596,6 +754,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. The feature does not do what its name says.
 - **Decision needed:** `fix`. Make the player's background transparent inside Studio.
 - **Raised by:** [the stage toolbar](stage/the-stage-toolbar.md#edge-cases), [the stage toolbar](stage/the-stage-toolbar.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): STAGETOOLBAR-92.
 
 ### B-51: One unexpected error blanks the whole Studio page
 
@@ -606,6 +765,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Total in effect, but the triggers are uncommon.
 - **Decision needed:** `fix`. Guard the two storage writes, check the documentation answer, and add an error boundary around each panel and dialog.
 - **Raised by:** [the workspace](foundations/the-workspace.md#open-questions-and-verification), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): WORKSPACE-69. In a Chromium profile with site data blocked, the page stayed blank from the first load, with the uncaught "Failed to read the 'localStorage' property from 'Window': Access is denied for this document."
 
 ### B-52: The Omnibar opens beneath every other dialog and takes keyboard focus there
 
@@ -616,6 +776,29 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `medium`. Wrong but recoverable; a hidden Enter can act.
 - **Decision needed:** `fix`. Put the Omnibar on top of every dialog.
 - **Raised by:** [the workspace](foundations/the-workspace.md#dialogs), [the workspace](foundations/the-workspace.md#open-questions-and-verification), [the input model](foundations/input-model.md#edge-cases), [the Omnibar](compositions/the-omnibar.md#edge-cases), [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification), [composition settings](compositions/composition-settings.md#modifiers), [composition settings](compositions/composition-settings.md#open-questions-and-verification), [creating and duplicating](compositions/creating-and-duplicating.md#modifiers), [creating and duplicating](compositions/creating-and-duplicating.md#open-questions-and-verification), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): WORKSPACE-43, WORKSPACE-76, OMNIBAR-29, OMNIBAR-71, OMNIBAR-72, CREATEDUP-38, and COMPSETTINGS-43; SHORTCUTS-47 and SHORTCUTS-48, whose expected results are this behavior, passed.
+
+### B-76: At the default sidebar width the last sidebar tabs lie under the stage and cannot be clicked
+
+- **Where the user meets it:** The sidebar's tab row at its default width of 250 pixels.
+- **What happens / what was expected:** The six tabs need about 507 pixels. Components is cut off at the sidebar's edge, and Captions, Audio, and Renders lie under the stage, where a click lands on the composition (and toggles playback). They can be reached only after widening the sidebar to about 540 pixels. Expected: every tab can be seen and clicked at the default width.
+- **Reproduce:** Clear local storage, reload, and try to click the Renders tab.
+- **Why (from the code):** `packages/studio/src/components/Sidebar/Sidebar.css` lines 9 to 27 lay the tabs out in one row that neither wraps, scrolls, nor shrinks its labels, and the stage, later in the page, covers what overflows.
+- **Severity:** `medium`. Three panels are unreachable until the user discovers the divider.
+- **Decision needed:** `fix`. Let the row wrap or scroll, shorten the labels, or clip the row to the sidebar.
+- **Raised by:** the automated pass: [foundations.md](verification/foundations.md) (WORKSPACE-25); described in [the workspace](foundations/the-workspace.md#the-sidebar)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): WORKSPACE-25. The pass widened the sidebar with a real drag of its divider whenever it needed those tabs.
+
+### B-77: The stage never shrinks below about 938 pixels, pushing the inspector off a narrow window
+
+- **Where the user meets it:** A browser window narrower than about 1500 pixels, or a sidebar or inspector widened by its divider.
+- **What happens / what was expected:** The stage stops shrinking at about 938 pixels. At a 1400-pixel window the inspector runs 90 pixels past the right edge; from about 1200 pixels down it is entirely off the page, and the page does not scroll to it. Expected: the stage gives way so that the sidebar and the inspector stay on screen.
+- **Reproduce:** Make the window 1200 pixels wide and look for the Props Editor.
+- **Why (from the code):** `packages/studio/src/components/Layout/StudioLayout.css` line 19 sizes the middle column `1fr`, whose minimum is its content's width, here the stage toolbar's row of controls.
+- **Severity:** `medium`. The Props Editor disappears on an ordinary laptop window.
+- **Decision needed:** `fix`. Give the middle column a minimum of 0 (`minmax(0, 1fr)`) and let the toolbar wrap or scroll.
+- **Raised by:** the automated pass: [foundations.md](verification/foundations.md) (WORKSPACE-02, WORKSPACE-20); described in [the workspace](foundations/the-workspace.md#the-layout-and-its-dividers)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): WORKSPACE-02, WORKSPACE-20, and STAGETOOLBAR-88 (with the sidebar and the inspector at 600 pixels the stage stayed 938 wide and pushed the inspector past the window's right edge).
 
 ## Low
 
@@ -628,6 +811,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. An error toast for a no-op, and a refusal with an easy workaround (rename first).
 - **Decision needed:** `fix`. Skip a move to the current folder, and compare paths by whole segments.
 - **Raised by:** [asset actions](assets/asset-actions.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): ASSETACTIONS-109 and ASSETACTIONS-110.
 
 ### B-54: 📝 on a composition tile opens its folder rather than its page
 
@@ -638,6 +822,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The editor opens, just not on the file.
 - **Decision needed:** `fix`. Pass the path of `composition.html`.
 - **Raised by:** [the Compositions panel](compositions/the-compositions-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPOSPANEL-20 (with `LAUNCH_EDITOR` naming a stub, the editor was given the folder `gsap-animation`).
 
 ### B-55: Searching the Compositions panel shows a matching folder closed, and leaves folders it opened open
 
@@ -648,6 +833,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. A quirk of search.
 - **Decision needed:** `product call`. Open folders that match (more visible results, more clutter), or keep them closed (today); and whether clearing a search should restore the folders as they were.
 - **Raised by:** [the Compositions panel](compositions/the-compositions-panel.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPOSPANEL-33 and COMPOSPANEL-35, whose expected results are this behavior.
 
 ### B-56: The Omnibar's highlight does not scroll into view
 
@@ -658,6 +844,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The mouse and typing still work.
 - **Decision needed:** `fix`. Scroll the highlighted item into view when it changes.
 - **Raised by:** [the Omnibar](compositions/the-omnibar.md#edge-cases), [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): OMNIBAR-40, whose expected result is this behavior.
 
 ### B-57: Open Studio tabs never follow each other's remembered values
 
@@ -668,6 +855,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Surprising only with several tabs.
 - **Decision needed:** `product call`. Sync tabs through storage events, or keep tabs independent and say so.
 - **Raised by:** [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification), [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#edge-cases), [the playback range](playback/the-playback-range.md#interactions-with-other-systems)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headless Chromium 141 on Linux, with real mouse and keyboard input): RANGE-63. A second tab reloaded after the first set the range to 30 to 90 came back at 0 to 150 and wrote that over the record.
 
 ### B-58: Two `helios studio` processes on one project overwrite each other's render history
 
@@ -678,6 +866,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. An unusual setup.
 - **Decision needed:** `product call`. Refuse a second process on the same project, or merge the history on save.
 - **Raised by:** [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): OUTSIDE-78.
 
 ### B-59: An agent can cancel the user's render with no notice beyond the status
 
@@ -688,6 +877,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The status is shown.
 - **Decision needed:** `product call`. Show a toast when someone else changes a job, or limit agents to their own jobs.
 - **Raised by:** [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification)
+- **Status:** Not checked: in the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), the agent's `cancel_render` stopped the `helios studio` process ([B-78](#b-78-cancelling-a-server-side-render-stops-the-helios-studio-process); OUTSIDE-44), so what the user would see afterwards could not be observed.
 
 ### B-60: The Keyboard Shortcuts dialog and the Omnibar's hints disagree with the shortcuts
 
@@ -698,6 +888,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Copy that misleads.
 - **Decision needed:** `fix`. Correct the dialog and the hints.
 - **Raised by:** [the input model](foundations/input-model.md#the-shortcut-map), [the input model](foundations/input-model.md#open-questions-and-verification), [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): INPUT-50, INPUT-52, INPUT-53, INPUT-54, SHORTCUTS-21, and OMNIBAR-14.
 
 ### B-61: The Assistant picks documentation by splitting the question at spaces and taking the first three matches
 
@@ -708,6 +899,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The prompt is still useful without documentation.
 - **Decision needed:** `product call`. Keep the simple rule, or rank sections (strip punctuation, score by matches).
 - **Raised by:** [the Helios Assistant](help/the-assistant.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): ASSISTANT-24 and ASSISTANT-20, whose expected results are this behavior, passed (the first three matching sections in the list's order, and no keyword of three letters or fewer).
 
 ### B-62: Export and snapshot do nothing, without a message, when there is nothing to capture
 
@@ -718,6 +910,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Nothing is lost.
 - **Decision needed:** `fix`. Disable Export until connected, and show a message for an empty capture.
 - **Raised by:** [client-side export](output/client-side-export.md#open-questions-and-verification), [snapshots and job specs](output/snapshots-and-job-specs.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-11 and SNAPSPEC-30.
 
 ### B-63: A render job started in Studio is labeled with the composition page's address
 
@@ -728,6 +921,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. A labeling slip.
 - **Decision needed:** `fix`. Send the composition ID.
 - **Raised by:** [server-side renders](output/server-renders.md#open-questions-and-verification), [changes from outside Studio](cross-cutting/changes-from-outside-studio.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SERVERRENDER-50.
 
 ### B-64: A finished client-side export is not announced
 
@@ -738,6 +932,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The download itself is visible.
 - **Decision needed:** `product call`. Add an "Export finished" toast or not.
 - **Raised by:** [client-side export](output/client-side-export.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): CLIENTEXPORT-05, whose expected result is this behavior, passed; only the browser's download showed that the export had finished.
 
 ### B-65: Deleting a render job has no confirmation
 
@@ -748,6 +943,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The render can be run again.
 - **Decision needed:** `product call`. Add a confirmation like the other deletes, or not.
 - **Raised by:** [server-side renders](output/server-renders.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SERVERRENDER-58 and PROJECT-53, whose expected results are this behavior, passed: Delete removed the job and its file at once with no confirmation.
 
 ### B-66: Every render starts at once; there is no queue
 
@@ -758,6 +954,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Slower, not wrong.
 - **Decision needed:** `product call`. Queue renders (with a concurrency limit), or keep running them at once and drop the QUEUED status.
 - **Raised by:** [server-side renders](output/server-renders.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): SERVERRENDER-15, whose expected result is this behavior, passed: three clicks started three renders that ran at the same time and all completed.
 
 ### B-67: Import SRT accepts only strict SRT and refuses WebVTT
 
@@ -769,6 +966,17 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Decision needed:** `product call`. Use the general reader (and rename the button), or keep strict SRT.
 - **Raised by:** [the Captions panel](panels/the-captions-panel.md#open-questions-and-verification)
 
+### B-87: Two component installs at once leave only one of them in `helios.config.json`
+
+- **Where the user meets it:** The Components panel, when a second Install is started while the first is still running, which the panel allows after the user leaves the tab and comes back (or from a second tab, or by an agent through Studio's MCP server).
+- **What happens / what was expected:** Both installs write their files and both report success, but `helios.config.json` ends up listing only the components of the install that finished last; the other one's entries are lost. The panel still shows every component as Installed, because it decides that from the files on disk, so nothing in Studio shows the loss; tools that read the configuration (the `helios` CLI's list, diff, and update commands) no longer know the component. Expected: both components recorded.
+- **Reproduce:** In a project with a `helios.config.json`, press Install on `timer`, at once click another sidebar tab and come back, and press Install on `watermark` before the first toast. When both toasts have come, `helios.config.json` lists either `use-video-frame` and `timer`, or `watermark`, not all three.
+- **Why (from the code):** `packages/cli/src/utils/install.ts` reads the configuration when an install starts (line 45) and writes its own copy back when it ends (lines 141 to 163), after the package manager has run, so two overlapping installs each write a copy that lacks the other's components. `packages/cli/src/commands/studio.ts` lines 81 to 89 report a component installed when its files exist, whatever the configuration says.
+- **Severity:** `low`. It needs two installs at once, and installing the lost component again records it.
+- **Decision needed:** `fix`. Read, change, and write the configuration in one step at the end of each install, or let only one action run at a time on the server.
+- **Raised by:** the automated pass: [assets-and-panels.md](verification/assets-and-panels.md) (COMPONENTS-38); described in [the Components panel](panels/the-components-panel.md#cancel-and-interrupt)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): COMPONENTS-38, twice. In one run the configuration ended as `["watermark"]`, in the other as `["use-video-frame", "timer"]`; all three components' files were on disk and the panel showed all three as Installed.
+
 ### B-68: The empty background below the timeline's track area takes no presses or drops, and the drop highlight blinks
 
 - **Where the user meets it:** The timeline panel at its default height with no audio lanes, where most of the space below the header is empty background.
@@ -778,6 +986,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The track area itself works.
 - **Decision needed:** `fix`. Let the inner box fill the panel, and ignore drag-leave events into children.
 - **Raised by:** [the timeline](playback/the-timeline.md#edge-cases), [the timeline](playback/the-timeline.md#open-questions-and-verification), [timeline tracks](playback/timeline-tracks.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): TRACKS-21; INPUT-07 also found that a press below the lanes does not seek.
+
+### B-80: The `d3-animation` example never connects
+
+- **Where the user meets it:** Opening the `d3-animation` example in Studio.
+- **What happens / what was expected:** The page stops with "The requested module '/@fs/.../packages/core/src/drivers/index.ts' does not provide an export named 'TimeDriver'", and the player shows "Connection Failed...". Expected: it connects like the other canvas and SVG examples.
+- **Reproduce:** Open D3 Animation and wait 6 seconds.
+- **Why (from the code):** `examples/d3-animation/src/index.js` line 1 imports Helios from core's TypeScript source, and `packages/core/src/index.ts` line 22 re-exports `TimeDriver`, which is only an interface, as a value; a file-by-file transform cannot drop it, so the browser finds no such export.
+- **Severity:** `low`. One example.
+- **Decision needed:** `fix`. Re-export `TimeDriver` with `export type`, or import the built package in the example.
+- **Raised by:** the automated pass: [foundations.md](verification/foundations.md) (PLAYER-28); described in [the preview player](foundations/the-preview-player.md#finishing)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): PLAYER-28. The document's list of examples that never connect is corrected.
 
 ### B-69: A size typed in the stage toolbar is replaced by the metadata's at every save
 
@@ -788,6 +1008,18 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The size can be typed again.
 - **Decision needed:** `product call`. Keep a typed size until the composition changes, or keep today's behavior and say in the toolbar that it is a preview size.
 - **Raised by:** [the stage toolbar](stage/the-stage-toolbar.md#edge-cases), [the stage toolbar](stage/the-stage-toolbar.md#open-questions-and-verification), [project and compositions](foundations/project-and-compositions.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): in STAGETOOLBAR-23 the width typed in the toolbar, 1280, was replaced by the metadata's 1920 at the next auto-save, while the field had keyboard focus.
+
+### B-83: A canvas wider than the stage is drawn no wider than the composition's page
+
+- **Where the user meets it:** Typing a canvas width in the stage toolbar larger than the stage, for example 2500 or 5000 pixels on a 1920-pixel composition.
+- **What happens / what was expected:** The field and the canvas size take the typed width, but the player is drawn only as wide as the page inside it (1920 pixels for the test compositions), so the stage does not show the wider canvas. Widths below that are drawn as typed. Expected: the player is drawn at the canvas size, as it is for heights.
+- **Reproduce:** Open a composition, type 5000 in the stage toolbar's width field, and measure the player.
+- **Why (from the code):** `packages/studio/src/components/Stage/Stage.css` lines 13 to 19 make the stage's content a flex row, and the player (`Stage.tsx` lines 156 to 166) is a flex item that may shrink; a flex item cannot shrink below its content's width, which is the composition page's own width, so a wider canvas shrinks to that.
+- **Severity:** `low`. The preview misstates a large canvas size; renders use the typed size.
+- **Decision needed:** `fix`. Keep the player from shrinking (`flex-shrink: 0`).
+- **Raised by:** the automated pass: [stage-and-output.md](verification/stage-and-output.md) (STAGETOOLBAR-45); described in [the stage toolbar](stage/the-stage-toolbar.md#edge-cases)
+- **Status:** found by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): STAGETOOLBAR-45 (5000 typed, player 1920 pixels wide) and STAGETOOLBAR-90.
 
 ### B-70: Fit sets 100% rather than fitting the composition to the stage
 
@@ -798,6 +1030,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. The zoom buttons work.
 - **Decision needed:** `product call`. Compute a zoom that fits the stage, or rename the button.
 - **Raised by:** [the stage view](stage/the-stage-view.md#edge-cases), [the stage view](stage/the-stage-view.md#open-questions-and-verification)
+- **Status:** Confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): STAGEVIEW-22, whose expected result is this behavior.
 
 ### B-71: Clipboard copies report success without checking
 
@@ -808,6 +1041,7 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Copying usually works at the Studio address.
 - **Decision needed:** `fix`. Wait for the promise and report its result.
 - **Raised by:** [the Omnibar](compositions/the-omnibar.md#open-questions-and-verification), [the Props Editor](props/the-props-editor.md#open-questions-and-verification), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification)
+- **Status:** Not checked: in the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input), setting the clipboard permission to denied through the DevTools protocol did not stop Chromium from letting the page write, so a refused write could not be produced (OMNIBAR-47 and PROPSEDITOR-31 recorded `blocked`).
 
 ### B-72: Small copy and rendering slips
 
@@ -828,3 +1062,4 @@ The 27 feature and foundation documents raised 147 suspected defects, counting e
 - **Severity:** `low`. Cosmetic or wording.
 - **Decision needed:** `fix`. Each has an obvious correction.
 - **Raised by:** [the timeline](playback/the-timeline.md#open-questions-and-verification), [timeline tracks](playback/timeline-tracks.md#open-questions-and-verification), [the transport controls](playback/the-transport-controls.md#the-controls), [the transport controls](playback/the-transport-controls.md#open-questions-and-verification), [the Assets panel](assets/the-assets-panel.md#edge-cases), [the Assets panel](assets/the-assets-panel.md#open-questions-and-verification), [asset actions](assets/asset-actions.md#open-questions-and-verification), [shortcuts and diagnostics](help/shortcuts-and-diagnostics.md#open-questions-and-verification), [the Helios Assistant](help/the-assistant.md#open-questions-and-verification), [the Props Editor](props/the-props-editor.md#what-the-editor-shows), [the Props Editor](props/the-props-editor.md#open-questions-and-verification), [the Components panel](panels/the-components-panel.md#open-questions-and-verification), [project and compositions](foundations/project-and-compositions.md#edge-cases), [the Compositions panel](compositions/the-compositions-panel.md#edge-cases)
+- **Status:** Five items confirmed by the automated pass of 2026-10-07 (Playwright driving headed Chromium 141 on Linux, with real mouse and keyboard input): the hover guide's label (TIMELINE-42), the breadcrumb (ASSETPANEL-83), the rename message (ASSETACTIONS-47), the disabled transport controls (TRANSPORT-09, where the speed menu, unlike the others, is dimmed), and the Components panel's colors (COMPONENTS-10: the cards, the type label, and Install have a transparent background and no border). It found one more slip of the same kind: at Fit the timeline's last tick label overflows the track area by about 5 pixels, so a horizontal scrollbar appears and the label is out of view (TIMELINE-33, and at the first five zoom steps, TIMELINE-35). The rest were not checked.
