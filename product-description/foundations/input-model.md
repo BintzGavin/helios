@@ -93,7 +93,7 @@ When the player has focus, these keys act on the player first, and then Studio a
 | L | Jump forward 10 seconds | Play forward, or faster; with Shift, toggle loop | Both: a jump forward, then playback. Shift+L jumps forward 10 seconds and toggles loop. |
 | ← / → (with Shift) | Step 1 (10) frames, stopping at the last frame | Step 1 (10) frames from the same starting frame | One step, not two. |
 | Home | Go to frame 0 | Go to the in point | The in point. |
-| End | Go to the last frame | Nothing | The last frame. |
+| End | Go to the end: the total frames, one past the last frame a render draws | Nothing | The end of the timeline. |
 | , / . | Step one frame back or forward | Nothing | One step. |
 | 0 to 9 | Go to 0%, 10%, ... 90% of the composition | Nothing | The jump. |
 | I / O | Set the composition's own playback range from the current frame | Set the in or out point | Studio's in or out point; Studio's range replaces the player's as soon as the point changes. |
@@ -101,9 +101,9 @@ When the player has focus, these keys act on the player first, and then Studio a
 | M | Mute or unmute | Nothing | Mute toggles; the transport's mute button follows. |
 | F | Enter or leave fullscreen | Nothing | The composition fills the screen with no controls; Escape leaves. |
 | C | Show or hide captions | Nothing | Captions toggle on the picture. |
-| ? | Show the player's own shortcut list over the composition | Open the Keyboard Shortcuts dialog | Both at once. |
-| Shift+D | Show the player's diagnostics panel over the composition | Nothing | A panel inside the stage. |
-| Escape | Close the player's own panels if open | As in the map above | The panel closes. |
+| ? | Show or hide the player's own shortcut list over the composition | Open the Keyboard Shortcuts dialog | Both at once. The first Escape then closes only the player's list (see the Escape row). |
+| Shift+D | Show or hide the player's diagnostics panel over the composition | Nothing | A panel inside the stage. Only Shift+D closes it again; Escape does not. |
+| Escape | If the player's shortcut list is open, close it and keep the key from going any further | Nothing in that case; otherwise as in the map above | The player's list closes, and an open Omnibar, Keyboard Shortcuts dialog, or confirmation stays open until a second Escape. |
 | Ctrl/Cmd+K | Toggle playback (it reads only the K) | Open the Omnibar and pause | The Omnibar opens and playback is paused. |
 
 ### Keys Studio cancels everywhere
@@ -186,7 +186,7 @@ Every "Modifiers" table has the same six rows. In general:
 
 Every "Cancel and interrupt" table has the same nine rows. This is what each means in Studio in general; each document says what it does to its feature.
 
-- **Escape.** Closes the Omnibar, the Keyboard Shortcuts dialog, and confirmation dialogs, all of those that are open at once; cancels the timecode field and the asset rename fields; puts back the time shown in a Props Editor time field; and, when the player has focus, closes the player's own panels. It also leaves fullscreen and cancels a browser drag and drop, as the browser always does. It does nothing else: it does not stop a drag, playback, a render, or an export, and it does not close the New Composition, Duplicate, Composition Settings, System Diagnostics, Helios Assistant, or Render Preview dialogs.
+- **Escape.** Closes the Omnibar, the Keyboard Shortcuts dialog, and confirmation dialogs, all of those that are open at once; cancels the timecode field and the asset rename fields; puts back the time shown in a Props Editor time field; and, when the player has focus and its shortcut list is open, closes that list instead of anything else, because the player keeps that Escape to itself. It also leaves fullscreen and cancels a browser drag and drop, as the browser always does. It does nothing else: it does not stop a drag, playback, a render, or an export, and it does not close the New Composition, Duplicate, Composition Settings, System Diagnostics, Helios Assistant, or Render Preview dialogs.
 - **Another shortcut, click, or command.** Never blocked. A shortcut pressed during a drag acts, and the drag continues. A dialog opening over the area a drag is bound to ends that drag at the next mouse move, because the dialog's overlay is now under the pointer.
 - **Composition switched.** The player is replaced and has to connect again; see [the preview player](the-preview-player.md#switching-compositions).
 - **Window loses focus.** Studio does not listen for it. Playback continues while the tab is visible. A drag whose release happens in another window is not told about it (see [Three kinds of drag](#three-kinds-of-drag)). A hidden tab stops drawing frames, which affects playback (see [the transport controls](../playback/the-transport-controls.md#cancel-and-interrupt)). The browser itself, though, reports a focused field as left when another window takes focus or the tab is hidden, and gives it focus back when the window returns (Chromium's usual behavior, to confirm). So a field that commits when it is left commits at that moment: the [timecode field](../playback/the-timeline.md#the-timecode-field), the Props Editor's time fields and JSON boxes, the Captions panel's fields, and an asset rename field, which opens its confirmation if the name changed.
@@ -212,6 +212,7 @@ Every "Cancel and interrupt" table has the same nine rows. This is what each mea
 - Confirm what the open list of a drop-down menu, and an asset field's suggestion list, do with ↑ and ↓: read from Chromium's usual behavior, an open list takes the keys itself, before the page, so the arrows should work there.
 - Confirm that Chromium reports a focused field as left when another window takes focus and when the tab is hidden, and gives it focus back on return, which commits the fields that commit when left.
 - Confirm that a desktop file dropped on the stage, the sidebar, or the header replaces Studio with the file in the tab. Studio does not prevent this default outside its drop targets. If confirmed, this may be worth treating as a bug.
+- Confirm that, with the player focused and its shortcut list open (after ?), the first Escape closes only that list and leaves Studio's Keyboard Shortcuts dialog open: the player's key handler stops the Escape from reaching the page when it closes one of its panels (`packages/player/src/index.ts`, the start of `handleKeydown`). The player's diagnostics panel (Shift+D) does not close on Escape at all.
 - Confirm the combined behavior when the player has focus, key by key, against the table above. The order (player first, Studio second) is read from the code, as are the outcomes for Space at the end (restart from frame 0), K from paused, X, and I or O at the current in or out point (Studio's point does not change, so the player's range stays).
 - Confirm whether Chromium delivers the release to the page when a page-bound drag is released outside the browser window, and keeps reporting moves while the button is held outside.
 - Confirm that Ctrl/Cmd+I and Ctrl/Cmd+O set the in and out points as well as triggering the browser's own action, and what Ctrl+L does (it may play forward and also focus the address bar).
