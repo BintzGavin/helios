@@ -114,7 +114,7 @@ Studio reads no modifier key in these dialogs; the rows above are the general ru
 | Event | Before it is ongoing | While ongoing |
 | --- | --- | --- |
 | Escape | No effect; the dialog stays open. | No effect, including while waiting for the server. |
-| Another shortcut, click, or command | A click on the overlay closes the dialog. Shortcuts are ignored while focus is in a field; Ctrl/Cmd+K opens the Omnibar. | A click on the overlay discards the typing. While waiting for the server it closes the dialog, but the request finishes: the composition is still written, opened, and announced, or a refusal shows only as an error toast. |
+| Another shortcut, click, or command | A click on the overlay closes the dialog. Shortcuts are ignored while focus is in a field; Ctrl/Cmd+K opens the Omnibar, hidden behind the dialog but holding keyboard focus (see [dialogs](../foundations/the-workspace.md#dialogs)). | A click on the overlay discards the typing. While waiting for the server it closes the dialog, but the request finishes: the composition is still written, opened, and announced, or a refusal shows only as an error toast. |
 | Composition switched | Possible only through the Omnibar (Ctrl/Cmd+K). New Composition is unaffected. Duplicate Composition opened for the active composition fills in the new active composition's name and will copy that one; opened with 📑 it keeps its composition. | Same; filling in again replaces the typed name. Finishing is itself a switch, to the new composition. |
 | Window loses focus | No effect. | No effect; a request in progress finishes. |
 | Pointer leaves the window | No effect. | No effect. |
