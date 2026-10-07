@@ -207,8 +207,8 @@ Status is one of `not started`, `drafted`, or `verified`.
 | playback/timeline-tracks.md | drafted |
 | compositions/the-compositions-panel.md | not started |
 | compositions/the-omnibar.md | not started |
-| compositions/creating-and-duplicating.md | not started |
-| compositions/composition-settings.md | not started |
+| compositions/creating-and-duplicating.md | drafted |
+| compositions/composition-settings.md | drafted |
 | props/the-props-editor.md | not started |
 | props/prop-fields.md | not started |
 | assets/the-assets-panel.md | drafted |
