@@ -108,7 +108,7 @@ When the player has focus, these keys act on the player first, and then Studio a
 
 ### Keys Studio cancels everywhere
 
-Read from the code, Studio asks the browser not to perform its own action for four keys, on the whole page, whatever has focus:
+Read from the code, Studio asks the browser not to perform its own action for these keys, on the whole page:
 
 - **Enter, ↑, and ↓, always.** The Omnibar listens for them on the whole page from the moment Studio loads, even while it is closed, and cancels each key press before it checks whether it is open. Modifiers make no difference (Shift+Enter and Ctrl/Cmd+Enter are cancelled too).
 - **Space, outside a text field.** Studio's play-or-pause shortcut cancels it whenever focus is not in a text field, even with no composition open.
