@@ -21,7 +21,7 @@ From left to right:
 | Volume slider | "Volume: N%" | Sets the composition's volume from 0 to 100% in steps of 5%. |
 | Speed menu | "Playback Speed" | Sets the [playback rate](../glossary.md#the-preview): ⏪ -4x, ⏪ -2x, ⏪ -1x, 0.25x, 0.5x, 1x, 2x, 4x. Does not start playback. |
 
-Disabled controls are dimmed and show a not-allowed pointer. The keyboard equivalents are owned by the [input model](../foundations/input-model.md#the-shortcut-map); what they do is described below.
+Disabled controls show a not-allowed pointer but, read from the code, are not dimmed: their colors are set directly on each control, which overrides the browser's grey look for disabled buttons, so before connection the row looks exactly as it does after, apart from the volume slider, which the browser draws greyed (see [Open questions](#open-questions-and-verification)). The keyboard equivalents are owned by the [input model](../foundations/input-model.md#the-shortcut-map); what they do is described below.
 
 ## The simple case
 
@@ -64,7 +64,8 @@ What is captured: nothing. Playback reads the current frame, the rate, the range
 
 Playback that is started where it cannot go anywhere ends on its first step:
 
-- Space or L at the out point (or beyond it) with loop off: the composition plays for one animation frame, finds itself at the end, and stops on the out point. The button flickers to ❚❚ and back; nothing else changes. The ▶ button does not have this problem, because it goes to the in point first.
+- Space or L at the out point (or beyond it) with loop off: the composition starts, finds itself at the end, and stops on the out point (moving back to it from beyond). Read from the code, that first step is taken inside the play command itself, with no time elapsed, so for a composition connected through `window.helios` the button most likely never visibly changes; for one connected through `connectToParent`, whose state arrives by messages, ❚❚ may flash for a moment. The ▶ button does not have this problem, because it goes to the in point first.
+- A click on the composition at the out point (with the out point before the end of the composition): the player's toggle looks only at the composition's end, not at the range, so it plays, and playback stops again at once on the out point, as with Space.
 - J at the in point (or before it) with loop off: the same, stopping on the in point.
 - A negative rate chosen in the speed menu, then ▶ at the in point: the same.
 
@@ -107,7 +108,7 @@ Playback ends in one of these ways:
 
 Nothing is written to the project, and nothing can be undone. Pausing leaves the rate as it was: the next Space plays at the same rate, in the same direction.
 
-**Playing from outside the range.** The range only stops or wraps playback at its edges; it does not move the playhead into it. Playing forward from before the in point runs normally until the out point. Playing forward from after the out point stops at once on the out point (loop off) or jumps into the range (loop on). Playing in reverse from before the in point stops at once on the in point (loop off).
+**Playing from outside the range.** The range only stops or wraps playback at its edges; it does not move the playhead into it until playback reaches an edge. Playing forward from before the in point runs normally until the out point. Playing forward from after the out point jumps back at once to the out point and stops (loop off), or jumps into the range (loop on) at a place that depends on how far past the in point the playhead was: as far into the range as that distance leaves over after whole range lengths are taken away, so from frame 140 with a range of 30 to 90 it lands on frame 80. Playing in reverse from before the in point jumps forward at once to the in point and stops (loop off), or, with loop on, wraps into the range from its out end. Playing in reverse from after the out point runs normally down into the range. ▶ is the exception: anywhere from one frame before the out point onwards, including beyond it, it first goes to the in point.
 
 ## Modifiers
 
@@ -159,6 +160,8 @@ After every interrupt except a hot reload and (read from the code) a switch, the
 ## Edge cases
 
 - **Two "restart" rules.** ▶ at the end goes to the in point. Space at the end does nothing visible. A click on the composition at the end goes to frame 0. With an in point set, the three disagree.
+- **A click in the last frame.** The player's toggle restarts from frame 0 whenever the composition is within one frame of its end, playing or not. A click meant to pause during the last frame of playback therefore restarts playback from the beginning instead.
+- **A rate the menu does not list.** The speed menu shows the composition's current rate by matching it against its eight choices. A rate set some other way (by the composition's own code, for example 1.5) matches none, and the menu then shows no choice at all (read from the code).
 - **Reverse with the ▶ button.** After choosing a negative speed in the menu, ▶ plays in reverse. At the in point it stops at once; ▶'s "go back to the in point" check looks only at the end of the range, not the direction.
 - **The slow speeds.** 0.25x and 0.5x are reachable only from the speed menu; L from paused always starts at 1x, and J never produces a slow reverse speed.
 - **Fractional frames.** After playback the current frame is usually fractional. The timecode shows it rounded down, "Fr:" rounded to nearest, and frame steps keep the fraction, so → from 45.73 shows timecode frame 46 and "Fr: 47".
@@ -172,7 +175,10 @@ After every interrupt except a hot reload and (read from the code) a switch, the
 - All of this assumes a composition the player can drive. Verify first whether the examples and templates, which are clock-bound, respond to the transport at all (see [the preview player](../foundations/the-preview-player.md#clock-bound-compositions)).
 - Confirm that a hot reload during reverse or fast playback resumes at 1x forward; the code restores only the playing state, not the rate. This may be worth treating as a bug.
 - Confirm the jump after a hidden tab is shown again; the composition's clock measures real elapsed time between animation frames.
-- Confirm the flicker when Space or L is pressed at the out point with loop off.
+- Confirm whether ❚❚ flashes at all when Space or L is pressed at the out point with loop off; the code takes the first step inside the play command with no time elapsed.
+- Confirm that disabled transport buttons and the speed menu look the same as enabled ones before the player connects (inline colors on every control in `Controls/PlaybackControls.tsx` override the browser's disabled look). If confirmed, this may be worth treating as a bug: nothing but the pointer says the controls are off.
+- Confirm where loop puts the playhead when playback starts beyond the out point (read from the wrap in `onTick`, `packages/core/src/Helios.ts`: the overshoot past the in point modulo the range length), and that reverse playback from before the in point jumps forward to it.
+- Confirm that a click on the composition during the last frame of playback restarts from frame 0 instead of pausing (the player's `togglePlayPause` checks the end before the playing state). This may be worth treating as a bug.
 - Confirm what the composition's audio does at negative rates and at 0.25x; the code passes the rate to the composition's media but this was not traced further.
 - Read from `Controls/PlaybackControls.tsx`, `Controls/PlaybackControls.test.tsx`, `GlobalShortcuts.tsx`, `GlobalShortcuts.test.tsx`, `context/StudioContext.tsx`, and `play`, `pause`, `seek`, and the per-frame step in `packages/core/src/Helios.ts`; not yet confirmed by hand.
 
