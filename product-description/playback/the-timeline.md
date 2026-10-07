@@ -135,7 +135,7 @@ For the timecode field, "before it is ongoing" means the box is open and nothing
 | Event | Before it is ongoing | While ongoing |
 | --- | --- | --- |
 | Escape | Closes the box; nothing changes. | Closes the box; what was typed is discarded. |
-| Another shortcut, click, or command | Shortcuts are ignored except Ctrl/Cmd+K, which opens the Omnibar and takes focus, committing the box. A click anywhere that takes focus commits it. A press on the timeline's track area does not take focus, so the box stays open while the user scrubs; when it is committed later, the typed or shown value overrides the scrub. | Same, committing what was typed. |
+| Another shortcut, click, or command | Shortcuts are ignored except Ctrl/Cmd+K, which opens the Omnibar and takes focus, committing the box. A click anywhere that takes focus commits it. A press on the timeline's track area does not take focus, so the box stays open while the user scrubs; when it is committed later, the typed or shown value overrides the scrub. A press on a composition marker does take focus: the marker seeks first, then the box commits, so the box's value wins here too and the playhead goes back to the frame the box shows (see [timeline tracks](timeline-tracks.md#starting)). | Same, committing what was typed, which wins over a composition marker's seek. |
 | Composition switched | Switching takes focus (the Omnibar, a click in the sidebar), which commits the box against the composition being left. | Same. |
 | Window loses focus | The browser reports the box as left, so it commits the timecode it shows and closes (Chromium's usual behavior, to confirm; see [the input model](../foundations/input-model.md#the-interrupt-rows)). | The same, committing what was typed; text that is not a valid timecode or frame number closes the box and changes nothing. |
 | Pointer leaves the window | No effect. | No effect. |
@@ -213,6 +213,7 @@ These are the rows for the scrub; the timecode field's are in [its section](#the
 - Confirm the right-click behavior: whether the release after the context menu reaches the page, and whether the scrub keeps following the pointer.
 - Confirm that a scrub continues, and ends correctly, when the button is released outside the browser window.
 - Confirm that leaving the timecode field unchanged moves a fractional playhead to the whole frame shown.
+- Confirm that a composition marker pressed while the box is open ends with the box's value, not the marker's time: read from the code, the marker seeks on the press and the box commits afterwards, as it loses focus (see [timeline tracks](timeline-tracks.md#open-questions-and-verification)).
 - Confirm that switching to another window while the timecode field is open commits it and closes the box, as Chromium reports the field as left (the input model's open question).
 - Confirm that seeking on every mouse move keeps up with fast scrubbing on a heavy composition, and whether frames are skipped.
 - Read from `Timeline.tsx`, `Timeline.css`, `Timeline.test.tsx`, `Controls/TimecodeDisplay.tsx`, `Controls/TimecodeDisplay.test.tsx`, and `packages/core/src/timecode.ts`; not yet confirmed by hand.

@@ -50,6 +50,8 @@ The time-prop drag is narrated in full. Pressing a composition marker and droppi
 
 **A composition marker** is pressed with any mouse button. Studio seeks at once to the marker's time, without snapping and without rounding, so a marker at 1.23 seconds at 30 frames per second puts the playhead between frames, at 36.9 (the timecode shows frame 36, "Fr:" 37). This press, unlike others on the timeline, moves keyboard focus as on any web page, so a text field that had focus loses it. It does not start a scrub.
 
+If that text field is the timeline's open [timecode field](the-timeline.md#the-timecode-field), the two seeks come in a fixed order, read from the code and the browser's usual order of events: the marker seeks on the press, and the box, losing focus as part of the same press, then commits against the frame the marker has just sought. The box's commit wins whenever it seeks: a typed timecode or frame number leaves the playhead there, and a box left as it was when it opened seeks back to the frame it showed then (rounded down). The marker's seek stands only when the box is empty, holds something it cannot read, or names the marker's own frame.
+
 **An asset drag** enters the track area. The timeline's scrolling area gets a dashed blue outline and a faint blue tint while anything is dragged over the track area, including a desktop file or an image that will not be accepted. Only the track area takes the drop: over the empty background below it (see [the timeline](the-timeline.md#edge-cases)) the highlight goes out and the drop is refused, and read from the code the highlight can blink off and on as the pointer crosses from one lane or marker to another.
 
 ### Ending at once
@@ -82,7 +84,7 @@ Releasing the button anywhere on the page ends the drag with the prop at its las
 | Shift | Time-prop drag: no effect on the press. Composition marker: no effect. Asset drop: no effect. | Time-prop drag: read on every move; Shift turns snapping off from the next move, which also stops the marker sticking to itself. |
 | Ctrl/Cmd | No effect. | No effect. |
 | Alt/Option | No effect. | No effect. |
-| Keyboard focus | A time-prop press leaves focus where it was. A composition-marker press takes focus out of a text field. A drop does not change focus. | No effect; keys go wherever focus is. |
+| Keyboard focus | A time-prop press leaves focus where it was. A composition-marker press takes focus out of a text field (committing an open timecode box, whose seek then wins; see [Starting](#starting)). An asset drop leaves focus where the drag left it: the press on the asset tile that started the drag has already moved focus, out of any text field, as any press does, and the drop itself moves it nowhere. | No effect; keys go wherever focus is. |
 | Playback | A drag or drop while playing changes the prop live; the composition plays on with each new value. A marker press while playing jumps and playing continues. | Same. |
 | Player connection | Before connection none of these items is drawn for the composition being opened, and a drop does nothing. Right after a switch, the previous composition's items stay on the timeline until the new one connects. | If the composition reloads during a drag, Studio restores the last props it saw, and the next move sets the prop on the reloaded composition. |
 
@@ -102,7 +104,7 @@ The columns are for the time-prop drag. A composition-marker press and an asset 
 | Hot reload | No effect. | The composition reloads with the last props Studio saw, including the dragged value; the drag continues. |
 | Project changed on disk | No effect. | No effect. |
 
-A **composition-marker press** is unaffected by every row: it has already jumped. An **asset drag over the timeline** is cancelled by Escape, as every browser drag is; otherwise it is unaffected until it is dropped, and a drop during a hot reload or before connection does nothing.
+A **composition-marker press** is unaffected by every row: it has already jumped. (A timecode box open at the press commits after the jump and can move the playhead again; see [Starting](#starting).) An **asset drag over the timeline** is cancelled by Escape, as every browser drag is; otherwise it is unaffected until it is dropped, and a drop during a hot reload or before connection does nothing.
 
 ## Interactions with other systems
 
@@ -135,6 +137,7 @@ A **composition-marker press** is unaffected by every row: it has already jumped
 - **A replaced audio file.** The waveform of a file that changes on disk keeps its old shape until the page is reloaded.
 - **Overlapping diamonds.** A time-prop marker covers a composition marker at the same time; the in and out markers cover both.
 - **Focus from a marker press.** Pressing a composition marker takes focus out of a text field, while pressing anywhere else on the timeline does not.
+- **A marker press with the timecode box open.** The marker seeks, then the box commits and seeks again, so the playhead ends where the box says, not on the marker; with the box unchanged it goes back to the frame the box showed. Close the box first (Escape) to jump to a marker.
 
 ## Open questions and verification
 
@@ -142,6 +145,7 @@ A **composition-marker press** is unaffected by every row: it has already jumped
 - Confirm that time-prop markers, and the in and out markers in [the playback range](the-playback-range.md#while-ongoing), stick to their own position and move in steps of about 10 pixels unless Shift is held.
 - Confirm that caption bars and audio bars show no tooltip, although each is given one in the code.
 - Confirm that the previous composition's items stay on the timeline after a switch until the new composition connects.
+- Confirm the order of the two seeks when a composition marker is pressed while the timecode box is open: the marker's seek runs in the press's handler (`Timeline.tsx`, the composition marker's `onMouseDown`), and the box commits when it loses focus (`Controls/TimecodeDisplay.tsx`, `onBlur`), which Chromium does after the press's handlers have run; the commit compares with the frame Studio holds by then, which the code updates before the focus moves. If Studio has not yet taken in the marker's frame at that moment, an unchanged box would leave the marker's seek standing instead.
 - Confirm the drop rules with a schema that has a video prop and a matching time prop, and with one that has neither. Confirm also that a schema with both `time` and `{name}Time` gives the drop position to whichever comes first (`Timeline.tsx`, `handleDrop`, finds the first key matching either name), and that a drop whose time prop is declared as text, or whose address the video prop's accepted extensions refuse, changes nothing at all.
 - Confirm that a drop on the empty background below the track area is refused (only the track area listens for drops) and whether the highlight blinks while dragging across lanes and markers (the area's drag-leave fires for every element the pointer leaves). The blinking and the dead background may be worth treating as bugs.
 - Read from `Timeline.tsx`, `Timeline.css`, `Timeline.test.tsx`, `TimelineAudioTrack.tsx`, `TimelineAudioTrack.test.tsx`, and `hooks/useAudioWaveform.ts`; not yet confirmed by hand.

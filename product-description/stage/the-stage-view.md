@@ -60,7 +60,7 @@ The pan becomes ongoing at the first mouse move inside the stage while the butto
 
 ### While ongoing
 
-On each mouse move the pan is recomputed from scratch as the pointer's position minus the offset recorded at the press, so the composition stays under the same point of the pointer however fast it moves. The pan is in screen pixels and does not depend on the zoom: at 200% a 50-pixel drag still moves the composition 50 pixels. There are no bounds; the composition can be dragged entirely out of the stage, and Fit brings it back.
+On each mouse move the pan is recomputed from scratch as the pointer's position minus the offset recorded at the press, so the composition stays under the same point of the pointer however fast it moves. One consequence: a wheel movement during the drag (with or without Shift) moves the composition as usual, but the next mouse move recomputes the pan and undoes it, so the wheel's movement lasts only if the button is released without moving again. A zoom with Ctrl/Cmd and the wheel during the drag does last, because the zoom is not recomputed. The pan is in screen pixels and does not depend on the zoom: at 200% a 50-pixel drag still moves the composition 50 pixels. There are no bounds; the composition can be dragged entirely out of the stage, and Fit brings it back.
 
 Every move is remembered at once, not only the final position.
 
@@ -70,7 +70,7 @@ Everything else keeps running: playback continues, the timeline keeps updating, 
 
 Releasing the button inside the stage ends the pan where it is. Nothing is written to the project, and there is no undo step; the final pan is already remembered. The view stays as it is for every composition until the user changes it.
 
-If the press and the release were both on the composition, the release is also a click on the player, and playback toggles even though the user was panning. If the release is on a different element from the press, there is no click.
+If the press and the release were both on the composition, the release is also a click on the player, and playback toggles even though the user was panning. The composition usually fills most of the stage, so this is the case for nearly every pan made by grabbing the picture: nearly every such pan starts or stops playback. If the release is on a different element from the press, there is no click.
 
 If the pointer leaves the stage while the button is held, the pan ends at its last position. Coming back into the stage with the button still held does not resume it; a new press is needed.
 
@@ -78,8 +78,8 @@ If the pointer leaves the stage while the button is held, the pan ends at its la
 
 | Modifier | Set at the start | Changed while ongoing |
 | --- | --- | --- |
-| Shift | Drag: no effect. Wheel: no effect in Studio itself, but Chromium turns Shift and a vertical wheel into horizontal scrolling, so the composition moves sideways. | No effect on the drag. A Shift+wheel during a drag pans sideways as well. |
-| Ctrl/Cmd | Drag: no effect; the drag pans. Wheel: zooms instead of panning. The browser may also zoom the whole page (see [Open questions](#open-questions-and-verification)). | No effect on the drag. A Ctrl/Cmd+wheel during a drag zooms while the pan continues. |
+| Shift | Drag: no effect. Wheel: no effect in Studio itself, but Chromium turns Shift and a vertical wheel into horizontal scrolling, so the composition moves sideways. | No effect on the drag. A Shift+wheel during a drag moves the composition sideways, but only until the next mouse move, which puts it back under the pointer at the offset taken at the press (see [While ongoing](#while-ongoing)); the sideways move lasts only if the button is released without moving again. |
+| Ctrl/Cmd | Drag: no effect; the drag pans. Wheel: zooms instead of panning. The browser may also zoom the whole page (see [Open questions](#open-questions-and-verification)). | No effect on the drag. A Ctrl/Cmd+wheel during a drag zooms while the pan continues, and the new zoom lasts. |
 | Alt/Option | No effect. | No effect. |
 | Keyboard focus | No effect on the pan or zoom. The press itself moves focus: onto the player if it lands on the composition, out of any text field otherwise. | No effect. Keys go wherever focus is. |
 | Playback | No effect on the view. Playing continues during a pan; a click on the composition toggles it. | No effect. |
@@ -140,7 +140,8 @@ After any interrupt the user is back in the ordinary stage with no pan in progre
 ## Open questions and verification
 
 - Ctrl/Cmd and the wheel: Studio tries to stop the browser from also handling the wheel, but the code registers its wheel handler in a way that cannot stop the browser (React attaches wheel listeners as passive). On Windows and Linux, Ctrl and the wheel is likely to zoom the whole Studio page as well as the stage; a pinch on a Mac may zoom the page too. This may be worth treating as a bug rather than documenting.
-- A drag that starts and ends on the composition toggles playback when it ends, because the player's click layer sees a click. A user panning by grabbing the picture will start or stop playback by accident. This looks like a bug, or at least a product call (should a pan suppress the click?).
+- A drag that starts and ends on the composition toggles playback when it ends, because the player's click layer sees a click. Since the composition covers most of the stage, that is nearly every pan made by grabbing the picture: such a pan almost always starts or stops playback by accident. This looks like a bug, or at least a product call (should a pan suppress the click?).
+- Confirm that a wheel movement during a drag is undone by the next mouse move (`Stage/Stage.tsx`: the wheel adds to the pan, and each move sets the pan from the pointer and the offset recorded at the press), while a Ctrl/Cmd+wheel zoom during the drag stays.
 - Fit does not fit. Confirm what a 1920 by 1080 composition looks like at 100% in a stage narrower than 1920 pixels: cropped, squeezed, or letterboxed.
 - Confirm that pressing on the composition gives the player keyboard focus (the player element is focusable), so that keys such as F, M, and the digits start acting on the player after a pan.
 - Confirm the "sticky pan" after the window loses focus mid-drag and the button is released elsewhere.

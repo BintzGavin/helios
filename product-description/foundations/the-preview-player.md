@@ -44,7 +44,7 @@ stateDiagram-v2
 
 ### Starting
 
-A composition is opened when the page loads (the remembered one, or the first in the list), when the user picks one in the Compositions panel or the Omnibar, after creating or duplicating one (the new one opens), after renaming one (its address changes), and after deleting the active one (the next in the list opens).
+A composition is opened when the page loads (the remembered one, or the first in the list), when the user picks one in the Compositions panel or the Omnibar, after creating or duplicating one (the new one opens), and after renaming one (its address changes). Deleting the active one would open the first remaining composition in the list, but a delete from the Compositions panel never reaches the server, so from the page this does not happen (see [when a request fails](project-and-compositions.md#when-a-request-fails)).
 
 At that moment Studio puts a new player in the stage with the new composition's page, and considers itself disconnected: the transport buttons are disabled, the Props Editor says "No active controller", and the timeline keeps showing the previous composition's numbers until the new ones arrive. The player shows "Loading...". At the same moment Studio restores the composition's remembered [timeline state](../glossary.md#the-preview) (the in and out readouts change at once) and sets the canvas size from the composition's metadata; a composition without metadata keeps the previous canvas size.
 
@@ -74,7 +74,7 @@ If the out point was 0, it is set to the composition's total frames. The composi
 
 **Failed.** After 5 seconds with nothing found, the player shows "Connection Failed..." with Retry. Studio stays disconnected for as long as the composition is open, and would pick up a connection made later (after Retry).
 
-**Which compositions connect.** The player finds a composition whose code assigns its Helios instance to `window.helios`, or calls the player's `connectToParent`, while its page loads. All the examples in `examples/` that animate do this. Of Studio's templates, Title explainer, Vue, Svelte, and Solid do; Vanilla JS, React, and Three.js never connect. The Vue, Svelte, and Solid templates also need the project to compile their framework, which the verification project does not, so there only Title explainer connects (see [the project and compositions](project-and-compositions.md#templates)).
+**Which compositions connect.** The player finds a composition whose code assigns its Helios instance to `window.helios`, or calls the player's `connectToParent`, while its page loads. Fourteen of the seventeen examples in `examples/` do this (`client-export-api` through `connectToParent`, the others through `window.helios`). Three never connect and show "Connection Failed...": `lottie-animation` and `web-component-animation`, whose code makes a Helios instance but hands it to nobody, and `dom-benchmark`, which has no Helios instance at all (a CSS animation). The four examples written for a framework may not load in the verification project at all (see [templates](project-and-compositions.md#templates)). Of Studio's templates, Title explainer, Vue, Svelte, and Solid do; Vanilla JS, React, and Three.js never connect. The Vue, Svelte, and Solid templates also need the project to compile their framework, which the verification project does not, so there only Title explainer connects (see [the project and compositions](project-and-compositions.md#templates)).
 
 ### What works before the player is connected
 
@@ -100,7 +100,7 @@ The interaction here is opening a composition: "before it is ongoing" is while i
 
 ## Clock-bound compositions
 
-Every example in `examples/` and every Studio template binds itself to the browser's document clock, so that the Helios renderer can drive it frame by frame. The code says that, in an ordinary browser tab, such a composition sets its own current frame on every animation frame from the time since its page loaded, multiplied by its frame rate, and nothing stops that from overriding Studio. Read from the code, a clock-bound composition in Studio behaves like this:
+Every Studio template, and every example in `examples/` except `lottie-animation` and `dom-benchmark`, binds itself to the browser's document clock, so that the Helios renderer can drive it frame by frame. (`lottie-animation` makes a Helios instance but never binds it, and `dom-benchmark` has none; neither connects, so neither can be controlled from Studio either way.) The code says that, in an ordinary browser tab, such a composition sets its own current frame on every animation frame from the time since its page loaded, multiplied by its frame rate, and nothing stops that from overriding Studio. Read from the code, a clock-bound composition in Studio behaves like this:
 
 - **It runs on its own.** From the moment it loads, its frame advances in real time whether Studio shows it as playing or paused, and it does not stop at its last frame. The timecode keeps counting past the composition's length; the playhead reaches the right end of the timeline and stays there.
 - **Seeks do not hold.** Scrubbing, frame steps, Home, the timecode field, the in point on Play, and the remembered playhead position each move the frame for at most one animation frame, after which the clock puts it back.
@@ -137,7 +137,7 @@ Read from the code, when the composition being left was connected, the first con
 - seeks to the **previous composition's playhead position**, unless the new composition has a remembered position, which then wins;
 - **starts playing** if the previous composition was playing.
 
-Once the auto-save's wait is over (a second or more while the new composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)), the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
+Once the auto-save's wait is over (a second or more while the new composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)), the Props Editor's auto-save writes the carried-over props into the new composition's `composition.json` as its default props. The auto-save never comes for a [clock-bound composition](#clock-bound-compositions), so this write happens only when the new composition is not clock-bound. If confirmed, this is a high-severity bug: switching from a composition with props to another composition overwrites the second one's saved props.
 
 After a switch from a composition that never connected, there is nothing to carry over, and the new composition gets a fresh open, default props included.
 
@@ -176,7 +176,8 @@ A second effect of the switch is described with the range: if the new compositio
 
 ## Open questions and verification
 
-- **First to verify:** whether a clock-bound composition (every example, every template) runs on its own clock in Studio as described in [Clock-bound compositions](#clock-bound-compositions). Nearly every playback claim depends on the answer.
+- **First to verify:** whether a clock-bound composition (every template, and every example that connects) runs on its own clock in Studio as described in [Clock-bound compositions](#clock-bound-compositions). Nearly every playback claim depends on the answer.
+- Confirm which examples connect. Read from their code, `lottie-animation` and `web-component-animation` make a Helios instance but neither set `window.helios` nor call `connectToParent` (`examples/lottie-animation/src/main.ts`, `examples/web-component-animation/src/main.ts`), and `dom-benchmark` has no Helios instance, so all three should end on "Connection Failed..."; `lottie-animation` and `dom-benchmark` are also the only examples that are not clock-bound. Confirm too whether `react-dom-animation`, `vue-dom-animation`, `svelte-dom-animation`, and `framer-motion-animation` load at all in the verification project.
 - Whether switching compositions carries the previous composition's input props, playhead position, and playing state into the next one, and whether the auto-save then writes those props into the next one's `composition.json`. Read from `Stage/Stage.tsx`; no test covers a switch.
 - Whether "Loading..." or "Connecting..." is what the user sees while a composition loads. The player shows "Connecting..." when it is put on the page with nothing showing yet and "Loading..." when its address is set; Studio creates a new player for each composition, so which comes last decides the message.
 - Confirm that a hot reload, or a switch, whose props the composition refuses restores neither the playhead position nor the playing state (`Stage/Stage.tsx` lines 68 to 82 put back props, then the frame, then playing, inside one attempt that stops at the first error). For a switch this means the previous composition's props are dropped and the new composition's default props are not applied either; whether that is better or worse than the carry-over, it is not what either path intends.

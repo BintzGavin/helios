@@ -19,7 +19,7 @@ An agent connected to Studio's MCP server starts a render of the composition. Wi
 | Outside change | What the user sees meanwhile | When Studio catches up |
 | --- | --- | --- |
 | A file the active composition's page uses (`composition.html`, its scripts, styles, imports) | The composition reloads in place, in every tab that has it open | At once ([hot reload](../foundations/the-preview-player.md#hot-reload)) |
-| `composition.json` edited | Nothing. Composition Settings, the canvas size on opening, and the default props applied on opening are Studio's old copy | A page reload, or Studio's own create, duplicate, or "Set from Current Frame", which re-read every composition; until then a settings save or the Props Editor's auto-save writes the old copy back over the edit |
+| `composition.json` edited | Nothing. Composition Settings, the canvas size on opening, and the default props applied on opening are Studio's old copy | A page reload, or Studio's own create, duplicate, or "Set from Current Frame", which re-read every composition; until then a settings save or the Props Editor's auto-save writes the old copy back over the edit (the auto-save only for a composition that is paused and not [clock-bound](../foundations/the-preview-player.md#clock-bound-compositions); it never comes for a clock-bound one) |
 | A composition folder added | Not listed | The same re-reads |
 | A composition folder deleted or renamed | Still listed under its old ID and name; opening it ends in "Connection Failed..."; saving its settings or props fails with "Composition "{ID}" not found" | The same re-reads |
 | An asset added, renamed, moved, or deleted | The Assets panel and the Omnibar show the old list | A page reload, or any asset change made in Studio |
@@ -27,7 +27,7 @@ An agent connected to Studio's MCP server starts a render of the composition. Wi
 | `renders/jobs.json` edited | Nothing | The next start of `helios studio` |
 | A component installed, updated, or removed | The Components panel shows the old "installed" state | The next time the Components tab is shown |
 | A README edited | The Helios Assistant's documentation is the old one | A page reload |
-| Remembered values written by another tab | This tab keeps its own | A page reload |
+| Remembered values written by another tab | This tab keeps its own | A page reload, except for the timeline state of the composition this tab has open, which the reload writes over first; that is picked up only by opening the composition again from another one |
 
 The Studio page itself never reloads because of a file change: only the composition inside the [player](../glossary.md#the-preview) does.
 
@@ -37,8 +37,8 @@ Two tabs on the same Studio address share the server and the project, but nothin
 
 - **Each tab has its own player and playback.** Each plays, pauses, and seeks its own copy of the composition. A file saved by either the user's editor or an agent hot-reloads the composition in both.
 - **Lists are read per tab.** A composition created, duplicated, renamed, or deleted in one tab appears, moves, or disappears in the other only after the other reloads or re-reads; the same holds for assets. A composition deleted in one tab can still be open in the other; there, every save fails with an error toast.
-- **Remembered values are shared but not followed.** Both tabs write the same [remembered](../glossary.md#persistence) values (layout, stage view, render settings, active composition, each composition's [timeline state](../glossary.md#the-preview)) and neither notices the other's writes while open. The last write wins, and is what the next reload of either tab reads. See [what Studio remembers](../foundations/the-workspace.md#what-studio-remembers).
-- **Saved files are last-write-wins.** Both tabs auto-save the input props of the composition they show into the same `composition.json`, each from its own copy; neither tab sees the other's props until it reloads.
+- **Remembered values are shared but not followed.** Both tabs write the same [remembered](../glossary.md#persistence) values (layout, stage view, render settings, active composition, each composition's [timeline state](../glossary.md#the-preview)) and neither notices the other's writes while open. The last write wins, and is what the next reload of either tab reads, with one exception: a tab writes the timeline state of the composition it has open as the page closes, so reloading it puts back its own in point, out point, loop, and playhead position over the other tab's, and it picks up the other tab's only by opening that composition again from another one (see [the playback range](../playback/the-playback-range.md#interactions-with-other-systems)). See [what Studio remembers](../foundations/the-workspace.md#what-studio-remembers).
+- **Saved files are last-write-wins.** Both tabs auto-save the input props of the composition they show into the same `composition.json`, each from its own copy, when that composition is paused and not clock-bound; neither tab sees the other's props until it reloads.
 - **Render jobs are shared.** Both tabs poll the server, so a render started, cancelled, or deleted in one shows in the other within a second. Toasts appear only in the tab that acted.
 
 ## An agent and Studio's MCP server
@@ -92,9 +92,9 @@ The user works on what Studio last read, and Studio acts on it:
 
 The view comes back in step in one of three ways:
 
-1. **A page reload** re-reads everything Studio reads at load: the compositions and their metadata, the assets, the templates, the render jobs, and the remembered values, including those another tab wrote. The Helios Assistant re-reads the documentation on its next opening.
+1. **A page reload** re-reads everything Studio reads at load: the compositions and their metadata, the assets, the templates, the render jobs, and the remembered values, including those another tab wrote, except the timeline state of the composition this tab has open, which the closing page writes over first. The Helios Assistant re-reads the documentation on its next opening.
 2. **A re-read after Studio's own change** catches up on the compositions or the assets only.
-3. **Studio writes over the change.** Composition Settings' Save and the Props Editor's auto-save write Studio's copy of the size, time, and default props into `composition.json`, replacing what was edited outside, with a "Composition updated" toast. The outside edit is gone, and nothing says so. See [composition metadata](../foundations/project-and-compositions.md#composition-metadata).
+3. **Studio writes over the change.** Composition Settings' Save and the Props Editor's auto-save write Studio's copy of the size, time, and default props into `composition.json`, replacing what was edited outside, with a "Composition updated" toast. The outside edit is gone, and nothing says so. Read from the code, the auto-save never comes for a [clock-bound composition](../glossary.md#the-preview), which is what every template and nearly every example is, so for those only a Save writes over the edit. See [composition metadata](../foundations/project-and-compositions.md#composition-metadata).
 
 ## Modifiers
 
@@ -121,7 +121,7 @@ No modifier changes how Studio notices or ignores an outside change.
 | Window loses focus | No effect. A hot reload or job update that happens while the tab is hidden is shown when it is visible again. | Studio does not re-check anything when the tab is shown again or regains focus. |
 | Pointer leaves the window | No effect. | No effect. |
 | Server request fails or server stops | While the server is stopped, nothing is picked up: no hot reload, no job updates. | The view stays out of date; the render jobs keep showing their last known state. When a server answers on the same address again, the jobs update from the history it read from `renders/jobs.json` (a job that was rendering comes back as failed); everything else needs a page reload. |
-| Reload or tab closed | Nothing to catch up on. | A reload catches up on everything; it is the only way to catch up on the remembered values another tab wrote. |
+| Reload or tab closed | Nothing to catch up on. | A reload catches up on everything, and is the only way to catch up on the remembered values another tab wrote, except the timeline state of the composition open in this tab, which the closing page writes over first. |
 | Hot reload | This is the change picked up at once; see [the preview player](../foundations/the-preview-player.md#hot-reload). | Catches up on the composition's code only; the lists and metadata stay out of date. |
 | Project changed on disk | A further change to the composition's files hot-reloads it again. | Changes add up; each re-read catches up only on what it covers. |
 
@@ -137,7 +137,7 @@ After any of these the user stays where they were, with the same composition ope
 
 **Playback range and loop.** Kept in the browser per [composition ID](../glossary.md#compositions-and-files), so they survive any outside change except a rename on disk, which gives the composition a new ID and forgets them (they return if the folder is renamed back). A hot reload re-applies them. An agent's render ignores them.
 
-**Input props.** A hot reload puts back the input props Studio last saw, so a default value changed in the composition's code does not show after the reload; on a fresh open, the default props in `composition.json` win over the code's in the same way. Default props edited in `composition.json` are not seen until Studio re-reads the compositions. Two tabs' auto-saves overwrite each other. An agent's render uses the agent's props.
+**Input props.** A hot reload puts back the input props Studio last saw, so a default value changed in the composition's code does not show after the reload; on a fresh open, the default props in `composition.json` win over the code's in the same way. Default props edited in `composition.json` are not seen until Studio re-reads the compositions. Two tabs' auto-saves overwrite each other. The auto-save never comes for a clock-bound composition (see [the Props Editor](../props/the-props-editor.md#while-ongoing)), so with one of those nothing the user changes in the Props Editor reaches the file. An agent's render uses the agent's props.
 
 **Rendering and export.** Render jobs from any tab or agent show in every tab within a second, and run at the same time as each other. An agent's render differs from the Renders panel's in range, length, and props (see [An agent and Studio's MCP server](#an-agent-and-studios-mcp-server)).
 
@@ -150,7 +150,7 @@ After any of these the user stays where they were, with the same composition ope
 ## Edge cases
 
 - **Reloading switches the composition.** Tab A shows one composition, tab B opens another. Reloading tab A opens tab B's composition, because the active composition is remembered once for both.
-- **Timeline state from the other tab.** With the same composition in two tabs, the in and out points of whichever tab last changed them, paused, or closed are what the next reload restores.
+- **Timeline state from the other tab.** With the same composition in two tabs, the record holds the in point, out point, loop, and playhead position of whichever tab last changed them, paused, or closed. A fresh page load (a new tab) restores that record, and so does reopening the composition from another one. Reloading one of the two tabs does not: the closing page writes its own values first, so the reloaded tab comes back with what it had.
 - **An editor that saves on every keystroke** hot-reloads the composition on each save; each reload restores the frame and the playing state, but the playback rate goes back to 1x each time.
 - **Two `helios studio` processes on one project.** Each has its own address, remembered values, and render jobs, and each writes its whole job list to `renders/jobs.json`, replacing the other's. After a restart only the jobs of whichever process wrote last come back. Neither shows the other's renders.
 - **A render's output deleted on disk.** The job still shows as completed; its preview and download fail, because the file is gone.
@@ -164,7 +164,8 @@ After any of these the user stays where they were, with the same composition ope
 - Confirm that the Studio page itself never reloads because of a file change: it is served as built files without the development server's reload script, while the composition's page has it.
 - Two `helios studio` processes on the same project overwrite each other's render history, because each writes its whole in-memory list to `renders/jobs.json` (`server/render-manager.ts:66-74`). This may be worth treating as a bug, or a product call: should a second process be refused?
 - Open tabs never follow each other's remembered values, because Studio does not listen for storage changes from other tabs (`hooks/usePersistentState.ts:18-24`). Reloading one tab can therefore switch its composition. Product call.
-- Two tabs showing one composition auto-save their own input props over each other's (`components/PropsEditor.tsx:48-71`). Product call.
+- Two tabs showing one composition auto-save their own input props over each other's (`components/PropsEditor.tsx:48-71`), when it is paused and not clock-bound. Product call.
+- Confirm that reloading a tab that shows a composition puts back its own timeline state rather than one another tab wrote meanwhile, because the closing page writes first (`context/StudioContext.tsx:669-678`).
 - An agent's render uses the frame rate and duration in `composition.json` (`server/mcp.ts:157-160`), and 30 frames per second and 10 seconds when the file has none (`server/render-manager.ts:289-290`), while the Renders panel uses the composition's own frame rate and duration. The two can render different lengths of the same composition. This may be worth treating as a bug.
 - An agent's composition defaults to the Vanilla JS template (`server/mcp.ts:111`), which never connects to the player (see [the project and compositions](../foundations/project-and-compositions.md#open-questions-and-verification)).
 - An agent can cancel the user's own render with no notice in Studio beyond the status change. Product call.

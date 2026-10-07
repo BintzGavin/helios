@@ -35,7 +35,7 @@ A composition's **name** is made from the last part of its folder path: the fold
 
 Each composition also carries a **description**, which the Omnibar shows under its name. After a walk, the description is the ID. After its settings are saved or its input props are auto-saved, it becomes "Example: {name}" until the next walk.
 
-A `composition.html` directly in the project root makes a composition with an empty ID, named after the project folder. Studio lists it and plays it, but every request that names a composition by its ID refuses it: its settings cannot be saved, it cannot be renamed or deleted, its thumbnail cannot be set, and the Props Editor's auto-save fails (see [Open questions](#open-questions-and-verification)).
+A `composition.html` directly in the project root makes a composition with an empty ID, named after the project folder. Studio lists it and plays it, but every request that names a composition by its ID refuses it: its settings cannot be saved, it cannot be renamed or deleted, its thumbnail cannot be set, and the Props Editor's auto-save fails (see [Open questions](#open-questions-and-verification)). Because Studio does not look inside a composition's folder, and the root is then a composition's folder, it is also the only composition listed: every other composition in the project disappears from the Compositions panel and the Omnibar. A composition created or duplicated in such a project is written to disk and opens at once, but it is never listed, not even after the walk that follows the creation, and after a reload it can no longer be opened from Studio at all; the root composition opens instead.
 
 ### Where new compositions go
 
@@ -84,6 +84,8 @@ Each template bakes the frame rate and duration typed in the dialog into its cod
 
 Four templates make their Helios instance available to the player (by setting `window.helios`): Title explainer, Vue, Svelte, and Solid. Vanilla JS, React, and Three.js never do, so a composition made from one of them loads, but the player never connects to it and shows "Connection Failed..." after 5 seconds. The Vue, Svelte, and Solid templates also need the project's Vite configuration to compile their framework (see the technical note under [The project](#the-project)); a project without one, such as the verification project (`examples/` has no `vite.config` at its top), cannot load their pages at all, so there too the player shows "Connection Failed...". In the verification project, Title explainer is the only template whose compositions connect. See [the preview player](the-preview-player.md#connecting) and the open questions below.
 
+The same compile problem probably affects the four examples written for a framework: `react-dom-animation`, `vue-dom-animation`, `svelte-dom-animation`, and `framer-motion-animation`. Each carries its own `vite.config` in its folder, which only that example's own development server reads; Studio's server reads the configuration at the project root, and `examples/` has none. The Vue and Svelte examples' components therefore cannot be compiled, and whether the two React ones load depends on how their JSX is compiled without their configuration and on finding React from the copy. Read from the code; not tried.
+
 ## Assets
 
 Assets are the files Studio lists in the Assets panel. Where they come from depends on the project:
@@ -122,7 +124,7 @@ Server-side renders are written to `renders/` at the project root, created when 
 | Components | The components folder (`src/components/helios` unless the [project configuration](../glossary.md#compositions-and-files) names another), `helios.config.json`, and, through the package manager, `package.json`, its lockfile, and `node_modules` | Install and Update in [the Components panel](../panels/the-components-panel.md); Remove never reaches the server from the panel |
 | In and out points, loop, playhead position | The browser, per composition ID | See [what Studio remembers](the-workspace.md#what-studio-remembers) |
 | Stage view, guides, grid, layout, sidebar tab, timeline zoom, render settings, active composition | The browser | See [what Studio remembers](the-workspace.md#what-studio-remembers) |
-| Canvas size changed on the stage toolbar | Nowhere | Lost when another composition is opened or the page reloads |
+| Canvas size changed on the stage toolbar | Nowhere | Lost when the page reloads, and replaced whenever Studio's copy of a composition with a width and height in `composition.json` changes: such a composition is opened, or the open one's settings are saved, its props auto-saved, or its thumbnail set. Opening a composition without `composition.json` keeps it (see [Edge cases](#edge-cases)) |
 | Playback rate, volume, mute, per-track audio mix | Only in the running composition | Lost on reload and on hot reload |
 
 Nothing Studio saves to disk can be undone from Studio. There is no trash: deleting an asset, or a composition folder through the Assets panel, removes it from the disk at once.
@@ -171,6 +173,7 @@ Who else changes the project, and how Studio looks to the user meanwhile, is des
 - Deleting a composition from the Compositions panel and removing a component from the Components panel never reach the server (see [When a request fails](#when-a-request-fails)). Confirm the red toast's wording. If confirmed, both are high-severity bugs: neither button works at all.
 - Confirm that the canvas size goes back to `composition.json`'s width and height after "Set from Current Frame", which re-reads every composition (`context/StudioContext.tsx` lines 514 to 517).
 - A composition at the project root has an empty ID, and every request that names a composition refuses an empty ID. Confirm, and confirm what the Props Editor's auto-save does with it: the code suggests an error toast ("ID is required") that repeats roughly every second while the composition is open. This may be worth treating as a bug.
+- Confirm that a root `composition.html` hides every other composition, and that a composition created in such a project opens but is never listed (`server/discovery.ts`, `findCompositions`, returns at the first folder holding `composition.html`, which is then the root; `context/StudioContext.tsx` lines 356 to 384 open the server's answer when the re-read list lacks it).
 - Confirm the three failure behaviors in [When a request fails](#when-a-request-fails), especially the requests that report success without checking the answer. Those may be worth treating as bugs.
 - Confirm that `fps` and `duration` in `composition.json` have no effect on playback, renders, or exports when they disagree with the composition's code.
 - The auto-save's one-second wait starts again whenever anything in Studio changes, not only the props (`PropsEditor.tsx` lines 48 to 71, `context/StudioContext.tsx` lines 431 and 713 to 714). Confirm when a save actually happens while paused and while playing; the Props Editor owns the details.

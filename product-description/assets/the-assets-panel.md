@@ -17,7 +17,7 @@ Which files appear is decided on disk: the assets are everything under the proje
 
 When there is nothing to show, the list says "Folder is empty." and "Drag & drop to upload." (the current folder has no folders and no files of the chosen type), or "No matching assets found." (a search found nothing).
 
-In the verification project (`examples/`, which has no `public/`), Home shows the seventeen example folders and no files, because the only file at the top, `README.md`, is not a recognized type. Inside `simple-canvas-animation` are a `src` folder and three JSON assets: `package-lock.json`, `package.json`, and `tsconfig.json`.
+In an untouched copy of the verification project (`examples/` as checked in, which has no `public/`), Home shows the seventeen example folders and no files, because the only file at the top, `README.md`, is not a recognized type. Anything added at the top during a pass shows there too: each composition created in Studio, the [renders folder](../glossary.md#compositions-and-files) once a render has run, and any fixture folder or file. Inside `simple-canvas-animation` are a `src` folder and three JSON assets: `package-lock.json`, `package.json`, and `tsconfig.json`.
 
 ## The simple case
 
@@ -157,7 +157,7 @@ Browsing ends at once, so most rows do not touch it. Reloading or hiding the pan
 - **A current folder that no longer exists.** If the open folder is deleted or renamed (on disk, or from a search result), the panel keeps showing its breadcrumbs and "Folder is empty."; an upload or a new folder there creates it again.
 - **Projects without `public/`.** Every composition folder, the renders folder, and every `package.json` and `tsconfig.json` are assets. Uploads land in the project root, next to the compositions. What the tile buttons can then do to a composition is in [asset actions](asset-actions.md#edge-cases).
 - **A desktop file dropped on an asset confirmation.** The Delete Asset and Rename Asset confirmations belong to the panel, so, read from the code, a desktop file dropped anywhere on one of them is uploaded into the current folder.
-- **New folder names.** Spaces are kept, a leading "../" is removed, and slashes nest. A name that is only spaces makes a folder with that name.
+- **New folder names.** Spaces are kept, and slashes nest. A name that is only spaces makes a folder with that name. The name is added to the current folder's path and the result is simplified, so "../" climbs out of the current folder: "../x" typed in `images/icons` makes `images/x`, and typed in `images` makes `x` at Home, beside `images` rather than inside it. At Home, a leading "../" is removed, so "../x" makes `x` at Home.
 - **Big files.** Studio sets no size limit and shows no progress; a large video simply takes a while before its toast.
 
 ## Open questions and verification

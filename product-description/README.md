@@ -77,7 +77,7 @@ For each document:
 
 ### Verification
 
-Drafting reads the code; verification watches the product. The `verification/` directory will hold one checklist per cluster of documents, each item a single observable claim with setup, steps, expected result, a priority, and the device it needs. A tester runs them in Studio launched with `helios studio` on the verification project, records `pass`, `fail`, or `blocked` in the Result column, and files every failure in `bug-triage.md` with the item's ID. A document moves from `drafted` to `verified` in the coverage table only when every P1 and P2 item for it has passed or been filed.
+Drafting reads the code; verification watches the product. The `verification/` directory holds [the protocol](verification/README.md) and one checklist per cluster of documents, each item a single observable claim with setup, steps, expected result, a priority, and the device it needs. A tester runs them in Studio launched with `helios studio` on the verification project, records `pass`, `fail`, or `blocked` in the Result column, and files every failure in `bug-triage.md` with the item's ID. A document moves from `drafted` to `verified` in the coverage table only when every P1 and P2 item for it has passed or been filed.
 
 `bug-triage.md` is the other half: every behavior the documents flagged as a likely defect, deduplicated, with reproduction steps, the reason in the code, a severity, and the decision the product team needs to make. Entries confirmed in the running product carry a Status line.
 
@@ -98,7 +98,7 @@ These were decided without the user (who was not available), from the code and t
 - **The source commit.** Commits to this directory move the repository's `HEAD`, so the source is pinned once: `git log -1 --format=%h -- . ':!product-description'`, which is `c2bfddb`. Every document's footer cites it. A later session that finds a newer source commit decides explicitly whether to re-verify; it does not mix commits silently.
 - **The surface.** Helios Studio as served by `helios studio` (`packages/cli/src/commands/studio.ts`): the built Studio UI on `http://127.0.0.1:5173/` (the next free port if 5173 is taken), with the folder the command was started in as the project root, no `helios.config.json` registry override, no remote MCP flags, in a desktop Chromium-based browser with a fresh profile (empty local storage), used with a mouse and keyboard. Studio is the surface because the root `AGENTS.md` names it the primary product surface and it is by far the richest interactive one; reconnaissance found about forty components and a server with a dozen routes.
 - **The verification project.** The repository's `examples/` folder, started with `helios studio`, with `simple-canvas-animation` open. Where a document needs input props, it uses a composition created in Studio from the "Title explainer" template, which is the only Studio template whose compositions connect to the player in this project: Vanilla JS, React, and Three.js compositions never connect, and Vue, Svelte, and Solid ones need a framework Vite configuration that `examples/` does not have (see [templates](foundations/project-and-compositions.md#templates)). `examples/` has no `public/` folder, so every example folder is also an asset folder: deleting, renaming, or moving one in the Assets panel deletes, renames, or moves that composition on disk, and a verification pass must work on a copy of `examples/` it can afford to lose. A freshly scaffolded `helios init` project is not used because its templates contain no `composition.html`, so Studio would open on its empty state.
-- **Clock-bound compositions.** Every example in `examples/` and every Studio template binds itself to the browser's document clock. The code says such a composition takes its frame from that clock rather than from Studio's transport. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) owns this behavior and flags it for verification first. The playback documents describe what Studio does when the player can drive the composition, and link there for the difference.
+- **Clock-bound compositions.** Every Studio template, and every example in `examples/` except `lottie-animation` and `dom-benchmark` (two of the three examples that never connect), binds itself to the browser's document clock. The code says such a composition takes its frame from that clock rather than from Studio's transport. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) owns this behavior and flags it for verification first. The playback documents describe what Studio does when the player can drive the composition, and link there for the difference.
 - **Out of scope: other CLI subcommands.** `init`, `render`, `build`, `preview`, `add`, `remove`, `components`, `diff`, `deploy`, `job`, `merge`, `frames`, `list`, `skills`, `update`, and `mcp` are separate surfaces. They may get their own description later.
 - **Out of scope: other ways to start Studio.** The standalone `helios-studio` binary (which resolves the project root differently) and Studio's development mode (`npm run dev` inside `packages/studio`, which shows a "Composition reloaded" toast that the built Studio does not) are mentioned only where they differ.
 - **Out of scope: the libraries and the platform.** The core, renderer, and player library APIs, distributed rendering beyond downloading a job spec, the infrastructure and cloud adapters, Studio's `/mcp` endpoint and authenticated remote MCP listener, the `helios mcp` plugin server, and the AI-host plugin. What an agent connected through Studio's MCP server does to the files under the user is described in [changes from outside Studio](cross-cutting/changes-from-outside-studio.md).
@@ -121,13 +121,16 @@ goal.md                          the standing instructions for whoever drafts
 AGENTS.md, CLAUDE.md             entry points for agents: read README.md, then goal.md
 .gitignore                       keeps output/ tracked although the repository's root .gitignore ignores it
 glossary.md                      shared vocabulary
-bug-triage.md                    (not started) suspected defects collected from every document, with
-                                 repro steps and decisions needed
+bug-triage.md                    every suspected defect, deduplicated: repro, cause, severity, decision
 
-verification/                    (not started)
-  README.md                      how to run a hand-verification pass and record results
-  {cluster}.md                   checklists, one per cluster of documents
-  ...
+verification/
+  README.md                      the protocol: building and starting Studio, devices, recording results
+  foundations.md                 checklists for the four foundation documents, and the shared setups
+  playback.md                    checklists for the four playback documents, with their fixtures
+  stage-and-output.md            checklists for the two stage and the three output documents
+  compositions-and-props.md      checklists for the four compositions and the two props documents
+  assets-and-panels.md           checklists for the two assets and the three panels documents
+  help-and-cross-cutting.md      checklists for the two help documents and the cross-cutting one
 
 foundations/
   input-model.md                 mouse presses and drags, the wheel, keyboard focus and who receives
@@ -204,7 +207,7 @@ Status is one of `not started`, `drafted`, or `verified`.
 | --- | --- |
 | glossary.md | drafted |
 | bug-triage.md | drafted |
-| verification/ (checklists) | not started |
+| verification/ (README.md, foundations.md, playback.md, stage-and-output.md, compositions-and-props.md, assets-and-panels.md, help-and-cross-cutting.md) | drafted |
 | foundations/input-model.md | drafted |
 | foundations/project-and-compositions.md | drafted |
 | foundations/the-workspace.md | drafted |

@@ -4,7 +4,7 @@
 
 The transport controls start, stop, and steer playback of the active composition: play and pause, play in reverse, change speed, step frame by frame, jump back to the in point, loop, and set the volume. They are a row of buttons, a slider, and a menu at the left of the [timeline panel](../glossary.md#the-workspace), and the keyboard shortcuts Space, K, J, L, Shift+L, ←, →, and Home. Playback itself (the composition's frame advancing on its own) is the long-running state this document owns: how it starts, how fast and in which direction it runs, and how it ends at the edges of the [playback range](../glossary.md#the-preview). Every control except Loop is disabled until the player is [connected](../glossary.md#the-preview).
 
-This document describes a composition the player can drive. A [clock-bound composition](../foundations/the-preview-player.md#clock-bound-compositions), which is what every example and template is, takes its frame from its own clock instead; read that section first when verifying.
+This document describes a composition the player can drive. A [clock-bound composition](../foundations/the-preview-player.md#clock-bound-compositions), which is what every template and every example that connects is, takes its frame from its own clock instead; read that section first when verifying.
 
 ## The controls
 

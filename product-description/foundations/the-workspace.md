@@ -69,6 +69,8 @@ The header shows "Helios Studio", then the composition button, then a "+" button
 - **The composition button** shows the active composition's name, or "Select Composition..." when none is open, with "⌘K" at its right on every platform. Clicking it opens [the Omnibar](../compositions/the-omnibar.md).
 - **The "+" button**, titled "New Composition", opens the New Composition dialog (see [creating and duplicating](../compositions/creating-and-duplicating.md)).
 
+While any [dialog](#dialogs) is open, its overlay covers the header too, so neither button can be pressed: a click on either lands on the overlay and closes the dialog on top instead. With the Omnibar open, a click on the composition button closes the Omnibar.
+
 ## The sidebar
 
 The sidebar has six tabs, in this order, with Compositions shown first by default:
@@ -95,7 +97,7 @@ When no composition is open, the stage shows an empty state instead of the playe
 - **The project has no compositions:** "Welcome to Helios Studio", "Get started by creating your first composition.", and a "+ Create Composition" button that opens the New Composition dialog.
 - **The project has compositions but none is open:** "No Composition Selected", "Select a composition to start editing.", and a "Select Composition (⌘K)" button that opens the Omnibar.
 
-The first appears whenever Studio's list of compositions is empty, including for a moment while the page loads and for good if the list failed to load. The second does not normally appear: whenever the list has compositions, Studio opens one (see [When the page loads](#when-the-page-loads)), and deleting the active composition opens the next one in the list.
+The first appears whenever Studio's list of compositions is empty, including for a moment while the page loads and for good if the list failed to load. The second does not normally appear: whenever the list has compositions, Studio opens one (see [When the page loads](#when-the-page-loads)). Deleting the active composition would open the first remaining composition in the list if the delete reached the server, but from the page it never does (see [when a request fails](project-and-compositions.md#when-a-request-fails)), so in practice the second empty state cannot be reached.
 
 ## The inspector
 
@@ -153,7 +155,7 @@ Studio keeps these values in the browser's local storage. Each is written as soo
 | Safe-area guides | Off | No | Toggled | [The stage toolbar](../stage/the-stage-toolbar.md) |
 | Timeline zoom | Fit | No | The zoom slider moves | [The timeline](../playback/the-timeline.md) |
 | Active composition | The first composition the server lists | No | A composition is opened | [When the page loads](#when-the-page-loads) |
-| Timeline state: in point, out point, loop, playhead position | In 0, out at the total frames, loop off, frame 0 | Yes, by composition ID | The in or out point or loop changes; playback pauses; the page is closed or reloaded; and at a switch, under the new composition's ID with the old one's values | [The playback range](../playback/the-playback-range.md#how-the-range-is-remembered) |
+| Timeline state: in point, out point, loop, playhead position | In 0, out at the total frames, loop off, frame 0 | Yes, by composition ID | The in or out point or loop changes; playback pauses; the page is closed or reloaded; at a switch, under the new composition's ID with the old one's values; and when the page loads, with the starting values, as the first composition opens | [The playback range](../playback/the-playback-range.md#how-the-range-is-remembered) |
 | Render settings | Canvas mode, nothing else set | No | Any render setting changes | [Server-side renders](../output/server-renders.md#the-render-settings) |
 
 Not remembered: the canvas size, the playback rate, volume, mute, the audio mix, the Omnibar's search text, the Compositions panel's search and open folders, the Assets panel's folder, search, and type filter, the client-side export format, the Props Editor's collapsed groups, the timeline's scroll position, and the contents of every dialog.
@@ -174,7 +176,7 @@ Until step 3 finishes the stage shows the "Welcome to Helios Studio" empty state
 ## Edge cases
 
 - **Composition Settings with nothing open.** Pressing ⚙️ when no composition is open shows nothing, but Studio now considers the dialog open: it appears by itself as soon as a composition is opened. See [composition settings](../compositions/composition-settings.md).
-- **A dialog opened twice.** Pressing ? while Keyboard Shortcuts is open, or the composition button while the Omnibar is open, does nothing more; the dialog is not reset.
+- **A dialog opened twice.** Pressing ? while Keyboard Shortcuts is open, or Ctrl/Cmd+K while the Omnibar is open, does nothing more; the dialog is not reset. The buttons that open a dialog cannot be pressed a second time: the open dialog's overlay covers the whole page, header and sidebar included, so a click on the composition button, +, ✨, 🩺, or the sidebar's ? closes the dialog on top instead.
 - **A dialog hidden under another.** Ctrl/Cmd+K while any other dialog is open, and ? while System Diagnostics or Render Preview is open, open a dialog the user cannot see. The hidden Omnibar holds keyboard focus, so typing goes into it and Enter runs whatever it has highlighted, which is "Create Composition" if nothing was typed.
 - **Panels lose their place.** Searching the Compositions panel, switching to Assets, and back, clears the search; the Assets panel always reopens at the top level.
 - **Storage shared across projects.** Two different projects run one after the other on port 5173 share remembered state, including per-composition timeline state for compositions with the same ID.
@@ -182,7 +184,7 @@ Until step 3 finishes the stage shows the "Welcome to Helios Studio" empty state
 
 ## Open questions and verification
 
-- The render settings are written to local storage without the protection the other values have. In a browser that refuses local storage, changing a render setting may break the whole page rather than being forgotten quietly. Confirm in a profile with storage blocked.
+- Two values are written to local storage without the protection the others have: the render settings, written once as the page loads and again on every change (`context/StudioContext.tsx` lines 217 to 220), and the active composition, written whenever a composition opens, including the one opened at page load (lines 602 to 607). Read from the code, in a browser that refuses local storage the first of those writes breaks the whole page as soon as it loads, leaving it blank, rather than the values being forgotten quietly. Confirm in a profile with storage blocked. This may be worth treating as a bug.
 - Confirm the order of the compositions list from the server and therefore which composition opens on a first visit. Node's directory listing sorts names by character code on macOS and Linux, so `audio-visualization` should open first in the verification project; Windows was not checked.
 - Confirm the stacking order of the dialogs, starting with Ctrl/Cmd+K in the New Composition dialog's name field: the Omnibar should open hidden behind it, with keyboard focus in its search. If confirmed, the Omnibar opening beneath every other dialog may be worth treating as a bug.
 - Confirm that Enter does not submit the New Composition, Duplicate Composition, or Composition Settings dialog, and that neither Enter nor Space presses a confirmation's buttons (the input model's first open question).

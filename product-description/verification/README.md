@@ -20,11 +20,20 @@ Priorities: **P1** is an established fact, a claim many documents depend on, or 
 ## How to run a pass
 
 1. Bring up the surface.
-   1. **Build.** In the repository root, `/home/user/helios`, run `npm install`, then `npm run build` (it builds the core, player, renderer, Studio, and CLI packages in that order).
+   1. **Build.** At this commit the repository's own build command does not work as it stands: the root `npm run build` builds the core, player, renderer, Studio, and CLI packages in that order, but the CLI depends on `@helios-project/infrastructure`, which that command never builds, so it fails at the CLI with "Cannot find module '@helios-project/infrastructure'". In the repository root, `/home/user/helios`, run:
+
+      ```sh
+      npm install
+      npm run build                                # builds core, player, renderer, and Studio, then fails at the CLI
+      npm run build -w packages/infrastructure
+      npm run build -w packages/cli
+      ```
+
+      The first build's failure is expected; the last two commands finish it. This build-order defect is a finding in its own right, about building Helios rather than about Studio, and is filed as [B-73](../bug-triage.md#b-73-the-repositorys-npm-run-build-fails-because-it-never-builds-packagesinfrastructure).
    2. **Make a throwaway copy of `examples/`.** From the repository root, `cp -R examples verify-examples`. Never run a pass in `examples/` itself: it has no `public/` folder, so every example folder is also an asset folder, and deleting, renaming, or moving one in the Assets panel deletes, renames, or moves that composition on disk (see [the project and compositions](../foundations/project-and-compositions.md#assets)). Keep the copy one level below the repository root, where `examples/` is, so that the compositions find `@helios-project/*` through the repository's `node_modules` and the Helios Assistant's documentation lookup behaves as it does for `examples/`. The copy is outside `product-description/`: never stage or commit it. Put a file `scratch.json` containing `{}` at its root, for items that need an asset they can lose.
    3. **Start Studio from the copy.** `cd verify-examples && node ../packages/cli/bin/helios.js studio` (or `helios studio`, if the CLI is linked on the path). The terminal prints the address. Every document assumes `http://127.0.0.1:5173/`; if 5173 is taken Studio uses the next free port, so free 5173 first, because remembered state belongs to the exact address and many items read it.
    4. **Open it** in a desktop Chromium-based browser with a fresh profile (for example `google-chrome --user-data-dir="$(mktemp -d)"`), with a window of at least 1600 by 900 pixels and the page zoom at 100%.
-   5. **Check the clock-bound claim first.** Every example and every Studio template binds itself to the browser's document clock, and the code says such a composition takes its frame from that clock rather than from Studio's transport (see [clock-bound compositions](../foundations/the-preview-player.md#clock-bound-compositions)). Run PLAYER-43 to PLAYER-46 and PLAYER-49 in [foundations.md](foundations.md), and the three unmodified-example items [playback.md](playback.md) names (TRANSPORT-02, TIMELINE-82, RANGE-66), before anything else. Nearly every playback claim depends on the answer, which is why the playback items run on copies with the binding removed.
+   5. **Check the clock-bound claim first.** Every Studio template, and every example that connects, binds itself to the browser's document clock, and the code says such a composition takes its frame from that clock rather than from Studio's transport (see [clock-bound compositions](../foundations/the-preview-player.md#clock-bound-compositions)). Run PLAYER-43 to PLAYER-46 and PLAYER-49 in [foundations.md](foundations.md), and the three unmodified-example items [playback.md](playback.md) names (TRANSPORT-02, TIMELINE-82, RANGE-66), before anything else. Nearly every playback claim depends on the answer, which is why the playback items run on copies with the binding removed.
    6. **Make the test compositions**, once per pass, with the header's + (New Composition), then edit them on disk as the table says:
 
       | Composition | Folder | How to make it | Used for |
@@ -64,23 +73,30 @@ Priorities: **P1** is an established fact, a claim many documents depend on, or 
 
 ## Devices and conditions
 
-The Device column names what an item needs beyond reading the screen. Several values can be combined (`mouse, disk`; `mouse + keyboard`).
+The Device column names what an item needs beyond reading the screen. Several values can be combined (`mouse, disk`; `mouse + keyboard`; `keyboard; disk`). Every value used in the six checklist files is listed here; a file may say more about a value at its top.
 
 - **`mouse`**: a mouse with a notched wheel and a middle button. Chromium reports about 100 wheel units per notch. A trackpad is not a mouse: it scrolls in two directions at once and with inertia, and its pinch arrives as Ctrl and the wheel.
 - **`trackpad`**: two-finger scrolling and pinching, for the items about them.
-- **`keyboard`**: a US English layout. Ctrl/Cmd means Control on Windows and Linux and Command on a Mac; Studio treats both as the same key on every platform.
+- **`keyboard`**: a physical keyboard with a US English layout. Ctrl/Cmd means Control on Windows and Linux and Command on a Mac; Studio treats both as the same key on every platform.
 - **`keyboard layout`**: an operating system layout other than US English (German, for example, where ? is Shift+ß).
-- **`Mac`**, **`Windows or Linux`** (also written `Windows/Linux`): the item applies to that platform's keyboard or browser behavior only. Alt and Option differ: Option with a letter types another character on a Mac.
+- **`Mac`**, **`Windows or Linux`** (also written `Windows/Linux`), and **`Linux`**: the item applies to that platform's keyboard, browser, or file system only. Alt and Option differ: Option with a letter types another character on a Mac. A `Linux` item is about a disk that treats upper and lower case as different, which macOS and Windows disks by default do not.
 - **`devtools`**: Chromium's developer tools: Application, Local storage (to read and clear remembered values), the Console, Network request blocking by URL and throttling (Slow 4G or Slow 3G keeps a page or request loading for seconds), and the Elements picker (to measure sizes). Network "Offline" in developer tools blocks the page's own requests; it does not stop the Studio server, and it is not the same condition as `server`.
-- **`disk`** (also written `terminal`): an editor or shell on the files in `verify-examples/`, plus `ffprobe` and an image viewer for downloaded and rendered files. Saving a file a composition uses triggers a hot reload, so make edits deliberately.
-- **`server`**: the terminal running `helios studio`; stop it with Ctrl+C and start it again with the same command. Stopping the process is the only way to get "the server stops"; a blocked request is a different failure. `second server` is a second `helios studio` started while the first runs (it takes the next free port).
-- **`second tab`**: another tab of the same browser at the same address. It shares local storage with the first tab, so it is not a second user and not a second browser. **`second window`**: another application's window beside the browser, to take focus or receive a release.
+- **`throttled`**: `devtools` with Network throttling set to "Slow 3G", so that "Creating...", "Saving...", and "Updating..." last long enough to be seen and interrupted; turn it off afterwards.
+- **`disk`**: an editor or shell on the files in `verify-examples/`, plus `ffprobe` and an image viewer for downloaded and rendered files. Saving a file a composition uses triggers a hot reload, so make edits deliberately.
+- **`terminal`**: a shell. In [playback.md](playback.md) it is a shell in the copy, the same as `disk`; in [assets-and-panels.md](assets-and-panels.md) it is the terminal running `helios studio`, the same as `server` (reading its output, stopping it, and starting it again with extra environment variables).
+- **`server`**: the terminal running `helios studio`; stop it with Ctrl+C and start it again with the same command. Stopping the process is the only way to get "the server stops"; a blocked request is a different failure. **`second server`**: a second `helios studio` started while the first runs (it takes the next free port).
+- **`second tab`**: another tab of the same browser at the same address. It shares local storage with the first tab, so it is not a second user and not a second browser.
+- **`second window`** (also written `other app`): another application's window beside the browser, to take focus from the browser, receive a release, or receive a drop.
 - **`second project`**: another folder served by `helios studio` at the same address, after stopping the first; it shares the first one's remembered values.
-- **`desktop file`**: a file dragged in from the operating system's file manager.
+- **`desktop file`** (also written `desktop drag`): a file dragged in from the operating system's file manager onto the Studio window, with both visible side by side.
+- **`picker`**: the browser's own file chooser, opened by the Assets panel's Upload or the Captions panel's file chooser.
 - **`blocked storage`**: a browser profile in which site data for `127.0.0.1` is blocked in Chromium's settings, so local storage refuses every read and write.
-- **`speakers`**: the item is judged by ear. **`stopwatch`**: a timer, for items with a timing; a screen recording played frame by frame is better for anything under a second.
+- **`speakers`** (also written `audio`): speakers or headphones; the item is judged by ear. **`stopwatch`**: a timer, for items with a timing; a screen recording played frame by frame is better for anything under a second.
 - **`render`**: a server-side render or client-side export must finish and its frames be counted (`ffprobe -count_frames`, or the duration at the frame rate).
-- **`clipboard`**: any application to paste into.
+- **`clipboard`**: any application to paste into. **`clipboard denied`**: the Studio address's clipboard permission set to Block in Chromium's site settings, with known text already on the clipboard.
+- **`editor`**: `helios studio` started with `LAUNCH_EDITOR` naming an installed code editor (for example `LAUNCH_EDITOR=code`). **`no editor`**: started with no `LAUNCH_EDITOR` and no code editor running.
+- **`network`**: internet access, for the package manager a component install runs.
+- **`registry`**: a local static file server (for example `python3 -m http.server 8099` in a folder) serving a component registry.
 - **`agent`**: an MCP client on the same computer connected to `http://127.0.0.1:5173/mcp` (for example the MCP Inspector).
 - **`no Chromium`** and **`repo root`**: special server starts that [help-and-cross-cutting.md](help-and-cross-cutting.md) defines at its top.
 
@@ -109,4 +125,4 @@ Use the console to observe and to set up, not to gesture. Where an item is about
 
 ## Results so far
 
-No pass has been run yet. Every document is `drafted` in the [coverage table](../README.md#coverage), and none is `verified`.
+No pass has been run yet. Every document is `drafted` in the [coverage table](../README.md#coverage), and none is `verified`. Building the surface for this protocol has been done once, and it found one defect before any item was run: the root `npm run build` fails at this commit because it never builds `packages/infrastructure` (see step 1 of [How to run a pass](#how-to-run-a-pass), and [B-73](../bug-triage.md#b-73-the-repositorys-npm-run-build-fails-because-it-never-builds-packagesinfrastructure)). That is about building Helios, not about Studio's behavior, so it changes no document's status.

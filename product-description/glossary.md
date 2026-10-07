@@ -48,7 +48,7 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Composition.** A folder in the project that contains a file named `composition.html`. Studio finds compositions by scanning the project when the page loads, skipping folders named `node_modules`, `.git`, `dist`, `build`, and `.helios`, and not looking inside a folder once it has found a composition there. The [project and compositions](foundations/project-and-compositions.md) document owns the details.
 
-**Composition ID.** The composition folder's path relative to the project root, with forward slashes (`simple-canvas-animation`, `scenes/intro`). It is what Studio uses to remember things per composition. A `composition.html` directly in the project root has an empty ID.
+**Composition ID.** The composition folder's path relative to the project root, with forward slashes (`simple-canvas-animation`, `scenes/intro`). It is what Studio uses to remember things per composition. A `composition.html` directly in the project root has an empty ID, and hides every other composition in the project, because Studio does not look inside a composition's folder.
 
 **Composition name.** The name Studio shows. It is derived from the composition folder's own name, never stored: the folder name is split at hyphens and each part is capitalized ("simple-canvas-animation" becomes "Simple Canvas Animation"). Renaming a composition therefore renames its folder. After its settings are saved or its props auto-saved, a composition in a subfolder is named from its whole ID instead ("Scenes/intro Card") until the page is reloaded (see [the project and compositions](foundations/project-and-compositions.md#edge-cases)).
 
@@ -88,7 +88,7 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Connected.** The player is connected when it has found the composition's Helios instance and Studio has noticed (Studio checks every 200 milliseconds). Until then the transport controls are disabled (except loop), the Props Editor says "No active controller", and the timeline shows a placeholder length of 100 frames (or, right after a switch, the previous composition's numbers). A composition that has not connected within 5 seconds shows "Connection Failed..." in the stage.
 
-**Clock-bound composition.** A composition that binds itself to the browser's document clock (its code calls `bindToDocumentTimeline()`), as every example and every Studio template does. In an ordinary browser tab the code makes such a composition take its frame from that clock, so it keeps advancing on its own and Studio's seeks and pauses do not hold. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) document owns this behavior; it is the first thing verification checks.
+**Clock-bound composition.** A composition that binds itself to the browser's document clock (its code calls `bindToDocumentTimeline()`), as every Studio template does, and every example except `lottie-animation` and `dom-benchmark`. In an ordinary browser tab the code makes such a composition take its frame from that clock, so it keeps advancing on its own and Studio's seeks and pauses do not hold. The [preview player](foundations/the-preview-player.md#clock-bound-compositions) document owns this behavior; it is the first thing verification checks.
 
 **Hot reload.** The player reloading the composition's page because a file the composition uses changed on disk. Studio notices the new connection and puts back the frame, the playing state, and the input props it last saw.
 
@@ -144,7 +144,7 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **SRT file.** A SubRip caption file: blocks separated by blank lines, each made of an optional number line, a `HH:MM:SS,mmm --> HH:MM:SS,mmm` line, and the cue's text. It is the only format the Captions panel imports and exports; WebVTT files are refused there. The [Captions panel](panels/the-captions-panel.md) document owns the details.
 
-**Audio track.** One source of sound in the composition, as Studio lists it. The Audio panel lists every audio and video element in the composition's page, named by its `data-helios-track-id` attribute, else its `id`, else `track-0`, `track-1`, and so on by its position, together with any track the composition reports itself. The timeline draws a lane only for the tracks the composition reports (see [timeline tracks](playback/timeline-tracks.md)), so the Audio panel can list more tracks than the timeline shows.
+**Audio track.** One source of sound in the composition, as Studio lists it. The Audio panel lists every audio and video element in the composition's page, named by its `data-helios-track-id` attribute, else its `id`, else `track-0`, `track-1`, and so on by its position, together with any track the composition reports itself. A composition reports tracks in two ways: made with `autoSyncAnimations: true`, it reports every audio and video element carrying `data-helios-track-id` by itself; and its code can name tracks directly (the `availableAudioTracks` option or `setAvailableAudioTracks`). A composition that does neither reports none. The timeline draws a lane only for the tracks the composition reports (see [timeline tracks](playback/timeline-tracks.md)), so the Audio panel can list more tracks than the timeline shows.
 
 **Audio mix.** The per-track volume and mute set in the Audio panel, including what *solo* changes. It lives only in the running composition: it is not saved or remembered, and it is lost on reload, hot reload, and switching compositions. It shapes the preview and client-side exports, not server-side renders. The [audio mixer](panels/the-audio-mixer.md) document owns it.
 
@@ -200,7 +200,7 @@ These are the rows of every "Cancel and interrupt" table. The [input model](foun
 
 **Another shortcut, click, or command.** The user doing something else before the interaction is over: pressing a shortcut, clicking another control, running an Omnibar command, or opening a dialog.
 
-**Composition switched.** The active composition changing, from the Compositions panel, the Omnibar, or as a side effect of creating, duplicating, renaming, or deleting a composition. The player is replaced and must connect again.
+**Composition switched.** The active composition changing, from the Compositions panel, the Omnibar, or as a side effect of creating, duplicating, or renaming a composition (deleting the active one would switch too, but a delete from the page never reaches the server). The player is replaced and must connect again.
 
 **Window loses focus.** Another window or application takes focus, or the Studio tab is hidden. Studio does not listen for this; whatever was in progress continues, and a mouse button released elsewhere is never seen. The browser does report a focused field as left (and focuses it again on return), so a field that commits when it is left commits (Chromium's usual behavior, to confirm; see [the input model](foundations/input-model.md#the-interrupt-rows)).
 

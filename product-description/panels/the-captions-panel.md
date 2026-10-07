@@ -16,13 +16,15 @@ Each cue is a dark card with a blue stripe at its left: two time fields side by 
 
 A time shows as minutes, seconds, and milliseconds, `MM:SS.mmm`, or from one hour on as `HH:MM:SS.mmm`. A cue from 1.5 to 3 seconds shows `00:01.500` and `00:03.000`. Caption cues count milliseconds (see [units](../glossary.md#units)), so they need not fall on frames.
 
-The panel shows what the composition has now. Every example and every template starts with no captions, so the panel usually opens on "No captions loaded".
+The panel shows what the composition has now. No example and no template has captions to start with, so the panel usually opens on "No captions loaded".
 
 Where captions show: on the timeline, always, as green bars; on the picture only if the composition draws them itself, or if the user turns on the player's own caption display with C while the player has keyboard focus (see [the input model](../foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)), which is off whenever a composition opens; and in every [client-side export](../output/client-side-export.md#while-ongoing), burned into the picture.
 
 ## The simple case
 
-The user plays to two seconds, pauses, and presses "+ Add". A cue "New Caption" from `00:02.000` to `00:04.000` appears in the list and as a green bar on the timeline from two to four seconds. The user clicks its text box, types "Hello", and clicks anywhere else: the cue's text is now "Hello". The user selects the end time, types `00:05`, and presses Tab: the field shows `00:05.000` and the bar now ends at five seconds.
+The user, with a composition the player can drive (connected and not [clock-bound](../foundations/the-preview-player.md#clock-bound-compositions)), plays to two seconds, pauses, and presses "+ Add". A cue "New Caption" from `00:02.000` to `00:04.000` appears in the list and as a green bar on the timeline from two to four seconds. The user clicks its text box, types "Hello", and clicks anywhere else: the cue's text is now "Hello". The user selects the end time, types `00:05`, and presses Tab: the field shows `00:05.000` and the bar now ends at five seconds.
+
+With a clock-bound composition, which is what every template is, the pause does not hold: the frame goes on advancing, so the new cue starts wherever the composition's clock has reached at the click, not at two seconds (see [Edge cases](#edge-cases)).
 
 "Export SRT" downloads `captions.srt` holding that cue. Choosing an SRT file under "Import SRT" replaces every cue with the file's. "Clear" removes all the cues and × removes one. None of these asks for confirmation, and none can be undone. The panel stays as it is after each; there is no selection and no mode to leave.
 
@@ -81,7 +83,7 @@ The timeline's bars move at once. Nothing is checked: an end can be before its s
 
 Nothing is written anywhere. The cues live in the running composition until it reloads or another composition is opened.
 
-> Technical note: Studio gives the cues to the composition's Helios instance directly, which is how every example and template is connected. For a composition connected through `connectToParent` without `window.helios`, the panel instead sets an input prop named `captions` holding the cues. Read from the code, the composition's captions then do not change, the panel's list stays as it was, and the Props Editor's [auto-save](../glossary.md#the-preview) writes the cues into `composition.json` (see [Open questions](#open-questions-and-verification)).
+> Technical note: Studio gives the cues to the composition's Helios instance directly, which is possible for every composition that connects through `window.helios`: every template that connects, and every example that does except `client-export-api`. A composition connects through `connectToParent` instead when its code passes its Helios instance to the player's `connectToParent` function (imported from `@helios-project/player/bridge`) and does not set `window.helios`; in the verification project `client-export-api` is built this way. For such a composition the panel instead sets an input prop named `captions` holding the cues. Read from the code, the composition's captions then do not change, the panel's list stays as it was, and, if the composition is paused and not [clock-bound](../glossary.md#the-preview), the Props Editor's [auto-save](../glossary.md#the-preview) writes the cues into `composition.json` (see [Open questions](#open-questions-and-verification)). `client-export-api` is clock-bound, so with it nothing is written.
 
 ## Modifiers
 
@@ -124,7 +126,7 @@ After every interrupt the user is in the panel with no field being edited, excep
 
 **Playback range and loop.** No effect on the range. Caption starts and ends are [snap points](../playback/the-timeline.md#snapping) for scrubbing and for the in and out markers, so every change in the panel changes where those snap. + Add uses the current frame whether or not it is inside the range.
 
-**Input props.** None for a composition connected through `window.helios`, which includes every example and template. See the technical note for the exception.
+**Input props.** None for a composition connected through `window.helios`, which every template that connects and every example that connects except `client-export-api` is. See the technical note for the exception.
 
 **Rendering and export.** Server-side renders load the composition afresh and use its own captions, never the panel's edits (see [server-side renders](../output/server-renders.md)). Client-side exports draw the cues showing at each frame onto the picture, always, whether or not the player shows captions; read from the code they are drawn one frame late (see [client-side export](../output/client-side-export.md#edge-cases)). Snapshots do not include captions.
 
@@ -157,7 +159,7 @@ After every interrupt the user is in the panel with no field being edited, excep
 - Confirm that leaving a field always applies it, even unchanged, and that the window losing focus applies a field being edited (read from how Chromium reports focus leaving a field; the panel listens only for that).
 - Confirm the negative-time and `NaN` displays, and what the timeline draws for a cue whose time is not a number.
 - Confirm that edits never appear on the picture unless the composition draws captions itself or C has turned on the player's caption display.
-- For a composition connected through `connectToParent` without `window.helios`, the panel writes the cues into an input prop named `captions` instead of the composition's captions (`packages/studio/src/components/CaptionsPanel/CaptionsPanel.tsx:50-57`), although the connection offers a way to set captions directly. The list would then not change and the auto-save would write the cues into `composition.json`. This may be worth treating as a bug.
+- For a composition connected through `connectToParent` without `window.helios`, the panel writes the cues into an input prop named `captions` instead of the composition's captions (`packages/studio/src/components/CaptionsPanel/CaptionsPanel.tsx:50-57`), although the connection offers a way to set captions directly. The list would then not change and, for a composition that is paused and not clock-bound, the auto-save would write the cues into `composition.json`. `client-export-api` (clock-bound) shows the first part in the verification project; a Title explainer copy with its `window.helios = helios;` line replaced by `connectToParent(helios);` and its document-clock binding removed shows the write. This may be worth treating as a bug.
 - Import SRT accepts only a strict form of SRT and refuses WebVTT (`CaptionsPanel.tsx:70` uses the SRT reader, not the general one in `packages/core/src/captions.ts:172`). Files with one-digit hours or periods before the milliseconds are common; this may be worth a product call.
 - Confirm the file chooser's appearance in Chromium, and that it offers `.srt` files only by default.
 - Read from `CaptionsPanel/CaptionsPanel.tsx`, `CaptionsPanel/CaptionsPanel.css`, `CaptionsPanel/CaptionsPanel.test.tsx`, `packages/core/src/captions.ts`, `packages/core/src/Helios.ts`, `Timeline.tsx`, `App.tsx`, and `packages/player/src/controllers.ts` and `index.ts`; not yet confirmed by hand.

@@ -63,7 +63,7 @@ The Omnibar opens on Ctrl/Cmd+K (Control or Command on every platform, wherever 
 - About 10 milliseconds later the search box takes keyboard focus. Whatever had focus loses it: a field that commits when left commits (the [timecode field](../playback/the-timeline.md#the-timecode-field), a Props Editor text box), and the player stops receiving keys.
 - The lists are made from what Studio already holds: the compositions and assets it last read from the Studio server. Opening makes no request.
 
-If the Omnibar is already open, Ctrl/Cmd+K and the composition button do nothing more; the search is not cleared.
+If the Omnibar is already open, Ctrl/Cmd+K does nothing more; the search is not cleared. The composition button cannot be pressed again: the Omnibar's overlay covers the whole page, header included, so a click on the button lands on the overlay and closes the Omnibar (see [Ending at once](#ending-at-once)).
 
 The Omnibar is drawn beneath every other dialog. Opened while another dialog is open (Ctrl/Cmd+K works in any dialog's text field, and anywhere else while a dialog is open), it appears behind that dialog's overlay, dimmed and out of reach of the mouse, while its search box still takes keyboard focus (see [Edge cases](#edge-cases)).
 

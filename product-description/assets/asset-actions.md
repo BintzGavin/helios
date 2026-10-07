@@ -110,7 +110,7 @@ On success no toast appears: the list is re-read, and the tile reappears under i
 
 A move asks the server to move the file or folder, with everything in it, into the target folder under the same name. It is refused with a red toast giving the server's reason when the target already has something of that name (`Asset "logo.png" already exists in target folder`), or when a folder would go into itself or into one of its own folders (`Cannot move folder "{absolute path}" into itself "{absolute path}"`). On success an "Asset moved" toast appears, for a folder too, the list is re-read, and the tile leaves the current view. The move is saved on disk at once, with no undo, and, unlike a rename, it gives no warning that references to the old path will break.
 
-A drop on the Props Editor or the timeline changes input props, not files; [the Props Editor](../props/the-props-editor.md)'s auto-save then writes them into `composition.json` once its wait is over (a second or more while the composition is paused; see [the Props Editor](../props/the-props-editor.md#while-ongoing)).
+A drop on the Props Editor or the timeline changes input props, not files; [the Props Editor](../props/the-props-editor.md)'s auto-save then writes them into `composition.json` once its wait is over (a second or more while the composition is paused, and never for a [clock-bound](../glossary.md#the-preview) composition; see [the Props Editor](../props/the-props-editor.md#while-ongoing)).
 
 ## Modifiers
 

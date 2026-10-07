@@ -18,7 +18,7 @@ The list is fixed text; it does not change with the platform, the keyboard layou
 
 | Group | Description | Key caps shown | What the key does in Studio |
 | --- | --- | --- | --- |
-| Playback | Play / Pause | Space, /, K | Space plays or pauses. "/" is drawn as a key cap but is no shortcut. K only pauses, unless the player has keyboard focus, where it toggles. |
+| Playback | Play / Pause | Space, /, K | Space plays or pauses. "/" is drawn as a key cap but is no shortcut. K only pauses, wherever keyboard focus is: with the player focused the player toggles playback first, and Studio's K then pauses, so K never starts playback (see [the input model](../foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)). |
 | Playback | Play Reverse / Slower | J | Plays in reverse, then faster in reverse, up to 4x. It never slows down forward playback: during forward playback it switches to reverse at 1x. |
 | Playback | Play Forward / Faster | L | Plays forward, then faster, up to 4x. |
 | Playback | Restart / Rewind | Home | Goes to the in point. |
@@ -26,7 +26,7 @@ The list is fixed text; it does not change with the platform, the keyboard layou
 | Navigation | Previous Frame, Next Frame | ←, → | One frame back or forward. |
 | Navigation | Back 10 Frames, Forward 10 Frames | Shift and ←, Shift and → | Ten frames back or forward. |
 | Timeline | Set In Point, Set Out Point | I, O | Set the in or out point at the current frame. |
-| General | Switch Composition | ⌘, K | Opens the Omnibar, which does more than switch compositions, and also pauses. The ⌘ cap is shown on every platform; Ctrl+K works too. |
+| General | Switch Composition | ⌘, K | Opens the Omnibar, which does more than switch compositions, and also pauses. The ⌘ cap is shown on every platform. Studio takes Control and Command alike on every platform, so Ctrl+K opens it on Windows and Linux, and on a Mac both Cmd+K and Control+K do. |
 | General | Show Shortcuts | ? | Opens this dialog. |
 
 Not listed: ' (safe-area guides, see [the stage toolbar](../stage/the-stage-toolbar.md)), Escape, the Omnibar's ↑, ↓, and Enter, and the keys the player adds when it has keyboard focus (see [the input model](../foundations/input-model.md#keys-the-player-adds-when-it-has-keyboard-focus)).
@@ -70,7 +70,7 @@ stateDiagram-v2
 
 **System Diagnostics** opens on 🩺 (tooltip "System Diagnostics") or the Omnibar's "Diagnostics" command. At that instant two checks start. The client check runs in the Studio page and finishes almost at once. The server check is a request to the Studio server, which launches a fresh headless Chromium, opens a blank page in it, reads its capabilities, inspects FFmpeg, and closes the browser. The right column is cleared to its loading message on every opening; the left column still shows the previous opening's result, if there was one, until the new client check replaces it. Focus does not move into the dialog.
 
-Pressing ?, 🩺, or a command for a dialog that is already open does nothing more: the dialog is not reset and no new check starts.
+Pressing the ? key, or running the Omnibar's command, for a dialog that is already open does nothing more: the dialog is not reset and no new check starts. The sidebar's ? and 🩺 buttons cannot be pressed while either dialog is open: the dialog's overlay covers the sidebar, so a click on them closes the dialog instead (see [the workspace](../foundations/the-workspace.md#edge-cases)).
 
 ### Ending at once
 
@@ -152,7 +152,7 @@ After any of these the user is back in the workspace with no dialog open, or wit
 - **A press inside, a release on the overlay.** Selecting the user agent text by dragging and releasing over the dark overlay is, in Chromium, a click on the overlay, and closes the dialog.
 - **Opening Diagnostics repeatedly.** Each opening launches a new headless browser. Closing and reopening while a check is still running starts a second one; whichever answer arrives last is shown, except that an error from either stays on screen until the next opening.
 - **The client check never failing.** If the client check failed, the left column would keep saying "Loading client diagnostics..." until the next opening; Studio does not handle that case. In Chromium it does not fail.
-- **The ⌘ key cap.** On Windows and Linux the dialog shows ⌘ K, a key those keyboards do not have; Ctrl+K is meant.
+- **The ⌘ key cap.** On Windows and Linux the dialog shows ⌘ K, a key those keyboards do not have; Ctrl+K is meant. On a Mac, Control+K works as well as Cmd+K, because Studio accepts either key there too (read from the code: the shortcut checks for Control or Command, whatever the platform).
 - **Keyboard layouts.** Where ? is on another key, that key opens the dialog; the dialog still shows "?".
 
 ## Open questions and verification

@@ -79,7 +79,7 @@ Dialogs do not change this. While a dialog is open, Studio's shortcuts keep work
 
 Every one of these is active from the moment the page loads, whether or not a composition is open. The playback keys do nothing until the player is [connected](../glossary.md#the-preview); I, O, Shift+L, ', ?, and Ctrl/Cmd+K work before that.
 
-Other lists of shortcuts disagree with this map. The Keyboard Shortcuts dialog draws a "/" key cap between Space and K for play and pause, as if "/" were a key (it does nothing), and does not list '. The Omnibar shows "N" next to Create Composition and "S" next to Take Snapshot, which do nothing, and "L" next to Toggle Loop, which plays forward instead. Outside Studio, the Studio package's README also lists L as "Toggle Loop", and the user guide in `docs/site/guides/using-studio.md` says K toggles play and pause, which it does only when the player has focus.
+Other lists of shortcuts disagree with this map. The Keyboard Shortcuts dialog draws a "/" key cap between Space and K for play and pause, as if "/" were a key (it does nothing), and does not list '. The Omnibar shows "N" next to Create Composition and "S" next to Take Snapshot, which do nothing, and "L" next to Toggle Loop, which plays forward instead. Outside Studio, the Studio package's README also lists L as "Toggle Loop", and the user guide in `docs/site/guides/using-studio.md` says K toggles play and pause, which it never does in Studio: with the player focused the player toggles playback and Studio then pauses, so K still ends paused (see the next table).
 
 ### Keys the player adds when it has keyboard focus
 
@@ -88,7 +88,7 @@ When the player has focus, these keys act on the player first, and then Studio a
 | Key | The player does | Studio then does | What the user sees |
 | --- | --- | --- | --- |
 | Space | Toggle playback; at the end, restart from frame 0 | Play or pause from its last known state | Playback toggles. At the end it restarts from frame 0, not from the in point. |
-| K | Toggle playback; at the end, restart from frame 0 | Pause | Pause only. From paused nothing visible happens, except at the end, where the composition jumps to frame 0 and stays paused. |
+| K | Toggle playback; at the end, restart from frame 0 | Pause, whatever the player just did | Pause only: K never starts playback. Playing, it pauses. From paused nothing visible happens. Within one frame of the end, playing or paused, the composition jumps to frame 0 and stays paused. |
 | J | Jump back 10 seconds | Play in reverse, or faster in reverse | Both: a jump back, then reverse playback. |
 | L | Jump forward 10 seconds | Play forward, or faster; with Shift, toggle loop | Both: a jump forward, then playback. Shift+L jumps forward 10 seconds and toggles loop. |
 | ← / → (with Shift) | Step 1 (10) frames, stopping at the last frame | Step 1 (10) frames from the same starting frame | One step, not two. |
