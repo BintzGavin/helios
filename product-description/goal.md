@@ -87,7 +87,7 @@ The preview ([the preview player](foundations/the-preview-player.md)):
 - A click on the composition gives the player focus and toggles playback; within one frame of the end it goes to frame 0 and plays (ignoring the in point). A double-click enters fullscreen. The composition's own buttons cannot be clicked.
 - Clock-bound compositions (every example and every template) take their frame from the browser's document clock, per the code, so Studio's seeks, pauses, range, loop, and rate would not hold. This is the first thing to verify. Playback documents describe a composition the player can drive (connected and not clock-bound).
 - Hot reload restores the playhead position, the playing state, and the input props, and re-applies loop and range; it does not restore the playback rate, volume, mute, audio mix, or caption edits.
-- Switching compositions (suspected bug): the first connection after a switch is treated as a hot reload, carrying the previous composition's input props, playhead position, and playing state into the new one; the auto-save then writes those props into the new one's `composition.json`.
+- Switching compositions (suspected bug): after a switch from a connected composition, the first connection is treated as a hot reload, carrying the previous composition's input props, playhead position, and playing state into the new one and never applying the new one's default props; the auto-save then writes those props into the new one's `composition.json`. If the new one refuses the props, nothing else is carried over either.
 
 The stage view ([the stage view](stage/the-stage-view.md)):
 
