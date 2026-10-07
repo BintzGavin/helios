@@ -36,9 +36,15 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Toast.** A short notification that slides in at the bottom right of the page and disappears by itself after 3 seconds (2 seconds for "Composition reloaded"), or when its × is clicked. Toasts stack upward, newest at the bottom; a colored stripe on the left marks the kind: green for success, blue for info, orange for warning, red for error.
 
+**Browser prompt.** A message box drawn by the browser itself rather than by Studio, with the browser's own look and buttons: the Assets panel's "Enter folder name:" box, the confirmation before removing a component in the Components panel, and the "Failed to parse SRT file." message in the Captions panel. It is not a *dialog*: it has no overlay, Escape answers it as Cancel (or as OK when OK is its only button), and it blocks the whole Studio page, keys and clicks included, until it is answered.
+
 ## Compositions and files
 
 **Project.** The folder `helios studio` was started in, and everything under it. Also called the *project root*. Studio reads and writes only inside it, and cannot be pointed at another project without restarting the server.
+
+**Agent.** A program, usually an AI coding assistant, that changes the project while the user has Studio open. An agent that writes files with its own tools is, to Studio, the same as an editor. An agent connected to *Studio's MCP server* (the `/mcp` address the Studio server answers on the same port, only for programs on the same computer) can also list compositions, create a composition, start, watch, and cancel server-side renders, and install, update, and remove components. The Studio page shows nothing when an agent connects or acts. The [changes from outside Studio](cross-cutting/changes-from-outside-studio.md) document owns what the user sees.
+
+**Code editor.** The text editor or IDE on the user's computer, outside Studio, in which the Studio server can open a file or folder when the user presses 📝 (Open in Editor) on a composition tile or an asset tile. Studio does not choose it and does not report whether one opened: the development server underneath Studio picks the editor named in the `LAUNCH_EDITOR` environment variable of the `helios studio` process or one it finds running, and prints a message in that process's terminal when it finds none. Not to be confused with the *Props Editor*.
 
 **Composition.** A folder in the project that contains a file named `composition.html`. Studio finds compositions by scanning the project when the page loads, skipping folders named `node_modules`, `.git`, `dist`, `build`, and `.helios`, and not looking inside a folder once it has found a composition there. The [project and compositions](foundations/project-and-compositions.md) document owns the details.
 
@@ -54,11 +60,23 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Thumbnail.** A `thumbnail.png` file in the composition folder, shown in the Compositions panel and the Omnibar. Studio writes it from the current frame when asked (Composition Settings, "Set from Current Frame").
 
+**Composition tile.** One composition's entry in the Compositions panel: a card 140 pixels wide with the composition's thumbnail (cropped to 16:9, or 🎬 on gray when it has none) above its name, and a blue border when it is the *active composition*. While the pointer is over the thumbnail, three buttons appear on it: 📝 (Open in Editor), 📑 (Duplicate), and × (Delete). Clicking anywhere else on the tile opens the composition. The [Compositions panel](compositions/the-compositions-panel.md) document owns what a tile does.
+
 **Template.** One of the starting points the New Composition dialog offers: Title explainer, Vanilla JS (the default choice), React, Vue, Svelte, Solid, and Three.js.
 
 **Asset.** A file Studio lists in the Assets panel: an image, video, audio, font, 3D model, JSON, or shader file, recognized by its extension, or a folder. Assets are taken from the project's `public/` folder if it exists, otherwise from the whole project.
 
+**Asset tile.** One square in the Assets panel's list, standing for one asset. A folder's tile is 100 pixels square and shows 📁 above the folder's name; clicking it opens the folder. A file's tile is 100 pixels wide and shows a preview made for the asset's type above the file name, and, while the pointer is over it, three small round buttons at its top right: 📝 (Open in Editor), ✎ (Rename Asset), and × (Delete Asset). Every tile can be dragged. The [asset actions](assets/asset-actions.md) document owns what a tile does.
+
+**Current folder.** The folder the Assets panel is showing, named in the panel's breadcrumb row ("Home / images / icons"). "Home" is the top level of the assets: the `public/` folder, or the project root when there is none (the panel's drop message calls it "Root"). Files uploaded and folders made in the panel go into the current folder. It starts at Home whenever the panel appears and is not remembered.
+
 **Renders folder.** The `renders/` folder at the project root, where server-side renders are written as `render-{id}.mp4`, next to `jobs.json`, the render job history.
+
+**Project configuration.** The optional `helios.config.json` file at the project root, written by `helios init` and by installing a component. Studio reads it only for components: the folder components are installed into (`src/components/helios` unless it names another), the project's framework, a registry address, and the list of installed components. Without it, components cannot be installed. The verification project has none.
+
+**Component.** A piece of reusable code for compositions, such as a React timer or a watermark, that the Components panel copies into the project from the *component registry*. It is not a composition: installing one writes its source files into the project's components folder and lists it in the *project configuration*, and it does nothing until a composition's own code imports it.
+
+**Component registry.** The list of components the Components panel offers. `helios studio` reads it once, when it starts: from the address in the project configuration or in the `HELIOS_REGISTRY_URL` environment variable, if one is set and answers within 5 seconds, and otherwise from the list built into the `helios` command (four React components: `use-video-frame`, `timer`, `progress-bar`, and `watermark`). When the project configuration names a framework, only components for that framework and plain JavaScript ("vanilla") ones are offered.
 
 ## The preview
 
@@ -106,11 +124,23 @@ The vocabulary used across these documents. When a document uses one of these wo
 
 **Time prop.** An input prop that the schema declares as a number with the format "time", holding seconds. Each time prop with a numeric value shows on the composition track as a cyan diamond that can be dragged.
 
+**Prop field.** The control in a Props Editor row that shows one input prop and changes it. When the *schema* lists the prop, the field is made for the type it declares: a text box, a number box (with a slider when the schema gives both limits), a check box, a color field (a swatch and a text box), a drop-down menu, a date or clock-time picker, a *time field* (a box that shows a time prop as a timecode, not to be confused with the timeline's *timecode field*), an *asset field* (a text box that suggests the project's assets of one type and accepts one dropped on it), a *JSON box* (a text area that is applied only when it is left), or a nested list or object of further fields. A prop the schema does not list gets an *inferred* field, chosen from the kind of value it holds. Most fields apply every keystroke at once; the time field and the JSON box wait until they are left. The [prop fields](props/prop-fields.md) document owns them.
+
 **Auto-save.** The Props Editor writing the input props into the composition's default props in `composition.json`, about one second after they stop changing, with a "Composition updated" toast.
 
 **Markers.** Named points in time that the composition declares. They show on the timeline as small colored ticks.
 
 **Captions.** Timed text cues the composition carries. They show on the timeline as bars and can be edited in the Captions panel.
+
+**SRT file.** A SubRip caption file: blocks separated by blank lines, each made of an optional number line, a `HH:MM:SS,mmm --> HH:MM:SS,mmm` line, and the cue's text. It is the only format the Captions panel imports and exports; WebVTT files are refused there. The [Captions panel](panels/the-captions-panel.md) document owns the details.
+
+**Audio track.** One source of sound in the composition, as Studio lists it. The Audio panel lists every audio and video element in the composition's page, named by its `data-helios-track-id` attribute, else its `id`, else `track-0`, `track-1`, and so on by its position, together with any track the composition reports itself. The timeline draws a lane only for the tracks the composition reports (see [timeline tracks](playback/timeline-tracks.md)), so the Audio panel can list more tracks than the timeline shows.
+
+**Audio mix.** The per-track volume and mute set in the Audio panel, including what *solo* changes. It lives only in the running composition: it is not saved or remembered, and it is lost on reload, hot reload, and switching compositions. It shapes the preview and client-side exports, not server-side renders. The [audio mixer](panels/the-audio-mixer.md) document owns it.
+
+**Solo.** The Audio panel's "S" button on a track: it mutes every other track so that this one is heard alone, and pressing it again puts every track's mute back as it was when solo began.
+
+**Level meter.** The two small bars beside the Audio panel's title, titled "Master Levels" (the UI's words): the strength of the left and right channels of the sound coming from the composition's audio and video elements, updated on every frame the page draws while the Audio panel is shown.
 
 ## The stage view
 
@@ -184,11 +214,15 @@ These are the rows of every "Cancel and interrupt" table. The [input model](foun
 
 **Render settings.** The options in the Renders panel that shape a server-side render and a client-side export: mode (canvas or DOM), codec, bitrate, scale, and the like. They are remembered for all compositions.
 
+**Render mode.** The render setting shown as "Mode" in the Renders panel, which decides how a picture of a frame is taken from the composition. Canvas (the default) takes the picture from the first `<canvas>` element in the composition's page, so anything the composition draws outside that canvas is left out, and a composition with no canvas cannot be captured. DOM takes a picture of the composition's whole page. The same setting applies to server-side renders, client-side exports, snapshots, and thumbnails. The [server-side renders](output/server-renders.md#the-render-settings) document owns it.
+
 **Client-side export.** Rendering the playback range to an MP4 or WebM file inside the browser, without the server, and downloading it.
 
 **Snapshot.** A PNG of the current frame as captured from the composition, downloaded by the browser as `snapshot-{composition name}-{frame}.png`.
 
 **Job spec.** A JSON file describing how to render the playback range in chunks with the `helios` CLI, downloaded as `job-{timestamp}.json`.
+
+**Chunk.** One part of a job spec: a run of consecutive frames of the playback range, with the `helios render` command that renders them into a file of their own. A job spec has as many chunks as the Concurrency (Workers) render setting asks for (one by default), or fewer when there are fewer frames, all the same length except a shorter last one, and one `helios merge` command that joins the chunk files into the final video. The [snapshots and job specs](output/snapshots-and-job-specs.md) document owns it.
 
 ## Units
 

@@ -1,0 +1,2 @@
+# The root .gitignore ignores every output/ directory; this one is documentation.
+!output/

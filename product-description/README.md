@@ -200,7 +200,7 @@ Status is one of `not started`, `drafted`, or `verified`.
 | foundations/the-workspace.md | drafted |
 | foundations/the-preview-player.md | drafted |
 | stage/the-stage-view.md | drafted |
-| stage/the-stage-toolbar.md | not started |
+| stage/the-stage-toolbar.md | drafted |
 | playback/the-transport-controls.md | drafted |
 | playback/the-timeline.md | drafted |
 | playback/the-playback-range.md | drafted |
@@ -213,9 +213,9 @@ Status is one of `not started`, `drafted`, or `verified`.
 | props/prop-fields.md | not started |
 | assets/the-assets-panel.md | not started |
 | assets/asset-actions.md | not started |
-| output/server-renders.md | not started |
-| output/client-side-export.md | not started |
-| output/snapshots-and-job-specs.md | not started |
+| output/server-renders.md | drafted |
+| output/client-side-export.md | drafted |
+| output/snapshots-and-job-specs.md | drafted |
 | panels/the-captions-panel.md | not started |
 | panels/the-audio-mixer.md | not started |
 | panels/the-components-panel.md | not started |
