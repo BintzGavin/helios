@@ -4,21 +4,27 @@
  *
  * Asks fresh, headless Claude Code sessions for videos, in throwaway directories, with and
  * without the Helios plugin, then records per run: did it use Helios, did it produce an MP4,
- * does the MP4 match the request (duration, audio, size), how long it took and what it cost,
- * and where it failed. See README.md in this directory.
+ * does the MP4 match the request (duration, audio, size), does it pass the flash check, does the
+ * picture follow the music's beats, the pass/fail verdict, how long it took and what it cost, and
+ * where it failed. See README.md in this directory.
  *
- * No dependencies beyond Node 18+, the `claude` CLI, and ffmpeg/ffprobe on PATH.
+ * No dependencies beyond Node 18+, the `claude` CLI, and ffmpeg/ffprobe on PATH. The flash check
+ * also needs this repo's CLI built (packages/cli/dist).
  */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ensureTrack, trackStatus } from './track.mjs';
+import { ensureTrack, legacyTruth, trackStatus } from './track.mjs';
+import {
+  SYNC, computeVerdict, flashTool, frameMotion, runFlashCheck, scoreSync,
+} from './metrics.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
 const DEFAULT_PLUGIN = path.join(REPO, 'plugins', 'helios');
+const DEFAULT_CLI = path.join(REPO, 'packages', 'cli', 'bin', 'helios.js');
 
 const DEFAULTS = {
   model: 'claude-opus-5-5',
@@ -28,6 +34,7 @@ const DEFAULTS = {
   repeat: 1,
   conditions: 'baseline,helios',
   pluginDir: DEFAULT_PLUGIN,
+  heliosCli: DEFAULT_CLI,
   permissionMode: 'bypassPermissions',
   claudeBin: 'claude',
 };
@@ -42,6 +49,8 @@ const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
                            (default: ${rel(DEFAULTS.pluginDir)} in this repo)
   --skills-dir <path>      Instead of a plugin, wrap every SKILL.md under <path> (for example
                            skills/) in a throwaway skills-only plugin
+  --helios-cli <path>      CLI entry that runs \`helios check\` for the flash check
+                           (default: ${rel(DEFAULTS.heliosCli)}; build it first)
   --model <id>             Model for the sessions (default: ${DEFAULTS.model})
   --budget <usd>           Per-run --max-budget-usd cap (default: ${DEFAULTS.budget})
   --timeout-min <n>        Per-run wall-clock limit (default: ${DEFAULTS.timeoutMin})
@@ -52,13 +61,13 @@ const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
   --keep-workdirs          Keep each run's working directory (can be large: node_modules)
   --dry-run                Print what would run; spends and writes nothing
   --claude-bin <path>      claude executable (default: claude)
-  --rescore <dir>          Rebuild scoreboard.md/json from an existing results directory
+  --rescore <dir>          Re-measure and rebuild scoreboard.md/json from a results directory
 `;
 
 const FLAGS = new Set(['dryRun', 'keepWorkdirs']);
 const VALUES = new Set([
-  'prompts', 'conditions', 'pluginDir', 'skillsDir', 'model', 'budget', 'timeoutMin', 'parallel',
-  'repeat', 'permissionMode', 'out', 'claudeBin', 'rescore',
+  'prompts', 'conditions', 'pluginDir', 'skillsDir', 'heliosCli', 'model', 'budget', 'timeoutMin',
+  'parallel', 'repeat', 'permissionMode', 'out', 'claudeBin', 'rescore',
 ]);
 
 function parseArgs(argv) {
@@ -87,6 +96,10 @@ function parseArgs(argv) {
 
 function which(bin) {
   return spawnSync('sh', ['-c', `command -v ${bin}`], { encoding: 'utf8' }).status === 0;
+}
+
+function loadPrompts() {
+  return JSON.parse(fs.readFileSync(path.join(HERE, 'prompts.json'), 'utf8'));
 }
 
 function gitState(dir) {
@@ -379,7 +392,7 @@ function detectPipeline(workdir, commands, pluginName) {
   if (commands.some((c) => /\bffmpeg\b/.test(c))) tools.push('ffmpeg');
 
   const heliosCommands = commands.filter((c) =>
-    /@helios-project\/(cli|renderer)|\bhelios\s+(render|init|preview|studio|still|sheet|verify|doctor)\b/.test(c));
+    /@helios-project\/(cli|renderer)|\bhelios\s+(render|init|preview|studio|still|sheet|verify|doctor|analyze|check)\b/.test(c));
   const heliosInstalled = fs.existsSync(path.join(workdir, 'node_modules', '@helios-project'))
     || /"@helios-project\//.test(pkg);
   const heliosRender = heliosCommands.some((c) => /render|still|sheet/.test(c))
@@ -420,7 +433,45 @@ function failurePoint(run, exec, summary, deliverable, checkFailures) {
   return '';
 }
 
-function scoreRun(run, exec) {
+/** The scoring expectations for a prompt: what the run recorded, plus newer keys (like beatSync). */
+function scoringExpect(promptId, storedPrompts, currentPrompts) {
+  const stored = (storedPrompts || []).find((p) => p.id === promptId);
+  const current = (currentPrompts || []).find((p) => p.id === promptId);
+  return { ...(current?.expect || {}), ...(stored?.expect || {}) };
+}
+
+/**
+ * Flash, sync and the verdict for one run, written onto the result. `mp4` is the run's copy of
+ * its deliverable (null when there is none). A metric that cannot be measured now keeps an earlier
+ * measurement if the result has one, and is otherwise recorded as ok: null with a reason.
+ */
+function measureQuality(r, { mp4, missingReason, expect, truth, truthNote, tool, runDir }) {
+  if (mp4) {
+    const fresh = runFlashCheck(mp4, tool, { saveTo: runDir ? path.join(runDir, 'check.json') : null });
+    r.flash = fresh.ok == null && r.flash?.ok != null
+      ? { ...r.flash, note: `kept from an earlier scoring; re-running failed: ${fresh.reason}` }
+      : fresh;
+  } else if (!r.flash || r.flash.ok == null) {
+    r.flash = { ok: null, reason: missingReason };
+  }
+
+  if (!expect.beatSync) {
+    r.sync = null; // not asked of this prompt
+  } else if (mp4 && truth) {
+    const { detail, ...summary } = scoreSync(frameMotion(mp4, { maxSeconds: truth.duration + 1 }), truth);
+    if (detail && runDir) fs.writeFileSync(path.join(runDir, 'sync.json'), JSON.stringify({ ...summary, truthNote: truthNote ?? null, ...detail }));
+    r.sync = summary.ok == null && r.sync?.ok != null
+      ? { ...r.sync, note: `kept from an earlier scoring; re-measuring failed: ${summary.reason}` }
+      : { ...summary, ...(truthNote ? { truthNote } : {}) };
+  } else if (!r.sync || r.sync.ok == null) {
+    r.sync = { ok: null, score: null, reason: truth ? missingReason : 'no ground-truth beats recorded for these results' };
+  }
+
+  r.verdict = computeVerdict(r, expect);
+  return r;
+}
+
+function scoreRun(run, exec, ctx) {
   const summary = summariseTranscript(readTranscript(path.join(run.resultDir, 'transcript.jsonl')));
   const commands = summary.toolUses.filter((t) => t.name === 'Bash').map((t) => String(t.input.command || ''));
   const skillCalls = summary.toolUses
@@ -442,8 +493,9 @@ function scoreRun(run, exec) {
   const checkFailures = deliverable ? checkExpectations(run.prompt.expect || {}, probe, gifs) : [];
 
   let sheet = null;
+  let copy = null;
   if (deliverable && probe && !probe.error) {
-    const copy = path.join(run.resultDir, 'deliverable.mp4');
+    copy = path.join(run.resultDir, 'deliverable.mp4');
     fs.copyFileSync(deliverable.path, copy);
     if (contactSheet(copy, probe.durationSec, path.join(run.resultDir, 'sheet.png'))) sheet = 'sheet.png';
   }
@@ -476,6 +528,7 @@ function scoreRun(run, exec) {
     costUsd: r?.total_cost_usd ?? null,
     turns: r?.num_turns ?? null,
     resultSubtype: r?.subtype ?? null,
+    resultIsError: r ? Boolean(r.is_error) : null,
     timedOut: exec.timedOut,
     failure: failurePoint(run, exec, summary, deliverable, checkFailures),
     toolErrorCount: summary.toolErrors.length,
@@ -484,6 +537,14 @@ function scoreRun(run, exec) {
     sheet,
     workdir: run.opts.keepWorkdirs ? run.workdir : null,
   };
+  measureQuality(metrics, {
+    mp4: copy,
+    missingReason: deliverable ? 'the MP4 could not be read' : 'no MP4',
+    expect: run.prompt.expect || {},
+    truth: ctx.truth,
+    tool: ctx.tool,
+    runDir: run.resultDir,
+  });
   fs.writeFileSync(path.join(run.resultDir, 'metrics.json'), JSON.stringify(metrics, null, 2));
   return metrics;
 }
@@ -502,45 +563,158 @@ function median(values) {
   return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
 }
 
+const pct = (n, d) => (d ? `${n}/${d} (${Math.round((100 * n) / d)}%)` : '–');
+const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+
+/** "5/6", plus how many could not be measured. Counts only runs where the metric applies. */
+function rate(rs, get) {
+  const applicable = rs.map(get).filter((m) => m !== undefined);
+  if (!applicable.length) return '–';
+  const ok = applicable.filter((m) => m?.ok === true).length;
+  const na = applicable.filter((m) => m == null || m.ok == null).length;
+  return `${ok}/${applicable.length}${na ? ` (${na} n/a)` : ''}`;
+}
+
+function flashCell(r) {
+  if (!r.producedMp4) return '–';
+  const f = r.flash;
+  if (!f || f.ok == null) return 'n/a';
+  return f.ok ? `ok${f.maxPerSecond != null ? ` (max ${f.maxPerSecond}/s)` : ''}` : `FAIL (${f.maxPerSecond ?? '>3'}/s)`;
+}
+
+function syncCell(r, expect) {
+  if (!expect.beatSync) return '–';
+  const s = r.sync;
+  if (!r.producedMp4) return '–';
+  if (!s || s.ok == null) return 'n/a';
+  return `${s.ok ? 'ok' : 'FAIL'} ${fmt(s.score, 2)} · cov ${fmt(s.coverage, 2)} · r ${fmt(s.corr, 2)}`;
+}
+
+/** The verdict's reasons, with failurePoint()'s more specific wording (budget, last tool error) where it has one. */
+function whyFailed(r) {
+  if (!r.verdict) return r.failure || '';
+  if (r.verdict.pass) return '';
+  const reasons = [...r.verdict.reasons];
+  if (r.failure) {
+    const i = reasons.findIndex((x) => x.startsWith('the session '));
+    const j = reasons.indexOf('no MP4');
+    if (i !== -1) reasons[i] = r.failure;
+    else if (j !== -1 && r.failure.startsWith('no MP4')) reasons[j] = r.failure;
+  }
+  return reasons.join('; ');
+}
+
 function scoreboard(results, meta) {
+  const prompts = meta.prompts || [];
+  const expectOf = (r) => scoringExpect(r.prompt, prompts, meta.currentPrompts);
   const lines = [];
-  lines.push(`# Agent video scoreboard`, '');
-  lines.push(`${meta.startedAt} · model \`${meta.model}\` · $${meta.budget} cap per run · ${meta.timeoutMin} min limit`);
+  lines.push('# Agent video scoreboard', '');
+  lines.push(`${meta.startedAt} · model \`${meta.model}\` · $${meta.budget} cap per run · ${meta.timeoutMin} min limit${meta.rescoredAt ? ` · rescored ${meta.rescoredAt}` : ''}`);
   const pluginLine = describePluginLine(meta.plugin);
-  if (pluginLine) lines.push(`Helios condition: ${pluginLine}`);
+  if (pluginLine) lines.push('', `Helios condition: ${pluginLine}`);
+  if (meta.flashTool) {
+    lines.push('', `Flash check: ${meta.flashTool.available ? `\`${meta.flashTool.command.replace(REPO + path.sep, '')}\`` : `NOT AVAILABLE (${meta.flashTool.reason}). Runs with no earlier flash result show n/a and fail.`}`);
+  }
+  if (meta.track) {
+    lines.push('', `Music track: \`${meta.track.id}\`${meta.track.note ? ` (${meta.track.note})` : ''}; sync passes at score ≥ ${SYNC.minScore}, coverage ≥ ${SYNC.minCoverage}, r ≥ ${SYNC.minCorr}`);
+  }
   lines.push('');
-  lines.push('| Condition | Runs | MP4 | Passed checks | Used Helios | Median min | Mean $ | Total $ |');
-  lines.push('|---|---|---|---|---|---|---|---|');
+  lines.push('| Condition | Runs | Verdict pass | MP4 | Passed checks | Used Helios | Flash ok | Sync ok | Median min | Mean $ | Total $ |');
+  lines.push('|---|---|---|---|---|---|---|---|---|---|---|');
   const conditions = [...new Set(results.map((r) => r.condition))];
   for (const c of conditions) {
     const rs = results.filter((r) => r.condition === c);
     const costs = rs.map((r) => r.costUsd).filter((x) => x != null);
     const total = costs.reduce((a, b) => a + b, 0);
-    lines.push(`| ${c} | ${rs.length} | ${rs.filter((r) => r.producedMp4).length}/${rs.length} | ${rs.filter((r) => r.passed).length}/${rs.length} | ${rs.filter((r) => r.usedHelios).length}/${rs.length} | ${fmt(median(rs.map((r) => r.minutes)))} | ${costs.length ? fmt(total / costs.length, 2) : '–'} | ${fmt(total, 2)} |`);
+    const withMp4 = rs.filter((r) => r.producedMp4);
+    const synced = withMp4.filter((r) => expectOf(r).beatSync);
+    lines.push(`| ${c} | ${rs.length} | ${pct(rs.filter((r) => r.verdict?.pass).length, rs.length)} | ${rs.filter((r) => r.producedMp4).length}/${rs.length} | ${rs.filter((r) => r.passed).length}/${rs.length} | ${rs.filter((r) => r.usedHelios).length}/${rs.length} | ${rate(withMp4, (r) => r.flash ?? null)} | ${rate(synced, (r) => r.sync ?? null)} | ${fmt(median(rs.map((r) => r.minutes)))} | ${costs.length ? fmt(total / costs.length, 2) : '–'} | ${fmt(total, 2)} |`);
+  }
+
+  const promptIds = [...new Set(results.map((r) => r.prompt))];
+  if (results.some((r) => r.repeat > 1) || conditions.length > 1) {
+    lines.push('', `| Verdict by prompt | ${conditions.join(' | ')} |`, `|---|${conditions.map(() => '---|').join('')}`);
+    for (const id of promptIds) {
+      const cells = conditions.map((c) => {
+        const rs = results.filter((r) => r.prompt === id && r.condition === c);
+        return rs.length ? `${rs.filter((r) => r.verdict?.pass).length}/${rs.length}` : '–';
+      });
+      lines.push(`| ${id} | ${cells.join(' | ')} |`);
+    }
+  }
+
+  lines.push('');
+  lines.push('| Prompt | Condition | Verdict | Used Helios | Toolchain | MP4 | Duration (asked) | Audio | Size | Flash | Sync | Min | $ | Turns | Why it failed |');
+  lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+  for (const r of results) {
+    const expect = expectOf(r);
+    const helios = r.usedHelios
+      ? `yes${r.heliosSkillCalls?.length ? ` (skills: ${r.heliosSkillCalls.length})` : ''}`
+      : (r.heliosSkillCalls?.length ? `no (skills: ${r.heliosSkillCalls.length})` : 'no');
+    const why = whyFailed(r);
+    lines.push(`| ${r.prompt}${r.repeat > 1 ? ` #${r.repeat}` : ''} | ${r.condition} | ${r.verdict ? (r.verdict.pass ? 'PASS' : 'FAIL') : 'n/a'} | ${helios} | ${(r.tools || []).join(', ') || '–'} | ${r.producedMp4 ? (r.passed ? 'yes' : 'yes, off-spec') : 'no'} | ${fmt(r.probe?.durationSec, 2)} (${expect.durationSec ?? '–'}) | ${r.probe ? (r.probe.audio ? 'yes' : 'no') : '–'} | ${r.probe?.width ? `${r.probe.width}x${r.probe.height}` : '–'} | ${flashCell(r)} | ${syncCell(r, expect)} | ${fmt(r.minutes)} | ${fmt(r.costUsd, 2)} | ${r.turns ?? '–'} | ${cell(why.length > 240 ? `${why.slice(0, 239)}…` : why)} |`);
   }
   lines.push('');
-  lines.push('| Prompt | Condition | Used Helios | Toolchain | MP4 | Duration (asked) | Audio | Size | Min | $ | Turns | Failure |');
-  lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|');
-  const prompts = new Map(meta.prompts.map((p) => [p.id, p]));
-  for (const r of results) {
-    const asked = prompts.get(r.prompt)?.expect?.durationSec;
-    const helios = r.usedHelios
-      ? `yes${r.heliosSkillCalls.length ? ` (skills: ${r.heliosSkillCalls.length})` : ''}`
-      : (r.heliosSkillCalls.length ? `no (skills: ${r.heliosSkillCalls.length})` : 'no');
-    lines.push(`| ${r.prompt}${r.repeat > 1 ? ` #${r.repeat}` : ''} | ${r.condition} | ${helios} | ${r.tools.join(', ') || '–'} | ${r.producedMp4 ? (r.passed ? 'yes' : 'yes, off-spec') : 'no'} | ${fmt(r.probe?.durationSec, 2)} (${asked ?? '–'}) | ${r.probe ? (r.probe.audio ? 'yes' : 'no') : '–'} | ${r.probe?.width ? `${r.probe.width}x${r.probe.height}` : '–'} | ${fmt(r.minutes)} | ${fmt(r.costUsd, 2)} | ${r.turns ?? '–'} | ${(r.failure || '').replace(/\|/g, '\\|')} |`);
-  }
+  lines.push('`–` means the metric does not apply (no MP4, or a prompt without music). `n/a` means it applies but could not be measured, which fails the verdict.');
   lines.push('');
   return lines.join('\n');
 }
 
 function writeScoreboard(outDir, results, meta) {
-  fs.writeFileSync(path.join(outDir, 'scoreboard.json'), JSON.stringify({ meta, results }, null, 2));
+  const { currentPrompts, ...stored } = meta;
+  fs.writeFileSync(path.join(outDir, 'scoreboard.json'), JSON.stringify({ meta: stored, results }, null, 2));
   const md = scoreboard(results, meta);
   fs.writeFileSync(path.join(outDir, 'scoreboard.md'), md);
   return md;
 }
 
 // ---------------------------------------------------------------------------------------
+
+/** The truth a results directory was scored against: its own copy, or the legacy grid for old results. */
+function resultsTruth(dir, meta) {
+  const file = path.join(dir, 'track.truth.json');
+  if (fs.existsSync(file)) {
+    try {
+      const truth = JSON.parse(fs.readFileSync(file, 'utf8'));
+      return { truth, track: { id: truth.id, file: 'track.truth.json' } };
+    } catch { /* fall through */ }
+  }
+  if (!meta.track || meta.track.assumed) {
+    const truth = legacyTruth();
+    return { truth, truthNote: truth.note, track: { id: truth.id, assumed: true, note: 'assumed: these results predate recorded ground truth' } };
+  }
+  return { truth: null, track: { ...meta.track, note: 'track.truth.json is missing from the results directory' } };
+}
+
+function rescore(dir, opts) {
+  const file = path.join(dir, 'scoreboard.json');
+  if (!fs.existsSync(file)) throw new Error(`No scoreboard.json in ${dir}`);
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const meta = { ...data.meta, currentPrompts: loadPrompts() };
+  const { truth, truthNote, track } = resultsTruth(dir, meta);
+  const tool = flashTool(opts.heliosCli, { defaultEntry: DEFAULT_CLI });
+  if (!tool.available) console.error(`Flash check unavailable: ${tool.reason}`);
+  for (const r of data.results) {
+    const runDir = path.join(dir, r.id);
+    const copy = path.join(runDir, 'deliverable.mp4');
+    const hasRunDir = fs.existsSync(runDir);
+    measureQuality(r, {
+      mp4: fs.existsSync(copy) ? copy : null,
+      missingReason: r.producedMp4 ? 'the MP4 copy is not in the results directory' : 'no MP4',
+      expect: scoringExpect(r.prompt, meta.prompts, meta.currentPrompts),
+      truth,
+      truthNote,
+      tool,
+      runDir: hasRunDir ? runDir : null,
+    });
+    if (hasRunDir) fs.writeFileSync(path.join(runDir, 'metrics.json'), JSON.stringify(r, null, 2));
+  }
+  meta.rescoredAt = new Date().toISOString();
+  meta.flashTool = { available: tool.available, command: tool.command, reason: tool.reason ?? null };
+  if (data.results.some((r) => scoringExpect(r.prompt, meta.prompts, meta.currentPrompts).beatSync)) meta.track = track;
+  meta.sync = SYNC;
+  return writeScoreboard(dir, data.results, meta);
+}
 
 async function pool(items, size, worker) {
   const queue = [...items];
@@ -552,11 +726,10 @@ async function pool(items, size, worker) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const allPrompts = JSON.parse(fs.readFileSync(path.join(HERE, 'prompts.json'), 'utf8'));
+  const allPrompts = loadPrompts();
 
   if (opts.rescore) {
-    const data = JSON.parse(fs.readFileSync(path.join(opts.rescore, 'scoreboard.json'), 'utf8'));
-    console.log(writeScoreboard(opts.rescore, data.results, data.meta));
+    console.log(rescore(path.resolve(opts.rescore), opts));
     return;
   }
 
@@ -582,6 +755,7 @@ async function main() {
   const needsTrack = prompts.some((p) => (p.assets || []).includes('track.mp3'));
   const plugin = conditions.includes('helios') ? resolvePlugin(opts, outDir, { dryRun: opts.dryRun }) : null;
   if (plugin?.missing && !opts.dryRun) throw new Error(plugin.missing);
+  const tool = flashTool(opts.heliosCli, { defaultEntry: DEFAULT_CLI });
 
   const runs = [];
   for (let repeat = 1; repeat <= opts.repeat; repeat++) {
@@ -597,6 +771,9 @@ async function main() {
   console.log(`Worst case spend: $${(runs.length * opts.budget).toFixed(2)} (${runs.length} × $${opts.budget} cap)`);
   if (plugin) console.log(`Helios condition: ${describePluginLine(plugin)}`);
   if (needsTrack) console.log(`Music track: ${trackStatus(assetsDir)}`);
+  console.log(tool.available
+    ? `Flash check: ${tool.command}`
+    : `Flash check: NOT AVAILABLE: ${tool.reason}. Every MP4's verdict will fail; build the CLI and --rescore the results.`);
 
   if (opts.dryRun) {
     for (const run of runs) {
@@ -606,16 +783,23 @@ async function main() {
   }
 
   fs.mkdirSync(outDir, { recursive: true });
+  let truth = null;
   let track = null;
   if (needsTrack) {
     const generated = ensureTrack(assetsDir);
+    truth = generated.truth;
     // The scorer's copy; the agent only ever gets track.mp3.
     fs.copyFileSync(generated.truthFile, path.join(outDir, 'track.truth.json'));
-    track = { id: generated.truth.id, file: 'track.truth.json' };
+    track = { id: truth.id, file: 'track.truth.json' };
   }
   const finalPlugin = plugin?.kind === 'skills-dir' ? buildSkillsPlugin(plugin.source, outDir) : plugin;
   for (const run of runs) if (run.condition === 'helios') run.pluginDir = finalPlugin.pluginDir;
-  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts, track };
+
+  const meta = {
+    startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts,
+    track, sync: SYNC, flashTool: { available: tool.available, command: tool.command, reason: tool.reason ?? null },
+    currentPrompts: allPrompts,
+  };
 
   const results = [];
   await pool(runs, opts.parallel, async (run) => {
@@ -627,11 +811,11 @@ async function main() {
     }
     console.log(`▶ ${run.id} (${run.workdir})`);
     const exec = await runClaude(opts, run);
-    const metrics = scoreRun(run, exec);
+    const metrics = scoreRun(run, exec, { truth, tool });
     results.push(metrics);
-    console.log(`■ ${run.id}: ${metrics.passed ? 'PASS' : metrics.producedMp4 ? 'MP4 off-spec' : 'no MP4'}`
+    console.log(`■ ${run.id}: ${metrics.verdict.pass ? 'PASS' : 'FAIL'}`
       + ` · Helios ${metrics.usedHelios ? 'yes' : 'no'} · ${fmt(metrics.minutes)} min · $${fmt(metrics.costUsd, 2)}`
-      + `${metrics.failure ? ` · ${metrics.failure}` : ''}`);
+      + `${metrics.verdict.pass ? '' : ` · ${metrics.verdict.reasons.join('; ')}`}`);
     if (!opts.keepWorkdirs) fs.rmSync(run.workdir, { recursive: true, force: true });
     const order = new Map(runs.map((r, i) => [r.id, i]));
     results.sort((a, b) => order.get(a.id) - order.get(b.id));
