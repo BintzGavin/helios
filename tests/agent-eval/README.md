@@ -208,3 +208,26 @@ the beat and decays, which is what "pulse with the beat" usually means, passes.
 - **Results from before this scoring existed** have no recorded truth. They were made with the old fixed
   120 BPM track (a kick every 0.5 s from t = 0), so rescoring scores their sync against that grid and
   labels it `legacy-120bpm (assumed)` on the board.
+
+## Self-test
+
+```bash
+node --test tests/agent-eval/selftest.mjs
+```
+
+The self-test needs no network and no `claude`, and spends nothing: just Node and ffmpeg. It takes
+about 10 seconds and covers:
+- **The track:** it's deterministic, its truth has the expected shape, and the encoded mp3 lines up
+  with the synthesized audio to within 1 ms. An encoder delay would shift every beat.
+- **Sync:** it renders tiny videos with a box that flashes on the true beats, on the off-beats, at
+  random, on a fixed 120 BPM grid, or never. On-beat must pass and the others must fail, in that order.
+- **The verdict rules:** fixture results, including every kind of missing data.
+- **The flash plumbing:** a stand-in `helios check` that follows the CLI's JSON contract, plus
+  missing, unbuilt and old CLIs.
+- **`--dry-run`:** the plugin loads only for `helios` runs, and nothing is written.
+- **`--rescore`:** fixture result directories in the new format and in the format from before these
+  metrics existed.
+- **A full run** with a stand-in `claude` that writes a transcript and an MP4: the live scoring path
+  end to end.
+
+Set `HELIOS_EVAL_SELFTEST_KEEP=1` to keep its videos and fixture scoreboards for a look.
