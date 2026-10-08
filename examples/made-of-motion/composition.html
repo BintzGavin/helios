@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Made of Motion</title>
+<style>
+  html, body { margin: 0; overflow: hidden; background: #000; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="film" width="1440" height="1080"></canvas>
+<script type="module">
+  // Frame-exact Helios port of the fframes "made-of-motion" promo. Render with:
+  //   helios render composition.html --width 1440 --height 1080 --fps 24 --duration 20.375
+  import { Film, FPS, FRAMES } from './src/film.js';
+
+  const ctx = document.getElementById('film').getContext('2d');
+  const film = Film.load('assets');
+
+  window.renderAt = async (t) => {
+    const f = await film;
+    const frame = Math.min(FRAMES - 1, Math.max(0, Math.round(t * FPS)));
+    await f.prepare(frame);
+    f.render(ctx, frame);
+  };
+</script>
+</body>
+</html>
