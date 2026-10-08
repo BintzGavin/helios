@@ -113,11 +113,14 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 *Helios ships as one agent plugin in the Claude directory, the ChatGPT plugin directory and the Codex marketplace. Design and gates: [`docs/rfcs/2026-10-01-ai-host-distribution.md`](rfcs/2026-10-01-ai-host-distribution.md).*
 
 ### Phase 1 — List the skill plugin
-- [ ] **SKILLS**: Merge `feat/agent-video-entry-skill` in `helios-skills` (`plugins/helios`, entry skill `make-video`).
-- [ ] **SKILLS** *(done on `helios-skills` branch `feat/plugin-manifests`, unmerged)*: Add an Agent Plugins 1.0 `plugin.json`, `.codex-plugin/plugin.json` (interface metadata, `onboardingSkill`) and `.agents/plugins/marketplace.json` to `plugins/helios`.
+- [x] **SKILLS**: Merge `feat/agent-video-entry-skill` in `helios-skills` (`plugins/helios`, entry skill `make-video`).
+  - Merged there as #4. The plugin and the skill catalog have since moved into this repository (`plugins/helios/`, `skills/`), and `helios-skills` is deprecated.
+- [x] **SKILLS**: Add an Agent Plugins 1.0 `plugin.json`, `.codex-plugin/plugin.json` (interface metadata, `onboardingSkill`) and `.agents/plugins/marketplace.json` to `plugins/helios`.
+  - The marketplace files are at this repository's root: `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`.
 - [x] **CLI**: `helios skills install` and Studio's `skillsRoot` ship real skills.
-  - **Problem**: `packages/cli/scripts/bundle-skills.js` copies `.agents/skills/helios`, which holds only `dummy.ts`, so both ship nothing.
+  - **Problem**: `packages/cli/scripts/bundle-skills.js` copied `.agents/skills/helios`, which held only `dummy.ts`, so both shipped nothing.
   - **Goal**: bundle the `make-video` skill.
+  - **Now**: the script bundles `make-video` from `plugins/helios/skills/` and the catalog from `skills/`, which carries the `core`, `renderer`, `player` and `studio` skills Studio's assistant reads.
   - **Verification**: `helios skills install` in an empty directory writes `make-video/SKILL.md`.
 - [x] **DOCS**: Directory assets: logo and composer icon (`assets/brand/`), screenshots, support contact (GitHub issues).
 - [ ] **DOCS**: Privacy policy and terms. Drafts are on branch `docs/legal`, awaiting the maintainer's review.
@@ -135,7 +138,8 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - Renders through `render_video`.
 - [x] **CLI**: ChatGPT extension metadata on the same tools: `openai/ui` entrypoints `thread` and `global` (on `helios_library`).
 - [ ] **CLI**: ChatGPT structured settings (`openai/settings` read/update tools): default size, fps, preset, output folder.
-- [ ] **SKILLS** *(helios-skills#6, merges after the CLI release)*: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+- [x] **SKILLS**: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+  - `plugins/helios/.mcp.json` and `mcp.json` pin `@helios-project/cli@0.46.0`, a published release that ships `helios mcp`.
 - [x] **CLI**: Claude Desktop extension (`integrations/claude-desktop`, `.mcpb`), tested in the Chat and Code tabs.
 - [ ] **CLI**: Publish a CLI release with `helios mcp`, then attach `helios.mcpb` to a GitHub release.
 - [ ] **Gate**: In Claude Desktop and ChatGPT desktop, a brief becomes an inline preview, takes one revision by selection, and ends as an MP4 on disk without a terminal. Scripted in `tests/manual/`.
@@ -195,7 +199,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Why it matters**: this is the same root cause as the GSAP item above, and it fails
     **silently** — the CLI prints `Render complete!` and the MP4 probes as a perfectly
     valid 1920x1080/30fps file. Only frame sampling catches it. `guided/promo-video` in
-    `helios-skills` instructs agents to animate with motion.dev, so this is on the
+    `skills/` instructs agents to animate with motion.dev, so this is on the
     default authoring path.
   - **Workaround (composition side)**: retain every handle `animate()` returns and call
     `.pause()` on each before setting `window.helios`, which forces instantiation.

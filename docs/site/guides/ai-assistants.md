@@ -19,18 +19,22 @@ There are two pieces, and you can use either one or both:
 **Claude Code**
 
 ```text
-/plugin marketplace add BintzGavin/helios-skills
+/plugin marketplace add BintzGavin/helios
 /plugin install helios@helios
 ```
 
 **Codex**
 
 ```bash
-codex plugin marketplace add BintzGavin/helios-skills
+codex plugin marketplace add BintzGavin/helios
 codex plugin add helios@helios
 ```
 
 Then ask for a video, for example "Make a 15-second launch video for this project".
+
+**Other agents.** Install the skill with the [skills CLI](https://skills.sh). `npx skills add BintzGavin/helios` lists `make-video` and the rest of the Helios skill catalog, so you can pick the ones you want.
+
+The plugin lives in [`plugins/helios`](https://github.com/BintzGavin/helios/tree/main/plugins/helios) and the catalog in [`skills/`](https://github.com/BintzGavin/helios/tree/main/skills) of the Helios repository.
 
 ## Connect the MCP server
 

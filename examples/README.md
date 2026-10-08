@@ -6,8 +6,9 @@ animation library, or renderer.
 **These are integration references, not design references.** Each one is deliberately
 slim — enough to show the wiring and nothing more. Do not copy them as a starting point
 for the *look* of a video: they are barely styled, and they are not kept current with
-Helios' visual capabilities. To author a real composition, follow the guided skills in
-`.agents/skills/helios-skills/` and the API contract in `llms.txt`.
+Helios' visual capabilities. To author a real composition, follow the `make-video` skill in
+`plugins/helios/skills/make-video/`, the guided skills in `skills/guided/`, and the API
+contract in `llms.txt`.
 
 Larger, opinionated video examples were removed from this directory on 2026-07-31,
 precisely because they were being treated as a template to imitate.

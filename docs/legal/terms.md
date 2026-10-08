@@ -1,13 +1,13 @@
 # Helios terms of use
 
-**Last updated: 5 October 2026**
+**Last updated: 8 October 2026**
 
 These terms cover the Helios agent plugin, the Helios MCP server (`helios mcp`), the Claude Desktop extension, the Helios CLI, and Helios Cloud, the hosted service that AI assistants connect to.
 
 ## Licenses
 
 - The Helios engine packages (`@helios-project/*`, including the CLI and the MCP server) are licensed under the [Elastic License 2.0](https://github.com/BintzGavin/helios/blob/main/LICENSE).
-- The Helios skills and plugin manifests in [helios-skills](https://github.com/BintzGavin/helios-skills) are licensed under the [Apache License 2.0](https://github.com/BintzGavin/helios-skills/blob/main/LICENSE).
+- The Helios skills and plugin, in [`skills/`](https://github.com/BintzGavin/helios/tree/main/skills) and [`plugins/helios/`](https://github.com/BintzGavin/helios/tree/main/plugins/helios) of the Helios repository (skill files, plugin manifests and assets), are licensed under the [Apache License 2.0](https://github.com/BintzGavin/helios/blob/main/skills/LICENSE). The rest of that repository is licensed under the Elastic License 2.0 unless a file or folder says otherwise.
 
 Your use of the software is governed by those licenses. Among other things, the Elastic License 2.0 doesn't allow offering Helios to third parties as a hosted or managed service. Helios Cloud is a service, not software you receive, and these terms govern it.
 

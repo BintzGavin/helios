@@ -29,7 +29,7 @@ Three journeys, one package.
 1. **Coding agents: Claude Code, Codex.** Someone asks for a 20-second launch video for their repo.
    - The `make-video` skill loads.
    - The agent writes `video.html`, checks it with `helios verify` and a contact sheet, and renders `video.mp4` locally.
-   - This already works from the unmerged plugin in `helios-skills`. What's left is packaging and listings.
+   - This works today with the plugin in [`plugins/helios/`](../../plugins/helios/). What's left is the directory listings.
 2. **Desktop chat: Claude Desktop, ChatGPT desktop.** Same request, but through the local Helios MCP server.
    - The model writes the page, and an inline player appears in the chat.
    - The person scrubs to 3.2 s, clicks the headline and types "slower, and bigger". The view tells the model which time and element they picked.
@@ -41,7 +41,7 @@ Three journeys, one package.
 
 ## One package, many hosts
 
-The plugin lives in `helios-skills` under `plugins/helios/`. Work on it started on the `feat/agent-video-entry-skill` branch. The code lives in this repository and ships in `@helios-project/cli`; the plugin only points at a pinned version. That split keeps the skills repo under Apache-2.0 and the engine under ELv2.
+The plugin lives in this repository under [`plugins/helios/`](../../plugins/helios/), and the root `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json` point Claude Code and Codex at it (decision 1 below). It started in the separate `helios-skills` repository, which is now deprecated. The code ships in `@helios-project/cli`; the plugin only points at a pinned version. The plugin and the skill catalog in `skills/` are Apache-2.0, each with its own LICENSE file, and the engine stays under ELv2.
 
 ```text
 plugins/helios/
@@ -50,7 +50,8 @@ plugins/helios/
 ├── .codex-plugin/plugin.json    Codex and ChatGPT: interface metadata, onboarding skill
 ├── mcp.json, .mcp.json          Local server: npx -y @helios-project/cli@<pinned> mcp
 ├── skills/make-video/           Entry skill and its references
-└── assets/                      Logo, composer icon, screenshots
+├── assets/                      Logo, composer icon, screenshots
+└── LICENSE                      Apache-2.0
 ```
 
 | Host | Reads | MCP server | Where the view appears |
@@ -64,7 +65,7 @@ plugins/helios/
 
 A local stdio MCP App does work in ChatGPT desktop. OpenAI's bundled Code Review plugin ships exactly that: its `.mcp.json` starts a local process, and its tools declare `openai/ui` entrypoints of type `global`, `thread` and `settings`.
 
-Keep the plugin to a few skills. `make-video` is the entry, and deeper material lives in its `references/`. The 30-skill tree in `helios-skills` stays a separate catalog for `npx skills add`. Plugins discover skills at `skills/<name>/SKILL.md`, and a hosted server that serves skills over MCP (`io.modelcontextprotocol/skills`) is limited to 5 skills in ChatGPT.
+Keep the plugin to a few skills. `make-video` is the entry, and deeper material lives in its `references/`. The 30-skill catalog in [`skills/`](../../skills/) stays separate from the plugin, for `npx skills add BintzGavin/helios`. Plugins discover skills at `skills/<name>/SKILL.md`, and a hosted server that serves skills over MCP (`io.modelcontextprotocol/skills`) is limited to 5 skills in ChatGPT.
 
 ## Architecture: one server, two transports, three render placements
 
@@ -187,9 +188,9 @@ Directory review needs a privacy policy, terms, a support contact, a logo and sc
 
 ### Phase 1: list the skill plugin (days)
 
-- Merge `feat/agent-video-entry-skill` in `helios-skills`.
+- Merge `feat/agent-video-entry-skill` in `helios-skills`. *(Done; the plugin has since moved to `plugins/helios/` in this repository.)*
 - Add `plugin.json` (Agent Plugins 1.0), `.codex-plugin/plugin.json` with interface metadata, and `.agents/plugins/marketplace.json` for Codex.
-- Fix `helios skills install` and Studio's `skillsRoot`. Both currently ship no skills: `scripts/bundle-skills.js` copies `.agents/skills/helios`, which holds only `dummy.ts`.
+- Fix `helios skills install` and Studio's `skillsRoot`. Both shipped no skills: `scripts/bundle-skills.js` copied `.agents/skills/helios`, which held only `dummy.ts`. It now bundles `make-video` from `plugins/helios/skills/` and the catalog from `skills/`.
 - Prepare directory assets: logo, composer icon, three screenshots, and privacy-policy and terms URLs.
 - Submit to the Claude directory and the ChatGPT directory.
 
@@ -246,7 +247,7 @@ A separate RFC. This RFC only requires that nothing above rules it out.
 
 ## Open decisions for the maintainer
 
-1. **Plugin home.** `helios-skills/plugins/helios` (recommended; already started), or this monorepo.
+1. **Plugin home.** *Decided, 8 October 2026:* this monorepo. The plugin is in `plugins/helios/`, the skill catalog in `skills/`, and the marketplace files at the root, so `/plugin marketplace add BintzGavin/helios`, `codex plugin marketplace add BintzGavin/helios` and `npx skills add BintzGavin/helios` all read this repository. `helios-skills` is deprecated in favour of this repository.
 2. **Public identity for the listings.** Website, privacy policy, terms, support email, and the domain for the hosted endpoint.
 3. **Listing name.** "Helios" or "Helios Video".
 4. **Phase 1 gate thresholds.**

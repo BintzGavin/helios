@@ -60,7 +60,7 @@ https://github.com/user-attachments/assets/6713cddb-e509-400d-bb43-9961c7dbd128
 Run this in an existing repo (preferably your marketing site):
 
 ```bash
-npx skills add BintzGavin/helios-skills
+npx skills add BintzGavin/helios
 ```
 
 Then tell your agent something like:
@@ -68,6 +68,27 @@ Then tell your agent something like:
 ```bash
 generate a product demo video using the guided helios skill.
 ```
+
+### Or install the Helios plugin
+
+The plugin gives Claude Code and Codex the `make-video` skill and the Helios MCP server.
+
+**Claude Code**
+
+```text
+/plugin marketplace add BintzGavin/helios
+/plugin install helios@helios
+```
+
+**Codex**
+
+```bash
+codex plugin marketplace add BintzGavin/helios
+codex plugin add helios@helios
+```
+
+The skills live in [`skills/`](./skills/) and the plugin in [`plugins/helios/`](./plugins/helios/). For Claude Desktop, ChatGPT and other MCP hosts, see [Use Helios from Claude, ChatGPT and Codex](./docs/site/guides/ai-assistants.md).
+
 ---
 
 ## Quick Start
@@ -386,7 +407,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Captions/subtitles** | 🟡 Standard (SRT) | 🟢 Built-in |
 | **Audio mixing** | 🟢 Client-side (WebCodecs) | 🟢 Advanced |
 | **MCP Server** | 🟡 Planned | 🟢 Available |
-| **Agent Skills** | 🟡 Local only | 🟢 `npx skills add` |
+| **Agent Skills** | 🟢 `npx skills add`, Claude Code and Codex plugin | 🟢 `npx skills add` |
 | **Transitions library** | 🟢 Available | 🟢 `@remotion/transitions` |
 | **Sequence/Series** | 🔴 Not yet | 🟢 Built-in components |
 
@@ -629,6 +650,8 @@ A seamless local development workflow is crucial for productivity. We recommend 
 ## License
 
 Helios Engine is licensed under the **Elastic License 2.0 (ELv2)**. This license is designed to encourage widespread adoption while protecting our ability to build a SaaS platform.
+
+The agent skills in [`skills/`](./skills/) and the agent plugin in [`plugins/helios/`](./plugins/helios/) (its manifests, assets and the `make-video` skill) are licensed under the **Apache License 2.0**; each folder has its own LICENSE file. The rest of this repository is under ELv2 unless a file or folder says otherwise.
 
 ### What This Means
 

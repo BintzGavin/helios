@@ -92,14 +92,15 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io/Docker/K8s/Modal/Deno Deploy/Vercel/Hetzner/Cloudflare Sandbox) | Available |
 
 ## Agent Skills
-Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
-- `.agents/skills/helios-skills/skills/core/SKILL.md` - Core API patterns, state management, subscriptions
-- `.agents/skills/helios-skills/skills/renderer/SKILL.md` - Rendering pipeline usage
-- `.agents/skills/helios-skills/skills/player/SKILL.md` - Player component usage
-- `.agents/skills/helios-skills/skills/studio/SKILL.md` - Studio usage and extensions
-- `.agents/skills/helios-skills/skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
-- `.agents/skills/helios-skills/skills/workflows/*.md`, `.agents/skills/helios-skills/skills/examples/*.md` & `.agents/skills/helios-skills/skills/guided/*.md` - Task-specific workflows, examples, and guided skills
-- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills
+The entry skill ships in the Helios agent plugin (`plugins/helios/`); the rest of the catalog is in `skills/` (install with `npx skills add BintzGavin/helios`):
+- `plugins/helios/skills/make-video/SKILL.md` - Entry skill: one HTML page with `window.renderAt(t)`, rendered frame-exact to MP4, checked with stills and contact sheets
+- `skills/core/SKILL.md` - Core API patterns, state management, subscriptions
+- `skills/renderer/SKILL.md` - Rendering pipeline usage
+- `skills/player/SKILL.md` - Player component usage
+- `skills/studio/SKILL.md` - Studio usage and extensions
+- `skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
+- `skills/workflows/*/SKILL.md`, `skills/examples/*/SKILL.md`, `skills/guided/*/SKILL.md` & `skills/design/*/SKILL.md` - Task-specific workflows, examples, guided and design skills
+- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills (for this repo's agents)
 
 ## Key Files for Agents
 - `README.md` - Vision document
