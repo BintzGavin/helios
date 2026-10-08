@@ -11,7 +11,10 @@ import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } f
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
-import { beatsText, parseJsonObject, summarizeBeats, summarizeVerify, verifyText } from './reports.js';
+import {
+  beatsText, parseJsonObject, summarizeBeats, summarizeCheck, summarizeVerify, verifyText,
+  type RenderChecks,
+} from './reports.js';
 
 export const PLAYER_URI = 'ui://helios/player';
 export const PLAYER_MIME_TYPE = 'text/html;profile=mcp-app';
@@ -58,6 +61,11 @@ function revealWithSystem(absPath: string, open: boolean): Promise<void> {
 /** Timed-text files verify_video checks against the page. */
 const CUE_FILES = /\.(srt|vtt|json)$/i;
 
+/** How long a render result waits for `helios check` before saying it is still running. */
+const DEFAULT_CHECK_WAIT_MS = 15_000;
+/** `helios check` is stopped after this long; it reads the video once at a small size. */
+const CHECK_TIMEOUT_MS = 10 * 60_000;
+
 /** Largest page preview_video will save, in characters. */
 const MAX_PAGE_CHARS = 4_000_000;
 
@@ -80,6 +88,8 @@ export interface HeliosMcpOptions {
   reveal?: (absPath: string, open: boolean) => Promise<void>;
   /** Grace period between SIGTERM and SIGKILL when a render is cancelled. */
   killGraceMs?: number;
+  /** How long a finished render's result waits for `helios check` (default 15 s); it keeps running after that. */
+  checkWaitMs?: number;
 }
 
 export interface HeliosMcp {
@@ -147,6 +157,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   const viewPath = options.viewPath ?? defaultViewPath();
   const buildShim = options.buildShim ?? defaultBuildShim;
   const reveal = options.reveal ?? revealWithSystem;
+  const checkWaitMs = options.checkWaitMs ?? DEFAULT_CHECK_WAIT_MS;
 
   const server = new McpServer({ name: 'helios', version: options.version ?? packageVersion() });
 
@@ -194,6 +205,17 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     bytes: z.number().optional(),
     error: z.string().optional(),
     logTail: z.array(z.string()).optional(),
+    checks: z.object({
+      status: z.enum(['passed', 'failed', 'error', 'running']),
+      message: z.string(),
+      problems: z.array(z.string()),
+      warnings: z.array(z.string()),
+      flash: z.object({
+        ok: z.boolean(),
+        maxPerSecond: z.number().optional(),
+        worst: z.object({ t0: z.number(), t1: z.number(), count: z.number() }).nullable(),
+      }).optional(),
+    }).optional().describe('helios check on the finished MP4: flashing (WCAG 2.3.1), colour tags, frame count'),
   };
 
   // ---- Model tools that open the view ------------------------------------------------------
@@ -371,14 +393,64 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     }
   }
 
-  function renderResult(job: RenderJob): CallToolResult {
+  /** One `helios check` per finished render, started the first time a result reports it. */
+  const checks = new WeakMap<RenderJob, Promise<RenderChecks>>();
+
+  async function runChecks(job: RenderJob): Promise<RenderChecks> {
+    const failed = (reason: string): RenderChecks => ({
+      status: 'error',
+      // One line, even when the reason is the last lines of stderr.
+      message: `Checks: could not check ${job.outputRel}: ${reason.replace(/\s*\n\s*/g, ' ')}`,
+      problems: [],
+      warnings: [],
+    });
+    try {
+      const result = await runCli(runner, ['check', job.output, '--json'], root, AbortSignal.timeout(CHECK_TIMEOUT_MS));
+      const report = parseJsonObject(result.stdout);
+      // Exit 1 with a report is a failed check; exit 1 without one is a check that couldn't run.
+      if (report && (result.code === 0 || result.code === 1)) return summarizeCheck(report);
+      if (result.code === 0) return failed('helios check printed no report.');
+      return failed(result.error?.message || errorFromStderr(result.stderr, 'Check failed:') || `helios check exited with ${result.signal ?? `code ${result.code}`}`);
+    } catch (err) {
+      return failed(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  /** The finished render's checks, or a "still running" note once checkWaitMs has passed. */
+  async function checksFor(job: RenderJob): Promise<RenderChecks> {
+    let pending = checks.get(job);
+    if (!pending) {
+      pending = runChecks(job);
+      checks.set(job, pending);
+    }
+    let timer: NodeJS.Timeout | undefined;
+    const waiting = new Promise<RenderChecks>((resolve) => {
+      timer = setTimeout(() => resolve({
+        status: 'running',
+        message: `Checks: still checking ${job.outputRel}; get_render_status with jobId "${job.id}" reports them.`,
+        problems: [],
+        warnings: [],
+      }), checkWaitMs);
+    });
+    try {
+      return await Promise.race([pending, waiting]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function renderResult(job: RenderJob): Promise<CallToolResult> {
     const snapshot = jobs.snapshot(job);
     let text: string;
     switch (job.status) {
-      case 'completed':
+      case 'completed': {
         text = `Rendered ${job.outputRel} (${job.duration !== undefined ? `${job.duration.toFixed(1)} s requested, ` : ''}` +
           `${formatBytes(job.bytes ?? 0)}) in ${Math.round(snapshot.elapsedSeconds)} s. It is at ${job.output}`;
+        const checked = await checksFor(job);
+        snapshot.checks = checked;
+        text += `\n${checked.message}`;
         break;
+      }
       case 'failed':
         text = `Render of ${job.outputRel} failed: ${job.error ?? 'unknown error'}`;
         break;
@@ -401,7 +473,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description:
         'Renders a Helios video page to an MP4 on this machine (Chromium and FFmpeg). ' +
         'If it is not done within waitSeconds it keeps rendering in the background and returns a jobId for get_render_status. ' +
-        'Run verify_video first on a new or changed page: a page whose frames are not a function of time alone renders wrong.',
+        'Run verify_video first on a new or changed page: a page whose frames are not a function of time alone renders wrong. ' +
+        'A finished render is checked for flashing (WCAG 2.3.1) and colour tags, and the result says what failed.',
       inputSchema: {
         path: pagePath,
         output: z.string().min(1).optional().describe('Output file, relative to the project root (default: the page name with .mp4, next to the page)'),
@@ -446,7 +519,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         throw err;
       }
       await waitForJob(job, args.waitSeconds, extra);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 
@@ -469,7 +542,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       const job = jobs.get(args.jobId);
       if (!job) return toolError(`No render with jobId "${args.jobId}". Start one with render_video.`);
       await waitForJob(job, args.waitSeconds, extra);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 
@@ -486,7 +559,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     guard(async (args) => {
       const job = jobs.cancel(args.jobId);
       if (!job) return toolError(`No render with jobId "${args.jobId}".`);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 

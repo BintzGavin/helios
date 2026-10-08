@@ -2,7 +2,7 @@ import path from 'path';
 import { stripAnsi } from './cli-runner.js';
 
 /**
- * Reads what `helios analyze` and `helios verify --json` write, and turns
+ * Reads what `helios analyze`, `helios check --json` and `helios verify --json` write, and turns
  * it into the short text and structured content the MCP tools return. Every field is checked
  * and copied, never passed through: a structuredContent that doesn't match the tool's
  * outputSchema fails the whole call, and these files come from another process and version.
@@ -26,6 +26,10 @@ function round(n: number, places: number): number {
 /** Seconds as a short number: 9.64, 12.5, 3. */
 function secs(n: number): string {
   return String(round(n, 2));
+}
+
+function strings(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.trim() !== '') : [];
 }
 
 /** A time list: numbers, or objects with a `t`. */
@@ -162,6 +166,56 @@ export function beatsText(summary: BeatsSummary): string {
     'Every time in it is in seconds of song time; bar k starts at downbeats[k].',
   );
   return lines.join('\n');
+}
+
+// ---- helios check --------------------------------------------------------------------------
+
+export interface RenderChecks {
+  [key: string]: unknown;
+  /** passed or failed: helios check ran; error: it couldn't; running: it hasn't finished yet. */
+  status: 'passed' | 'failed' | 'error' | 'running';
+  /** The one line a render result adds to its text. */
+  message: string;
+  problems: string[];
+  warnings: string[];
+  flash?: { ok: boolean; maxPerSecond?: number; worst: { t0: number; t1: number; count: number } | null };
+}
+
+/** "bt709" → "BT.709"; other tags are shown as written. */
+function colorName(tag: string): string {
+  const bt = /^bt(\d+)/i.exec(tag);
+  return bt ? `BT.${bt[1]}` : tag;
+}
+
+export function summarizeCheck(data: Json): RenderChecks {
+  const problems = strings(data.problems);
+  const warnings = strings(data.warnings);
+  const ok = typeof data.ok === 'boolean' ? data.ok : problems.length === 0;
+
+  let flash: RenderChecks['flash'];
+  if (isObject(data.flash)) {
+    const worst = isObject(data.flash.worst) && num(data.flash.worst.t0) !== undefined && num(data.flash.worst.t1) !== undefined
+      ? { t0: num(data.flash.worst.t0)!, t1: num(data.flash.worst.t1)!, count: num(data.flash.worst.count) ?? 0 }
+      : null;
+    flash = { ok: data.flash.ok !== false, worst };
+    if (num(data.flash.maxPerSecond) !== undefined) flash.maxPerSecond = num(data.flash.maxPerSecond);
+  }
+
+  let message: string;
+  if (!ok) {
+    message = `Checks: ${[...(problems.length ? problems : ['helios check reported a problem without saying which.']), ...warnings].join(' ')}`;
+  } else {
+    const passed: string[] = [];
+    if (flash?.ok) passed.push('no flashing above WCAG 2.3.1');
+    const color = isObject(data.video) && isObject(data.video.color) ? data.video.color : undefined;
+    const tag = color && [color.matrix, color.primaries, color.transfer].find((v): v is string => typeof v === 'string' && v !== '');
+    if (tag) passed.push(`colour tagged ${colorName(tag)}`);
+    message = `Checks: ${passed.length ? passed.join('; ') : 'passed'}.${warnings.length ? ` ${warnings.join(' ')}` : ''}`;
+  }
+
+  const checks: RenderChecks = { status: ok ? 'passed' : 'failed', message, problems, warnings };
+  if (flash) checks.flash = flash;
+  return checks;
 }
 
 // ---- helios verify --json ------------------------------------------------------------------

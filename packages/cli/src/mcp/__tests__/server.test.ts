@@ -48,6 +48,31 @@ function fakeRunner(onCall: (call: FakeCall) => void = () => {}) {
   return { runner, calls };
 }
 
+/** What `helios check --json` prints for a clean render. */
+const CHECK_PASS = {
+  ok: true,
+  file: 'a.mp4',
+  video: {
+    codec: 'h264', width: 1920, height: 1080, fps: 30, duration: 4, frames: 120, pixFmt: 'yuv420p',
+    color: { matrix: 'bt709', primaries: 'bt709', transfer: 'bt709', range: 'tv' },
+  },
+  audio: null,
+  flash: { ok: true, maxPerSecond: 1, worst: { t0: 3, t1: 4, count: 1 }, red: false },
+  problems: [],
+  warnings: [],
+};
+
+/** Answers a `helios check` call with a passing report. */
+function passCheck(c: FakeCall) {
+  c.out(`${JSON.stringify(CHECK_PASS, null, 2)}\n`);
+  c.exit(0);
+}
+
+/** A fake runner that sends `helios check` calls to onCheck and everything else to onCall. */
+function renderRunner(onCall: (call: FakeCall) => void = () => {}, onCheck: (call: FakeCall) => void = passCheck) {
+  return fakeRunner((c) => (c.args[0] === 'check' ? onCheck(c) : onCall(c)));
+}
+
 const SHIM = 'window.__shim = "</script><img src=x>";';
 const VIEW = '<!doctype html><html><body><script>const PAGE_SHIM = "__HELIOS_PAGE_SHIM__";</script></body></html>';
 
@@ -58,7 +83,7 @@ let client: Client;
 
 let revealed: Array<{ path: string; open: boolean }>;
 
-async function connect(runner: CliRunner = fakeRunner().runner) {
+async function connect(runner: CliRunner = fakeRunner().runner, options: { checkWaitMs?: number } = {}) {
   revealed = [];
   helios = createHeliosMcpServer({
     root,
@@ -68,6 +93,8 @@ async function connect(runner: CliRunner = fakeRunner().runner) {
     buildShim: () => SHIM,
     version: '9.9.9',
     killGraceMs: 50,
+    checkWaitMs: 2000,
+    ...options,
   });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   client = new Client({ name: 'test-host', version: '1.0.0' });
@@ -166,6 +193,7 @@ describe('helios MCP server: listing', () => {
     // It writes the beats file, always the same one for the same audio.
     expect(byName.analyze_audio.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: false, idempotentHint: true });
     expect((byName.verify_video.inputSchema.properties as any).cues).toMatchObject({ type: 'string' });
+    expect((byName.render_video.outputSchema!.properties as any).checks).toBeDefined();
     expect((byName.render_video.inputSchema.properties as any).preset.enum).toContain('veryslow');
     expect((byName.render_video.inputSchema.properties as any).waitSeconds).toMatchObject({ default: 45, minimum: 0, maximum: 100 });
   });
@@ -379,7 +407,7 @@ describe('helios MCP server: rendering', () => {
   it('maps render_video arguments to the CLI flags and reports completion', async () => {
     write('v/intro.html', '<html></html>');
     write('music/song.mp3', 'x');
-    const fake = fakeRunner((c) => {
+    const fake = renderRunner((c) => {
       c.out('Initializing renderer...\nProgress: Rendered 30 / 60 frames\n');
       write('renders/final.mp4', Buffer.alloc(2048));
       c.out('Render complete.\n');
@@ -400,7 +428,7 @@ describe('helios MCP server: rendering', () => {
       waitSeconds: 5,
     });
 
-    expect(fake.calls).toHaveLength(1);
+    expect(fake.calls).toHaveLength(2);
     expect(fake.calls[0].cwd).toBe(root);
     expect(fake.calls[0].args).toEqual([
       'render', path.join(root, 'v/intro.html'),
@@ -458,7 +486,7 @@ describe('helios MCP server: rendering', () => {
 
   it('returns running after waitSeconds, then completes through get_render_status with progress', async () => {
     write('a.html');
-    const fake = fakeRunner((c) => c.out('Progress: Rendered 0 / 100 frames\n'));
+    const fake = renderRunner((c) => c.out('Progress: Rendered 0 / 100 frames\n'));
     await connect(fake.runner);
 
     const started = await call('render_video', { path: 'a.html', duration: 4, waitSeconds: 0.05 });
@@ -529,6 +557,9 @@ describe('helios MCP server: rendering', () => {
       error: 'How long should the video be? Pass --duration <seconds>: it defines no window.helios or window.renderAt(t).',
     });
     expect(result.content[0].text).toMatch(/^Render of a\.mp4 failed: How long/);
+    // Only a finished MP4 is checked.
+    expect(fake.calls).toHaveLength(1);
+    expect(result.structuredContent.checks).toBeUndefined();
   });
 
   it('allows two renders at a time and names the running jobs on a third', async () => {
@@ -920,5 +951,208 @@ describe('helios MCP server: verify_video with timed text', () => {
     const result = await call('verify_video', { path: 'a.html', cues: 'bad.vtt' });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Could not verify a.html: bad.vtt is not a WebVTT file: it must start with WEBVTT');
+  });
+});
+
+// ---- Checks after a render --------------------------------------------------------------------------
+
+/** A render that writes its output and finishes. */
+function finishRender(c: FakeCall) {
+  fs.writeFileSync(c.args[c.args.indexOf('-o') + 1], Buffer.alloc(10));
+  c.exit(0);
+}
+
+describe('helios MCP server: checks after a render', () => {
+  it('runs helios check once on the finished MP4 and adds its result', async () => {
+    write('a.html');
+    const fake = renderRunner(finishRender);
+    await connect(fake.runner);
+
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    expect(fake.calls.map((c) => c.args)).toEqual([
+      ['render', path.join(root, 'a.html'), '-o', path.join(root, 'a.mp4')],
+      ['check', path.join(root, 'a.mp4'), '--json'],
+    ]);
+    expect(fake.calls[1].cwd).toBe(root);
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toMatch(/^Rendered a\.mp4 \(10 B\) in \d+ s\. It is at .*a\.mp4\nChecks: no flashing above WCAG 2\.3\.1; colour tagged BT\.709\.$/);
+    expect(result.structuredContent).toMatchObject({ status: 'completed', bytes: 10 });
+    expect(result.structuredContent.checks).toEqual({
+      status: 'passed',
+      message: 'Checks: no flashing above WCAG 2.3.1; colour tagged BT.709.',
+      problems: [],
+      warnings: [],
+      flash: { ok: true, maxPerSecond: 1, worst: { t0: 3, t1: 4, count: 1 } },
+    });
+
+    // Later results reuse the same check.
+    const jobId = result.structuredContent.jobId;
+    const again = await call('get_render_status', { jobId, waitSeconds: 0 });
+    expect(again.structuredContent.checks).toEqual(result.structuredContent.checks);
+    expect(again.content[0].text).toContain('\nChecks: no flashing above WCAG 2.3.1; colour tagged BT.709.');
+    expect(fake.calls).toHaveLength(2);
+  });
+
+  it('checks a render whose completion get_render_status sees, and not while it runs', async () => {
+    write('a.html');
+    const fake = renderRunner();
+    await connect(fake.runner);
+    const started = await call('render_video', { path: 'a.html', waitSeconds: 0 });
+    expect(started.structuredContent.status).toBe('running');
+    expect(started.structuredContent.checks).toBeUndefined();
+    expect(started.content[0].text).not.toContain('Checks:');
+    expect(fake.calls).toHaveLength(1);
+
+    finishRender(fake.calls[0]);
+    const done = await call('get_render_status', { jobId: started.structuredContent.jobId, waitSeconds: 5 });
+    expect(done.structuredContent).toMatchObject({ status: 'completed', checks: { status: 'passed' } });
+    expect(fake.calls.map((c) => c.args[0])).toEqual(['render', 'check']);
+  });
+
+  it('reports a failed check, and its warnings, in a successful render result', async () => {
+    write('a.html');
+    const problem = 'The video flashes 5 times in one second at 3–4 s, above the WCAG 2.3.1 limit of 3: slow the flashes or make them smaller.';
+    const warning = 'The video has no color tags: players may show it washed out. Re-render with this Helios version.';
+    const fake = renderRunner(finishRender, (c) => {
+      c.out(JSON.stringify({
+        ...CHECK_PASS,
+        ok: false,
+        video: { ...CHECK_PASS.video, color: { matrix: null, primaries: null, transfer: null, range: null } },
+        flash: { ok: false, maxPerSecond: 5, worst: { t0: 3, t1: 4, count: 5 }, red: false },
+        problems: [problem],
+        warnings: [warning],
+      }));
+      c.exit(1);
+    });
+    await connect(fake.runner);
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent.status).toBe('completed');
+    expect(result.structuredContent.checks).toEqual({
+      status: 'failed',
+      message: `Checks: ${problem} ${warning}`,
+      problems: [problem],
+      warnings: [warning],
+      flash: { ok: false, maxPerSecond: 5, worst: { t0: 3, t1: 4, count: 5 } },
+    });
+    expect(result.content[0].text.split('\n')[1]).toBe(`Checks: ${problem} ${warning}`);
+  });
+
+  it('adds warnings to a passing check that found no colour tags', async () => {
+    write('a.html');
+    const warning = 'The video has no color tags: players may show it washed out. Re-render with this Helios version.';
+    const fake = renderRunner(finishRender, (c) => {
+      c.out(JSON.stringify({
+        ...CHECK_PASS,
+        video: { ...CHECK_PASS.video, color: { matrix: null, primaries: null, transfer: null, range: null } },
+        flash: { ok: true, maxPerSecond: 0, worst: null, red: false },
+        warnings: [warning],
+      }));
+      c.exit(0);
+    });
+    await connect(fake.runner);
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    expect(result.structuredContent.checks).toMatchObject({ status: 'passed', flash: { ok: true, worst: null } });
+    expect(result.content[0].text.split('\n')[1]).toBe(`Checks: no flashing above WCAG 2.3.1. ${warning}`);
+  });
+
+  it('says in one line when the check itself fails, and keeps the render successful', async () => {
+    write('a.html');
+    const fake = renderRunner(finishRender, (c) => {
+      c.err('Check failed: ffmpeg could not read a.mp4: moov atom not found\n');
+      c.exit(1);
+    });
+    await connect(fake.runner);
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toMatchObject({
+      status: 'completed',
+      checks: {
+        status: 'error',
+        message: 'Checks: could not check a.mp4: ffmpeg could not read a.mp4: moov atom not found',
+        problems: [],
+        warnings: [],
+      },
+    });
+    expect(result.content[0].text.split('\n')).toHaveLength(2);
+    expect(result.content[0].text.split('\n')[1]).toBe('Checks: could not check a.mp4: ffmpeg could not read a.mp4: moov atom not found');
+  });
+
+  it('treats a check that prints no report as a check error', async () => {
+    write('a.html');
+    const fake = renderRunner(finishRender, (c) => { c.out('error: unknown command \'check\'\n'); c.exit(0); });
+    await connect(fake.runner);
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    expect(result.structuredContent.checks).toMatchObject({ status: 'error', message: 'Checks: could not check a.mp4: helios check printed no report.' });
+  });
+
+  it('reports a slow check as still running, then its result on the next status call', async () => {
+    write('a.html');
+    const fake = renderRunner(finishRender, () => {});
+    await connect(fake.runner, { checkWaitMs: 50 });
+    const result = await call('render_video', { path: 'a.html', waitSeconds: 5 });
+    const jobId = result.structuredContent.jobId;
+    expect(result.structuredContent).toMatchObject({ status: 'completed', checks: { status: 'running' } });
+    expect(result.content[0].text.split('\n')[1]).toBe(`Checks: still checking a.mp4; get_render_status with jobId "${jobId}" reports them.`);
+
+    passCheck(fake.calls[1]);
+    const later = await call('get_render_status', { jobId, waitSeconds: 0 });
+    expect(later.structuredContent.checks.status).toBe('passed');
+    expect(fake.calls.map((c) => c.args[0])).toEqual(['render', 'check']);
+  });
+
+  it('does not check a cancelled render', async () => {
+    write('a.html');
+    const fake = renderRunner();
+    await connect(fake.runner);
+    const started = await call('render_video', { path: 'a.html', waitSeconds: 0 });
+    const cancelled = await call('cancel_render', { jobId: started.structuredContent.jobId });
+    expect(cancelled.structuredContent.checks).toBeUndefined();
+    fake.calls[0].exit(null, 'SIGTERM');
+    await tick();
+    expect(fake.calls).toHaveLength(1);
+  });
+});
+
+describe('helios MCP server: new results match their output schemas', () => {
+  it('analyze_audio, verify_video and render_video results pass a JSON Schema 2020-12 validator', async () => {
+    write('a.html');
+    write('song.mp3', 'x');
+    write('words.json', '[]');
+    const verifyReport = {
+      ok: false,
+      purity: { ok: false, samples: 6, differing: [1, { t: 2 }, 'x'], noisy: [3], message: 'Frames at 1s, 2s differ.' },
+      cues: { ok: false, total: 2, shown: 1, missing: [{ text: 'hi', start: 1, end: 2, seen: 7 }], message: '1 of 2 cues.' },
+      extra: { anything: true },
+    };
+    const fake = fakeRunner((c) => {
+      if (c.args[0] === 'analyze') {
+        fs.writeFileSync(c.args[c.args.indexOf('-o') + 1], JSON.stringify({ ...BEATS, sections: [{ t0: 0, t1: 1 }, { t0: 'x' }], hits: [{ t: 1 }, null] }));
+        c.exit(0);
+      } else if (c.args[0] === 'verify') {
+        c.out(JSON.stringify(verifyReport));
+        c.exit(1);
+      } else if (c.args[0] === 'check') {
+        c.out(JSON.stringify({ ok: true, flash: { ok: true, worst: { t0: 'x' } }, problems: [1, 'p'], warnings: null }));
+        c.exit(0);
+      } else {
+        finishRender(c);
+      }
+    });
+    await connect(fake.runner);
+    const ajv = new Ajv2020({ strict: false });
+    const { tools } = await client.listTools();
+    const validate = (name: string) => ajv.compile(tools.find((t) => t.name === name)!.outputSchema!);
+
+    for (const [name, args] of [
+      ['analyze_audio', { path: 'song.mp3' }],
+      ['verify_video', { path: 'a.html', cues: 'words.json' }],
+      ['render_video', { path: 'a.html', waitSeconds: 5 }],
+    ] as const) {
+      const result = await call(name, args);
+      expect(result.isError, `${name}: ${result.content?.[0]?.text}`).toBeFalsy();
+      const validator = validate(name);
+      expect(validator(result.structuredContent), `${name}: ${JSON.stringify(validator.errors)}`).toBe(true);
+    }
   });
 });
