@@ -39,6 +39,7 @@ vi.mock('../commands/skills.js', () => ({ registerSkillsCommand: vi.fn() }));
 vi.mock('../commands/diff.js', () => ({ registerDiffCommand: vi.fn() }));
 vi.mock('../commands/deploy.js', () => ({ registerDeployCommand: vi.fn() }));
 vi.mock('../commands/check.js', () => ({ registerCheckCommand: vi.fn() }));
+vi.mock('../commands/analyze.js', () => ({ registerAnalyzeCommand: vi.fn() }));
 vi.mock('../commands/mcp.js', () => ({ registerMcpCommand: vi.fn() }));
 
 describe('CLI Entry Point (index.ts)', () => {
@@ -74,6 +75,7 @@ describe('CLI Entry Point (index.ts)', () => {
     const { registerDiffCommand } = await import('../commands/diff.js');
     const { registerDeployCommand } = await import('../commands/deploy.js');
     const { registerCheckCommand } = await import('../commands/check.js');
+    const { registerAnalyzeCommand } = await import('../commands/analyze.js');
     const { registerMcpCommand } = await import('../commands/mcp.js');
 
     const programInstance = vi.mocked(Command).mock.results[0].value;
@@ -95,6 +97,7 @@ describe('CLI Entry Point (index.ts)', () => {
     expect(registerDiffCommand).toHaveBeenCalledWith(programInstance);
     expect(registerDeployCommand).toHaveBeenCalledWith(programInstance);
     expect(registerCheckCommand).toHaveBeenCalledWith(programInstance);
+    expect(registerAnalyzeCommand).toHaveBeenCalledWith(programInstance);
     expect(registerMcpCommand).toHaveBeenCalledWith(programInstance);
 
     // Verify parse was called

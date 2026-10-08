@@ -29,6 +29,7 @@ if (process.argv[2] !== 'mcp') {
     { registerDiffCommand },
     { registerDeployCommand },
     { registerCheckCommand },
+    { registerAnalyzeCommand },
   ] = await Promise.all([
     import('./commands/studio.js'),
     import('./commands/init.js'),
@@ -47,6 +48,7 @@ if (process.argv[2] !== 'mcp') {
     import('./commands/diff.js'),
     import('./commands/deploy.js'),
     import('./commands/check.js'),
+    import('./commands/analyze.js'),
   ]);
 
   registerStudioCommand(program);
@@ -66,6 +68,7 @@ if (process.argv[2] !== 'mcp') {
   registerDiffCommand(program);
   registerDeployCommand(program);
   registerCheckCommand(program);
+  registerAnalyzeCommand(program);
 }
 registerMcpCommand(program);
 
