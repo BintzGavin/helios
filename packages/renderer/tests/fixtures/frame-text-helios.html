@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden;color:#fff;font:40px sans-serif}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<div id="caption" style="position:absolute;left:20px;top:200px"></div>
+<script type="module">
+// A Helios composition: a DOM caption and a canvas word, both drawn from subscribe.
+import { Helios } from '../../../core/dist/index.js';
+const CAPTIONS = ['first caption', 'second caption'];
+const WORDS = ['alpha', 'beta'];
+const g = document.getElementById('c').getContext('2d');
+const caption = document.getElementById('caption');
+const helios = new Helios({ duration: 2, fps: 10, width: 320, height: 400 });
+helios.bindToDocumentTimeline();
+helios.subscribe(({ currentFrame }) => {
+  const k = Math.min(1, Math.floor(currentFrame / 10));
+  caption.textContent = CAPTIONS[k];
+  g.fillStyle = '#000'; g.fillRect(0, 0, 320, 180);
+  g.fillStyle = '#fff'; g.fillText(WORDS[k], 20, 100);
+  window.heliosDrawnText?.add(WORDS[k]);
+});
+window.helios = helios;
+</script>
+</body>
+</html>

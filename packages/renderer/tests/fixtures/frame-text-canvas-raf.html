@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+<head><style>html,body{margin:0;background:#000;overflow:hidden}</style></head>
+<body>
+<canvas id="c" width="320" height="180"></canvas>
+<script>
+// A canvas drawn from a requestAnimationFrame loop, on the page's clock: word k shows from
+// t = k to t = k + 1. It marks what it draws for the text check.
+const WORDS = ['zero', 'one', 'two', 'three'];
+const g = document.getElementById('c').getContext('2d');
+function frame() {
+  const t = performance.now() / 1000;
+  const word = WORDS[Math.min(WORDS.length - 1, Math.floor(t))];
+  g.fillStyle = '#000'; g.fillRect(0, 0, 320, 180);
+  g.fillStyle = '#fff'; g.font = '40px sans-serif'; g.fillText(word, 20, 100);
+  window.heliosDrawnText?.add(word);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

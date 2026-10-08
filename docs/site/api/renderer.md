@@ -149,6 +149,22 @@ import { captureContactSheet } from '@helios-project/renderer';
 const png = await captureContactSheet('file:///path/to/page.html', [0, 2, 4, 6], { width: 1920, height: 1080, columns: 4 });
 ```
 
+#### `readFrameText(url, times, options?)`
+Reads the text on screen at each time (in seconds), seeking the page the way a render does, in one page session. It takes no screenshots. `helios verify --cues` uses it to check that lyrics and captions show at their time. It returns one `{ text, drawn }` per time:
+- `text`: visible DOM and SVG text, in document order. Text nodes that sit next to each other on a line are joined, so a word set one letter per element reads as one word. Text counts when its element is rendered, it is at least `minOpacity` opaque, and at least half of it lies inside the viewport and inside any ancestor whose overflow clips it. Opacity counts the element's ancestors and the alpha of the text's colour.
+- `drawn`: what the page passed to `window.heliosDrawnText.add()` while drawing that frame. The function sets `window.heliosDrawnText` to a new `Set` before each frame, so a canvas page can declare the text it draws with `window.heliosDrawnText?.add(text)`.
+
+It doesn't detect text covered by other elements, or text cut by `clip-path` or masks.
+
+Options: `width`, `height`, `browserConfig`, `stabilityTimeout`, and `minOpacity` (default `0.1`).
+
+```typescript
+import { readFrameText } from '@helios-project/renderer';
+
+const [frame] = await readFrameText('file:///path/to/page.html', [9.8], { width: 1920, height: 1080 });
+// { text: ['LADIES AND', 'GENTLEMEN'], drawn: [] }
+```
+
 ### Diagnostics
 
 #### `Renderer.diagnose()`

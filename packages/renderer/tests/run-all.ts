@@ -48,6 +48,7 @@ const tests = [
   'tests/verify-frame-count.ts',
   'tests/verify-frame-exact-seek.ts',
   'tests/verify-frame-stills.ts',
+  'tests/verify-frame-text.ts',
   'tests/verify-hardware-codec-selection.ts',
   'tests/verify-hwaccel-args.ts',
   'tests/verify-hwaccel-validation.ts',

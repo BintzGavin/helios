@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden; color: #fff; font: 700 40px/1.2 sans-serif; }
+  .row { position: absolute; left: 20px; white-space: nowrap; }
+  .letters span { display: inline-block; }
+  .mask { overflow: hidden; height: 50px; position: absolute; left: 20px; top: 560px; width: 400px; }
+  .mask span { display: inline-block; transform: translateY(120%); }
+  .flex { display: flex; position: absolute; left: 600px; top: 20px; }
+  .abs-letters { position: absolute; left: 600px; top: 80px; width: 400px; height: 50px; }
+  .abs-letters span { position: absolute; top: 0; }
+  .gradient { background: linear-gradient(90deg, #f00, #00f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tracked { letter-spacing: 0.4em; }
+</style>
+</head>
+<body>
+  <!-- Visible -->
+  <div class="row letters" style="top: 20px"><span>L</span><span>A</span><span>D</span><span>I</span><span>E</span><span>S</span></div>
+  <div class="row" style="top: 140px; opacity: 0.5"><span style="opacity: 0.1">faintword</span> <span>halfword</span></div>
+  <div class="row gradient" style="top: 440px">gradientword</div>
+  <div class="flex">
+    <span>F</span><span>L</span><span>E</span><span>X</span>
+  </div>
+  <div class="abs-letters"><span style="left: 0">A</span><span style="left: 28px">B</span><span style="left: 56px">S</span></div>
+  <div class="row tracked" style="top: 140px; left: 600px"><span>T</span><span>R</span><span>A</span><span>C</span><span>K</span></div>
+  <div class="row" style="top: 200px; left: 600px"><span>two</span> <span>words</span></div>
+  <div class="row" style="top: 260px; left: 600px; display: flex; gap: 0.3em"><span>gap</span><span>separated</span></div>
+  <div class="row" style="top: 320px; left: 1700px">partly beyondtheedge</div>
+  <div class="row" id="host" style="top: 850px"></div>
+  <div class="row" style="top: 920px"><span style="display: contents">contentsword</span></div>
+  <div style="overflow: hidden; width: 300px; height: 50px; position: absolute; top: 980px; left: 600px;">
+    <div style="position: fixed; left: 1000px; top: 980px">fixedescapes</div>
+  </div>
+  <svg class="row" style="top: 640px" width="900" height="120" viewBox="0 0 900 120">
+    <text x="10" y="50" font-size="40" fill="#fff">svgword</text>
+    <text x="10" y="100" font-size="40" fill="#fff" fill-opacity="0">svghidden</text>
+    <text x="300" y="50" font-size="40" fill="#fff"><tspan>svg</tspan><tspan>joined</tspan></text>
+  </svg>
+
+  <!-- Hidden -->
+  <div class="row" style="top: 80px; opacity: 0">zeroopacity</div>
+  <div class="row" style="top: 200px; left: -900px">offscreen</div>
+  <div class="row" style="top: 260px; display: none">displaynone</div>
+  <div class="row" style="top: 320px; visibility: hidden">visibilityhidden</div>
+  <div class="row" style="top: 380px; color: transparent">transparentword</div>
+  <div class="row" style="top: 500px; transform: scale(0)">scaledzero</div>
+  <div class="mask"><span>maskedword</span></div>
+  <div style="position: absolute; top: 980px; left: 20px; width: 300px; height: 50px; overflow: hidden;">
+    <div style="position: absolute; left: 400px; top: 0">clippedbyparent</div>
+  </div>
+
+  <!-- Shown from t = 1 -->
+  <div class="row" id="later" style="top: 1020px; left: 1200px; opacity: 0">later</div>
+<script>
+  document.getElementById('host').attachShadow({ mode: 'open' }).innerHTML = '<span>shadowword</span>';
+  window.renderAt = (t) => {
+    document.getElementById('later').style.opacity = t >= 1 ? 1 : 0;
+  };
+</script>
+</body>
+</html>
