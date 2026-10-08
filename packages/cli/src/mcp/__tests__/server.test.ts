@@ -706,6 +706,101 @@ describe('helios MCP server: frames and verify', () => {
   });
 });
 
+// ---- Prompts ------------------------------------------------------------------------------------
+
+/** Words that would sell something inside the host, which AI hosts don't allow. */
+const SALES_TALK = /price|pricing|upgrade|subscri|\$\d|paid|checkout|free plan|pro plan/i;
+
+/** The numbered step n of a prompt's text. */
+function step(text: string, n: number): string {
+  return text.split('\n').find((line) => line.startsWith(`${n}. `)) ?? '';
+}
+
+describe('helios MCP server: prompts', () => {
+  it('lists make_video and music_video with their arguments', async () => {
+    await connect();
+    const { prompts } = await client.listPrompts();
+    expect(prompts.map((p) => p.name)).toEqual(['make_video', 'music_video']);
+    const byName = Object.fromEntries(prompts.map((p) => [p.name, p]));
+    expect(byName.make_video.title).toBe('Make a video');
+    expect(byName.make_video.arguments!.map((a) => [a.name, a.required])).toEqual([
+      ['brief', true], ['duration', false], ['size', false],
+    ]);
+    expect(byName.music_video.title).toBe('Make a music video');
+    expect(byName.music_video.arguments!.map((a) => [a.name, a.required])).toEqual([['audio', true], ['brief', true]]);
+    for (const prompt of prompts) {
+      expect(prompt.description, prompt.name).toBeTruthy();
+      expect(prompt.description, prompt.name).not.toMatch(SALES_TALK);
+      for (const arg of prompt.arguments ?? []) expect(arg.description, `${prompt.name}.${arg.name}`).toBeTruthy();
+    }
+  });
+
+  it('make_video steers through writing the page, verify, frames, preview and render', async () => {
+    await connect();
+    const result = await client.getPrompt({
+      name: 'make_video',
+      arguments: { brief: 'A 3-step explainer for Acme Sync', duration: '15', size: '1080x1920' },
+    });
+    expect(result.messages).toHaveLength(1);
+    expect(result.messages[0].role).toBe('user');
+    const text = (result.messages[0].content as any).text as string;
+    expect(text).toContain('Brief: A 3-step explainer for Acme Sync\nLength in seconds: 15\nSize or aspect: 1080x1920\n');
+    expect(text).toContain('window.renderAt(t)');
+    expect(text).toContain('pure function of t');
+    expect(text).toContain('never call Math.random() inside renderAt');
+    expect(text).toContain('calls no generative model');
+    expect(text).toContain('pass the page to preview_video as html');
+    expect(step(text, 1)).toContain('window.renderAt(t)');
+    expect(step(text, 2)).toContain('verify_video');
+    expect(step(text, 3)).toContain('get_frames');
+    expect(step(text, 4)).toContain('preview_video');
+    expect(step(text, 5)).toMatch(/render_video.*get_render_status/);
+    expect(text).not.toMatch(SALES_TALK);
+  });
+
+  it('make_video leaves out optional arguments that are missing or blank', async () => {
+    await connect();
+    const variants: Array<Record<string, string>> = [{ brief: 'A logo reveal' }, { brief: 'A logo reveal', duration: '', size: '  ' }];
+    for (const args of variants) {
+      const text = ((await client.getPrompt({ name: 'make_video', arguments: args })).messages[0].content as any).text as string;
+      expect(text).toContain('Brief: A logo reveal\n\n');
+      expect(text).not.toContain('Length in seconds');
+      expect(text).not.toContain('Size or aspect');
+    }
+  });
+
+  it('make_video requires a brief', async () => {
+    await connect();
+    await expect(client.getPrompt({ name: 'make_video', arguments: {} })).rejects.toThrow(/brief/);
+  });
+
+  it('music_video starts from analyze_audio, times words to their cues and checks them', async () => {
+    await connect();
+    const result = await client.getPrompt({
+      name: 'music_video',
+      arguments: { audio: 'music/song.mp3', brief: 'Neon type that hits on every chorus' },
+    });
+    const text = (result.messages[0].content as any).text as string;
+    expect(text.split('\n')[0]).toBe('Make a music video with Helios for music/song.mp3.');
+    expect(text).toContain('Brief: Neon type that hits on every chorus');
+    expect(text).toContain('1. Run analyze_audio on music/song.mp3.');
+    expect(text).toContain('Cut on downbeats and kicks, and land key moves on the hits');
+    expect(text).toContain('Don\'t snap words to the beat');
+    expect(text).toContain('pass their timed-text file as cues');
+    expect(text).toContain('window.heliosDrawnText?.add(text)');
+    expect(text).toContain('never more than three times in any one second (WCAG 2.3.1)');
+    expect(text).toContain('render_video with audio music/song.mp3');
+    expect(text).toContain('calls no generative model');
+    expect(text).toContain('Helios doesn\'t transcribe');
+    expect(step(text, 1)).toContain('analyze_audio');
+    expect(step(text, 2)).toContain('window.renderAt(t)');
+    expect(step(text, 3)).toContain('verify_video');
+    expect(step(text, 4)).toContain('get_frames');
+    expect(step(text, 5)).toMatch(/preview_video.*render_video.*get_render_status/);
+    expect(text).not.toMatch(SALES_TALK);
+  });
+});
+
 // ---- analyze_audio -----------------------------------------------------------------------------
 
 const BEATS = {

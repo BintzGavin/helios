@@ -11,6 +11,7 @@ import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } f
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
+import { registerHeliosPrompts } from './prompts.js';
 import {
   beatsText, parseJsonObject, summarizeBeats, summarizeCheck, summarizeVerify, verifyText,
   type RenderChecks,
@@ -764,6 +765,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       return { content: [{ type: 'text', text: beatsText(summary) }], structuredContent: summary };
     }),
   );
+
+  registerHeliosPrompts(server);
 
   listSchemasWithoutDialect(server);
   return { server, jobs, root };
