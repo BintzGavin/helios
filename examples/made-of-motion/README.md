@@ -6,7 +6,7 @@ MIT). It contains a handwritten opening, an electric star, thermal footage, a ca
 objects, 34,272 rotoscoped ink contours and a flying wordmark. There are two pages:
 
 - **`composition.html`** reproduces the fframes film frame for frame. Rendered through Helios, it
-  matches fframes' own output to the byte on nearly every frame (see [Fidelity](#fidelity)).
+  matches fframes' own output to the byte on 488 of 489 frames (see [Fidelity](#fidelity)).
 - **`enhanced.html`** draws the same frames, then grades them with extra shader passes:
   bloom with film halation, god rays from the star, refraction shockwaves at the ring
   collisions, heat haze on the thermal shots, light leaks on hard cuts, soft contact shadows
@@ -118,7 +118,19 @@ helios still composition.html --width 1440 --height 1080 -o /tmp/helios-frames \
 python3 scripts/compare.py /tmp/fframes-frames /tmp/helios-frames
 ```
 
-FIDELITY_RESULTS
+On this machine, 488 of the 489 frames are byte-identical:
+
+```
+489 frames compared, 488 bit-identical; 2 differing pixels in all (0.0000%), largest difference 2
+```
+
+The two pixels are on the edge of the small orange dot under the tagline in frame 482, off by
+1 and 2 levels. The dot is drawn inside the tagline's fade layer, and Chrome and fframes
+rasterize it slightly differently there. The poses, opacities and transforms that reach both
+renderers are identical.
+
+"Byte-identical" holds for the frames Helios captures. The MP4 that `helios render` writes
+is H.264, so its decoded pixels differ from the frames after encoding, as any encode does.
 
 ## Credits
 
