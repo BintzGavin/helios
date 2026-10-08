@@ -11,6 +11,7 @@ describe('Registry Manifest', () => {
     expect(names).toContain('progress-bar');
     expect(names).toContain('watermark');
     expect(names).toContain('shaders');
+    expect(names).toContain('beat-clock');
   });
 
   it('should have valid ComponentDefinition structure for each component', () => {
@@ -43,6 +44,20 @@ describe('Registry Manifest', () => {
   it('installs the same Shaders adapter the shaders-animation example runs', () => {
     const example = readFileSync(new URL('../../../../../examples/shaders-animation/src/heliosShader.ts', import.meta.url), 'utf8');
     expect(findComponent('shaders')?.files[0].content).toBe(example);
+  });
+
+  it.each([
+    ['beat-clock', 'beatClock.ts'],
+  ])('installs the tested source of %s, with nothing else to install', (name, file) => {
+    const component = findComponent(name);
+    expect(component).toMatchObject({ name, type: 'vanilla' });
+    expect(component?.files.map((f) => f.name)).toEqual([file]);
+    const source = readFileSync(new URL(`../components/${file}`, import.meta.url), 'utf8');
+    expect(component?.files[0].content).toBe(source);
+    // Framework-free: no npm packages, no other components, no imports.
+    expect(component?.dependencies).toBeUndefined();
+    expect(component?.registryDependencies).toBeUndefined();
+    expect(source).not.toMatch(/^import /m);
   });
 
   it('findComponent should return undefined for unknown components', () => {

@@ -24,7 +24,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js",
+    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js && node scripts/copy-registry.js",
     "dev": "tsc -w",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
