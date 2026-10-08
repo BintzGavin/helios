@@ -59,6 +59,8 @@
         "examples/vue-audio-visualization",
         "examples/pixi-animation",
         "examples/shaders",
+        "examples/beat-clock",
+        "examples/cursor",
         "examples/solid-audio-visualization",
         "examples/react-components"
       ]
