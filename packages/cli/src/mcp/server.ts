@@ -11,6 +11,7 @@ import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } f
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
+import { parseJsonObject, summarizeVerify, verifyText } from './reports.js';
 
 export const PLAYER_URI = 'ui://helios/player';
 export const PLAYER_MIME_TYPE = 'text/html;profile=mcp-app';
@@ -53,6 +54,9 @@ function revealWithSystem(absPath: string, open: boolean): Promise<void> {
     child.once('spawn', () => { child.unref(); resolve(); });
   });
 }
+
+/** Timed-text files verify_video checks against the page. */
+const CUE_FILES = /\.(srt|vtt|json)$/i;
 
 /** Largest page preview_video will save, in characters. */
 const MAX_PAGE_CHARS = 4_000_000;
@@ -560,30 +564,59 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       title: 'Verify video',
       description:
         'Checks that every frame of a video page depends only on its time, by rendering sample frames in order and in reverse and comparing them. ' +
+        'With cues (an .srt, .vtt or .json file of lyrics, captions or words with start and end times), it also checks that each piece of timed text is on screen during its time. ' +
         'Run it on a new or changed page before render_video. ' +
-        'A failure names the times whose frames depend on what came before: the page uses counters, timers or per-frame randomness instead of values computed from t.',
+        'A failure names the times whose frames depend on what came before (the page uses counters, timers or per-frame randomness instead of values computed from t), ' +
+        'or the cues that were not on screen and what the frame showed instead.',
       inputSchema: {
         path: pagePath,
         duration: duration.optional(),
         samples: z.number().int().min(2).max(24).optional().describe('Frames to compare (default 6)'),
+        cues: z.string().min(1).optional()
+          .describe('Timed text to check: an .srt, .vtt or .json file in the project (JSON: [{ text, start, end }] in seconds). Canvas pages report drawn text with window.heliosDrawnText?.add(text)'),
       },
-      outputSchema: { ok: z.boolean(), message: z.string() },
+      outputSchema: {
+        ok: z.boolean(),
+        message: z.string(),
+        purity: z.object({
+          ok: z.boolean(),
+          message: z.string(),
+          samples: z.number().optional(),
+          differing: z.array(z.number()).describe('Times, in seconds, whose frames depend on render order'),
+        }).optional(),
+        cues: z.object({
+          ok: z.boolean(),
+          message: z.string(),
+          total: z.number(),
+          shown: z.number(),
+          missing: z.array(z.object({ text: z.string(), start: z.number(), end: z.number(), seen: z.string().optional() })),
+        }).optional(),
+      },
       annotations: { title: 'Verify video', readOnlyHint: true, openWorldHint: false },
     },
     guard(async (args, extra) => {
       const page = await resolveInRoot(root, args.path, { kind: 'file' });
+      const cues = args.cues !== undefined ? await resolveInRoot(root, args.cues, { kind: 'file', label: 'cues' }) : undefined;
+      if (cues && !CUE_FILES.test(cues.abs)) throw new PathError(`cues "${args.cues}" must be an .srt, .vtt or .json file`);
       const cli = ['verify', page.abs];
       if (args.duration !== undefined) cli.push('--duration', String(args.duration));
       if (args.samples !== undefined) cli.push('--samples', String(args.samples));
+      if (cues) cli.push('--cues', cues.abs);
+      cli.push('--json');
 
       const result = await runCli(runner, cli, root, extra.signal);
+      const json = parseJsonObject(result.stdout);
+      // A page that fails a check is an answer, not a tool failure.
+      if (json && (result.code === 0 || result.code === 1)) {
+        const report = summarizeVerify(json);
+        return { content: [{ type: 'text', text: verifyText(report) }], structuredContent: report };
+      }
       if (result.code === 0) {
         const lines = stripAnsi(result.stdout).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
         const message = [...lines].reverse().find((line) => line.includes('sampled frames')) ?? lines[lines.length - 1] ?? 'Verified.';
         return { content: [{ type: 'text', text: message }], structuredContent: { ok: true, message } };
       }
       const message = result.error?.message || errorFromStderr(result.stderr, 'Verify failed:') || `exit ${result.signal ?? result.code}`;
-      // A page that fails the check is an answer, not a tool failure.
       if (/^Frames at .* differ depending on what was rendered before them/.test(message)) {
         return { content: [{ type: 'text', text: message }], structuredContent: { ok: false, message } };
       }

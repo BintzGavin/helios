@@ -163,6 +163,7 @@ describe('helios MCP server: listing', () => {
       expect(byName[name].annotations?.readOnlyHint, name).toBe(true);
     }
     expect(byName.render_video.annotations).toMatchObject({ readOnlyHint: false, idempotentHint: false });
+    expect((byName.verify_video.inputSchema.properties as any).cues).toMatchObject({ type: 'string' });
     expect((byName.render_video.inputSchema.properties as any).preset.enum).toContain('veryslow');
     expect((byName.render_video.inputSchema.properties as any).waitSeconds).toMatchObject({ default: 45, minimum: 0, maximum: 100 });
   });
@@ -639,25 +640,25 @@ describe('helios MCP server: frames and verify', () => {
     expect(fake.calls).toHaveLength(0);
   });
 
-  it('verify_video passes the CLI message through when frames match', async () => {
+  it('verify_video passes a plain-text success line through when the CLI prints no JSON', async () => {
     write('a.html');
     const message = '6 sampled frames are identical rendered in order and in reverse: each frame depends only on t.';
     const fake = fakeRunner((c) => { c.out(`Initializing...\n${message}\n`); c.exit(0); });
     await connect(fake.runner);
     const result = await call('verify_video', { path: 'a.html', duration: 3, samples: 8 });
-    expect(fake.calls[0].args).toEqual(['verify', path.join(root, 'a.html'), '--duration', '3', '--samples', '8']);
+    expect(fake.calls[0].args).toEqual(['verify', path.join(root, 'a.html'), '--duration', '3', '--samples', '8', '--json']);
     expect(result.isError).toBeFalsy();
     expect(result.structuredContent).toEqual({ ok: true, message });
     expect(result.content[0].text).toBe(message);
   });
 
-  it('verify_video reports differing frames as a result, not a tool error', async () => {
+  it('verify_video reports differing frames from stderr as a result, not a tool error', async () => {
     write('a.html');
     const message = 'Frames at 1s, 2s differ depending on what was rendered before them. Every frame must be a function of t alone.';
     const fake = fakeRunner((c) => { c.err(`Verify failed: ${message}\n`); c.exit(1); });
     await connect(fake.runner);
     const result = await call('verify_video', { path: 'a.html' });
-    expect(fake.calls[0].args).toEqual(['verify', path.join(root, 'a.html')]);
+    expect(fake.calls[0].args).toEqual(['verify', path.join(root, 'a.html'), '--json']);
     expect(result.isError).toBeFalsy();
     expect(result.structuredContent).toEqual({ ok: false, message });
   });
@@ -669,5 +670,110 @@ describe('helios MCP server: frames and verify', () => {
     const result = await call('verify_video', { path: 'a.html' });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Could not verify a.html: The page declares no duration: pass --duration <seconds>');
+  });
+});
+
+// ---- verify_video with cues and JSON ---------------------------------------------------------------
+
+const PURE = '6 sampled frames are identical rendered in order and in reverse: each frame depends only on t.';
+
+describe('helios MCP server: verify_video with timed text', () => {
+  it('passes --cues and --json and reports both checks', async () => {
+    write('v/a.html');
+    write('v/lyrics.srt', '1\n00:00:01,000 --> 00:00:02,000\nhello\n');
+    const report = {
+      ok: true,
+      purity: { ok: true, samples: 6, differing: [], noisy: [], message: PURE },
+      cues: { ok: true, total: 3, shown: 3, missing: [], message: '3/3 cues on screen at their time.' },
+    };
+    // Something logged before the JSON doesn't stop it being read.
+    const fake = fakeRunner((c) => { c.out(`Initializing...\n${JSON.stringify(report, null, 2)}\n`); c.exit(0); });
+    await connect(fake.runner);
+
+    const result = await call('verify_video', { path: 'v/a.html', duration: 4, cues: 'v/lyrics.srt' });
+    expect(fake.calls[0].args).toEqual([
+      'verify', path.join(root, 'v/a.html'), '--duration', '4', '--cues', path.join(root, 'v/lyrics.srt'), '--json',
+    ]);
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toBe(`${PURE}\n3/3 cues on screen at their time.`);
+    expect(result.structuredContent).toEqual({
+      ok: true,
+      message: `${PURE} 3/3 cues on screen at their time.`,
+      purity: { ok: true, message: PURE, samples: 6, differing: [] },
+      cues: { ok: true, message: '3/3 cues on screen at their time.', total: 3, shown: 3, missing: [] },
+    });
+  });
+
+  it('reports cues that are not on screen as a result, with what the frame showed', async () => {
+    write('a.html');
+    write('words.json', '[]');
+    const message = '3 of 417 cues are not on screen at their time: "gentlemen" (9.64–9.98 s), "and" (10.1–10.2 s), "x" (11–11.5 s)';
+    const report = {
+      ok: false,
+      purity: { ok: true, samples: 6, differing: [], noisy: [], message: PURE },
+      cues: {
+        ok: false, total: 417, shown: 414, message,
+        missing: [
+          { text: 'gentlemen', start: 9.64, end: 9.98, seen: 'LADIES.' },
+          { text: 'and', start: 10.1, end: 10.2, seen: '' },
+          { text: 'x', start: 11, end: 11.5 },
+        ],
+      },
+    };
+    const fake = fakeRunner((c) => { c.out(JSON.stringify(report)); c.exit(1); });
+    await connect(fake.runner);
+
+    const result = await call('verify_video', { path: 'a.html', cues: 'words.json' });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent.ok).toBe(false);
+    expect(result.structuredContent.cues).toMatchObject({ ok: false, total: 417, shown: 414 });
+    expect(result.structuredContent.cues.missing).toHaveLength(3);
+    expect(result.content[0].text).toBe([
+      PURE,
+      message,
+      '- "gentlemen" (9.64–9.98 s): the frame showed "LADIES.".',
+      '- "and" (10.1–10.2 s): the frame showed no text.',
+      'Show each cue for its whole time. A canvas page reports the text it draws with window.heliosDrawnText?.add(text).',
+    ].join('\n'));
+  });
+
+  it('reports differing frames from the JSON as a result', async () => {
+    write('a.html');
+    const message = 'Frames at 1s, 2s differ depending on what was rendered before them. Every frame must be a function of t alone.';
+    const report = { ok: false, purity: { ok: false, samples: 6, differing: [1, 2], noisy: [], message } };
+    const fake = fakeRunner((c) => { c.out(JSON.stringify(report)); c.exit(1); });
+    await connect(fake.runner);
+    const result = await call('verify_video', { path: 'a.html' });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toEqual({ ok: false, message, purity: { ok: false, message, samples: 6, differing: [1, 2] } });
+    expect(result.content[0].text).toBe(message);
+  });
+
+  it('only takes .srt, .vtt or .json cues inside the root', async () => {
+    write('a.html');
+    write('notes.txt', 'x');
+    fs.writeFileSync(path.join(tmp, 'outside.srt'), 'x');
+    const fake = fakeRunner();
+    await connect(fake.runner);
+    for (const [cues, message] of [
+      ['notes.txt', 'must be an .srt, .vtt or .json file'],
+      ['../outside.srt', 'outside the project root'],
+      ['missing.vtt', 'was not found'],
+    ] as const) {
+      const result = await call('verify_video', { path: 'a.html', cues });
+      expect(result.isError, cues).toBe(true);
+      expect(result.content[0].text, cues).toContain(message);
+    }
+    expect(fake.calls).toHaveLength(0);
+  });
+
+  it('turns a cue file the CLI cannot read into a tool error', async () => {
+    write('a.html');
+    write('bad.vtt', 'nope');
+    const fake = fakeRunner((c) => { c.err('Verify failed: bad.vtt is not a WebVTT file: it must start with WEBVTT\n'); c.exit(1); });
+    await connect(fake.runner);
+    const result = await call('verify_video', { path: 'a.html', cues: 'bad.vtt' });
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toBe('Could not verify a.html: bad.vtt is not a WebVTT file: it must start with WEBVTT');
   });
 });
