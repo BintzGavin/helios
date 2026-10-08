@@ -14,6 +14,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ensureTrack, trackStatus } from './track.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..', '..');
@@ -86,24 +87,6 @@ function parseArgs(argv) {
 
 function which(bin) {
   return spawnSync('sh', ['-c', `command -v ${bin}`], { encoding: 'utf8' }).status === 0;
-}
-
-function ensureTrackMp3(assetsDir) {
-  const track = path.join(assetsDir, 'track.mp3');
-  if (fs.existsSync(track)) return track;
-  // 15 s at 120 BPM: a kick on every beat, a bass note that changes each bar, a hi-hat on
-  // the off-beats. Deterministic, so every run hears the same song.
-  const expr = [
-    '0.9*sin(2*PI*(50+60*exp(-30*mod(t,0.5)))*mod(t,0.5))*exp(-9*mod(t,0.5))',
-    '0.25*sin(2*PI*(55*pow(2,floor(mod(t/2,4))*3/12))*t)',
-    '0.08*(random(0)*2-1)*exp(-40*mod(t+0.25,0.5))',
-  ].join('+');
-  const result = spawnSync('ffmpeg', [
-    '-v', 'error', '-y', '-f', 'lavfi', '-i', `aevalsrc='${expr}':s=44100:d=15`,
-    '-ac', '2', '-b:a', '160k', track,
-  ], { encoding: 'utf8' });
-  if (result.status !== 0) throw new Error(`Could not synthesise track.mp3: ${result.stderr}`);
-  return track;
 }
 
 function gitState(dir) {
@@ -613,6 +596,7 @@ async function main() {
   console.log(`${runs.length} run(s) → ${outDir}${opts.dryRun ? ' (not created in a dry run)' : ''}`);
   console.log(`Worst case spend: $${(runs.length * opts.budget).toFixed(2)} (${runs.length} × $${opts.budget} cap)`);
   if (plugin) console.log(`Helios condition: ${describePluginLine(plugin)}`);
+  if (needsTrack) console.log(`Music track: ${trackStatus(assetsDir)}`);
 
   if (opts.dryRun) {
     for (const run of runs) {
@@ -622,10 +606,16 @@ async function main() {
   }
 
   fs.mkdirSync(outDir, { recursive: true });
-  if (needsTrack) ensureTrackMp3(assetsDir);
+  let track = null;
+  if (needsTrack) {
+    const generated = ensureTrack(assetsDir);
+    // The scorer's copy; the agent only ever gets track.mp3.
+    fs.copyFileSync(generated.truthFile, path.join(outDir, 'track.truth.json'));
+    track = { id: generated.truth.id, file: 'track.truth.json' };
+  }
   const finalPlugin = plugin?.kind === 'skills-dir' ? buildSkillsPlugin(plugin.source, outDir) : plugin;
   for (const run of runs) if (run.condition === 'helios') run.pluginDir = finalPlugin.pluginDir;
-  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts };
+  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts, track };
 
   const results = [];
   await pool(runs, opts.parallel, async (run) => {

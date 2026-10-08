@@ -25,6 +25,7 @@ Every run records:
 The results go to `results/<timestamp>/`, which is gitignored:
 
 - `scoreboard.md` and `scoreboard.json`: the summary table.
+- `track.truth.json`: the music track's ground truth for the run.
 - `<run>/`, one directory per run, holding:
   - `transcript.jsonl` (the stream-json log)
   - `metrics.json`
@@ -34,8 +35,8 @@ The results go to `results/<timestamp>/`, which is gitignored:
 ## Running it
 
 ```bash
-# Free: prints the exact claude commands, the worst-case spend and whether the plugin is
-# there. Writes nothing.
+# Free: prints the exact claude commands, the worst-case spend, and whether the plugin and
+# the music track are ready. Writes nothing.
 node tests/agent-eval/run.mjs --dry-run
 
 # Smoke run: one prompt, both conditions.
@@ -84,6 +85,26 @@ accepts API-key auth.
 `bypassPermissions` lets the agent run commands (`npm install`, browsers, ffmpeg) without anyone
 approving them. That is how these runs happen unattended, and it is also why each run gets a fresh
 temp directory. Its process group is killed when the run ends or hits `--timeout-min`.
+
+## The music track
+
+The music-video prompt gets `track.mp3`, which [`track.mjs`](track.mjs) synthesizes the first time
+it's needed (deterministic: same code, same song). Real songs drift, so this one does too: 15 s whose
+tempo ramps from 116 to 124 BPM. It has:
+- silence until the first beat at 0.25 s;
+- a kick on every beat, louder on each bar's downbeat;
+- a snare on beats 2 and 4, and a soft hi-hat on every off-beat eighth;
+- a bass note and a chord (Am, F, C, G) that change on every downbeat;
+- one impact, a boom and a crash on the downbeat of bar 5 (10.35 s), after which the hats get louder.
+
+Its average is 120 BPM, so an agent that measures one tempo and lays a fixed grid gets it right at
+the start and the end but up to 125 ms off in the middle. That is the failure a video built on
+`k * 60 / bpm` makes on a real song.
+
+Generating the track also writes `assets/track.truth.json`: every beat, downbeat, kick, snare, hat
+and the impact, in the shape of `helios analyze` output. It is for scoring only; the agent gets
+`track.mp3` alone, and each results directory keeps a copy. A `track.mp3` left over from an older harness (with no matching truth) is
+regenerated.
 
 ## Reading the numbers
 
