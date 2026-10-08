@@ -148,6 +148,21 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [ ] **INFRASTRUCTURE**: A stateless streamable-HTTP deployment of the same server: no rendering, no accounts.
 - [ ] **PLAYER**: In-view export spike. Measure frame exactness against `helios still`, find how the file leaves the sandbox, and record the decision in `docs/rfcs/`.
 
+### Checks a script can run, and music sync
+Lessons from a production that drew its motion layer with a renderer shaped like Helios (claudia.gallery): every bar that held was something a script measured.
+- [x] **CLI**: `helios analyze <audio>` writes a beat map: beats on a drifting tempo snapped to onsets, downbeats, kick/snare/hat onsets, hits, risers, sections, per-frame envelopes.
+- [x] **CLI**: `helios verify --cues <srt|vtt|json>` checks that every timed cue is on screen at its time; `--json` output.
+- [x] **CLI**: `helios check <video>`: WCAG 2.3.1 flash check, colour tags, frame count.
+- [x] **RENDERER**: Encode Y'CbCr output with the BT.709 matrix and tag it.
+- [x] **CLI**: `helios mcp` prompts (`make_video`, `music_video`), `analyze_audio`, cues in `verify_video`, `helios check` after renders.
+- [x] **CLI**: Registry components `beat-clock` and `cursor`.
+- [x] **SKILLS**: Timing rules (words to the voice, motion to the beat), checks, canvas history traps.
+- [x] **Eval**: `tests/agent-eval` drifting-tempo track with ground truth, flash and beat-sync metrics, verdict computed in code.
+- [ ] **Gate**: Run `tests/agent-eval` with the new metrics and record the scoreboard.
+- [ ] **RENDERER**: Keep the BT.709 `colr` atom when chunks are stitched by stream copy (FFmpeg 4.1 drops it), and tag `helios merge --video-codec` output.
+- [ ] **RENDERER**: Decide one transfer-curve policy for the main and portable renderers. Portable converts sRGB to the BT.709 transfer curve; the main renderer converts the matrix only, so the same grey encodes differently under the same tags.
+- [ ] **SKILLS**: Retire the `helios-skills` repository: replace its README with a pointer to this repo, then archive it.
+
 ## Product Surface (Studio, CLI, Examples)
 *Studio, CLI, and examples are first class product surfaces in V2.*
 
