@@ -2,7 +2,7 @@
 
 When someone asks an AI agent for a video, does the agent reach for Helios, and does it hand back a
 correct MP4? This harness measures both questions. Use it as the acceptance check for agent-facing
-work in the skills, CLI and renderer.
+work in the plugin, skills, CLI and renderer.
 
 It runs fresh, headless Claude Code sessions. Each session gets its own throwaway temp directory
 and one of the prompts in [`prompts.json`](prompts.json): a music video for an mp3, an animated
@@ -12,7 +12,7 @@ loop. Each prompt runs under two conditions:
 | Condition  | What the session has                                                                  |
 |------------|---------------------------------------------------------------------------------------|
 | `baseline` | Stock Claude Code. No Helios.                                                         |
-| `helios`   | The same, plus the Helios skills loaded as a plugin (`--plugin-dir`).                 |
+| `helios`   | The same, plus the Helios plugin from [`plugins/helios`](../../plugins/helios) (`--plugin-dir`). |
 
 Every run records:
 - whether it used Helios;
@@ -34,7 +34,8 @@ The results go to `results/<timestamp>/`, which is gitignored:
 ## Running it
 
 ```bash
-# Free: prints the exact claude commands and the worst-case spend.
+# Free: prints the exact claude commands, the worst-case spend and whether the plugin is
+# there. Writes nothing.
 node tests/agent-eval/run.mjs --dry-run
 
 # Smoke run: one prompt, both conditions.
@@ -49,9 +50,13 @@ Requirements:
 - ffmpeg and ffprobe on your `PATH`.
 - A logged-in `claude` CLI: either `claude auth login` (subscription) or `ANTHROPIC_API_KEY` (API
   billing). With a subscription, the dollar figures are what the same tokens would cost on the API.
-- For the `helios` condition, a checkout of
-  [helios-skills](https://github.com/BintzGavin/helios-skills) at `~/Developer/helios-skills`.
-  Otherwise, pass `--skills-dir` or `--plugin-dir`.
+
+The `helios` condition loads `plugins/helios` from this checkout, so it measures the plugin exactly as
+it is in your working tree; the scoreboard records its commit and whether it had uncommitted
+changes. Two ways to try something else:
+- `--plugin-dir <path>`: any other plugin directory.
+- `--skills-dir <path>`: wraps every `SKILL.md` under `<path>` in a throwaway skills-only plugin, for
+  example `--skills-dir skills` to try the whole skill catalog. It carries no MCP server.
 
 `--rescore <results dir>` rebuilds the tables without re-running anything.
 
@@ -72,6 +77,9 @@ Together, these settings mean:
 
 `--bare` is deliberately not used. It cuts the tools down to Bash, Edit and Read, and it only
 accepts API-key auth.
+
+`metrics.json` lists the plugins and MCP servers each session actually loaded (`pluginsLoaded`,
+`mcpServersLoaded`), so you can confirm the plugin's own MCP server came up.
 
 `bypassPermissions` lets the agent run commands (`npm install`, browsers, ffmpeg) without anyone
 approving them. That is how these runs happen unattended, and it is also why each run gets a fresh

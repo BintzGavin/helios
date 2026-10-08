@@ -3,7 +3,7 @@
  * Agent video scoreboard.
  *
  * Asks fresh, headless Claude Code sessions for videos, in throwaway directories, with and
- * without the Helios skills, then records per run: did it use Helios, did it produce an MP4,
+ * without the Helios plugin, then records per run: did it use Helios, did it produce an MP4,
  * does the MP4 match the request (duration, audio, size), how long it took and what it cost,
  * and where it failed. See README.md in this directory.
  *
@@ -16,6 +16,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO = path.resolve(HERE, '..', '..');
+const DEFAULT_PLUGIN = path.join(REPO, 'plugins', 'helios');
 
 const DEFAULTS = {
   model: 'claude-opus-5-5',
@@ -24,18 +26,21 @@ const DEFAULTS = {
   parallel: 1,
   repeat: 1,
   conditions: 'baseline,helios',
-  skillsDir: path.join(os.homedir(), 'Developer', 'helios-skills'),
+  pluginDir: DEFAULT_PLUGIN,
   permissionMode: 'bypassPermissions',
   claudeBin: 'claude',
 };
+
+const rel = (p) => (path.relative(REPO, p).startsWith('..') ? p : path.relative(REPO, p) || '.');
 
 const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
 
   --prompts <ids>          Comma-separated prompt ids from prompts.json (default: all)
   --conditions <ids>       baseline, helios, or both (default: ${DEFAULTS.conditions})
-  --plugin-dir <path>      Plugin to load for the "helios" condition (default: a wrapper
-                           built from --skills-dir, one entry per SKILL.md)
-  --skills-dir <path>      helios-skills checkout (default: ${DEFAULTS.skillsDir})
+  --plugin-dir <path>      Plugin to load for the "helios" condition
+                           (default: ${rel(DEFAULTS.pluginDir)} in this repo)
+  --skills-dir <path>      Instead of a plugin, wrap every SKILL.md under <path> (for example
+                           skills/) in a throwaway skills-only plugin
   --model <id>             Model for the sessions (default: ${DEFAULTS.model})
   --budget <usd>           Per-run --max-budget-usd cap (default: ${DEFAULTS.budget})
   --timeout-min <n>        Per-run wall-clock limit (default: ${DEFAULTS.timeoutMin})
@@ -44,24 +49,35 @@ const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
   --permission-mode <m>    Passed to claude (default: ${DEFAULTS.permissionMode})
   --out <dir>              Results directory (default: tests/agent-eval/results/<timestamp>)
   --keep-workdirs          Keep each run's working directory (can be large: node_modules)
-  --dry-run                Print what would run, spend nothing
+  --dry-run                Print what would run; spends and writes nothing
   --claude-bin <path>      claude executable (default: claude)
   --rescore <dir>          Rebuild scoreboard.md/json from an existing results directory
 `;
 
+const FLAGS = new Set(['dryRun', 'keepWorkdirs']);
+const VALUES = new Set([
+  'prompts', 'conditions', 'pluginDir', 'skillsDir', 'model', 'budget', 'timeoutMin', 'parallel',
+  'repeat', 'permissionMode', 'out', 'claudeBin', 'rescore',
+]);
+
 function parseArgs(argv) {
-  const opts = { ...DEFAULTS };
+  const opts = { ...DEFAULTS, explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (!arg.startsWith('--')) throw new Error(`Unexpected argument: ${arg}\n\n${USAGE}`);
     const key = arg.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
     if (key === 'help') { console.log(USAGE); process.exit(0); }
-    if (key === 'dryRun' || key === 'keepWorkdirs') { opts[key] = true; continue; }
+    if (FLAGS.has(key)) { opts[key] = true; continue; }
+    if (!VALUES.has(key)) throw new Error(`Unknown option: ${arg}\n\n${USAGE}`);
     const value = argv[++i];
     if (value === undefined) throw new Error(`Missing value for ${arg}`);
     opts[key] = value;
+    opts.explicit.add(key);
   }
   for (const key of ['budget', 'timeoutMin', 'parallel', 'repeat']) opts[key] = Number(opts[key]);
+  if (opts.explicit.has('pluginDir') && opts.explicit.has('skillsDir')) {
+    throw new Error('Pass --plugin-dir or --skills-dir, not both.');
+  }
   return opts;
 }
 
@@ -90,36 +106,115 @@ function ensureTrackMp3(assetsDir) {
   return track;
 }
 
-/** A plugin wrapper exposing every SKILL.md under <skillsDir>/skills as a top-level skill. */
-function buildHeliosPlugin(skillsDir, outDir) {
-  const skillsRoot = path.join(skillsDir, 'skills');
-  if (!fs.existsSync(skillsRoot)) throw new Error(`No skills/ in ${skillsDir}; pass --skills-dir or --plugin-dir`);
+function gitState(dir) {
+  const head = spawnSync('git', ['-C', dir, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
+  if (head.status !== 0) return { commit: null, dirty: null };
+  const status = spawnSync('git', ['-C', dir, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' });
+  return { commit: head.stdout.trim(), dirty: status.status === 0 ? status.stdout.trim().length > 0 : null };
+}
+
+/** Every directory holding a SKILL.md at or under root (following symlinked directories). */
+function findSkillDirs(root) {
+  const found = fs.existsSync(path.join(root, 'SKILL.md')) ? [root] : [];
+  (function walk(dir, depth) {
+    if (depth > 6) return;
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      let isDir = entry.isDirectory();
+      if (entry.isSymbolicLink()) { try { isDir = fs.statSync(full).isDirectory(); } catch { isDir = false; } }
+      if (!isDir || SKIP_DIRS.has(entry.name)) continue;
+      if (fs.existsSync(path.join(full, 'SKILL.md'))) found.push(full);
+      walk(full, depth + 1);
+    }
+  })(root, 0);
+  return found;
+}
+
+/** What the plugin at pluginDir declares: its manifest, skills and MCP servers, and its commit. */
+function describePlugin(pluginDir) {
+  // Claude Code reads .claude-plugin/plugin.json; an Agent Plugins manifest sits at the root.
+  const manifestFile = [path.join(pluginDir, '.claude-plugin', 'plugin.json'), path.join(pluginDir, 'plugin.json')]
+    .find((f) => fs.existsSync(f));
+  if (!manifestFile && !fs.existsSync(path.join(pluginDir, 'skills'))) {
+    return {
+      kind: 'plugin', pluginDir, source: pluginDir,
+      missing: `No plugin at ${pluginDir} (no .claude-plugin/plugin.json, plugin.json or skills/). Pass --plugin-dir <path>, or --skills-dir <path> to wrap loose skills.`,
+    };
+  }
+  let manifest = {};
+  try { manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8')); } catch { /* no or unreadable manifest: claude will say so */ }
+  let mcpServers = [];
+  try {
+    const mcp = JSON.parse(fs.readFileSync(path.join(pluginDir, '.mcp.json'), 'utf8'));
+    mcpServers = Object.keys(mcp.mcpServers || mcp);
+  } catch {
+    if (manifest.mcpServers && typeof manifest.mcpServers === 'object') mcpServers = Object.keys(manifest.mcpServers);
+  }
+  const skills = findSkillDirs(path.join(pluginDir, 'skills')).map((d) => path.basename(d));
+  return {
+    kind: 'plugin',
+    pluginDir,
+    source: pluginDir,
+    name: manifest.name ?? null,
+    version: manifest.version ?? null,
+    skills,
+    skillCount: skills.length,
+    mcpServers,
+    ...gitState(pluginDir),
+  };
+}
+
+/** A throwaway plugin exposing every SKILL.md under skillsDir as a top-level skill. */
+function buildSkillsPlugin(skillsDir, outDir) {
+  const found = findSkillDirs(skillsDir);
+  if (!found.length) throw new Error(`No SKILL.md under ${skillsDir}`);
   const pluginDir = path.join(outDir, '_plugin-helios');
   fs.rmSync(pluginDir, { recursive: true, force: true });
   fs.mkdirSync(path.join(pluginDir, '.claude-plugin'), { recursive: true });
   fs.mkdirSync(path.join(pluginDir, 'skills'));
-  const found = [];
-  (function walk(dir) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue;
-      const full = path.join(dir, entry.name);
-      if (fs.existsSync(path.join(full, 'SKILL.md'))) found.push(full);
-      walk(full);
-    }
-  })(skillsRoot);
   for (const dir of found) {
     const name = path.basename(dir);
     const link = path.join(pluginDir, 'skills', name);
-    if (fs.existsSync(link)) throw new Error(`Two skills named ${name} under ${skillsRoot}`);
+    if (fs.existsSync(link)) throw new Error(`Two skills named ${name} under ${skillsDir}`);
     fs.symlinkSync(dir, link);
   }
-  const git = spawnSync('git', ['-C', skillsDir, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
+  const git = gitState(skillsDir);
   fs.writeFileSync(path.join(pluginDir, '.claude-plugin', 'plugin.json'), JSON.stringify({
     name: 'helios',
     version: '0.0.0-eval',
-    description: `Helios skills from ${skillsDir}${git.status === 0 ? ` @ ${git.stdout.trim()}` : ''}`,
+    description: `Helios skills from ${skillsDir}${git.commit ? ` @ ${git.commit}` : ''}`,
   }, null, 2));
-  return { pluginDir, skillCount: found.length, source: skillsDir, commit: git.status === 0 ? git.stdout.trim() : null };
+  const skills = found.map((d) => path.basename(d));
+  return { kind: 'skills-dir', pluginDir, source: skillsDir, name: 'helios', version: '0.0.0-eval', skills, skillCount: skills.length, mcpServers: [], ...git };
+}
+
+function resolvePlugin(opts, outDir, { dryRun }) {
+  if (opts.explicit.has('skillsDir')) {
+    const skillsDir = path.resolve(opts.skillsDir);
+    if (dryRun) {
+      const skills = findSkillDirs(skillsDir).map((d) => path.basename(d));
+      return {
+        kind: 'skills-dir', pluginDir: path.join(outDir, '_plugin-helios'), source: skillsDir, skills, skillCount: skills.length,
+        ...(skills.length ? {} : { missing: `No SKILL.md under ${skillsDir}` }),
+      };
+    }
+    return buildSkillsPlugin(skillsDir, outDir);
+  }
+  return describePlugin(path.resolve(opts.pluginDir));
+}
+
+function describePluginLine(plugin) {
+  if (!plugin) return null;
+  if (plugin.missing) return `MISSING: ${plugin.missing}`;
+  const parts = [];
+  // Results from before the plugin moved into this repo only recorded skillCount/source/commit.
+  const what = plugin.kind === 'skills-dir' ? 'skills wrapped from' : `plugin${plugin.name ? ` \`${plugin.name}\`` : ''}${plugin.version ? ` ${plugin.version}` : ''} from`;
+  parts.push(`${plugin.kind ? what : 'skills from'} \`${rel(plugin.source)}\`${plugin.commit ? ` @ ${plugin.commit}${plugin.dirty ? ' (uncommitted changes)' : ''}` : ''}`);
+  if (plugin.skillCount != null) parts.push(`${plugin.skillCount} skill${plugin.skillCount === 1 ? '' : 's'}${plugin.skills?.length ? ` (${plugin.skills.join(', ')})` : ''}`);
+  if (plugin.mcpServers?.length) parts.push(`declares MCP: ${plugin.mcpServers.join(', ')}`);
+  return parts.join(' · ');
 }
 
 /** Environment for the child: the parent's, minus anything that marks it as a nested session. */
@@ -380,6 +475,7 @@ function scoreRun(run, exec) {
     repeat: run.repeat,
     model: summary.init?.model ?? null,
     pluginsLoaded: (summary.init?.plugins || []).map((p) => p.name),
+    mcpServersLoaded: (summary.init?.mcp_servers || []).map((s) => `${s.name}${s.status ? `:${s.status}` : ''}`),
     heliosSkillsAvailable: (summary.init?.skills || []).filter((s) => String(s).startsWith('helios:')).length,
     usedHelios: pipeline.heliosRender || pipeline.heliosInstalled,
     heliosRender: pipeline.heliosRender,
@@ -427,7 +523,8 @@ function scoreboard(results, meta) {
   const lines = [];
   lines.push(`# Agent video scoreboard`, '');
   lines.push(`${meta.startedAt} · model \`${meta.model}\` · $${meta.budget} cap per run · ${meta.timeoutMin} min limit`);
-  if (meta.plugin) lines.push(`Helios condition: ${meta.plugin.skillCount} skills from \`${meta.plugin.source}\`${meta.plugin.commit ? ` @ ${meta.plugin.commit}` : ''}`);
+  const pluginLine = describePluginLine(meta.plugin);
+  if (pluginLine) lines.push(`Helios condition: ${pluginLine}`);
   lines.push('');
   lines.push('| Condition | Runs | MP4 | Passed checks | Used Helios | Median min | Mean $ | Total $ |');
   lines.push('|---|---|---|---|---|---|---|---|');
@@ -498,17 +595,10 @@ async function main() {
 
   const startedAt = new Date().toISOString();
   const outDir = path.resolve(opts.out || path.join(HERE, 'results', startedAt.replace(/[:.]/g, '-')));
-  fs.mkdirSync(outDir, { recursive: true });
-
   const assetsDir = path.join(HERE, 'assets');
-  if (prompts.some((p) => (p.assets || []).includes('track.mp3'))) ensureTrackMp3(assetsDir);
-
-  let plugin = null;
-  if (conditions.includes('helios')) {
-    plugin = opts.pluginDir
-      ? { pluginDir: path.resolve(opts.pluginDir), skillCount: null, source: path.resolve(opts.pluginDir), commit: null }
-      : buildHeliosPlugin(path.resolve(opts.skillsDir), outDir);
-  }
+  const needsTrack = prompts.some((p) => (p.assets || []).includes('track.mp3'));
+  const plugin = conditions.includes('helios') ? resolvePlugin(opts, outDir, { dryRun: opts.dryRun }) : null;
+  if (plugin?.missing && !opts.dryRun) throw new Error(plugin.missing);
 
   const runs = [];
   for (let repeat = 1; repeat <= opts.repeat; repeat++) {
@@ -520,9 +610,9 @@ async function main() {
     }
   }
 
-  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin, prompts };
-  console.log(`${runs.length} run(s) → ${outDir}`);
+  console.log(`${runs.length} run(s) → ${outDir}${opts.dryRun ? ' (not created in a dry run)' : ''}`);
   console.log(`Worst case spend: $${(runs.length * opts.budget).toFixed(2)} (${runs.length} × $${opts.budget} cap)`);
+  if (plugin) console.log(`Helios condition: ${describePluginLine(plugin)}`);
 
   if (opts.dryRun) {
     for (const run of runs) {
@@ -530,6 +620,12 @@ async function main() {
     }
     return;
   }
+
+  fs.mkdirSync(outDir, { recursive: true });
+  if (needsTrack) ensureTrackMp3(assetsDir);
+  const finalPlugin = plugin?.kind === 'skills-dir' ? buildSkillsPlugin(plugin.source, outDir) : plugin;
+  for (const run of runs) if (run.condition === 'helios') run.pluginDir = finalPlugin.pluginDir;
+  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts };
 
   const results = [];
   await pool(runs, opts.parallel, async (run) => {
