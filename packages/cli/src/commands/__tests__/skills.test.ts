@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Command } from 'commander';
 import { registerSkillsCommand } from '../skills.js';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 vi.mock('fs', () => ({
   default: {
@@ -42,6 +44,16 @@ describe('skills command', () => {
     expect(consoleLogMock).toHaveBeenCalledWith(expect.stringContaining('Skills installed successfully!'));
   });
 
+  it('copies the bundled skills into .agents/skills/helios of the current project', async () => {
+    vi.mocked(fs.existsSync).mockImplementation((p: any) => !String(p).includes('.agents'));
+
+    await program.parseAsync(['node', 'test', 'skills', 'install']);
+
+    const [source, target] = vi.mocked(fs.cpSync).mock.lastCall!;
+    expect(path.basename(String(source))).toBe('skills');
+    expect(target).toBe(path.resolve(process.cwd(), '.agents/skills/helios'));
+  });
+
   it('should overwrite target directory if it exists', async () => {
     vi.mocked(fs.existsSync).mockReturnValue(true); // Both source and target exist
 
@@ -72,5 +84,23 @@ describe('skills command', () => {
 
     expect(consoleErrorMock).toHaveBeenCalledWith(expect.stringContaining('Failed to install skills:'), error);
     expect(exitMock).toHaveBeenCalledWith(1);
+  });
+});
+
+// scripts/bundle-skills.js builds dist/skills from these repo paths, and Studio's assistant
+// reads core, renderer, player and studio from it. Moving them breaks both quietly.
+describe('bundled skill sources', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../../..');
+
+  it.each([
+    'plugins/helios/skills/make-video/SKILL.md',
+    'skills/core/SKILL.md',
+    'skills/renderer/SKILL.md',
+    'skills/player/SKILL.md',
+    'skills/studio/SKILL.md',
+    'skills/LICENSE',
+  ])('%s exists', async (relativePath) => {
+    const realFs = await vi.importActual<typeof import('fs')>('fs');
+    expect(realFs.existsSync(path.join(repoRoot, relativePath))).toBe(true);
   });
 });
