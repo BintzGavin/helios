@@ -159,6 +159,30 @@ helios verify page.html --duration 12
 - `--samples <n>`: The number of frames to compare (default: `6`).
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
 
+### `helios analyze`
+
+Analyzes a song into a beat map, so a video can cut and move on the music. It decodes the audio with ffmpeg and calls no model.
+
+```bash
+helios analyze song.mp3
+# Wrote song.beats.json: 131.6 BPM (129.2–133.9), 412 beats, 103 bars, 14 hits, 5 sections
+```
+
+**Options**:
+- `-o, --output <path>`: The output file (default: `<audio name>.beats.json` next to the audio).
+- `--fps <n>`: Frames per second of the loudness envelopes (default: `30`).
+- `--tempo-range <min:max>`: The BPM range to search (default: `70:180`). If the beats come out at half or double time, narrow it, e.g. `--tempo-range 120:180`.
+- `--beats-per-bar <n>`: Beats in a bar (default: `4`).
+
+**The file** (all times in seconds of audio time):
+- `beats`: every beat. Songs drift (one went from 131.5 to 133.9 BPM), so the beats follow a local tempo, fitted on 20 s windows every 5 s, and each one is moved to the drum onset within 30 ms of it. Don't rebuild them from `bpm`: one fixed BPM ends up more than a beat off.
+- `tempo`: the tempo every 5 s. `bpm` is its median.
+- `downbeats`: the beats that start bars; bar k starts at `downbeats[k]`. `downbeatMethod` says how beat 1 was chosen: `harmony` (where the chords change) or `kick` (where the kick hits hardest).
+- `hits`: the big moments (drops, impacts), each `{ t, score }` with a score from 0.22 to 1, on a downbeat when one is near. `risers` are `{ t0, t1 }` climbs that land on a hit.
+- `sections`: `{ t0, t1, energy }` spans where the track changes, on bar lines. They come from a loudness and harmony heuristic and carry no names.
+- `onsets`: kick (30–150 Hz), snare (150 Hz–5 kHz) and hat (6–16 kHz) onsets. A snare or hat at the same moment as a kick counts as the kick.
+- `envelope`: `level`, `low`, `mid` and `high` loudness, one value per frame at `fps`, each from 0 (48 dB below the loudest moment) to 1.
+
 ### `helios merge`
 
 Merges multiple video files into a single output file without re-encoding.
