@@ -406,7 +406,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Distributed rendering** | 🟡 Beta (Local Orchestrator) | 🟢 Lambda, Cloud Run |
 | **Captions/subtitles** | 🟡 Standard (SRT) | 🟢 Built-in |
 | **Audio mixing** | 🟢 Client-side (WebCodecs) | 🟢 Advanced |
-| **MCP Server** | 🟡 Planned | 🟢 Available |
+| **MCP Server** | 🟢 `helios mcp`: preview in the conversation, verify, render, analyse audio | 🟢 Available |
 | **Agent Skills** | 🟢 `npx skills add`, Claude Code and Codex plugin | 🟢 `npx skills add` |
 | **Transitions library** | 🟢 Available | 🟢 `@remotion/transitions` |
 | **Sequence/Series** | 🔴 Not yet | 🟢 Built-in components |
