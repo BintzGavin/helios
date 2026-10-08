@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
@@ -798,6 +799,35 @@ describe('helios MCP server: prompts', () => {
     expect(step(text, 4)).toContain('get_frames');
     expect(step(text, 5)).toMatch(/preview_video.*render_video.*get_render_status/);
     expect(text).not.toMatch(SALES_TALK);
+  });
+});
+
+describe('Claude Desktop manifest', () => {
+  const manifestPath = fileURLToPath(new URL('../../../../../integrations/claude-desktop/manifest.json', import.meta.url));
+
+  it('lists every tool the model can call, and no app-only tool', async () => {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    await connect();
+    const { tools } = await client.listTools();
+    const modelTools = tools.filter((tool) => !(tool._meta as any)?.ui?.visibility?.length || (tool._meta as any).ui.visibility.includes('model'));
+    expect(manifest.tools.map((t: any) => t.name).sort()).toEqual(modelTools.map((t) => t.name).sort());
+    for (const tool of manifest.tools) expect(tool.description, tool.name).toBeTruthy();
+  });
+
+  it('declares the prompts with the same arguments and text the server returns', async () => {
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    await connect();
+    const { prompts } = await client.listPrompts();
+    expect(manifest.prompts.map((p: any) => p.name)).toEqual(prompts.map((p) => p.name));
+    for (const declared of manifest.prompts) {
+      const served = prompts.find((p) => p.name === declared.name)!;
+      expect(declared.arguments, declared.name).toEqual(served.arguments!.map((a) => a.name));
+      expect(declared.description, declared.name).toBe(served.description);
+      // The manifest's text is the prompt with every argument as an MCPB ${arguments.x} placeholder.
+      const placeholders = Object.fromEntries(declared.arguments.map((name: string) => [name, `\${arguments.${name}}`]));
+      const result = await client.getPrompt({ name: declared.name, arguments: placeholders });
+      expect(declared.text, declared.name).toBe((result.messages[0].content as any).text);
+    }
   });
 });
 

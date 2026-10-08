@@ -26,11 +26,26 @@
   "tools": [
     { "name": "preview_video", "description": "Play a video page in the chat, with a scrubber" },
     { "name": "get_frames", "description": "Contact sheet of chosen times" },
-    { "name": "verify_video", "description": "Check that every frame depends only on its time" },
-    { "name": "render_video", "description": "Render the MP4 on your computer" },
+    { "name": "verify_video", "description": "Check that every frame depends only on its time, and that timed text shows on cue" },
+    { "name": "render_video", "description": "Render the MP4 on your computer and check it for flashing" },
     { "name": "get_render_status", "description": "Follow a long render" },
     { "name": "cancel_render", "description": "Stop a render" },
+    { "name": "analyze_audio", "description": "Find a song's beats, bars, sections and hits" },
     { "name": "helios_library", "description": "Your video pages and renders" }
+  ],
+  "prompts": [
+    {
+      "name": "make_video",
+      "description": "Make a video from a brief: motion graphics, an explainer, an animated chart, a logo reveal or a social clip, drawn in code and rendered to MP4 on this computer.",
+      "arguments": ["brief", "duration", "size"],
+      "text": "Make a video with Helios.\n\nBrief: ${arguments.brief}\nLength in seconds: ${arguments.duration}\nSize or aspect: ${arguments.size}\n\nHelios renders a web page frame by frame into an MP4 on this computer. It draws only what the page's code draws and calls no generative model, so build the picture from type, shapes, SVG, canvas or WebGL and any images the person provides. If the brief needs live-action or AI-generated footage, say so: Helios can't make it.\n\n1. Write one HTML page in the project that defines window.renderAt(t), which draws the frame at t seconds.\n   - Every frame is a pure function of t: compute positions, opacity and the current scene from t. No counters, timers, x += speed or frame-by-frame physics.\n   - Seed any randomness from a number (rand(i)); never call Math.random() inside renderAt.\n   - Load fonts and images into a ready promise and await it in renderAt.\n   - Size the page to the video: 1920×1080 unless the brief asks otherwise (1080×1920 for 9:16, 1080×1080 for 1:1), with html,body{margin:0;overflow:hidden}.\n   - Load fonts and libraries only from cdnjs.cloudflare.com, cdn.jsdelivr.net, unpkg.com or Google Fonts: the player in the conversation blocks other sites.\n   If you can't write files, pass the page to preview_video as html and it is saved for you.\n2. Run verify_video on the page. If it fails, find what isn't computed from t and fix it.\n3. Look at your own work with get_frames: the key moments (at) or the whole video (every). Check that text is legible and inside the frame, transitions happen, no frame is blank and the pacing fits the brief. Fix the page and look again.\n4. Show it to the person with preview_video. They can scrub it and select a moment or an element to change; revise from their notes.\n5. When they're happy, render_video with preset medium. If it returns a jobId, follow it with get_render_status. Tell them where the MP4 is, and fix the page if the render's checks report a problem.\n\nPass the same duration, width and height to every tool."
+    },
+    {
+      "name": "music_video",
+      "description": "Make a video timed to a song in the project: find its beats, bars and hits, cut on them, check timed lyrics, then render the MP4 with the song.",
+      "arguments": ["audio", "brief"],
+      "text": "Make a music video with Helios for ${arguments.audio}.\n\nBrief: ${arguments.brief}\n\nHelios renders a web page frame by frame into an MP4 on this computer. It draws only what the page's code draws and calls no generative model: the picture is type, shapes, canvas or WebGL and any images the person provides, timed to the song.\n\n1. Run analyze_audio on ${arguments.audio}. It writes a beats file next to the song (every beat, downbeat, section and hit, in seconds of song time) and summarises it. Plan scenes on its sections and bars.\n2. Write one HTML page in the project that defines window.renderAt(t), with t in seconds of song time.\n   - Load the beats file with fetch(), its path relative to the page written out as a string (the player in the conversation serves only literal paths), and await it in renderAt.\n   - Every frame is a pure function of t: look up the current beat, bar and section from t. No counters, timers or unseeded randomness.\n   - The tempo can drift, so use the beats and downbeats arrays, not one BPM.\n   - Cut on downbeats and kicks, and land key moves on the hits.\n   - For lyrics or captions, take the times from the person's timed-text file (.srt, .vtt or JSON words; Helios doesn't transcribe) and show each word from its own start to its end. Don't snap words to the beat.\n   - Flash only where the idea calls for it, and never more than three times in any one second (WCAG 2.3.1).\n3. Run verify_video on the page. With lyrics or captions, pass their timed-text file as cues: each cue must be on screen during its time. Canvas pages report the text they draw with window.heliosDrawnText?.add(text).\n4. Look at your work with get_frames at the hits and section changes, and fix anything that lands late or reads badly.\n5. Show it with preview_video, then render_video with audio ${arguments.audio} and the song's duration. Follow a long render with get_render_status. If the render's checks report flashing, fix the page and render again."
+    }
   ],
   "keywords": ["video", "mp4", "animation", "motion graphics", "rendering"],
   "license": "ELv2",
