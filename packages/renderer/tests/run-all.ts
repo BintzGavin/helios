@@ -19,6 +19,7 @@ const tests = [
   'tests/verify-canvas-shadow-dom.ts',
   'tests/verify-canvas-strategy.ts',
   'tests/verify-captions.ts',
+  'tests/verify-color-tags.ts',
   'tests/verify-cdp-determinism.ts',
   'tests/verify-cdp-driver.ts',
   'tests/verify-cdp-driver-stability.ts',

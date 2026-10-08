@@ -1,5 +1,36 @@
 import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 
+// Y'CbCr pixel formats (yuv420p, yuva420p, yuv422p10le, nv12, p010le). Excludes RGB, grey and
+// palette formats, and the full-range yuvj* formats, which JPEG defines as BT.601.
+const YUV_PIXEL_FORMAT = /^(yuva?\d|nv\d|p\d{3})/;
+// Encoders that store RGB or palette pixels, or whose format fixes the matrix at BT.601
+// (JPEG, WebP). Converting or tagging their frames as BT.709 would shift their colours.
+const NON_VIDEO_ENCODER = /^(gif|a?png|mjpeg|ljpeg|jpegls|libwebp|libwebp_anim|libx264rgb|qtrle|bmp|tiff|targa|ppm|pam|rawvideo)(_|$)/;
+
+/**
+ * Pages are drawn in sRGB. Convert the frames to Y'CbCr with the BT.709 matrix in limited
+ * range and tag the stream to match. Untagged, players guess, and FFmpeg's default
+ * conversion is BT.601, so HD output looked washed out with shifted reds. The tags match
+ * @helios-project/portable's. Returns null for outputs that are not Y'CbCr video.
+ */
+function bt709Encoding(videoCodec: string, pixelFormat: string): { filters: string[]; args: string[] } | null {
+  if (videoCodec === 'copy' || NON_VIDEO_ENCODER.test(videoCodec) || !YUV_PIXEL_FORMAT.test(pixelFormat)) {
+    return null;
+  }
+  return {
+    // in_color_matrix stays "auto": JPEG and WebP intermediates decode as BT.601, untagged
+    // video as BT.601, tagged video as tagged. bicubic is FFmpeg's default scaler.
+    // setparams tags the frames as well as the stream: ProRes writes each frame's own
+    // tags into its frame header, and they would otherwise say BT.601 after a JPEG input.
+    filters: [
+      'scale=out_color_matrix=bt709:out_range=tv:flags=bicubic+accurate_rnd+full_chroma_int+full_chroma_inp',
+      `format=${pixelFormat}`,
+      'setparams=color_primaries=bt709:color_trc=bt709:colorspace=bt709:range=tv',
+    ],
+    args: ['-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv'],
+  };
+}
+
 export class FFmpegBuilder {
   static getArgs(options: RendererOptions, outputPath: string, videoInputArgs: string[]): FFmpegConfig {
     // 1. Normalize inputs into AudioTrackConfig objects
@@ -162,10 +193,13 @@ export class FFmpegBuilder {
       audioFilterChains.push(`[${inputId}]${filters.join(',')}[${outputLabel}]`);
     });
 
-    // 3. Prepare Video Filters (Subtitles)
+    // 3. Prepare Video Filters (Subtitles, then the BT.709 conversion)
     let videoFilterGraph = '';
     let videoMap = '0:v';
     const videoCodec = options.videoCodec || 'libx264';
+    const pixelFormat = options.pixelFormat || 'yuv420p';
+    const colorEncoding = bt709Encoding(videoCodec, pixelFormat);
+    const videoFilters: string[] = [];
 
     if (options.subtitles) {
       if (videoCodec === 'copy') {
@@ -181,7 +215,17 @@ export class FFmpegBuilder {
         .replace(/:/g, '\\:')
         .replace(/'/g, "\\'");
 
-      videoFilterGraph = `[0:v]subtitles='${escapedPath}'[vout]`;
+      // Burn subtitles in before the conversion, while the frames are still in the
+      // source's RGB or BT.601 encoding that the subtitles filter assumes.
+      videoFilters.push(`subtitles='${escapedPath}'`);
+    }
+
+    if (colorEncoding) {
+      videoFilters.push(...colorEncoding.filters);
+    }
+
+    if (videoFilters.length > 0) {
+      videoFilterGraph = `[0:v]${videoFilters.join(',')}[vout]`;
       videoMap = '[vout]';
     }
 
@@ -255,11 +299,15 @@ export class FFmpegBuilder {
     if (videoCodec === 'copy') {
       finalArgs.push('-movflags', '+faststart');
     } else {
-      const pixelFormat = options.pixelFormat || 'yuv420p';
-      finalArgs.push(
-        '-pix_fmt', pixelFormat,
-        '-movflags', '+faststart',
-      );
+      finalArgs.push('-pix_fmt', pixelFormat);
+
+      if (colorEncoding) {
+        // write_colr: MP4/MOV get a 'colr' atom too (older FFmpeg builds, like the
+        // bundled one, only write it when asked). Other muxers ignore movflags.
+        finalArgs.push(...colorEncoding.args, '-movflags', '+faststart+write_colr');
+      } else {
+        finalArgs.push('-movflags', '+faststart');
+      }
 
       if (options.crf !== undefined) {
         finalArgs.push('-crf', options.crf.toString());
