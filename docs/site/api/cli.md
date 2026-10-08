@@ -120,6 +120,8 @@ helios render <input> [options]
 - `--gpu` / `--no-gpu`: Enable or disable GPU acceleration in the browser (for WebGL).
 - `--no-headless`: Run in a visible browser window (useful for debugging).
 
+**Color**: frames are converted to Y'CbCr with the BT.709 matrix in limited range, and the stream is tagged BT.709, so players show the page's colors instead of guessing (an untagged video often looks washed out). GIF, PNG and other RGB outputs are left as they are.
+
 **Local pages are served over http**: `helios render page.html`, and likewise `still`, `sheet` and `verify`, serves the page from `127.0.0.1` for the length of the command. The server's root is the current directory, or the page's own folder if the page is outside it. So the page can `fetch()` data files that sit next to it, and media elements get byte-range requests. `--no-serve` loads the page from `file://` instead.
 
 **Pages that draw their own frames**: a page that defines `window.renderAt(t)` (or `window.seek(t)`, or `window.__render(t)`) is called once per frame with the time `t` in seconds, and the frame is captured when it returns. If it returns a promise, the frame is captured after the promise resolves. The page needs no Helios import:
@@ -188,6 +190,22 @@ The check confirms that each word is present at its time. It doesn't check that 
 - `--cues <file>`: Timed text that must be on screen at its time. Accepts an `.srt` file, a `.vtt` file, or a `.json` file holding an array of `{ "text", "start", "end" }` in seconds. The JSON can also be an object whose `cues` or `words` array holds those, and `w`, `t0` and `t1` work as aliases.
 - `--json`: Print one JSON object, `{ ok, purity: { ok, samples, differing, noisy, message }, cues?: { ok, total, shown, missing: [{ text, start, end, seen }], message } }`. It exits 1 when `ok` is false. Argument and page errors go to stderr as `Verify failed: <reason>`, with no JSON.
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
+
+### `helios check`
+
+Checks a rendered video file before you deliver it. It prints one line per check and exits 1 when a check fails or the file can't be read.
+
+```bash
+helios check out.mp4 [--json]
+```
+
+- **Video and audio**: the codec, size, frame rate, pixel format, and the audio stream (or none).
+- **Color**: the matrix, primaries, transfer and range tags. An untagged Y'CbCr video is a warning: players guess, and often show it washed out.
+- **Length**: the frames actually decoded against the file's duration × frame rate. A mismatch (dropped or repeated frames, or audio that runs past the picture) is a warning.
+- **Flashes** (WCAG 2.3.1): more than 3 flashes, or more than 3 saturated red flashes, in any one second fails. A flash is a pair of opposing changes in relative luminance of at least 10% where the darker state is below 0.8. It counts when the area flashing together covers at least a quarter of a 10° visual field, taken as a window one third of the frame's width and height.
+
+**Options**:
+- `--json`: Print exactly one JSON object (`ok`, `file`, `video`, `audio`, `flash`, `problems`, `warnings`) for a pass or a fail. When the file can't be read, nothing goes to stdout and `Check failed: <reason>` goes to stderr.
 
 ### `helios merge`
 
