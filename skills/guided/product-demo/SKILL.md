@@ -150,7 +150,7 @@ The specification must include:
 • Layering order (background → UI mockup → highlight overlay → text → cursor/pointer)
 • Audio direction
 • Asset requirements
-• Cursor or pointer choreography
+• Cursor or pointer choreography: every click with its time, keyed to a beat or a sound
 
 Use motion.dev compatible terminology only.
 
@@ -178,7 +178,11 @@ Create a composition.html file that:
 • Implements animations using WAAPI / CSS / motion.dev
 • Aligns feature reveals to downbeats
 • Uses UI mockup frames with highlight overlays
-• Includes cursor/pointer animations for interaction simulation
+• Includes cursor/pointer animations for interaction simulation.
+  Script them with the cursor component (`helios add cursor`):
+  each action's time is the moment it lands (a move's arrival, a
+  click's press), so clicks hit the beat. Reaches follow a human
+  minimum-jerk path with Fitts'-law timing and a small overshoot.
 • Includes generated audio file
 • Has exact duration
 
