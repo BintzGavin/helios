@@ -11,7 +11,7 @@ import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } f
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
-import { parseJsonObject, summarizeVerify, verifyText } from './reports.js';
+import { beatsText, parseJsonObject, summarizeBeats, summarizeVerify, verifyText } from './reports.js';
 
 export const PLAYER_URI = 'ui://helios/player';
 export const PLAYER_MIME_TYPE = 'text/html;profile=mcp-app';
@@ -621,6 +621,74 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         return { content: [{ type: 'text', text: message }], structuredContent: { ok: false, message } };
       }
       return toolError(`Could not verify ${page.rel}: ${message}`);
+    }),
+  );
+
+  // ---- Music ------------------------------------------------------------------------------------
+
+  server.registerTool(
+    'analyze_audio',
+    {
+      title: 'Analyze audio',
+      description:
+        'Finds the beats, bars, sections and biggest hits of a song or other audio file in the project, writes them to a JSON file the page can load, and summarises them. ' +
+        'Use it before timing a video to music: cut on downbeats and kicks, and land key moves on hits. ' +
+        'The tempo may drift, so the file lists every beat rather than one BPM; all times are in seconds of audio time. ' +
+        'It measures the signal only: it does not transcribe lyrics or call any generative model.',
+      inputSchema: {
+        path: z.string().min(1).describe('The audio file, relative to the project root'),
+        output: z.string().min(1).optional()
+          .describe('Where to write the beats JSON, relative to the project root (default: <audio name>.beats.json next to the audio)'),
+        fps: fps.optional().describe('Frames per second of the loudness envelope in the file (default 30); use the video\'s fps'),
+        tempoRange: z.string().regex(/^\s*\d+(\.\d+)?\s*:\s*\d+(\.\d+)?\s*$/, 'tempoRange is "min:max" in BPM').optional()
+          .describe('Limit the tempo search to "min:max" BPM, e.g. "120:140", when the result is half or double the real tempo'),
+      },
+      outputSchema: {
+        audio: z.string(),
+        path: z.string().describe('The beats JSON, relative to the project root'),
+        absolutePath: z.string(),
+        duration: z.number().nullable(),
+        bpm: z.number(),
+        tempoRange: z.object({ min: z.number(), max: z.number() }),
+        beats: z.number().describe('How many beats the file lists'),
+        bars: z.number(),
+        beatsPerBar: z.number(),
+        firstDownbeat: z.number().nullable(),
+        downbeatMethod: z.string().optional(),
+        sections: z.array(z.object({ t0: z.number(), t1: z.number(), energy: z.number().optional() })),
+        hits: z.array(z.object({ t: z.number(), score: z.number() })).describe('The strongest hits, in time order'),
+      },
+      annotations: { title: 'Analyze audio', readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    guard(async (args, extra) => {
+      const audio = await resolveInRoot(root, args.path, { kind: 'file' });
+      // The CLI's default: <name>.beats.json next to the audio.
+      const outputInput = args.output ?? path.join(path.dirname(audio.abs), `${path.parse(audio.abs).name}.beats.json`);
+      const output = await resolveInRoot(root, outputInput, { kind: 'new', label: 'output' });
+      if (!/\.json$/i.test(output.abs)) throw new PathError(`output "${output.rel}" must be a .json file`);
+      if (fs.existsSync(output.abs) && fs.statSync(output.abs).isDirectory()) {
+        throw new PathError(`output "${output.rel}" is a directory`);
+      }
+      await fs.promises.mkdir(path.dirname(output.abs), { recursive: true });
+
+      const cli = ['analyze', audio.abs, '-o', output.abs];
+      if (args.fps !== undefined) cli.push('--fps', String(args.fps));
+      if (args.tempoRange !== undefined) cli.push('--tempo-range', args.tempoRange.replace(/\s+/g, ''));
+
+      const result = await runCli(runner, cli, root, extra.signal);
+      if (result.code !== 0) {
+        return toolError(`Could not analyze ${audio.rel}: ${result.error?.message || errorFromStderr(result.stderr, 'Analyze failed:') || `exit ${result.signal ?? result.code}`}`);
+      }
+      const raw = await fs.promises.readFile(output.abs, 'utf8').catch(() => undefined);
+      if (raw === undefined) return toolError(`helios analyze finished but wrote no beats file at ${output.rel}`);
+      let data: unknown;
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        return toolError(`${output.rel} is not valid JSON`);
+      }
+      const summary = summarizeBeats(data, { audio: audio.rel, path: output.rel, absolutePath: output.abs });
+      return { content: [{ type: 'text', text: beatsText(summary) }], structuredContent: summary };
     }),
   );
 

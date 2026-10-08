@@ -128,13 +128,13 @@ describe('helios MCP server: listing', () => {
     }
   });
 
-  it('lists the ten tools with their view and visibility metadata', async () => {
+  it('lists the eleven tools with their view and visibility metadata', async () => {
     await connect();
     const { tools } = await client.listTools();
     const byName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
 
     expect(Object.keys(byName).sort()).toEqual([
-      'cancel_render', 'get_frames', 'get_render_status', 'helios_library', 'list_videos',
+      'analyze_audio', 'cancel_render', 'get_frames', 'get_render_status', 'helios_library', 'list_videos',
       'preview_video', 'read_page', 'render_video', 'reveal_file', 'verify_video',
     ]);
     expect(client.getServerVersion()).toEqual({ name: 'helios', version: '9.9.9' });
@@ -154,7 +154,7 @@ describe('helios MCP server: listing', () => {
     for (const name of ['render_video', 'get_render_status', 'cancel_render']) {
       expect(byName[name]._meta).toEqual({ 'openai/widgetAccessible': true });
     }
-    for (const name of ['get_frames', 'verify_video']) {
+    for (const name of ['get_frames', 'verify_video', 'analyze_audio']) {
       expect(byName[name]._meta).toBeUndefined();
     }
 
@@ -163,6 +163,8 @@ describe('helios MCP server: listing', () => {
       expect(byName[name].annotations?.readOnlyHint, name).toBe(true);
     }
     expect(byName.render_video.annotations).toMatchObject({ readOnlyHint: false, idempotentHint: false });
+    // It writes the beats file, always the same one for the same audio.
+    expect(byName.analyze_audio.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: false, idempotentHint: true });
     expect((byName.verify_video.inputSchema.properties as any).cues).toMatchObject({ type: 'string' });
     expect((byName.render_video.inputSchema.properties as any).preset.enum).toContain('veryslow');
     expect((byName.render_video.inputSchema.properties as any).waitSeconds).toMatchObject({ default: 45, minimum: 0, maximum: 100 });
@@ -670,6 +672,149 @@ describe('helios MCP server: frames and verify', () => {
     const result = await call('verify_video', { path: 'a.html' });
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toBe('Could not verify a.html: The page declares no duration: pass --duration <seconds>');
+  });
+});
+
+// ---- analyze_audio -----------------------------------------------------------------------------
+
+const BEATS = {
+  version: 1,
+  source: 'song.mp3',
+  duration: 12.5,
+  bpm: 120.04,
+  tempo: [{ t: 0, bpm: 119.5 }, { t: 5, bpm: 120.04 }, { t: 10, bpm: 121.26 }],
+  beatsPerBar: 4,
+  beats: Array.from({ length: 24 }, (_, i) => 0.5 + i * 0.5),
+  downbeats: [0.5, 2.5, 4.5, 6.5, 8.5, 10.5],
+  downbeatMethod: 'kick',
+  sections: [{ t0: 0, t1: 4.5, energy: 0.312 }, { t0: 4.5, t1: 12.5, energy: 0.8 }],
+  hits: [
+    { t: 1, score: 0.3 }, { t: 2.5, score: 0.9 }, { t: 3, score: 0.25 }, { t: 4.5, score: 0.7 }, { t: 5, score: 0.2 },
+    { t: 6.5, score: 0.6 }, { t: 7, score: 0.5 }, { t: 8.5, score: 0.85 }, { t: 9, score: 0.4 }, { t: 10.5, score: 0.95 },
+  ],
+  onsets: { kick: [0.5, 1.5], snare: [1, 2], hat: [0.75] },
+  risers: [{ t0: 9.5, t1: 10.5 }],
+  envelope: { fps: 30, level: [0, 0.5, 1], low: [0, 0.4, 1], mid: [0, 0.2, 0.5], high: [0, 0.1, 0.3] },
+};
+
+/** Plays `helios analyze`: writes the beats file to -o and prints the summary line. */
+function analyzeRunner(beats: unknown = BEATS) {
+  return fakeRunner((c) => {
+    fs.writeFileSync(c.args[c.args.indexOf('-o') + 1], JSON.stringify(beats));
+    c.out('Wrote song.beats.json: 120.0 BPM (119.5–121.3), 24 beats, 6 bars, 10 hits, 2 sections\n');
+    c.exit(0);
+  });
+}
+
+describe('helios MCP server: analyze_audio', () => {
+  it('runs helios analyze into <audio>.beats.json next to the audio and summarises the file', async () => {
+    write('music/song.mp3', 'x');
+    const fake = analyzeRunner();
+    await connect(fake.runner);
+
+    const result = await call('analyze_audio', { path: 'music/song.mp3' });
+    expect(fake.calls).toHaveLength(1);
+    expect(fake.calls[0].cwd).toBe(root);
+    expect(fake.calls[0].args).toEqual([
+      'analyze', path.join(root, 'music/song.mp3'), '-o', path.join(root, 'music/song.beats.json'),
+    ]);
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text).toBe([
+      'Analyzed music/song.mp3 (12.5 s) and wrote music/song.beats.json.',
+      'Tempo: 120 BPM, drifting 119.5–121.3: time things from the beats array, not a fixed grid.',
+      '24 beats in 6 bars of 4; the first downbeat is at 0.5 s (chosen by the kick vote).',
+      'Sections, in seconds (energy 0–1): 0–4.5 (0.31), 4.5–12.5 (0.8).',
+      'Strongest hits, in seconds (score): 1 (0.3), 2.5 (0.9), 4.5 (0.7), 6.5 (0.6), 7 (0.5), 8.5 (0.85), 9 (0.4), 10.5 (0.95).',
+      'In the page, load it with fetch() by its path relative to the page, e.g. fetch(\'song.beats.json\') from a page in the same folder. ' +
+        'Every time in it is in seconds of song time; bar k starts at downbeats[k].',
+    ].join('\n'));
+    expect(result.structuredContent).toEqual({
+      audio: 'music/song.mp3',
+      path: 'music/song.beats.json',
+      absolutePath: path.join(root, 'music/song.beats.json'),
+      duration: 12.5,
+      bpm: 120,
+      tempoRange: { min: 119.5, max: 121.3 },
+      beats: 24,
+      bars: 6,
+      beatsPerBar: 4,
+      firstDownbeat: 0.5,
+      downbeatMethod: 'kick',
+      sections: [{ t0: 0, t1: 4.5, energy: 0.31 }, { t0: 4.5, t1: 12.5, energy: 0.8 }],
+      // The eight strongest, in time order: 3 s (0.25) and 5 s (0.2) are left out.
+      hits: [
+        { t: 1, score: 0.3 }, { t: 2.5, score: 0.9 }, { t: 4.5, score: 0.7 }, { t: 6.5, score: 0.6 },
+        { t: 7, score: 0.5 }, { t: 8.5, score: 0.85 }, { t: 9, score: 0.4 }, { t: 10.5, score: 0.95 },
+      ],
+    });
+  });
+
+  it('passes output, fps and tempoRange to the CLI and creates the output folder', async () => {
+    write('song.wav', 'x');
+    const fake = analyzeRunner();
+    await connect(fake.runner);
+    const result = await call('analyze_audio', { path: 'song.wav', output: 'video/beats/song.json', fps: 24, tempoRange: ' 120 : 140 ' });
+    expect(fake.calls[0].args).toEqual([
+      'analyze', path.join(root, 'song.wav'), '-o', path.join(root, 'video/beats/song.json'), '--fps', '24', '--tempo-range', '120:140',
+    ]);
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent.path).toBe('video/beats/song.json');
+    expect(result.content[0].text).toContain('fetch(\'song.json\')');
+  });
+
+  it('describes a steady tempo and a file without downbeats, sections or hits', async () => {
+    write('click.wav', 'x');
+    const fake = analyzeRunner({ version: 1, bpm: 100, tempo: [{ t: 0, bpm: 100 }], beats: [0, 0.6, 1.2], downbeats: [] });
+    await connect(fake.runner);
+    const result = await call('analyze_audio', { path: 'click.wav' });
+    expect(result.isError).toBeFalsy();
+    expect(result.content[0].text.split('\n').slice(0, 3)).toEqual([
+      'Analyzed click.wav and wrote click.beats.json.',
+      'Tempo: 100 BPM.',
+      '3 beats; no downbeats were found.',
+    ]);
+    expect(result.structuredContent).toMatchObject({ duration: null, bars: 0, firstDownbeat: null, sections: [], hits: [] });
+  });
+
+  it('rejects audio and outputs outside the root, and outputs that are not .json, before running anything', async () => {
+    write('song.mp3', 'x');
+    write('page.html', '<html></html>');
+    fs.writeFileSync(path.join(tmp, 'outside.mp3'), 'x');
+    const fake = analyzeRunner();
+    await connect(fake.runner);
+    for (const [args, message] of [
+      [{ path: '../outside.mp3' }, 'outside the project root'],
+      [{ path: 'missing.mp3' }, 'was not found'],
+      [{ path: 'song.mp3', output: '../beats.json' }, 'outside the project root'],
+      [{ path: 'song.mp3', output: 'page.html' }, 'must be a .json file'],
+      [{ path: 'song.mp3', tempoRange: 'fast' }, 'min:max'],
+    ] as const) {
+      const result = await call('analyze_audio', args);
+      expect(result.isError, JSON.stringify(args)).toBe(true);
+      expect(result.content[0].text, JSON.stringify(args)).toContain(message);
+    }
+    expect(fake.calls).toHaveLength(0);
+    expect(fs.readFileSync(path.join(root, 'page.html'), 'utf8')).toBe('<html></html>');
+  });
+
+  it('turns a failed analysis or a missing or broken beats file into a tool error', async () => {
+    write('song.mp3', 'x');
+    await connect(fakeRunner((c) => { c.err('Analyze failed: song.mp3 has no audio stream\n'); c.exit(1); }).runner);
+    const failed = await call('analyze_audio', { path: 'song.mp3' });
+    expect(failed.isError).toBe(true);
+    expect(failed.content[0].text).toBe('Could not analyze song.mp3: song.mp3 has no audio stream');
+    await client.close();
+
+    await connect(fakeRunner((c) => c.exit(0)).runner);
+    const missing = await call('analyze_audio', { path: 'song.mp3' });
+    expect(missing.isError).toBe(true);
+    expect(missing.content[0].text).toBe('helios analyze finished but wrote no beats file at song.beats.json');
+    await client.close();
+
+    await connect(analyzeRunner({ version: 1, beats: 'none' }).runner);
+    const broken = await call('analyze_audio', { path: 'song.mp3' });
+    expect(broken.isError).toBe(true);
+    expect(broken.content[0].text).toContain('song.beats.json is not a Helios beats file');
   });
 });
 

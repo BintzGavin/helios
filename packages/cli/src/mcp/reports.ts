@@ -1,7 +1,8 @@
+import path from 'path';
 import { stripAnsi } from './cli-runner.js';
 
 /**
- * Reads what `helios verify --json` writes, and turns
+ * Reads what `helios analyze` and `helios verify --json` write, and turns
  * it into the short text and structured content the MCP tools return. Every field is checked
  * and copied, never passed through: a structuredContent that doesn't match the tool's
  * outputSchema fails the whole call, and these files come from another process and version.
@@ -55,6 +56,112 @@ export function parseJsonObject(stdout: string): Json | undefined {
     if (found) return found;
   }
   return undefined;
+}
+
+// ---- helios analyze ------------------------------------------------------------------------
+
+/** How many of the strongest hits a summary lists. */
+export const TOP_HITS = 8;
+const MAX_SECTIONS = 64;
+const TEXT_SECTIONS = 12;
+
+export interface BeatsSummary {
+  [key: string]: unknown;
+  /** The audio, relative to the project root. */
+  audio: string;
+  /** The beats file, relative to the project root. */
+  path: string;
+  absolutePath: string;
+  duration: number | null;
+  bpm: number;
+  tempoRange: { min: number; max: number };
+  beats: number;
+  bars: number;
+  beatsPerBar: number;
+  firstDownbeat: number | null;
+  /** How the downbeats were placed: "kick" or "harmony". */
+  downbeatMethod?: string;
+  sections: Array<{ t0: number; t1: number; energy?: number }>;
+  /** The strongest hits, in time order. */
+  hits: Array<{ t: number; score: number }>;
+}
+
+export function summarizeBeats(data: unknown, where: { audio: string; path: string; absolutePath: string }): BeatsSummary {
+  if (!isObject(data) || num(data.bpm) === undefined || !Array.isArray(data.beats)) {
+    throw new Error(`${where.path} is not a Helios beats file (it has no bpm or beats)`);
+  }
+  const bpm = num(data.bpm)!;
+  const tempos = Array.isArray(data.tempo)
+    ? data.tempo.map((point) => (isObject(point) ? num(point.bpm) : undefined)).filter((b): b is number => b !== undefined)
+    : [];
+  const downbeats = times(data.downbeats);
+  const sections = (Array.isArray(data.sections) ? data.sections : [])
+    .filter(isObject)
+    .filter((s) => num(s.t0) !== undefined && num(s.t1) !== undefined)
+    .slice(0, MAX_SECTIONS)
+    .map((s) => {
+      const section: { t0: number; t1: number; energy?: number } = { t0: round(num(s.t0)!, 3), t1: round(num(s.t1)!, 3) };
+      if (num(s.energy) !== undefined) section.energy = round(num(s.energy)!, 2);
+      return section;
+    });
+  const hits = (Array.isArray(data.hits) ? data.hits : [])
+    .filter(isObject)
+    .filter((h) => num(h.t) !== undefined)
+    .map((h) => ({ t: round(num(h.t)!, 3), score: round(num(h.score) ?? 0, 2) }))
+    .sort((a, b) => b.score - a.score || a.t - b.t)
+    .slice(0, TOP_HITS)
+    .sort((a, b) => a.t - b.t);
+
+  const summary: BeatsSummary = {
+    audio: where.audio,
+    path: where.path,
+    absolutePath: where.absolutePath,
+    duration: num(data.duration) !== undefined ? round(num(data.duration)!, 3) : null,
+    bpm: round(bpm, 1),
+    tempoRange: {
+      min: round(tempos.length ? Math.min(...tempos) : bpm, 1),
+      max: round(tempos.length ? Math.max(...tempos) : bpm, 1),
+    },
+    beats: data.beats.length,
+    bars: downbeats.length,
+    beatsPerBar: num(data.beatsPerBar) ?? 4,
+    firstDownbeat: downbeats.length ? round(downbeats[0], 3) : null,
+    sections,
+    hits,
+  };
+  if (typeof data.downbeatMethod === 'string' && data.downbeatMethod) summary.downbeatMethod = data.downbeatMethod;
+  return summary;
+}
+
+export function beatsText(summary: BeatsSummary): string {
+  const lines: string[] = [];
+  const length = summary.duration !== null ? ` (${secs(summary.duration)} s)` : '';
+  lines.push(`Analyzed ${summary.audio}${length} and wrote ${summary.path}.`);
+
+  const { min, max } = summary.tempoRange;
+  lines.push(min === max
+    ? `Tempo: ${summary.bpm} BPM.`
+    : `Tempo: ${summary.bpm} BPM, drifting ${min}–${max}: time things from the beats array, not a fixed grid.`);
+
+  const how = summary.downbeatMethod ? ` (chosen by the ${summary.downbeatMethod} vote)` : '';
+  lines.push(summary.firstDownbeat !== null
+    ? `${summary.beats} beats in ${summary.bars} bars of ${summary.beatsPerBar}; the first downbeat is at ${secs(summary.firstDownbeat)} s${how}.`
+    : `${summary.beats} beats; no downbeats were found.`);
+
+  if (summary.sections.length) {
+    const shown = summary.sections.slice(0, TEXT_SECTIONS)
+      .map((s) => `${secs(s.t0)}–${secs(s.t1)}${s.energy !== undefined ? ` (${s.energy})` : ''}`);
+    const more = summary.sections.length > TEXT_SECTIONS ? `, and ${summary.sections.length - TEXT_SECTIONS} more` : '';
+    lines.push(`Sections, in seconds (energy 0–1): ${shown.join(', ')}${more}.`);
+  }
+  if (summary.hits.length) {
+    lines.push(`Strongest hits, in seconds (score): ${summary.hits.map((h) => `${secs(h.t)} (${h.score})`).join(', ')}.`);
+  }
+  lines.push(
+    `In the page, load it with fetch() by its path relative to the page, e.g. fetch('${path.posix.basename(summary.path)}') from a page in the same folder. ` +
+    'Every time in it is in seconds of song time; bar k starts at downbeats[k].',
+  );
+  return lines.join('\n');
 }
 
 // ---- helios verify --json ------------------------------------------------------------------
