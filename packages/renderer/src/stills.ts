@@ -1,5 +1,6 @@
 import { BrowserPool } from './core/BrowserPool.js';
 import { BrowserConfig } from './types.js';
+import { DEFAULT_MIN_TEXT_OPACITY, FRAME_TEXT_SCRIPT } from './utils/frame-text.js';
 
 export interface CaptureFramesOptions {
   /** Viewport size. Defaults to 1920x1080. */
@@ -12,6 +13,31 @@ export interface CaptureFramesOptions {
   browserConfig?: BrowserConfig;
   /** How long a frame may wait for fonts, media or the page's hook. Defaults to 30s. */
   stabilityTimeout?: number;
+}
+
+export interface ReadFrameTextOptions {
+  /** Viewport size. Defaults to 1920x1080. */
+  width?: number;
+  height?: number;
+  browserConfig?: BrowserConfig;
+  /** How long a frame may wait for fonts, media or the page's hook. Defaults to 30s. */
+  stabilityTimeout?: number;
+  /**
+   * Text fainter than this does not count: its opacity, times its ancestors', times the
+   * alpha of its fill (or stroke). Defaults to 0.1.
+   */
+  minOpacity?: number;
+}
+
+/** The text on screen in one frame. */
+export interface FrameText {
+  /**
+   * Visible DOM and SVG text, in document order, one entry per run: text nodes that sit next
+   * to each other on a line are joined, so letters in separate elements read as one word.
+   */
+  text: string[];
+  /** What the page passed to `window.heliosDrawnText.add()` while drawing the frame. */
+  drawn: string[];
 }
 
 export interface ContactSheetOptions extends CaptureFramesOptions {
@@ -71,6 +97,45 @@ export async function captureContactSheet(url: string, times: number[], options:
     await sheetPage.evaluate('Promise.all(Array.from(document.images, (img) => img.decode()))');
     const grid = await sheetPage.$('.grid');
     return await grid!.screenshot({ type: 'png' });
+  } finally {
+    await pool.close();
+    await pool.cleanupStrategies();
+  }
+}
+
+/**
+ * Reads the text on screen at each time (seconds), seeking the page the way a DOM-mode
+ * render does, in one page session. For checking that timed text (lyrics, captions) is on
+ * screen when it should be, without screenshots.
+ *
+ * Before each frame `window.heliosDrawnText` is set to a new Set, so pages that draw text
+ * where the DOM cannot see it (a canvas) can declare it with
+ * `window.heliosDrawnText?.add(text)`. During a normal render it is undefined, and the call
+ * does nothing.
+ *
+ * DOM and SVG text counts when its element is rendered (not display: none, visibility:
+ * hidden or opacity: 0 anywhere up the tree), its effective opacity reaches `minOpacity`,
+ * and at least half of it lies inside the viewport and inside any ancestor whose overflow
+ * clips it. It does not detect text covered by other elements, cut by clip-path or masks,
+ * or too small or low-contrast to read: contact sheets are for that.
+ */
+export async function readFrameText(url: string, times: number[], options: ReadFrameTextOptions = {}): Promise<FrameText[]> {
+  const pool = createPool(options);
+  try {
+    await pool.init(url);
+    const { page, timeDriver } = pool.workers[0];
+    await page.evaluate(FRAME_TEXT_SCRIPT);
+    const minOpacity = options.minOpacity ?? DEFAULT_MIN_TEXT_OPACITY;
+    const frames: FrameText[] = [];
+    if (times.length > 0) await page.evaluate(`window.__helios_arm_drawn_text(${JSON.stringify(times[0])})`);
+    for (let i = 0; i < times.length; i++) {
+      await timeDriver.setTime(page, times[i]);
+      // Reads this frame and arms the next one in the same call.
+      const next = i + 1 < times.length ? JSON.stringify(times[i + 1]) : 'undefined';
+      frames.push(await page.evaluate<FrameText>(`window.__helios_read_frame_text(${JSON.stringify(minOpacity)}, ${next})`));
+    }
+    if (pool.capturedErrors.length > 0) throw pool.capturedErrors[0];
+    return frames;
   } finally {
     await pool.close();
     await pool.cleanupStrategies();

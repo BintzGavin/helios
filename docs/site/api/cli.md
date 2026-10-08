@@ -168,9 +168,25 @@ Checks that every frame depends only on its time. Rendering in chunks (distribut
 helios verify page.html --duration 12
 ```
 
+With `--cues`, it also checks timed text: every lyric word or caption in the file must be on screen during its time. Each cue is sampled just after it starts, in the middle and just before it ends, all in one page session. A cue passes when each of its words shows in at least one of those frames, so a line revealed word by word passes. Matching ignores case, punctuation and accents.
+
+```bash
+helios verify page.html --duration 182 --cues lyrics.srt
+# 6 sampled frames are identical rendered in order and in reverse: each frame depends only on t.
+# 417/417 cues on screen at their time.
+```
+
+Text counts as on screen in two cases:
+- It is DOM or SVG text that is rendered (not `display: none`, `visibility: hidden` or opacity 0) and at least 10% opaque, counting its ancestors' opacity and its colour's alpha. At least half of it must also lie inside the frame and inside any container whose overflow clips it.
+- The page declared it drawn for that frame with `window.heliosDrawnText?.add(text)`. Canvas pages use this. The check sets `window.heliosDrawnText` to a new `Set` before each frame. During a normal render it is undefined, so the call does nothing.
+
+The check confirms that each word is present at its time. It doesn't check that the word is easy to read: use `helios sheet` for that.
+
 **Options**:
 - `--duration <seconds>`: The span to sample (default: the composition's).
 - `--samples <n>`: The number of frames to compare (default: `6`).
+- `--cues <file>`: Timed text that must be on screen at its time. Accepts an `.srt` file, a `.vtt` file, or a `.json` file holding an array of `{ "text", "start", "end" }` in seconds. The JSON can also be an object whose `cues` or `words` array holds those, and `w`, `t0` and `t1` work as aliases.
+- `--json`: Print one JSON object, `{ ok, purity: { ok, samples, differing, noisy, message }, cues?: { ok, total, shown, missing: [{ text, start, end, seen }], message } }`. It exits 1 when `ok` is false. Argument and page errors go to stderr as `Verify failed: <reason>`, with no JSON.
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
 
 ### `helios merge`
