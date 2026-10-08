@@ -161,6 +161,22 @@ helios verify page.html --duration 12
 - `--samples <n>`: The number of frames to compare (default: `6`).
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
 
+### `helios check`
+
+Checks a rendered video file before you deliver it. It prints one line per check and exits 1 when a check fails or the file can't be read.
+
+```bash
+helios check out.mp4 [--json]
+```
+
+- **Video and audio**: the codec, size, frame rate, pixel format, and the audio stream (or none).
+- **Color**: the matrix, primaries, transfer and range tags. An untagged Y'CbCr video is a warning: players guess, and often show it washed out.
+- **Length**: the frames actually decoded against the file's duration × frame rate. A mismatch (dropped or repeated frames, or audio that runs past the picture) is a warning.
+- **Flashes** (WCAG 2.3.1): more than 3 flashes, or more than 3 saturated red flashes, in any one second fails. A flash is a pair of opposing changes in relative luminance of at least 10% where the darker state is below 0.8. It counts when the area flashing together covers at least a quarter of a 10° visual field, taken as a window one third of the frame's width and height.
+
+**Options**:
+- `--json`: Print exactly one JSON object (`ok`, `file`, `video`, `audio`, `flash`, `problems`, `warnings`) for a pass or a fail. When the file can't be read, nothing goes to stdout and `Check failed: <reason>` goes to stderr.
+
 ### `helios merge`
 
 Merges multiple video files into a single output file without re-encoding.
