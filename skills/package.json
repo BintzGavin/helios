@@ -1,0 +1,36 @@
+{
+  "name": "@helios-project/skills",
+  "version": "1.0.0",
+  "description": "Agent skills for Helios video engine - browser-native programmatic animation and rendering",
+  "keywords": [
+    "helios",
+    "video",
+    "animation",
+    "rendering",
+    "ai-skills",
+    "agent-skills",
+    "skills.sh",
+    "claude",
+    "cursor",
+    "copilot"
+  ],
+  "homepage": "https://github.com/BintzGavin/helios/tree/main/skills",
+  "bugs": {
+    "url": "https://github.com/BintzGavin/helios/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git",
+    "directory": "skills"
+  },
+  "license": "Apache-2.0",
+  "author": "Helios Project",
+  "type": "module",
+  "files": [
+    "**/*.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
