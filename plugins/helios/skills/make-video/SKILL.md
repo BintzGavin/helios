@@ -99,7 +99,10 @@ Before a long render, check that the page really is a function of `t`:
 
 ```bash
 npx -y @helios-project/cli@latest verify video.html --duration 12   # exits 1 and names the frames that depend on history
+npx -y @helios-project/cli@latest verify video.html --duration 12 --cues lyrics.srt   # also: every lyric or caption on screen at its time
 ```
+
+Pick the moments for a sheet from the video's structure, not at random: the first, middle and last frame of each scene, every big beat or hit, every entrance, the middle of every transition.
 
 Open the PNGs with your image-viewing tool and check:
 - text is legible and inside the frame
@@ -107,13 +110,21 @@ Open the PNGs with your image-viewing tool and check:
 - there are no empty or black frames
 - the pacing matches the brief
 
-Fix the page, check again, and render again.
+Fix the page, check again, and render again. Then check the file itself:
+
+```bash
+npx -y @helios-project/cli@latest check video.mp4   # flashing above the WCAG 2.3.1 limit, colour tags, frame count
+```
 
 ## 4. Music and sound
 
-`--audio` muxes an audio file. To sync visuals to the music, use one of these:
-- **Known BPM:** beat `k` falls at `k * 60 / bpm` seconds. Drive pulses from `t` against that grid.
-- **Unknown tempo:** analyse the audio in the page. Decode it once and precompute a loudness envelope, then read the envelope at `t` in `renderAt`. See [references/music.md](references/music.md).
+`--audio` muxes an audio file. To sync visuals to the music, analyse it first:
+
+```bash
+npx -y @helios-project/cli@latest analyze track.mp3   # writes track.beats.json: beats, downbeats, drum hits, big moments, loudness per frame
+```
+
+Load that file in the page and read it at `t`: cut on downbeats, punch on kicks, land big moves on hits. Real songs drift in tempo, so use its `beats` list rather than `k * 60 / bpm`. Lyrics and captions go on screen at their sung time, not snapped to the beat. See [references/music.md](references/music.md).
 
 ## When something is wrong
 
@@ -123,7 +134,9 @@ Fix the page, check again, and render again.
 | `window.renderAt(2.5) threw: …` | Your page errored at that time. The message includes your stack trace. |
 | The first render pauses to download Chromium | That's expected, and it happens once. Don't run `npx playwright install` yourself: it fetches a build for the wrong Playwright version. |
 | "The page defines no window.helios, window.renderAt(t) …" | Your script never defined `renderAt`. Check the page for a load error, such as a syntax error or a failed import. |
-| Frames differ between two renders, or `verify` fails | Something isn't a function of `t`: an unseeded `Math.random()`, a counter or a timer. |
+| Frames differ between two renders, or `verify` fails | Something isn't a function of `t`: an unseeded `Math.random()`, a counter or a timer. On a canvas, also a pixel readback without `willReadFrequently`, or context state left from the last frame. See [references/pages.md](references/pages.md#canvas-webgl-and-threejs). |
+| `verify --cues` says a cue is not on screen | Show each cue for its whole time. Text drawn on a canvas must be declared: `window.heliosDrawnText?.add(text)`. |
+| `check` reports flashing | More than three flashes in a second can trigger seizures. Slow the strobe, shrink the flashing area, or lower its contrast. |
 | Blank WebGL frames | Draw inside `renderAt` (or a rAF loop), not once at load. |
 
 Bigger projects (React/Vue components, studio editing, distributed cloud rendering) use the Helios packages directly: <https://github.com/BintzGavin/helios>.
