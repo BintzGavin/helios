@@ -47,6 +47,20 @@ helios add <component> [options]
 2. Downloads/Copies the component source code to your configured `components` directory.
 3. Installs any necessary dependencies (unless `--no-install` is used).
 
+**Built-in components**:
+
+| Component | Type | What it does |
+|---|---|---|
+| `use-video-frame` | React | Hook that re-renders on every frame. |
+| `timer` | React | Shows the time as MM:SS:FF. |
+| `progress-bar` | React | Shows playback progress. |
+| `watermark` | React | Text or image logo overlay. |
+| `shaders` | Vanilla | Renders [Shaders](/examples/shaders) WebGPU effects on Helios time. |
+| `beat-clock` | Vanilla | Beats, bars, kick pulses, hits and loudness at any time, from `helios analyze` output. See [Beat Clock](/examples/beat-clock). |
+| `cursor` | Vanilla | A scripted mouse pointer whose clicks land on the times you give. See [Scripted Cursor](/examples/cursor). |
+
+Vanilla components work in any project, with or without a framework.
+
 ### `helios update`
 
 Updates a component to the latest version from the registry.

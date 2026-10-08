@@ -1,4 +1,26 @@
-import { ComponentDefinition } from './types.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { ComponentDefinition, ComponentFile } from './types.js';
+
+/**
+ * A file whose source is a module in ./components, unit-tested with the rest of the CLI. The
+ * build copies those .ts files next to the compiled manifest (scripts/copy-registry.js), so the
+ * same relative path works from src and from dist. The source is read when the component is
+ * installed or diffed, not when the CLI starts.
+ */
+function sourceFile(name: string): ComponentFile {
+  return {
+    name,
+    get content() {
+      const url = new URL(`./components/${name}`, import.meta.url);
+      try {
+        return readFileSync(url, 'utf8');
+      } catch {
+        throw new Error(`The CLI is missing the source of ${name} (${fileURLToPath(url)}). Rebuild it with "npm run build -w packages/cli".`);
+      }
+    },
+  };
+}
 
 const TIMER_CODE = `import React from 'react';
 import { useVideoFrame } from './useVideoFrame';
@@ -408,6 +430,18 @@ export const registry: ComponentDefinition[] = [
       'shaders': '^4.0.0',
       '@helios-project/core': 'latest'
     }
+  },
+  {
+    name: 'beat-clock',
+    description: 'Beats, bars, kick pulses, hits, sections and loudness at any time, from `helios analyze` output.',
+    type: 'vanilla',
+    files: [sourceFile('beatClock.ts')],
+  },
+  {
+    name: 'cursor',
+    description: 'A scripted mouse pointer with human reaches, whose clicks land on the times you give.',
+    type: 'vanilla',
+    files: [sourceFile('cursor.ts')],
   },
 ];
 
