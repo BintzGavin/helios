@@ -1,6 +1,6 @@
 ---
 name: motion-design-rules
-description: Motion design framework for programmatic video. Defines anti-slideshow architecture, visual layering, physics-based easing, choreography rules, and quality validation. Reference this skill from any guided video skill.
+description: Motion design framework for programmatic video. Defines anti-slideshow architecture, visual layering, physics-based easing, choreography, timing to music and voice, and checks a script can run. Reference this skill from any guided video skill.
 ---
 
 These rules apply to every Helios video composition.
@@ -142,3 +142,67 @@ Preferred transition patterns:
 • Morphing shapes that carry energy between scenes
 
 Avoid: hard cuts, full-black gaps, simultaneous fade-out/fade-in.
+
+With music, a hard cut that lands on a kick or a downbeat is a
+transition in its own right: the beat carries it. See Rule 7.
+
+------------------------------------------------------------
+RULE 7 — Timing Answers the Sound
+------------------------------------------------------------
+
+When there is a soundtrack, every timed thing answers something
+you can hear. Get the beat map first:
+
+  npx -y @helios-project/cli@latest analyze track.mp3   # writes track.beats.json
+
+It holds beats and downbeats that follow the track's real tempo,
+which drifts, plus kick/snare/hat onsets, the big hits, risers,
+sections and per-frame loudness envelopes. Never lay a grid from
+one BPM on a real song: it is a beat off within a minute.
+
+Key every timed thing to one of these, and say which in the spec:
+
+• W  a word's time (lyrics, captions, voice-over)
+• B  the beat grid (beats, downbeats, bars)
+• H  a track event (kick, snare, impact, riser, envelope)
+• F  a fixed time in the video
+• T  a moment measured in footage or a clip
+
+Rules:
+
+• The motion syncs to the beat; the word syncs to the voice.
+  A lyric or caption appears at its spoken or sung time, never
+  snapped to the nearest beat.
+• Cuts land on downbeats, kicks or snares. Camera moves answer
+  sounds: a small punch on kicks, a push that rides a riser into
+  the hit it lands on, a bigger move on real impacts.
+• An entrance takes at most an eighth of a beat when it marks a
+  beat; a snap keyed early reads as early.
+• Hold still where the music breathes. No shake in a drumless
+  intro. Let a calm song be calm: fewer cuts, longer shots.
+• Flashes belong to an idea, on hits only, and never more than
+  three in any second (WCAG 2.3.1). `helios check video.mp4`
+  measures it.
+• The accent colour goes on at most two elements in a frame.
+• Two on-screen numbers that mean the same thing are driven by
+  the same value.
+
+------------------------------------------------------------
+RULE 8 — Checks a Script Can Run
+------------------------------------------------------------
+
+A check a script can run beats a judgement. Before handing over:
+
+• `helios verify page.html` — every frame depends only on t.
+• `helios verify page.html --cues lyrics.srt` — every lyric,
+  caption or word is on screen at its time (N/N). Canvas pages
+  declare what they drew with `window.heliosDrawnText?.add(text)`.
+• `helios sheet` at the moments that matter, not at random: the
+  first, middle and last frame of every scene, every hit, every
+  entrance, the middle of every transition. Open the sheet and
+  look; a sheet nobody looked at is not a review.
+• `helios check video.mp4` on the final file — flashing and
+  colour tags.
+
+If a reviewer can see a problem and no check catches it, add a
+check.

@@ -47,6 +47,24 @@ CSS `@keyframes`, the Web Animations API, and GSAP/motion timelines that are cre
 - WebGL/three.js: build the scene at load; in `renderAt`, set every animated property from `t`, then call `renderer.render(scene, camera)`. Don't rely on `clock.getDelta()`.
 - A page that is only one full-frame canvas renders fastest with `--mode canvas`.
 
+Frames that change depending on what rendered before them usually come from one of these:
+- **Canvas readbacks.** After `getImageData`, or after drawing a WebGL canvas into a 2D canvas, Chrome can switch a canvas between GPU and CPU rasterisation, and antialiasing then depends on history. Create any canvas you read back with `getContext('2d', { willReadFrequently: true })`.
+- **Leftover context state.** Reset it at the start of every frame: `ctx.reset()`, or `ctx.setTransform(1, 0, 0, 1, 0, 0)` plus `globalAlpha`, `filter` and `globalCompositeOperation`. Otherwise one frame's scale or alpha leaks into the next.
+- **CSS `will-change`.** It makes Chrome reuse rasterisation from earlier frames. Remove it.
+- **Caches filled on first use.** Decode images and fonts in `ready`, before any frame. A cache filled inside `renderAt` makes the first frame a worker draws different.
+
+Keep footage and anything graded with it on one canvas, and type and UI on a second canvas above it, so text stays crisp and is never filtered with the picture.
+
+## Text the checker can see
+
+`helios verify page.html --cues lyrics.srt` checks that every cue is on screen at its time. DOM and SVG text is found automatically. Text drawn on a canvas is invisible to it, so declare what each frame draws:
+
+```js
+const say = (text, x, y) => { ctx.fillText(text, x, y); window.heliosDrawnText?.add(text); };
+```
+
+During a normal render `window.heliosDrawnText` is undefined and the call does nothing.
+
 ## Images and fonts
 
 ```js
