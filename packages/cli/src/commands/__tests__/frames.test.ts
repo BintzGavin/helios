@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
-import { captureFrames, captureContactSheet, probeComposition } from '@helios-project/renderer';
+import os from 'os';
+import { captureFrames, captureContactSheet, probeComposition, readFrameText } from '@helios-project/renderer';
 import { registerFrameCommands } from '../frames.js';
 import { spawnSync } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
@@ -19,6 +20,7 @@ vi.mock('@helios-project/renderer', () => ({
   captureFrames: vi.fn(),
   captureContactSheet: vi.fn(),
   probeComposition: vi.fn(),
+  readFrameText: vi.fn(),
 }));
 
 describe('still and sheet commands', () => {
@@ -128,6 +130,123 @@ describe('still and sheet commands', () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
       expect(errors()).toContain('--duration');
       expect(captureFrames).not.toHaveBeenCalled();
+    });
+
+    it('names the canvas readback trap when frames depend on history', async () => {
+      let pass = 0;
+      vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
+        pass++;
+        return times.map((t) => (pass === 1 ? boxPng(10 + t) : boxPng(40 + t)));
+      });
+      await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '12', '--samples', '4', '--width', '160', '--height', '90']);
+      expect(errors()).toMatch(/^Verify failed: Frames at 0s, 3s, 6s, 9s differ depending on what was rendered before them/);
+      expect(errors()).toContain('will-change');
+      expect(errors()).toContain("getContext('2d', { willReadFrequently: true })");
+      expect(errors()).toContain('reset the context state');
+    });
+
+    describe('--cues and --json', () => {
+      let dir: string;
+      let stdout: string[];
+      const cueFile = (name: string, content: string) => {
+        const file = path.join(dir, name);
+        fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(file, content);
+        return file;
+      };
+      // The words on screen at each time: "hello" from 1 s, "world" from 2 s.
+      const lyrics = (times: number[]) => times.map((t) => ({ text: [t >= 1 ? 'Hello' : '', t >= 2 ? 'world.' : ''].filter(Boolean), drawn: [] }));
+
+      beforeEach(() => {
+        dir = path.join(os.tmpdir(), `helios-verify-cues-${process.pid}`);
+        // This block writes real cue files.
+        vi.mocked(fs.writeFileSync).mockRestore();
+        vi.mocked(fs.mkdirSync).mockRestore();
+        stdout = [];
+        vi.spyOn(process.stdout, 'write').mockImplementation(((chunk: any) => { stdout.push(String(chunk)); return true; }) as any);
+        vi.mocked(captureFrames).mockImplementation(async (_url, times) => times.map((t) => Buffer.from(`frame@${t}`)));
+        vi.mocked(readFrameText).mockImplementation(async (_url, times) => lyrics(times));
+      });
+
+      afterEach(() => { fs.rmSync(dir, { recursive: true, force: true }); });
+
+      it('reads the text at a few times inside every cue, in one page session, and passes when each cue shows', async () => {
+        const file = cueFile('lyrics.srt', '1\n00:00:01,000 --> 00:00:02,000\nHello\n\n2\n00:00:02,000 --> 00:00:03,000\nworld\n');
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--cues', file]);
+        expect(readFrameText).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(readFrameText).mock.calls[0][1]).toEqual([1.12, 1.5, 1.88, 2.12, 2.5, 2.88]);
+        expect(vi.mocked(readFrameText).mock.calls[0][2]).toEqual(expect.objectContaining({ width: 1080, height: 1920 }));
+        expect(exitSpy).not.toHaveBeenCalled();
+        expect(logs()).toContain('identical');
+        expect(logs()).toContain('2/2 cues on screen at their time.');
+      });
+
+      it('fails and names the cues that are not on screen at their time', async () => {
+        const file = cueFile('words.json', JSON.stringify({ words: [{ w: 'hello', t0: 1, t1: 1.5 }, { w: 'gentlemen', t0: 1.5, t1: 1.9 }] }));
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--cues', file]);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+        expect(logs()).toContain('identical');
+        expect(errors()).toMatch(/^1 of 2 cues are not on screen at their time: "gentlemen" \(1\.5–1\.9 s\)/);
+      });
+
+      it('--json prints one object with both checks, and exits 0 when they pass', async () => {
+        const file = cueFile('lyrics.vtt', 'WEBVTT\n\n00:01.000 --> 00:02.000\nHello\n');
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--samples', '2', '--cues', file, '--json']);
+        expect(exitSpy).not.toHaveBeenCalled();
+        expect(JSON.parse(stdout.join(''))).toEqual({
+          ok: true,
+          purity: { ok: true, samples: 2, differing: [], noisy: [], message: '2 sampled frames are identical rendered in order and in reverse: each frame depends only on t.' },
+          cues: { ok: true, total: 1, shown: 1, missing: [], message: '1/1 cues on screen at their time.' },
+        });
+      });
+
+      it('--json reports failures in the object and exits 1', async () => {
+        const file = cueFile('lyrics.json', JSON.stringify([{ text: 'world', start: 1, end: 1.5 }]));
+        let pass = 0;
+        vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
+          pass++;
+          return times.map((t) => (pass === 1 ? boxPng(10 + t) : boxPng(40 + t)));
+        });
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--samples', '2', '--width', '160', '--height', '90', '--cues', file, '--json']);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+        const result = JSON.parse(stdout.join(''));
+        expect(result.ok).toBe(false);
+        expect(result.purity).toEqual(expect.objectContaining({ ok: false, samples: 2, differing: [0, 2], noisy: [] }));
+        expect(result.purity.message).toMatch(/^Frames at 0s, 2s differ depending on what was rendered before them/);
+        expect(result.cues).toEqual(expect.objectContaining({
+          ok: false, total: 1, shown: 0,
+          missing: [{ text: 'world', start: 1, end: 1.5, seen: 'Hello' }],
+        }));
+        expect(result.cues.message).toMatch(/^1 of 1 cues are not on screen at their time: "world" \(1–1\.5 s\)/);
+      });
+
+      it('--json leaves out "cues" without --cues, and keeps logs off stdout', async () => {
+        vi.mocked(captureFrames).mockImplementation(async (_url, times) => {
+          console.log('Initializing pool of 1 browsers/pages...');
+          return times.map((t) => Buffer.from(`frame@${t}`));
+        });
+        const stderr = vi.spyOn(process.stderr, 'write').mockImplementation((() => true) as any);
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--json']);
+        const result = JSON.parse(stdout.join(''));
+        expect(Object.keys(result)).toEqual(['ok', 'purity']);
+        expect(stderr.mock.calls.flat().join('')).toContain('Initializing pool');
+        expect(vi.mocked(console.log)).not.toHaveBeenCalled();
+      });
+
+      it('reports a missing cue file or a page error on stderr, with no JSON', async () => {
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--cues', path.join(dir, 'nope.srt'), '--json']);
+        expect(errors()).toMatch(/^Verify failed: Could not read .*nope\.srt: no such file/);
+        expect(stdout).toEqual([]);
+        expect(captureFrames).not.toHaveBeenCalled();
+
+        vi.mocked(errorSpy).mockClear();
+        const file = cueFile('lyrics.srt', '00:00:01,000 --> 00:00:02,000\nHello\n');
+        vi.mocked(readFrameText).mockRejectedValue(new Error('window.renderAt(1.12) threw: boom'));
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--cues', file, '--json']);
+        expect(errors()).toBe('Verify failed: window.renderAt(1.12) threw: boom');
+        expect(stdout).toEqual([]);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+      });
     });
   });
 
