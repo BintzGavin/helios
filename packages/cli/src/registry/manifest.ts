@@ -437,6 +437,12 @@ export const registry: ComponentDefinition[] = [
     type: 'vanilla',
     files: [sourceFile('beatClock.ts')],
   },
+  {
+    name: 'cursor',
+    description: 'A scripted mouse pointer with human reaches, whose clicks land on the times you give.',
+    type: 'vanilla',
+    files: [sourceFile('cursor.ts')],
+  },
 ];
 
 export function findComponent(name: string): ComponentDefinition | undefined {

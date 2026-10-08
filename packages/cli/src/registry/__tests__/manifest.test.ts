@@ -12,6 +12,7 @@ describe('Registry Manifest', () => {
     expect(names).toContain('watermark');
     expect(names).toContain('shaders');
     expect(names).toContain('beat-clock');
+    expect(names).toContain('cursor');
   });
 
   it('should have valid ComponentDefinition structure for each component', () => {
@@ -48,6 +49,7 @@ describe('Registry Manifest', () => {
 
   it.each([
     ['beat-clock', 'beatClock.ts'],
+    ['cursor', 'cursor.ts'],
   ])('installs the tested source of %s, with nothing else to install', (name, file) => {
     const component = findComponent(name);
     expect(component).toMatchObject({ name, type: 'vanilla' });
