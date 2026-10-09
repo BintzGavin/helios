@@ -65,20 +65,21 @@ uniform float uFrameIndex;
 uniform float uBloom;
 uniform float uHaze;
 uniform vec4 uShock[6];     // centre (px), age (frames), strength
-uniform vec4 uRays;         // centre (px), strength, unused
+uniform vec4 uRays;         // centre (px), strength, 1 = gather warm light only
 uniform vec4 uLeak;         // centre (uv), radius, strength
 uniform vec3 uLeakColor;
 uniform vec2 uWeave;        // gate weave, px
 uniform float uAberration;
 uniform float uGrain;
 uniform float uVignette;
+uniform float uZoom;        // push-in about the centre, 1 = none
 
 vec3 frameAt(vec2 uv) { return texture(uFrame, uv).rgb; }
 
 void main() {
   vec2 res = uSize;
   vec2 px = vec2(gl_FragCoord.x, res.y - gl_FragCoord.y);   // y down, like the film
-  vec2 p = px + uWeave;
+  vec2 p = (px - res * .5) / uZoom + res * .5 + uWeave;
 
   // Heat haze: a slow upward shimmer on the thermal shots.
   if (uHaze > 0.) {
@@ -123,7 +124,7 @@ void main() {
     float decay = 1.;
     for (int i = 0; i < 36; i++) {
       vec3 f = frameAt(s);
-      float electric = smoothstep(.12, .55, f.b - f.r) + smoothstep(.35, .8, f.r - f.b) * .8;
+      float electric = smoothstep(.12, .55, f.b - f.r) * (1. - uRays.w) + smoothstep(.35, .8, f.r - f.b) * .8;
       rays += f * electric * decay;
       decay *= .94;
       s += step;
@@ -267,6 +268,7 @@ export class Enhancer {
       uAberration: look.aberration,
       uGrain: look.grain,
       uVignette: look.vignette,
+      uZoom: look.zoom ?? 1,
     }, { uFrame: this.source, uBloomA: halfA.texture, uBloomB: quarterB.texture });
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);

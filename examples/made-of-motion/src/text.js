@@ -16,12 +16,15 @@ export const FONT_FILES = {
 const fonts = new Map();
 
 export async function loadFonts(dir) {
-  await Promise.all(Object.entries(FONT_FILES).map(async ([family, file]) => {
-    const response = await fetch(`${dir}/${file}`);
-    if (!response.ok) throw new Error(`Missing font ${dir}/${file}. Run scripts/fetch-assets.mjs first.`);
-    const face = new hb.Face(new hb.Blob(await response.arrayBuffer()));
-    fonts.set(family, { font: new hb.Font(face), upem: face.upem, outlines: new Map() });
-  }));
+  await Promise.all(Object.entries(FONT_FILES).map(([family, file]) => loadFont(family, `${dir}/${file}`)));
+}
+
+/** Load one more font file under `family`. */
+export async function loadFont(family, url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Missing font ${url}. Run scripts/fetch-assets.mjs first.`);
+  const face = new hb.Face(new hb.Blob(await response.arrayBuffer()));
+  fonts.set(family, { font: new hb.Font(face), upem: face.upem, outlines: new Map() });
 }
 
 function font(family) {

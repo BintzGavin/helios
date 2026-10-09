@@ -3,7 +3,7 @@
 A Helios port of **made-of-motion**, the 489-frame, 1440×1080 promo film from the fframes
 repository ([dmtrKovalenko/fframes#193](https://github.com/dmtrKovalenko/fframes/pull/193),
 MIT). It contains a handwritten opening, an electric star, thermal footage, a carousel of pixel
-objects, 34,272 rotoscoped ink contours and a flying wordmark. There are two pages:
+objects, 34,272 rotoscoped ink contours and a flying wordmark. There are three pages:
 
 - **`composition.html`** reproduces the fframes film frame for frame. Rendered through Helios, it
   matches fframes' own output to the byte on 488 of 489 frames (see [Fidelity](#fidelity)).
@@ -11,11 +11,13 @@ objects, 34,272 rotoscoped ink contours and a flying wordmark. There are two pag
   bloom with film halation, god rays from the star, refraction shockwaves at the ring
   collisions, heat haze on the thermal shots, light leaks on hard cuts, soft contact shadows
   under the pixel objects, lens chromatic aberration, gate weave and luma-aware grain.
+- **`promo.html`** is a Helios promo built on the film: same edit, same music, a new story
+  (see [The promo](#the-promo)).
 
 > This example reproduces another engine's film exactly, so it is a fidelity reference. It
 > is not a template for how a Helios video should look or be organized.
 
-Both pages follow the Helios page contract: `window.renderAt(t)` draws the frame at `t`
+All three pages follow the Helios page contract: `window.renderAt(t)` draws the frame at `t`
 seconds and depends on nothing else.
 
 ## Run it
@@ -40,6 +42,10 @@ helios render composition.html -o made-of-motion.mp4 \
 helios render enhanced.html -o made-of-motion-enhanced.mp4 \
   --width 1440 --height 1080 --fps 24 --duration 20.375 \
   --audio assets/soundtrack.m4a --preset slow --quality 16
+
+helios render promo.html -o helios-promo.mp4 \
+  --width 1440 --height 1080 --fps 24 --duration 20.375 \
+  --audio assets/soundtrack.m4a --preset slow --quality 16
 ```
 
 To preview a page, serve this folder over HTTP and call `renderAt(t)`, or use `helios still`
@@ -58,6 +64,7 @@ and `helios sheet`. A `file://` URL won't work.
 | `src/text.js` | usvgr text layout | HarfBuzz (WASM) shaping and glyph outlines, filled as paths |
 | `src/libm.js` | glibc, Rust `libm` | `sinf`/`cosf`/`expf` as the Rust film computes them |
 | `src/enhance.js` | none (new) | The enhanced grade |
+| `src/promo.js` | none (new) | The Helios promo: copy, running time, worker grid, finale |
 
 fframes renders SVG trees with Skia, and Chrome's 2D canvas is also Skia, so the vector work
 (ink contours, glyph outlines, rectangles, strokes) matches once the geometry is the same.
@@ -97,6 +104,33 @@ Getting byte-identical frames needed the rest to follow fframes exactly:
 - **Undithered gradients are computed, not drawn.** Chrome dithers every canvas gradient, and
   Skia draws fframes' undithered one on its 8-bit pipeline, so the port computes that glow's
   pixels with the same integer arithmetic, using Chrome's coverage for the ellipse's edge.
+
+## The promo
+
+`promo.html` (`src/promo.js`) keeps the film's cuts and soundtrack and tells the Helios story
+over them. Helios is named after the sun because video is light over time, so light and time
+run through the whole cut:
+
+- **The story.** "how do you turn a web page into a film?" "you don't. you give it time." The
+  cards become `html.`, `time.` and `light.`, the hand takes it "from one page to every
+  frame", and the pulses spell T-I-M-E.
+- **The running time.** A small clock in the corner shows the film's own `t` and never resets.
+  It glows when the portrait says "time.", and the `time.` card calls
+  `window.renderAt(t)` with the live value.
+- **The worker grid.** After the `time.` card the camera pulls back from the shot into a grid of
+  sixteen tiles, each rendering a different moment of the same film at its own `t`, then dives
+  into the tile that opens the next shot: any frame, any order, any machine. It works because
+  every frame is a pure function of `t`.
+- **The finale.** The flying letters gather into HELIOS on the last hit. The paper then burns
+  away from the sun, edged with embers, into the brand's night sky. The sun mark draws its rays,
+  and "video is light over time." types itself out while the music breathes.
+
+The lockup follows the Helios logo (`docs/site/logo`): the gold sun with eight rays and the
+wordmark in Space Grotesk Bold, vendored here under the SIL Open Font License.
+
+The promo reuses the film's media, and some of it (the soundtrack, the portrait footage and the
+rotoscoped ink) traces back to the third-party reference film that fframes adapted. Replace
+those with media you have the rights to before publishing the promo.
 
 ## Fidelity
 
@@ -139,4 +173,6 @@ example by Dmitriy Kovalenko (MIT). The film adapts a
 [reference film](https://x.com/jordanarchivess/status/2107536262894915762) by its own
 account; its soundtrack and portrait footage come from there and are fetched from fframes,
 not redistributed here. HarfBuzz is vendored as harfbuzzjs 1.6.3 (MIT) in
-`vendor/harfbuzzjs`.
+`vendor/harfbuzzjs`, and Space Grotesk Bold 2.000 by the Space Grotesk Project Authors
+(SIL OFL 1.1, [floriankarsten/space-grotesk](https://github.com/floriankarsten/space-grotesk))
+in `vendor/space-grotesk`.
