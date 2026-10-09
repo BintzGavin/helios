@@ -8,7 +8,8 @@ import { FeatureExtractor } from '../features.js';
 import { drumOnsets } from '../onsets.js';
 import { tempoCurve } from '../beats.js';
 import {
-  NOTE, SR, Track, chord, crash, drumLoop, hat, kick, rampBeats, riser, snare, steadyBeats, writeWav, type Loop,
+  NOTE, SR, Track, chord, crash, drumLoop, dropSong, hat, kick, rampBeats, riser, snare, steadyBeats, typingSong, writeWav,
+  type Loop, type Song,
 } from './synth.js';
 
 const C = [NOTE.C4, NOTE.E4, NOTE.G4];
@@ -256,5 +257,74 @@ describe('analyzeAudioFile', () => {
     await expect(analyzeAudioFile(file('notes.txt'))).rejects.toThrow(/no audio stream|could not decode/);
     await expect(analyzeAudioFile(file('missing.mp3'))).rejects.toThrow('does not exist');
     await expect(analyzeAudioFile(file('loop.wav'), { tempoRange: [180, 60] })).rejects.toThrow('--tempo-range');
+  });
+});
+
+describe('analyzeSamples on two music videos', () => {
+  // Synthetic stand-ins for the two songs these failures came from (see dropSong and typingSong).
+  let drop: Song;
+  let dropMap: BeatMap;
+  let typing: Song;
+  let typingMap: BeatMap;
+  /** Hits strictly inside (t0, t1). */
+  const hitsWithin = (map: BeatMap, t0: number, t1: number) => map.hits.filter((h) => h.t > t0 && h.t < t1);
+
+  beforeAll(() => {
+    drop = dropSong();
+    dropMap = analyzeSamples(drop.track.normalize().samples, SR, 'drop.wav');
+    typing = typingSong();
+    typingMap = analyzeSamples(typing.track.normalize().samples, SR, 'typing.wav');
+  });
+
+  it('finds the drop after a riser and snare roll, though the riser already filled the window before it', () => {
+    // Was missed: the riser made the previous 1.5 s as loud as the drop.
+    const bar8 = drop.bar(8);
+    expect(worstMiss(dropMap.hits.map((h) => h.t), [bar8])).toBeLessThan(0.015);
+    expect(dropMap.hits.find((h) => Math.abs(h.t - bar8) < 0.015)!.score).toBeGreaterThanOrEqual(0.3);
+  });
+
+  it('finds the final hit after a reverse swell, and nothing on the swell\'s rising edge', () => {
+    // Was missed, with a spurious hit at bar 19.44 (and 47.77 s in the 120 BPM song).
+    expect(worstMiss(dropMap.hits.map((h) => h.t), [drop.bar(20)])).toBeLessThan(0.015);
+    expect(hitsWithin(dropMap, drop.bar(19), drop.bar(20) - 0.015)).toEqual([]);
+    expect(worstMiss(typingMap.hits.map((h) => h.t), [typing.bar(24)])).toBeLessThan(0.015);
+    expect(hitsWithin(typingMap, typing.bar(23), typing.bar(24) - 0.015)).toEqual([]);
+  });
+
+  it('finds the riser into the drop and the swell into the final hit', () => {
+    // Was empty. The riser runs bars 6–8, but under the pad it climbs audibly only in bar 7.
+    const into = (map: BeatMap, t: number) => map.risers.find((r) => Math.abs(r.t1 - t) < 0.015);
+    const riser = into(dropMap, dropMap.hits.find((h) => Math.abs(h.t - drop.bar(8)) < 0.015)!.t)!;
+    expect(riser).toBeDefined();
+    expect(riser.t0).toBeGreaterThan(drop.bar(5.75));
+    expect(riser.t0).toBeLessThan(drop.bar(7.25));
+    for (const [song, map] of [[drop, dropMap], [typing, typingMap]] as const) {
+      const swell = into(map, map.hits.find((h) => Math.abs(h.t - song.bar(map === dropMap ? 20 : 24)) < 0.015)!.t)!;
+      expect(swell).toBeDefined();
+      expect(swell.t0).toBeGreaterThan(song.bar(map === dropMap ? 19 : 23) - 0.25);
+    }
+  });
+
+  it('starts sections on the drop and on the break where the drums stop', () => {
+    // Was [bars 0–4] and [bars 4–21.4].
+    const starts = dropMap.sections.map((s) => s.t0);
+    expect(worstMiss(starts, [drop.bar(4), drop.bar(8), drop.bar(16)])).toBeLessThan(0.015);
+    const dropSection = dropMap.sections.find((s) => Math.abs(s.t0 - drop.bar(8)) < 0.015)!;
+    expect(Math.abs(dropSection.t1 - drop.bar(16))).toBeLessThan(0.015);
+  });
+
+  it('keeps beats on the kick grid under typewriter clicks, and on the tempo where only clicks play', () => {
+    // Was up to 40 ms off: −32 ms on bar 0, where only clicks play, and ±13–34 ms on the
+    // half-time bars under the typing.
+    expect(typingMap.beats).toHaveLength(typing.beats.length);
+    expect(worstMiss(typingMap.beats, typing.beats)).toBeLessThan(0.012);
+    expect(worstMiss(typing.beats, typingMap.beats)).toBeLessThan(0.012);
+    const bar0 = typing.beats.filter((t) => t < typing.bar(1));
+    expect(worstMiss(typingMap.beats.slice(0, bar0.length), bar0)).toBeLessThan(0.005);
+    // The clicks are not drums.
+    const clicks = (list: number[]) => list.filter((t) => t < typing.bar(1) - 0.05).length;
+    expect(clicks(typingMap.onsets.snare) + clicks(typingMap.onsets.hat)).toBe(0);
+    // And beats with no drum after the final hit keep to the tempo too.
+    expect(worstMiss(dropMap.beats, drop.beats)).toBeLessThan(0.012);
   });
 });

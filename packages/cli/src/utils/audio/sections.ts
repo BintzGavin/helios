@@ -1,7 +1,8 @@
 /**
  * Sections: a heuristic segmentation on bar lines. A boundary goes where the four bars after a
- * downbeat differ most from the four bars before it, in loudness per band and in harmony, with
- * a boost where a hit lands. It finds where the track changes; it does not name the sections.
+ * downbeat differ most from the four bars before it, in loudness per band, in harmony and in
+ * whether the drums play, with a boost where a hit lands. It finds where the track changes; it
+ * does not name the sections.
  */
 import type { Features } from './features.js';
 import type { Hit, Loudness } from './hits.js';
@@ -24,6 +25,17 @@ const EDGE_SECTION_BARS = 2;
 const HARMONY_WEIGHT = 0.5;
 /** Weight of a hit (its score) landing on the boundary. */
 const HIT_WEIGHT = 0.5;
+/**
+ * Weight of the drums coming in or dropping out: the change in the share of bars with drums
+ * (a bar has them in full with at least one drum onset per beat). A break where every drum
+ * stops is a section even when the pad keeps the loudness up.
+ */
+const DRUM_WEIGHT = 0.5;
+/** Drums play in a bar with at least this share, and are out below DRUMS_OUT… */
+const DRUMS_IN = 0.5;
+const DRUMS_OUT = 0.25;
+/** …and switching for this many whole bars either side marks a boundary outright. */
+const DRUM_SWITCH_BARS = 2;
 /** A boundary needs novelty of at least this, and above the song's mean + 1 standard deviation. */
 const MIN_NOVELTY = 0.06;
 
@@ -33,6 +45,8 @@ export function findSections(
   loud: Loudness,
   features: Features,
   hits: Hit[],
+  drumOnsets: number[] = [],
+  beatsPerBar = 4,
 ): Section[] {
   const energyOf = (t0: number, t1: number) => loud.level.level(t0, t1);
   const whole = (): Section[] => [{ t0: 0, t1: duration, energy: energyOf(0, duration) }];
@@ -50,6 +64,13 @@ export function findSections(
     const to = Math.min(features.frames, Math.round(barEnd(k) * features.frameRate));
     for (let f = from; f < to; f++) for (let c = 0; c < 12; c++) v[c] += features.chroma[f * 12 + c];
     return v;
+  });
+
+  // Drums per bar: onsets (kick, snare, hat) per beat, at most 1. Onsets a hair before the bar
+  // line count in the bar they start.
+  const drums = downbeats.map((d, k) => {
+    const n = drumOnsets.filter((t) => t >= d - 0.03 && t < barEnd(k) - 0.03).length;
+    return [Math.min(1, n / beatsPerBar)];
   });
 
   const average = (rows: ArrayLike<number>[], from: number, to: number) => {
@@ -80,12 +101,29 @@ export function findSections(
       nb += cb[c] * cb[c];
     }
     const harmony = na > 0 && nb > 0 ? 1 - dot / Math.sqrt(na * nb) : 0;
-    novelty[k] = change + HARMONY_WEIGHT * harmony + HIT_WEIGHT * hitScore[k];
+    const drumChange = Math.abs(average(drums, k, k + span)[0] - average(drums, k - span, k)[0]);
+    novelty[k] = change + HARMONY_WEIGHT * harmony + DRUM_WEIGHT * drumChange + HIT_WEIGHT * hitScore[k];
   }
+
+  // Drums starting or stopping for whole bars, and hits on a bar line, are boundaries outright.
+  // A change in the four-bar averages smears over the bars around it, so a drop four bars after
+  // the drums came in would otherwise lose the peak test to the bars between.
+  const drumSwitch = (k: number) => {
+    const before = drums.slice(Math.max(0, k - DRUM_SWITCH_BARS), k).map((d) => d[0]);
+    const after = drums.slice(k, k + DRUM_SWITCH_BARS).map((d) => d[0]);
+    const all = (list: number[], test: (v: number) => boolean) => list.length > 0 && list.every(test);
+    return (all(before, (v) => v >= DRUMS_IN) && all(after, (v) => v < DRUMS_OUT))
+      || (all(before, (v) => v < DRUMS_OUT) && all(after, (v) => v >= DRUMS_IN));
+  };
 
   const threshold = Math.max(MIN_NOVELTY, mean(novelty) + std(novelty));
   const candidates: number[] = [];
   for (let k = EDGE_SECTION_BARS; k <= bars - EDGE_SECTION_BARS; k++) {
+    if (novelty[k] < MIN_NOVELTY) continue;
+    if (hitScore[k] > 0 || drumSwitch(k)) {
+      candidates.push(k);
+      continue;
+    }
     if (novelty[k] < threshold) continue;
     let isPeak = true;
     for (let j = Math.max(0, k - 2); j <= Math.min(bars - 1, k + 2); j++) {
