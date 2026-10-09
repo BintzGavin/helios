@@ -12,11 +12,12 @@ export function registerSkillsCommand(program: Command) {
     .description('Manage Helios agent skills');
 
   skills.command('install')
-    .description('Install Helios skills into the current project')
+    .description('Install Helios skills (make-video and the skill catalog) into .agents/skills/helios')
     .action(() => {
       // Determine the location of the bundled skills directory
       // When built, this file is in dist/commands/skills.js
-      // The skills are bundled into dist/skills
+      // scripts/bundle-skills.js copies plugins/helios/skills (make-video) and the
+      // skills/ catalog from the repo into dist/skills
       const skillsDir = path.resolve(__dirname, '../skills');
       const targetDir = path.resolve(process.cwd(), '.agents/skills/helios');
 

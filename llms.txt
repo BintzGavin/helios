@@ -55,7 +55,7 @@ helios.play();
 - `@helios-project/player` - Web Component player (`<helios-player>`) and `ClientSideExporter`
 - `@helios-project/renderer` - Server-side rendering (Playwright, FFmpeg)
 - `@helios-project/studio` - Browser-based development environment (Alpha)
-- `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render)
+- `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render, still, sheet, verify, check, analyze, mcp)
 - `@helios-project/infrastructure` - Distributed rendering orchestration and cloud execution adapters
 
 ## Animation Approach
@@ -91,15 +91,32 @@ The engine controls `document.timeline.currentTime` to seek animations frame-acc
 | Maturity | Beta | Production-ready |
 | Distributed rendering | Local (Beta) / Cloud (GCP/AWS/Azure/Cloudflare/Fly.io/Docker/K8s/Modal/Deno Deploy/Vercel/Hetzner/Cloudflare Sandbox) | Available |
 
+## Making and Checking a Video (CLI)
+A video page defines `window.renderAt(t)`; every frame is a pure function of `t` (seconds).
+```bash
+helios render page.html -o out.mp4 --duration 12 [--audio song.mp3] [--preset medium]
+helios still page.html --at 0.5,3                 # PNGs, no encode
+helios sheet page.html --every 1 --duration 12    # labelled contact sheet (also --at, --strip a:b)
+helios verify page.html --duration 12             # frames depend only on t (in order vs reverse)
+helios verify page.html --duration 12 --cues lyrics.srt [--json]   # every timed cue (.srt/.vtt/.json) on screen at its time
+helios check out.mp4 [--json]                     # WCAG 2.3.1 flashing, colour tags, frame count
+helios analyze song.mp3                           # song.beats.json: beats, downbeats (drifting tempo), kick/snare/hat, hits, risers, sections, envelopes
+helios mcp                                        # plugin MCP server over stdio
+```
+- Canvas pages declare drawn text for the cue check: `window.heliosDrawnText?.add(text)` (undefined during normal renders).
+- Renders are BT.709: converted with the BT.709 matrix and tagged (primaries, transfer, matrix, tv range).
+- Registry components (`helios add <name>`): `beat-clock` (reads the analyze JSON: beat/bar/phase, pulse, envelope level, hits, sections) and `cursor` (scripted pointer; actions keyed to arrival/press times, minimum-jerk reaches, Fitts' law timing).
+
 ## Agent Skills
-Skills for AI agents are in `.agents/skills/helios-skills/skills/`:
-- `.agents/skills/helios-skills/skills/core/SKILL.md` - Core API patterns, state management, subscriptions
-- `.agents/skills/helios-skills/skills/renderer/SKILL.md` - Rendering pipeline usage
-- `.agents/skills/helios-skills/skills/player/SKILL.md` - Player component usage
-- `.agents/skills/helios-skills/skills/studio/SKILL.md` - Studio usage and extensions
-- `.agents/skills/helios-skills/skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
-- `.agents/skills/helios-skills/skills/workflows/*.md`, `.agents/skills/helios-skills/skills/examples/*.md` & `.agents/skills/helios-skills/skills/guided/*.md` - Task-specific workflows, examples, and guided skills
-- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills
+The entry skill ships in the Helios agent plugin (`plugins/helios/`); the rest of the catalog is in `skills/` (install with `npx skills add BintzGavin/helios`):
+- `plugins/helios/skills/make-video/SKILL.md` - Entry skill: one HTML page with `window.renderAt(t)`, rendered frame-exact to MP4, checked with stills and contact sheets
+- `skills/core/SKILL.md` - Core API patterns, state management, subscriptions
+- `skills/renderer/SKILL.md` - Rendering pipeline usage
+- `skills/player/SKILL.md` - Player component usage
+- `skills/studio/SKILL.md` - Studio usage and extensions
+- `skills/getting-started/SKILL.md` - Initial scaffolding and basic tasks
+- `skills/workflows/*/SKILL.md`, `skills/examples/*/SKILL.md`, `skills/guided/*/SKILL.md` & `skills/design/*/SKILL.md` - Task-specific workflows, examples, guided and design skills
+- `.agents/skills/skill-creator/SKILL.md` - Meta-skill for generating new agent skills (for this repo's agents)
 
 ## Key Files for Agents
 - `README.md` - Vision document
@@ -148,6 +165,7 @@ const report = await Helios.diagnose();
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
 - **System Prompt**: Programmatic context generation for agents (Done)
 - **Helios Assistant**: Context-aware documentation search (Done)
+- **Plugin MCP Server** (`helios mcp`): tools `preview_video`, `get_frames`, `verify_video` (purity + timed-text cues), `render_video` (checked with `helios check` when done), `get_render_status`, `cancel_render`, `analyze_audio`, `helios_library`; prompts `make_video`, `music_video` (Done)
 
 ### V2 (Next)
 - Advanced audio engine (Tone.js integration)

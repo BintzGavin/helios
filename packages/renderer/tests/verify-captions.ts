@@ -31,7 +31,9 @@ const videoInputArgs = ['-i', 'pipe:0'];
   assert.notStrictEqual(filterIndex, -1, 'Should have -filter_complex');
   const filter = args[filterIndex + 1];
 
-  assert.ok(filter.includes("[0:v]subtitles='subs.srt'[vout]"), 'Should have subtitles filter');
+  // Subtitles are burned in first, then the frames are converted to BT.709 in the same chain.
+  assert.ok(filter.startsWith("[0:v]subtitles='subs.srt',scale="), 'Should burn subtitles before the BT.709 conversion');
+  assert.ok(filter.endsWith('[vout]'), 'Video chain should end in [vout]');
 
   // Verify map
   const mapIndex = args.indexOf('-map');
@@ -56,7 +58,8 @@ const videoInputArgs = ['-i', 'pipe:0'];
   const filter = args[filterIndex + 1];
 
   // Should have both video and audio filters separated by ;
-  assert.ok(filter.includes("[0:v]subtitles='subs.srt'[vout]"), 'Should have subtitles filter');
+  assert.ok(filter.includes("[0:v]subtitles='subs.srt',scale="), 'Should have subtitles filter');
+  assert.ok(filter.includes('[vout]'), 'Should label the video chain [vout]');
   assert.ok(filter.includes('aformat=channel_layouts=stereo'), 'Should have audio filter');
   assert.ok(filter.includes(';'), 'Should combine filters with ;');
 
@@ -113,8 +116,8 @@ const videoInputArgs = ['-i', 'pipe:0'];
   // Check that backslashes are gone/replaced
   assert.strictEqual(filter.includes('\\'), true, 'Should contain escapes');
 
-  // Extract path from filter: [0:v]subtitles='PATH'[vout]
-  const match = filter.match(/subtitles='(.*)'\[vout\]/);
+  // Extract path from filter: [0:v]subtitles='PATH',scale=...[vout]
+  const match = filter.match(/subtitles='(.*)',scale=/);
   const escapedPath = match ? match[1] : '';
 
   console.log(`Original: ${complexPath}`);

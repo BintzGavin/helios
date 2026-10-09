@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="20" height="20">
+  <title>Helios</title>
+  <g stroke="#000" stroke-width="1.125" stroke-linecap="round" stroke-opacity="0.5"><line x1="16.25" y1="10.00" x2="18.75" y2="10.00"/><line x1="14.42" y1="14.42" x2="16.19" y2="16.19"/><line x1="10.00" y1="16.25" x2="10.00" y2="18.75"/><line x1="5.58" y1="14.42" x2="3.81" y2="16.19"/><line x1="3.75" y1="10.00" x2="1.25" y2="10.00"/><line x1="5.58" y1="5.58" x2="3.81" y2="3.81"/><line x1="10.00" y1="3.75" x2="10.00" y2="1.25"/><line x1="14.42" y1="5.58" x2="16.19" y2="3.81"/></g>
+  <circle cx="10" cy="10" r="3.750" fill="#000"/>
+</svg>

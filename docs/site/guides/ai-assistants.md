@@ -19,18 +19,22 @@ There are two pieces, and you can use either one or both:
 **Claude Code**
 
 ```text
-/plugin marketplace add BintzGavin/helios-skills
+/plugin marketplace add BintzGavin/helios
 /plugin install helios@helios
 ```
 
 **Codex**
 
 ```bash
-codex plugin marketplace add BintzGavin/helios-skills
+codex plugin marketplace add BintzGavin/helios
 codex plugin add helios@helios
 ```
 
 Then ask for a video, for example "Make a 15-second launch video for this project".
+
+**Other agents.** Install the skill with the [skills CLI](https://skills.sh). `npx skills add BintzGavin/helios` lists `make-video` and the rest of the Helios skill catalog, so you can pick the ones you want.
+
+The plugin lives in [`plugins/helios`](https://github.com/BintzGavin/helios/tree/main/plugins/helios) and the catalog in [`skills/`](https://github.com/BintzGavin/helios/tree/main/skills) of the Helios repository.
 
 ## Connect the MCP server
 
@@ -58,10 +62,16 @@ The first render downloads a matching Chromium build. Later renders start immedi
 | --- | --- |
 | `preview_video` | Shows the page playing in the conversation. In chat apps that can't write files, it saves the page the assistant wrote first. |
 | `get_frames` | Returns a contact sheet of chosen times, so the assistant can look at its own frames |
-| `verify_video` | Checks that every frame depends only on `t` (`helios verify`) |
-| `render_video` | Renders the MP4 (`helios render`). Long renders return a job ID. |
+| `verify_video` | Checks that every frame depends only on `t`, and with `cues` (an `.srt`, `.vtt` or `.json` file) that each lyric or caption is on screen at its time (`helios verify`) |
+| `render_video` | Renders the MP4 (`helios render`), then checks it for flashing and colour tags (`helios check`). Long renders return a job ID. |
 | `get_render_status`, `cancel_render` | Follow or stop a render |
+| `analyze_audio` | Finds a song's beats, bars, sections and hits and writes them to a JSON file the page loads (`helios analyze`) |
 | `helios_library` | Opens a list of the project's pages and renders |
+
+The server also offers two prompts, which hosts such as Claude Desktop list as starting points:
+
+- `make_video` makes a video from a brief, with an optional length and size.
+- `music_video` makes a video timed to a song in the project: it starts with `analyze_audio`, cuts on the beats and hits, and checks timed lyrics with `verify_video`.
 
 ## The player in the conversation
 

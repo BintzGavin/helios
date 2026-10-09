@@ -3,7 +3,7 @@
     "id": "music-video",
     "prompt": "Make a 15 second music video for track.mp3 (it's in this folder). The visuals should pulse with the beat. Export an MP4 with the song as its audio.",
     "assets": ["track.mp3"],
-    "expect": { "durationSec": 15, "durationTolerance": 0.5, "audio": true }
+    "expect": { "durationSec": 15, "durationTolerance": 0.5, "audio": true, "beatSync": true }
   },
   {
     "id": "animated-short",

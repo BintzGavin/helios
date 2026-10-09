@@ -3,19 +3,28 @@
  * Agent video scoreboard.
  *
  * Asks fresh, headless Claude Code sessions for videos, in throwaway directories, with and
- * without the Helios skills, then records per run: did it use Helios, did it produce an MP4,
- * does the MP4 match the request (duration, audio, size), how long it took and what it cost,
- * and where it failed. See README.md in this directory.
+ * without the Helios plugin, then records per run: did it use Helios, did it produce an MP4,
+ * does the MP4 match the request (duration, audio, size), does it pass the flash check, does the
+ * picture follow the music's beats, the pass/fail verdict, how long it took and what it cost, and
+ * where it failed. See README.md in this directory.
  *
- * No dependencies beyond Node 18+, the `claude` CLI, and ffmpeg/ffprobe on PATH.
+ * No dependencies beyond Node 18+, the `claude` CLI, and ffmpeg/ffprobe on PATH. The flash check
+ * also needs this repo's CLI built (packages/cli/dist).
  */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ensureTrack, legacyTruth, trackStatus } from './track.mjs';
+import {
+  SYNC, computeVerdict, flashTool, frameMotion, runFlashCheck, scoreSync,
+} from './metrics.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO = path.resolve(HERE, '..', '..');
+const DEFAULT_PLUGIN = path.join(REPO, 'plugins', 'helios');
+const DEFAULT_CLI = path.join(REPO, 'packages', 'cli', 'bin', 'helios.js');
 
 const DEFAULTS = {
   model: 'claude-opus-5-5',
@@ -24,18 +33,24 @@ const DEFAULTS = {
   parallel: 1,
   repeat: 1,
   conditions: 'baseline,helios',
-  skillsDir: path.join(os.homedir(), 'Developer', 'helios-skills'),
+  pluginDir: DEFAULT_PLUGIN,
+  heliosCli: DEFAULT_CLI,
   permissionMode: 'bypassPermissions',
   claudeBin: 'claude',
 };
+
+const rel = (p) => (path.relative(REPO, p).startsWith('..') ? p : path.relative(REPO, p) || '.');
 
 const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
 
   --prompts <ids>          Comma-separated prompt ids from prompts.json (default: all)
   --conditions <ids>       baseline, helios, or both (default: ${DEFAULTS.conditions})
-  --plugin-dir <path>      Plugin to load for the "helios" condition (default: a wrapper
-                           built from --skills-dir, one entry per SKILL.md)
-  --skills-dir <path>      helios-skills checkout (default: ${DEFAULTS.skillsDir})
+  --plugin-dir <path>      Plugin to load for the "helios" condition
+                           (default: ${rel(DEFAULTS.pluginDir)} in this repo)
+  --skills-dir <path>      Instead of a plugin, wrap every SKILL.md under <path> (for example
+                           skills/) in a throwaway skills-only plugin
+  --helios-cli <path>      CLI entry that runs \`helios check\` for the flash check
+                           (default: ${rel(DEFAULTS.heliosCli)}; build it first)
   --model <id>             Model for the sessions (default: ${DEFAULTS.model})
   --budget <usd>           Per-run --max-budget-usd cap (default: ${DEFAULTS.budget})
   --timeout-min <n>        Per-run wall-clock limit (default: ${DEFAULTS.timeoutMin})
@@ -44,24 +59,35 @@ const USAGE = `Usage: node tests/agent-eval/run.mjs [options]
   --permission-mode <m>    Passed to claude (default: ${DEFAULTS.permissionMode})
   --out <dir>              Results directory (default: tests/agent-eval/results/<timestamp>)
   --keep-workdirs          Keep each run's working directory (can be large: node_modules)
-  --dry-run                Print what would run, spend nothing
+  --dry-run                Print what would run; spends and writes nothing
   --claude-bin <path>      claude executable (default: claude)
-  --rescore <dir>          Rebuild scoreboard.md/json from an existing results directory
+  --rescore <dir>          Re-measure and rebuild scoreboard.md/json from a results directory
 `;
 
+const FLAGS = new Set(['dryRun', 'keepWorkdirs']);
+const VALUES = new Set([
+  'prompts', 'conditions', 'pluginDir', 'skillsDir', 'heliosCli', 'model', 'budget', 'timeoutMin',
+  'parallel', 'repeat', 'permissionMode', 'out', 'claudeBin', 'rescore',
+]);
+
 function parseArgs(argv) {
-  const opts = { ...DEFAULTS };
+  const opts = { ...DEFAULTS, explicit: new Set() };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if (!arg.startsWith('--')) throw new Error(`Unexpected argument: ${arg}\n\n${USAGE}`);
     const key = arg.slice(2).replace(/-([a-z])/g, (_, c) => c.toUpperCase());
     if (key === 'help') { console.log(USAGE); process.exit(0); }
-    if (key === 'dryRun' || key === 'keepWorkdirs') { opts[key] = true; continue; }
+    if (FLAGS.has(key)) { opts[key] = true; continue; }
+    if (!VALUES.has(key)) throw new Error(`Unknown option: ${arg}\n\n${USAGE}`);
     const value = argv[++i];
     if (value === undefined) throw new Error(`Missing value for ${arg}`);
     opts[key] = value;
+    opts.explicit.add(key);
   }
   for (const key of ['budget', 'timeoutMin', 'parallel', 'repeat']) opts[key] = Number(opts[key]);
+  if (opts.explicit.has('pluginDir') && opts.explicit.has('skillsDir')) {
+    throw new Error('Pass --plugin-dir or --skills-dir, not both.');
+  }
   return opts;
 }
 
@@ -72,54 +98,119 @@ function which(bin) {
   return spawnSync('sh', ['-c', `command -v ${bin}`], { encoding: 'utf8' }).status === 0;
 }
 
-function ensureTrackMp3(assetsDir) {
-  const track = path.join(assetsDir, 'track.mp3');
-  if (fs.existsSync(track)) return track;
-  // 15 s at 120 BPM: a kick on every beat, a bass note that changes each bar, a hi-hat on
-  // the off-beats. Deterministic, so every run hears the same song.
-  const expr = [
-    '0.9*sin(2*PI*(50+60*exp(-30*mod(t,0.5)))*mod(t,0.5))*exp(-9*mod(t,0.5))',
-    '0.25*sin(2*PI*(55*pow(2,floor(mod(t/2,4))*3/12))*t)',
-    '0.08*(random(0)*2-1)*exp(-40*mod(t+0.25,0.5))',
-  ].join('+');
-  const result = spawnSync('ffmpeg', [
-    '-v', 'error', '-y', '-f', 'lavfi', '-i', `aevalsrc='${expr}':s=44100:d=15`,
-    '-ac', '2', '-b:a', '160k', track,
-  ], { encoding: 'utf8' });
-  if (result.status !== 0) throw new Error(`Could not synthesise track.mp3: ${result.stderr}`);
-  return track;
+function loadPrompts() {
+  return JSON.parse(fs.readFileSync(path.join(HERE, 'prompts.json'), 'utf8'));
 }
 
-/** A plugin wrapper exposing every SKILL.md under <skillsDir>/skills as a top-level skill. */
-function buildHeliosPlugin(skillsDir, outDir) {
-  const skillsRoot = path.join(skillsDir, 'skills');
-  if (!fs.existsSync(skillsRoot)) throw new Error(`No skills/ in ${skillsDir}; pass --skills-dir or --plugin-dir`);
+function gitState(dir) {
+  const head = spawnSync('git', ['-C', dir, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
+  if (head.status !== 0) return { commit: null, dirty: null };
+  const status = spawnSync('git', ['-C', dir, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' });
+  return { commit: head.stdout.trim(), dirty: status.status === 0 ? status.stdout.trim().length > 0 : null };
+}
+
+/** Every directory holding a SKILL.md at or under root (following symlinked directories). */
+function findSkillDirs(root) {
+  const found = fs.existsSync(path.join(root, 'SKILL.md')) ? [root] : [];
+  (function walk(dir, depth) {
+    if (depth > 6) return;
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const full = path.join(dir, entry.name);
+      let isDir = entry.isDirectory();
+      if (entry.isSymbolicLink()) { try { isDir = fs.statSync(full).isDirectory(); } catch { isDir = false; } }
+      if (!isDir || SKIP_DIRS.has(entry.name)) continue;
+      if (fs.existsSync(path.join(full, 'SKILL.md'))) found.push(full);
+      walk(full, depth + 1);
+    }
+  })(root, 0);
+  return found;
+}
+
+/** What the plugin at pluginDir declares: its manifest, skills and MCP servers, and its commit. */
+function describePlugin(pluginDir) {
+  // Claude Code reads .claude-plugin/plugin.json; an Agent Plugins manifest sits at the root.
+  const manifestFile = [path.join(pluginDir, '.claude-plugin', 'plugin.json'), path.join(pluginDir, 'plugin.json')]
+    .find((f) => fs.existsSync(f));
+  if (!manifestFile && !fs.existsSync(path.join(pluginDir, 'skills'))) {
+    return {
+      kind: 'plugin', pluginDir, source: pluginDir,
+      missing: `No plugin at ${pluginDir} (no .claude-plugin/plugin.json, plugin.json or skills/). Pass --plugin-dir <path>, or --skills-dir <path> to wrap loose skills.`,
+    };
+  }
+  let manifest = {};
+  try { manifest = JSON.parse(fs.readFileSync(manifestFile, 'utf8')); } catch { /* no or unreadable manifest: claude will say so */ }
+  let mcpServers = [];
+  try {
+    const mcp = JSON.parse(fs.readFileSync(path.join(pluginDir, '.mcp.json'), 'utf8'));
+    mcpServers = Object.keys(mcp.mcpServers || mcp);
+  } catch {
+    if (manifest.mcpServers && typeof manifest.mcpServers === 'object') mcpServers = Object.keys(manifest.mcpServers);
+  }
+  const skills = findSkillDirs(path.join(pluginDir, 'skills')).map((d) => path.basename(d));
+  return {
+    kind: 'plugin',
+    pluginDir,
+    source: pluginDir,
+    name: manifest.name ?? null,
+    version: manifest.version ?? null,
+    skills,
+    skillCount: skills.length,
+    mcpServers,
+    ...gitState(pluginDir),
+  };
+}
+
+/** A throwaway plugin exposing every SKILL.md under skillsDir as a top-level skill. */
+function buildSkillsPlugin(skillsDir, outDir) {
+  const found = findSkillDirs(skillsDir);
+  if (!found.length) throw new Error(`No SKILL.md under ${skillsDir}`);
   const pluginDir = path.join(outDir, '_plugin-helios');
   fs.rmSync(pluginDir, { recursive: true, force: true });
   fs.mkdirSync(path.join(pluginDir, '.claude-plugin'), { recursive: true });
   fs.mkdirSync(path.join(pluginDir, 'skills'));
-  const found = [];
-  (function walk(dir) {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (!entry.isDirectory()) continue;
-      const full = path.join(dir, entry.name);
-      if (fs.existsSync(path.join(full, 'SKILL.md'))) found.push(full);
-      walk(full);
-    }
-  })(skillsRoot);
   for (const dir of found) {
     const name = path.basename(dir);
     const link = path.join(pluginDir, 'skills', name);
-    if (fs.existsSync(link)) throw new Error(`Two skills named ${name} under ${skillsRoot}`);
+    if (fs.existsSync(link)) throw new Error(`Two skills named ${name} under ${skillsDir}`);
     fs.symlinkSync(dir, link);
   }
-  const git = spawnSync('git', ['-C', skillsDir, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' });
+  const git = gitState(skillsDir);
   fs.writeFileSync(path.join(pluginDir, '.claude-plugin', 'plugin.json'), JSON.stringify({
     name: 'helios',
     version: '0.0.0-eval',
-    description: `Helios skills from ${skillsDir}${git.status === 0 ? ` @ ${git.stdout.trim()}` : ''}`,
+    description: `Helios skills from ${skillsDir}${git.commit ? ` @ ${git.commit}` : ''}`,
   }, null, 2));
-  return { pluginDir, skillCount: found.length, source: skillsDir, commit: git.status === 0 ? git.stdout.trim() : null };
+  const skills = found.map((d) => path.basename(d));
+  return { kind: 'skills-dir', pluginDir, source: skillsDir, name: 'helios', version: '0.0.0-eval', skills, skillCount: skills.length, mcpServers: [], ...git };
+}
+
+function resolvePlugin(opts, outDir, { dryRun }) {
+  if (opts.explicit.has('skillsDir')) {
+    const skillsDir = path.resolve(opts.skillsDir);
+    if (dryRun) {
+      const skills = findSkillDirs(skillsDir).map((d) => path.basename(d));
+      return {
+        kind: 'skills-dir', pluginDir: path.join(outDir, '_plugin-helios'), source: skillsDir, skills, skillCount: skills.length,
+        ...(skills.length ? {} : { missing: `No SKILL.md under ${skillsDir}` }),
+      };
+    }
+    return buildSkillsPlugin(skillsDir, outDir);
+  }
+  return describePlugin(path.resolve(opts.pluginDir));
+}
+
+function describePluginLine(plugin) {
+  if (!plugin) return null;
+  if (plugin.missing) return `MISSING: ${plugin.missing}`;
+  const parts = [];
+  // Results from before the plugin moved into this repo only recorded skillCount/source/commit.
+  const what = plugin.kind === 'skills-dir' ? 'skills wrapped from' : `plugin${plugin.name ? ` \`${plugin.name}\`` : ''}${plugin.version ? ` ${plugin.version}` : ''} from`;
+  parts.push(`${plugin.kind ? what : 'skills from'} \`${rel(plugin.source)}\`${plugin.commit ? ` @ ${plugin.commit}${plugin.dirty ? ' (uncommitted changes)' : ''}` : ''}`);
+  if (plugin.skillCount != null) parts.push(`${plugin.skillCount} skill${plugin.skillCount === 1 ? '' : 's'}${plugin.skills?.length ? ` (${plugin.skills.join(', ')})` : ''}`);
+  if (plugin.mcpServers?.length) parts.push(`declares MCP: ${plugin.mcpServers.join(', ')}`);
+  return parts.join(' · ');
 }
 
 /** Environment for the child: the parent's, minus anything that marks it as a nested session. */
@@ -301,7 +392,7 @@ function detectPipeline(workdir, commands, pluginName) {
   if (commands.some((c) => /\bffmpeg\b/.test(c))) tools.push('ffmpeg');
 
   const heliosCommands = commands.filter((c) =>
-    /@helios-project\/(cli|renderer)|\bhelios\s+(render|init|preview|studio|still|sheet|verify|doctor)\b/.test(c));
+    /@helios-project\/(cli|renderer)|\bhelios\s+(render|init|preview|studio|still|sheet|verify|doctor|analyze|check)\b/.test(c));
   const heliosInstalled = fs.existsSync(path.join(workdir, 'node_modules', '@helios-project'))
     || /"@helios-project\//.test(pkg);
   const heliosRender = heliosCommands.some((c) => /render|still|sheet/.test(c))
@@ -342,7 +433,45 @@ function failurePoint(run, exec, summary, deliverable, checkFailures) {
   return '';
 }
 
-function scoreRun(run, exec) {
+/** The scoring expectations for a prompt: what the run recorded, plus newer keys (like beatSync). */
+function scoringExpect(promptId, storedPrompts, currentPrompts) {
+  const stored = (storedPrompts || []).find((p) => p.id === promptId);
+  const current = (currentPrompts || []).find((p) => p.id === promptId);
+  return { ...(current?.expect || {}), ...(stored?.expect || {}) };
+}
+
+/**
+ * Flash, sync and the verdict for one run, written onto the result. `mp4` is the run's copy of
+ * its deliverable (null when there is none). A metric that cannot be measured now keeps an earlier
+ * measurement if the result has one, and is otherwise recorded as ok: null with a reason.
+ */
+function measureQuality(r, { mp4, missingReason, expect, truth, truthNote, tool, runDir }) {
+  if (mp4) {
+    const fresh = runFlashCheck(mp4, tool, { saveTo: runDir ? path.join(runDir, 'check.json') : null });
+    r.flash = fresh.ok == null && r.flash?.ok != null
+      ? { ...r.flash, note: `kept from an earlier scoring; re-running failed: ${fresh.reason}` }
+      : fresh;
+  } else if (!r.flash || r.flash.ok == null) {
+    r.flash = { ok: null, reason: missingReason };
+  }
+
+  if (!expect.beatSync) {
+    r.sync = null; // not asked of this prompt
+  } else if (mp4 && truth) {
+    const { detail, ...summary } = scoreSync(frameMotion(mp4, { maxSeconds: truth.duration + 1 }), truth);
+    if (detail && runDir) fs.writeFileSync(path.join(runDir, 'sync.json'), JSON.stringify({ ...summary, truthNote: truthNote ?? null, ...detail }));
+    r.sync = summary.ok == null && r.sync?.ok != null
+      ? { ...r.sync, note: `kept from an earlier scoring; re-measuring failed: ${summary.reason}` }
+      : { ...summary, ...(truthNote ? { truthNote } : {}) };
+  } else if (!r.sync || r.sync.ok == null) {
+    r.sync = { ok: null, score: null, reason: truth ? missingReason : 'no ground-truth beats recorded for these results' };
+  }
+
+  r.verdict = computeVerdict(r, expect);
+  return r;
+}
+
+function scoreRun(run, exec, ctx) {
   const summary = summariseTranscript(readTranscript(path.join(run.resultDir, 'transcript.jsonl')));
   const commands = summary.toolUses.filter((t) => t.name === 'Bash').map((t) => String(t.input.command || ''));
   const skillCalls = summary.toolUses
@@ -364,8 +493,9 @@ function scoreRun(run, exec) {
   const checkFailures = deliverable ? checkExpectations(run.prompt.expect || {}, probe, gifs) : [];
 
   let sheet = null;
+  let copy = null;
   if (deliverable && probe && !probe.error) {
-    const copy = path.join(run.resultDir, 'deliverable.mp4');
+    copy = path.join(run.resultDir, 'deliverable.mp4');
     fs.copyFileSync(deliverable.path, copy);
     if (contactSheet(copy, probe.durationSec, path.join(run.resultDir, 'sheet.png'))) sheet = 'sheet.png';
   }
@@ -380,6 +510,7 @@ function scoreRun(run, exec) {
     repeat: run.repeat,
     model: summary.init?.model ?? null,
     pluginsLoaded: (summary.init?.plugins || []).map((p) => p.name),
+    mcpServersLoaded: (summary.init?.mcp_servers || []).map((s) => `${s.name}${s.status ? `:${s.status}` : ''}`),
     heliosSkillsAvailable: (summary.init?.skills || []).filter((s) => String(s).startsWith('helios:')).length,
     usedHelios: pipeline.heliosRender || pipeline.heliosInstalled,
     heliosRender: pipeline.heliosRender,
@@ -397,6 +528,7 @@ function scoreRun(run, exec) {
     costUsd: r?.total_cost_usd ?? null,
     turns: r?.num_turns ?? null,
     resultSubtype: r?.subtype ?? null,
+    resultIsError: r ? Boolean(r.is_error) : null,
     timedOut: exec.timedOut,
     failure: failurePoint(run, exec, summary, deliverable, checkFailures),
     toolErrorCount: summary.toolErrors.length,
@@ -405,6 +537,14 @@ function scoreRun(run, exec) {
     sheet,
     workdir: run.opts.keepWorkdirs ? run.workdir : null,
   };
+  measureQuality(metrics, {
+    mp4: copy,
+    missingReason: deliverable ? 'the MP4 could not be read' : 'no MP4',
+    expect: run.prompt.expect || {},
+    truth: ctx.truth,
+    tool: ctx.tool,
+    runDir: run.resultDir,
+  });
   fs.writeFileSync(path.join(run.resultDir, 'metrics.json'), JSON.stringify(metrics, null, 2));
   return metrics;
 }
@@ -423,44 +563,158 @@ function median(values) {
   return v.length % 2 ? v[mid] : (v[mid - 1] + v[mid]) / 2;
 }
 
+const pct = (n, d) => (d ? `${n}/${d} (${Math.round((100 * n) / d)}%)` : '–');
+const cell = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+
+/** "5/6", plus how many could not be measured. Counts only runs where the metric applies. */
+function rate(rs, get) {
+  const applicable = rs.map(get).filter((m) => m !== undefined);
+  if (!applicable.length) return '–';
+  const ok = applicable.filter((m) => m?.ok === true).length;
+  const na = applicable.filter((m) => m == null || m.ok == null).length;
+  return `${ok}/${applicable.length}${na ? ` (${na} n/a)` : ''}`;
+}
+
+function flashCell(r) {
+  if (!r.producedMp4) return '–';
+  const f = r.flash;
+  if (!f || f.ok == null) return 'n/a';
+  return f.ok ? `ok${f.maxPerSecond != null ? ` (max ${f.maxPerSecond}/s)` : ''}` : `FAIL (${f.maxPerSecond ?? '>3'}/s)`;
+}
+
+function syncCell(r, expect) {
+  if (!expect.beatSync) return '–';
+  const s = r.sync;
+  if (!r.producedMp4) return '–';
+  if (!s || s.ok == null) return 'n/a';
+  return `${s.ok ? 'ok' : 'FAIL'} ${fmt(s.score, 2)} · cov ${fmt(s.coverage, 2)} · r ${fmt(s.corr, 2)}`;
+}
+
+/** The verdict's reasons, with failurePoint()'s more specific wording (budget, last tool error) where it has one. */
+function whyFailed(r) {
+  if (!r.verdict) return r.failure || '';
+  if (r.verdict.pass) return '';
+  const reasons = [...r.verdict.reasons];
+  if (r.failure) {
+    const i = reasons.findIndex((x) => x.startsWith('the session '));
+    const j = reasons.indexOf('no MP4');
+    if (i !== -1) reasons[i] = r.failure;
+    else if (j !== -1 && r.failure.startsWith('no MP4')) reasons[j] = r.failure;
+  }
+  return reasons.join('; ');
+}
+
 function scoreboard(results, meta) {
+  const prompts = meta.prompts || [];
+  const expectOf = (r) => scoringExpect(r.prompt, prompts, meta.currentPrompts);
   const lines = [];
-  lines.push(`# Agent video scoreboard`, '');
-  lines.push(`${meta.startedAt} · model \`${meta.model}\` · $${meta.budget} cap per run · ${meta.timeoutMin} min limit`);
-  if (meta.plugin) lines.push(`Helios condition: ${meta.plugin.skillCount} skills from \`${meta.plugin.source}\`${meta.plugin.commit ? ` @ ${meta.plugin.commit}` : ''}`);
+  lines.push('# Agent video scoreboard', '');
+  lines.push(`${meta.startedAt} · model \`${meta.model}\` · $${meta.budget} cap per run · ${meta.timeoutMin} min limit${meta.rescoredAt ? ` · rescored ${meta.rescoredAt}` : ''}`);
+  const pluginLine = describePluginLine(meta.plugin);
+  if (pluginLine) lines.push('', `Helios condition: ${pluginLine}`);
+  if (meta.flashTool) {
+    lines.push('', `Flash check: ${meta.flashTool.available ? `\`${meta.flashTool.command.replace(REPO + path.sep, '')}\`` : `NOT AVAILABLE (${meta.flashTool.reason}). Runs with no earlier flash result show n/a and fail.`}`);
+  }
+  if (meta.track) {
+    lines.push('', `Music track: \`${meta.track.id}\`${meta.track.note ? ` (${meta.track.note})` : ''}; sync passes at score ≥ ${SYNC.minScore}, coverage ≥ ${SYNC.minCoverage}, r ≥ ${SYNC.minCorr}`);
+  }
   lines.push('');
-  lines.push('| Condition | Runs | MP4 | Passed checks | Used Helios | Median min | Mean $ | Total $ |');
-  lines.push('|---|---|---|---|---|---|---|---|');
+  lines.push('| Condition | Runs | Verdict pass | MP4 | Passed checks | Used Helios | Flash ok | Sync ok | Median min | Mean $ | Total $ |');
+  lines.push('|---|---|---|---|---|---|---|---|---|---|---|');
   const conditions = [...new Set(results.map((r) => r.condition))];
   for (const c of conditions) {
     const rs = results.filter((r) => r.condition === c);
     const costs = rs.map((r) => r.costUsd).filter((x) => x != null);
     const total = costs.reduce((a, b) => a + b, 0);
-    lines.push(`| ${c} | ${rs.length} | ${rs.filter((r) => r.producedMp4).length}/${rs.length} | ${rs.filter((r) => r.passed).length}/${rs.length} | ${rs.filter((r) => r.usedHelios).length}/${rs.length} | ${fmt(median(rs.map((r) => r.minutes)))} | ${costs.length ? fmt(total / costs.length, 2) : '–'} | ${fmt(total, 2)} |`);
+    const withMp4 = rs.filter((r) => r.producedMp4);
+    const synced = withMp4.filter((r) => expectOf(r).beatSync);
+    lines.push(`| ${c} | ${rs.length} | ${pct(rs.filter((r) => r.verdict?.pass).length, rs.length)} | ${rs.filter((r) => r.producedMp4).length}/${rs.length} | ${rs.filter((r) => r.passed).length}/${rs.length} | ${rs.filter((r) => r.usedHelios).length}/${rs.length} | ${rate(withMp4, (r) => r.flash ?? null)} | ${rate(synced, (r) => r.sync ?? null)} | ${fmt(median(rs.map((r) => r.minutes)))} | ${costs.length ? fmt(total / costs.length, 2) : '–'} | ${fmt(total, 2)} |`);
+  }
+
+  const promptIds = [...new Set(results.map((r) => r.prompt))];
+  if (results.some((r) => r.repeat > 1) || conditions.length > 1) {
+    lines.push('', `| Verdict by prompt | ${conditions.join(' | ')} |`, `|---|${conditions.map(() => '---|').join('')}`);
+    for (const id of promptIds) {
+      const cells = conditions.map((c) => {
+        const rs = results.filter((r) => r.prompt === id && r.condition === c);
+        return rs.length ? `${rs.filter((r) => r.verdict?.pass).length}/${rs.length}` : '–';
+      });
+      lines.push(`| ${id} | ${cells.join(' | ')} |`);
+    }
+  }
+
+  lines.push('');
+  lines.push('| Prompt | Condition | Verdict | Used Helios | Toolchain | MP4 | Duration (asked) | Audio | Size | Flash | Sync | Min | $ | Turns | Why it failed |');
+  lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+  for (const r of results) {
+    const expect = expectOf(r);
+    const helios = r.usedHelios
+      ? `yes${r.heliosSkillCalls?.length ? ` (skills: ${r.heliosSkillCalls.length})` : ''}`
+      : (r.heliosSkillCalls?.length ? `no (skills: ${r.heliosSkillCalls.length})` : 'no');
+    const why = whyFailed(r);
+    lines.push(`| ${r.prompt}${r.repeat > 1 ? ` #${r.repeat}` : ''} | ${r.condition} | ${r.verdict ? (r.verdict.pass ? 'PASS' : 'FAIL') : 'n/a'} | ${helios} | ${(r.tools || []).join(', ') || '–'} | ${r.producedMp4 ? (r.passed ? 'yes' : 'yes, off-spec') : 'no'} | ${fmt(r.probe?.durationSec, 2)} (${expect.durationSec ?? '–'}) | ${r.probe ? (r.probe.audio ? 'yes' : 'no') : '–'} | ${r.probe?.width ? `${r.probe.width}x${r.probe.height}` : '–'} | ${flashCell(r)} | ${syncCell(r, expect)} | ${fmt(r.minutes)} | ${fmt(r.costUsd, 2)} | ${r.turns ?? '–'} | ${cell(why.length > 240 ? `${why.slice(0, 239)}…` : why)} |`);
   }
   lines.push('');
-  lines.push('| Prompt | Condition | Used Helios | Toolchain | MP4 | Duration (asked) | Audio | Size | Min | $ | Turns | Failure |');
-  lines.push('|---|---|---|---|---|---|---|---|---|---|---|---|');
-  const prompts = new Map(meta.prompts.map((p) => [p.id, p]));
-  for (const r of results) {
-    const asked = prompts.get(r.prompt)?.expect?.durationSec;
-    const helios = r.usedHelios
-      ? `yes${r.heliosSkillCalls.length ? ` (skills: ${r.heliosSkillCalls.length})` : ''}`
-      : (r.heliosSkillCalls.length ? `no (skills: ${r.heliosSkillCalls.length})` : 'no');
-    lines.push(`| ${r.prompt}${r.repeat > 1 ? ` #${r.repeat}` : ''} | ${r.condition} | ${helios} | ${r.tools.join(', ') || '–'} | ${r.producedMp4 ? (r.passed ? 'yes' : 'yes, off-spec') : 'no'} | ${fmt(r.probe?.durationSec, 2)} (${asked ?? '–'}) | ${r.probe ? (r.probe.audio ? 'yes' : 'no') : '–'} | ${r.probe?.width ? `${r.probe.width}x${r.probe.height}` : '–'} | ${fmt(r.minutes)} | ${fmt(r.costUsd, 2)} | ${r.turns ?? '–'} | ${(r.failure || '').replace(/\|/g, '\\|')} |`);
-  }
+  lines.push('`–` means the metric does not apply (no MP4, or a prompt without music). `n/a` means it applies but could not be measured, which fails the verdict.');
   lines.push('');
   return lines.join('\n');
 }
 
 function writeScoreboard(outDir, results, meta) {
-  fs.writeFileSync(path.join(outDir, 'scoreboard.json'), JSON.stringify({ meta, results }, null, 2));
+  const { currentPrompts, ...stored } = meta;
+  fs.writeFileSync(path.join(outDir, 'scoreboard.json'), JSON.stringify({ meta: stored, results }, null, 2));
   const md = scoreboard(results, meta);
   fs.writeFileSync(path.join(outDir, 'scoreboard.md'), md);
   return md;
 }
 
 // ---------------------------------------------------------------------------------------
+
+/** The truth a results directory was scored against: its own copy, or the legacy grid for old results. */
+function resultsTruth(dir, meta) {
+  const file = path.join(dir, 'track.truth.json');
+  if (fs.existsSync(file)) {
+    try {
+      const truth = JSON.parse(fs.readFileSync(file, 'utf8'));
+      return { truth, track: { id: truth.id, file: 'track.truth.json' } };
+    } catch { /* fall through */ }
+  }
+  if (!meta.track || meta.track.assumed) {
+    const truth = legacyTruth();
+    return { truth, truthNote: truth.note, track: { id: truth.id, assumed: true, note: 'assumed: these results predate recorded ground truth' } };
+  }
+  return { truth: null, track: { ...meta.track, note: 'track.truth.json is missing from the results directory' } };
+}
+
+function rescore(dir, opts) {
+  const file = path.join(dir, 'scoreboard.json');
+  if (!fs.existsSync(file)) throw new Error(`No scoreboard.json in ${dir}`);
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const meta = { ...data.meta, currentPrompts: loadPrompts() };
+  const { truth, truthNote, track } = resultsTruth(dir, meta);
+  const tool = flashTool(opts.heliosCli, { defaultEntry: DEFAULT_CLI });
+  if (!tool.available) console.error(`Flash check unavailable: ${tool.reason}`);
+  for (const r of data.results) {
+    const runDir = path.join(dir, r.id);
+    const copy = path.join(runDir, 'deliverable.mp4');
+    const hasRunDir = fs.existsSync(runDir);
+    measureQuality(r, {
+      mp4: fs.existsSync(copy) ? copy : null,
+      missingReason: r.producedMp4 ? 'the MP4 copy is not in the results directory' : 'no MP4',
+      expect: scoringExpect(r.prompt, meta.prompts, meta.currentPrompts),
+      truth,
+      truthNote,
+      tool,
+      runDir: hasRunDir ? runDir : null,
+    });
+    if (hasRunDir) fs.writeFileSync(path.join(runDir, 'metrics.json'), JSON.stringify(r, null, 2));
+  }
+  meta.rescoredAt = new Date().toISOString();
+  meta.flashTool = { available: tool.available, command: tool.command, reason: tool.reason ?? null };
+  if (data.results.some((r) => scoringExpect(r.prompt, meta.prompts, meta.currentPrompts).beatSync)) meta.track = track;
+  meta.sync = SYNC;
+  return writeScoreboard(dir, data.results, meta);
+}
 
 async function pool(items, size, worker) {
   const queue = [...items];
@@ -472,11 +726,10 @@ async function pool(items, size, worker) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const allPrompts = JSON.parse(fs.readFileSync(path.join(HERE, 'prompts.json'), 'utf8'));
+  const allPrompts = loadPrompts();
 
   if (opts.rescore) {
-    const data = JSON.parse(fs.readFileSync(path.join(opts.rescore, 'scoreboard.json'), 'utf8'));
-    console.log(writeScoreboard(opts.rescore, data.results, data.meta));
+    console.log(rescore(path.resolve(opts.rescore), opts));
     return;
   }
 
@@ -498,17 +751,11 @@ async function main() {
 
   const startedAt = new Date().toISOString();
   const outDir = path.resolve(opts.out || path.join(HERE, 'results', startedAt.replace(/[:.]/g, '-')));
-  fs.mkdirSync(outDir, { recursive: true });
-
   const assetsDir = path.join(HERE, 'assets');
-  if (prompts.some((p) => (p.assets || []).includes('track.mp3'))) ensureTrackMp3(assetsDir);
-
-  let plugin = null;
-  if (conditions.includes('helios')) {
-    plugin = opts.pluginDir
-      ? { pluginDir: path.resolve(opts.pluginDir), skillCount: null, source: path.resolve(opts.pluginDir), commit: null }
-      : buildHeliosPlugin(path.resolve(opts.skillsDir), outDir);
-  }
+  const needsTrack = prompts.some((p) => (p.assets || []).includes('track.mp3'));
+  const plugin = conditions.includes('helios') ? resolvePlugin(opts, outDir, { dryRun: opts.dryRun }) : null;
+  if (plugin?.missing && !opts.dryRun) throw new Error(plugin.missing);
+  const tool = flashTool(opts.heliosCli, { defaultEntry: DEFAULT_CLI });
 
   const runs = [];
   for (let repeat = 1; repeat <= opts.repeat; repeat++) {
@@ -520,9 +767,13 @@ async function main() {
     }
   }
 
-  const meta = { startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin, prompts };
-  console.log(`${runs.length} run(s) → ${outDir}`);
+  console.log(`${runs.length} run(s) → ${outDir}${opts.dryRun ? ' (not created in a dry run)' : ''}`);
   console.log(`Worst case spend: $${(runs.length * opts.budget).toFixed(2)} (${runs.length} × $${opts.budget} cap)`);
+  if (plugin) console.log(`Helios condition: ${describePluginLine(plugin)}`);
+  if (needsTrack) console.log(`Music track: ${trackStatus(assetsDir)}`);
+  console.log(tool.available
+    ? `Flash check: ${tool.command}`
+    : `Flash check: NOT AVAILABLE: ${tool.reason}. Every MP4's verdict will fail; build the CLI and --rescore the results.`);
 
   if (opts.dryRun) {
     for (const run of runs) {
@@ -530,6 +781,25 @@ async function main() {
     }
     return;
   }
+
+  fs.mkdirSync(outDir, { recursive: true });
+  let truth = null;
+  let track = null;
+  if (needsTrack) {
+    const generated = ensureTrack(assetsDir);
+    truth = generated.truth;
+    // The scorer's copy; the agent only ever gets track.mp3.
+    fs.copyFileSync(generated.truthFile, path.join(outDir, 'track.truth.json'));
+    track = { id: truth.id, file: 'track.truth.json' };
+  }
+  const finalPlugin = plugin?.kind === 'skills-dir' ? buildSkillsPlugin(plugin.source, outDir) : plugin;
+  for (const run of runs) if (run.condition === 'helios') run.pluginDir = finalPlugin.pluginDir;
+
+  const meta = {
+    startedAt, model: opts.model, budget: opts.budget, timeoutMin: opts.timeoutMin, plugin: finalPlugin, prompts,
+    track, sync: SYNC, flashTool: { available: tool.available, command: tool.command, reason: tool.reason ?? null },
+    currentPrompts: allPrompts,
+  };
 
   const results = [];
   await pool(runs, opts.parallel, async (run) => {
@@ -541,11 +811,11 @@ async function main() {
     }
     console.log(`▶ ${run.id} (${run.workdir})`);
     const exec = await runClaude(opts, run);
-    const metrics = scoreRun(run, exec);
+    const metrics = scoreRun(run, exec, { truth, tool });
     results.push(metrics);
-    console.log(`■ ${run.id}: ${metrics.passed ? 'PASS' : metrics.producedMp4 ? 'MP4 off-spec' : 'no MP4'}`
+    console.log(`■ ${run.id}: ${metrics.verdict.pass ? 'PASS' : 'FAIL'}`
       + ` · Helios ${metrics.usedHelios ? 'yes' : 'no'} · ${fmt(metrics.minutes)} min · $${fmt(metrics.costUsd, 2)}`
-      + `${metrics.failure ? ` · ${metrics.failure}` : ''}`);
+      + `${metrics.verdict.pass ? '' : ` · ${metrics.verdict.reasons.join('; ')}`}`);
     if (!opts.keepWorkdirs) fs.rmSync(run.workdir, { recursive: true, force: true });
     const order = new Map(runs.map((r, i) => [r.id, i]));
     results.sort((a, b) => order.get(a.id) - order.get(b.id));

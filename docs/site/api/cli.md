@@ -47,6 +47,20 @@ helios add <component> [options]
 2. Downloads/Copies the component source code to your configured `components` directory.
 3. Installs any necessary dependencies (unless `--no-install` is used).
 
+**Built-in components**:
+
+| Component | Type | What it does |
+|---|---|---|
+| `use-video-frame` | React | Hook that re-renders on every frame. |
+| `timer` | React | Shows the time as MM:SS:FF. |
+| `progress-bar` | React | Shows playback progress. |
+| `watermark` | React | Text or image logo overlay. |
+| `shaders` | Vanilla | Renders [Shaders](/examples/shaders) WebGPU effects on Helios time. |
+| `beat-clock` | Vanilla | Beats, bars, kick pulses, hits and loudness at any time, from `helios analyze` output. See [Beat Clock](/examples/beat-clock). |
+| `cursor` | Vanilla | A scripted mouse pointer whose clicks land on the times you give. See [Scripted Cursor](/examples/cursor). |
+
+Vanilla components work in any project, with or without a framework.
+
 ### `helios update`
 
 Updates a component to the latest version from the registry.
@@ -106,6 +120,8 @@ helios render <input> [options]
 - `--gpu` / `--no-gpu`: Enable or disable GPU acceleration in the browser (for WebGL).
 - `--no-headless`: Run in a visible browser window (useful for debugging).
 
+**Color**: frames are converted to Y'CbCr with the BT.709 matrix in limited range, and the stream is tagged BT.709, so players show the page's colors instead of guessing (an untagged video often looks washed out). GIF, PNG and other RGB outputs are left as they are.
+
 **Local pages are served over http**: `helios render page.html`, and likewise `still`, `sheet` and `verify`, serves the page from `127.0.0.1` for the length of the command. The server's root is the current directory, or the page's own folder if the page is outside it. So the page can `fetch()` data files that sit next to it, and media elements get byte-range requests. `--no-serve` loads the page from `file://` instead.
 
 **Pages that draw their own frames**: a page that defines `window.renderAt(t)` (or `window.seek(t)`, or `window.__render(t)`) is called once per frame with the time `t` in seconds, and the frame is captured when it returns. If it returns a promise, the frame is captured after the promise resolves. The page needs no Helios import:
@@ -154,10 +170,66 @@ Checks that every frame depends only on its time. Rendering in chunks (distribut
 helios verify page.html --duration 12
 ```
 
+With `--cues`, it also checks timed text: every lyric word or caption in the file must be on screen during its time. Each cue is sampled just after it starts, in the middle and just before it ends, all in one page session. A cue passes when each of its words shows in at least one of those frames, so a line revealed word by word passes. Matching ignores case, punctuation and accents.
+
+```bash
+helios verify page.html --duration 182 --cues lyrics.srt
+# 6 sampled frames are identical rendered in order and in reverse: each frame depends only on t.
+# 417/417 cues on screen at their time.
+```
+
+Text counts as on screen in two cases:
+- It is DOM or SVG text that is rendered (not `display: none`, `visibility: hidden` or opacity 0) and at least 10% opaque, counting its ancestors' opacity and its colour's alpha. At least half of it must also lie inside the frame and inside any container whose overflow clips it.
+- The page declared it drawn for that frame with `window.heliosDrawnText?.add(text)`. Canvas pages use this. The check sets `window.heliosDrawnText` to a new `Set` before each frame. During a normal render it is undefined, so the call does nothing.
+
+The check confirms that each word is present at its time. It doesn't check that the word is easy to read: use `helios sheet` for that.
+
 **Options**:
 - `--duration <seconds>`: The span to sample (default: the composition's).
 - `--samples <n>`: The number of frames to compare (default: `6`).
+- `--cues <file>`: Timed text that must be on screen at its time. Accepts an `.srt` file, a `.vtt` file, or a `.json` file holding an array of `{ "text", "start", "end" }` in seconds. The JSON can also be an object whose `cues` or `words` array holds those, and `w`, `t0` and `t1` work as aliases.
+- `--json`: Print one JSON object, `{ ok, purity: { ok, samples, differing, noisy, message }, cues?: { ok, total, shown, missing: [{ text, start, end, seen }], message } }`. It exits 1 when `ok` is false. Argument and page errors go to stderr as `Verify failed: <reason>`, with no JSON.
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
+
+### `helios check`
+
+Checks a rendered video file before you deliver it. It prints one line per check and exits 1 when a check fails or the file can't be read.
+
+```bash
+helios check out.mp4 [--json]
+```
+
+- **Video and audio**: the codec, size, frame rate, pixel format, and the audio stream (or none).
+- **Color**: the matrix, primaries, transfer and range tags. An untagged Y'CbCr video is a warning: players guess, and often show it washed out.
+- **Length**: the frames actually decoded against the file's duration × frame rate. A mismatch (dropped or repeated frames, or audio that runs past the picture) is a warning.
+- **Flashes** (WCAG 2.3.1): more than 3 flashes, or more than 3 saturated red flashes, in any one second fails. A flash is a pair of opposing changes in relative luminance of at least 10% where the darker state is below 0.8. It counts when the area flashing together covers at least a quarter of a 10° visual field, taken as a window one third of the frame's width and height.
+
+**Options**:
+- `--json`: Print exactly one JSON object (`ok`, `file`, `video`, `audio`, `flash`, `problems`, `warnings`) for a pass or a fail. When the file can't be read, nothing goes to stdout and `Check failed: <reason>` goes to stderr.
+
+### `helios analyze`
+
+Analyzes a song into a beat map, so a video can cut and move on the music. It decodes the audio with ffmpeg and calls no model.
+
+```bash
+helios analyze song.mp3
+# Wrote song.beats.json: 131.6 BPM (129.2–133.9), 412 beats, 103 bars, 14 hits, 5 sections
+```
+
+**Options**:
+- `-o, --output <path>`: The output file (default: `<audio name>.beats.json` next to the audio).
+- `--fps <n>`: Frames per second of the loudness envelopes (default: `30`).
+- `--tempo-range <min:max>`: The BPM range to search (default: `70:180`). If the beats come out at half or double time, narrow it, e.g. `--tempo-range 120:180`.
+- `--beats-per-bar <n>`: Beats in a bar (default: `4`).
+
+**The file** (all times in seconds of audio time):
+- `beats`: every beat. Songs drift (one went from 131.5 to 133.9 BPM), so the beats follow a local tempo, fitted on 20 s windows every 5 s, and each one is moved to the drum onset within 30 ms of it. Don't rebuild them from `bpm`: one fixed BPM ends up more than a beat off.
+- `tempo`: the tempo every 5 s. `bpm` is its median.
+- `downbeats`: the beats that start bars; bar k starts at `downbeats[k]`. `downbeatMethod` says how beat 1 was chosen: `harmony` (where the chords change) or `kick` (where the kick hits hardest).
+- `hits`: the big moments (drops, impacts), each `{ t, score }` with a score from 0.22 to 1, on a downbeat when one is near. `risers` are `{ t0, t1 }` climbs that land on a hit.
+- `sections`: `{ t0, t1, energy }` spans where the track changes, on bar lines. They come from a loudness and harmony heuristic and carry no names.
+- `onsets`: kick (30–150 Hz), snare (150 Hz–5 kHz) and hat (6–16 kHz) onsets. A snare or hat at the same moment as a kick counts as the kick.
+- `envelope`: `level`, `low`, `mid` and `high` loudness, one value per frame at `fps`, each from 0 (48 dB below the loudest moment) to 1.
 
 ### `helios merge`
 

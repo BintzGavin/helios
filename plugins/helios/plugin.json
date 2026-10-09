@@ -1,0 +1,54 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "helios",
+  "version": "0.1.0",
+  "description": "Make videos from code: one HTML page that draws any frame from its time t, rendered frame-exact to MP4 by Helios.",
+  "author": {
+    "name": "Gavin Bintz",
+    "url": "https://github.com/BintzGavin"
+  },
+  "homepage": "https://github.com/BintzGavin/helios",
+  "repository": "https://github.com/BintzGavin/helios",
+  "license": "Apache-2.0",
+  "keywords": [
+    "video",
+    "mp4",
+    "animation",
+    "rendering",
+    "helios"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Helios",
+        "shortDescription": "Make videos from code, rendered frame-exact to MP4",
+        "longDescription": "Your agent writes one HTML page that draws each frame from its time, and Helios renders it frame-exact to MP4. Along the way it checks stills and contact sheets, then adds a soundtrack.",
+        "developerName": "Gavin Bintz",
+        "category": "Creativity",
+        "capabilities": [
+          "Interactive",
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://github.com/BintzGavin/helios",
+        "privacyPolicyURL": "https://github.com/BintzGavin/helios/blob/main/docs/legal/privacy.md",
+        "termsOfServiceURL": "https://github.com/BintzGavin/helios/blob/main/docs/legal/terms.md",
+        "defaultPrompt": [
+          "Make a 15-second launch video for this project",
+          "Turn this CSV into an animated chart video",
+          "Make a 9:16 social clip that cuts to song.mp3"
+        ],
+        "brandColor": "#449DF0",
+        "composerIcon": "./assets/composer-icon.svg",
+        "logo": "./assets/logo.png",
+        "screenshots": [
+          "./assets/screenshots/1-preview.png",
+          "./assets/screenshots/2-select.png",
+          "./assets/screenshots/3-rendered.png",
+          "./assets/screenshots/4-library.png"
+        ]
+      },
+      "onboardingSkill": "./skills/make-video/SKILL.md"
+    }
+  }
+}

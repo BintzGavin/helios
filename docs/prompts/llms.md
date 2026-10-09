@@ -30,7 +30,7 @@ The `llms.txt` file is a standardized LLM-facing overview document designed to h
 
 **llms.txt is NOT:**
 - User documentation (that's `docs/site/`)
-- Agent skills (that's `.agents/skills/helios/`)
+- Agent skills (that's `skills/` and the plugin's `plugins/helios/skills/`)
 - A changelog or progress log
 - Verbose explanations or tutorials
 

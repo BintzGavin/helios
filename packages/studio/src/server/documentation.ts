@@ -9,17 +9,22 @@ export interface DocSection {
   content: string;
 }
 
-export function resolveDocumentationPath(cwd: string, pkgName: string): string | null {
-  // Strategy 1: Monorepo Development
-  let monorepoRoot: string | null = null;
+// The Helios monorepo root when Studio runs from inside it (from the root or from packages/studio).
+function findMonorepoRoot(cwd: string): string | null {
   // If cwd is package root (e.g. packages/studio)
   if (fs.existsSync(path.resolve(cwd, '../../packages/core'))) {
-      monorepoRoot = path.resolve(cwd, '../../');
+      return path.resolve(cwd, '../../');
   }
   // If cwd is repo root
-  else if (fs.existsSync(path.resolve(cwd, 'packages/core'))) {
-      monorepoRoot = cwd;
+  if (fs.existsSync(path.resolve(cwd, 'packages/core'))) {
+      return cwd;
   }
+  return null;
+}
+
+export function resolveDocumentationPath(cwd: string, pkgName: string): string | null {
+  // Strategy 1: Monorepo Development
+  const monorepoRoot = findMonorepoRoot(cwd);
 
   if (monorepoRoot) {
       const paths: Record<string, string> = {
@@ -114,10 +119,16 @@ function parseMarkdown(pkg: string, content: string, sections: DocSection[], tit
 
 function findSkills(cwd: string, sections: DocSection[], skillsRootOverride?: string) {
   let skillsRoot: string | null = null;
-  const possiblePaths = [
-      path.resolve(cwd, '../../.agents/skills/helios'), // From packages/studio
-      path.resolve(cwd, '.agents/skills/helios')        // From root
-  ];
+  const possiblePaths: string[] = [];
+
+  // In the Helios monorepo, the skill catalog sits at the repo root (skills/core/SKILL.md, ...).
+  const monorepoRoot = findMonorepoRoot(cwd);
+  if (monorepoRoot) {
+      possiblePaths.push(path.join(monorepoRoot, 'skills'));
+  }
+
+  // In a user project, `helios skills install` copies the bundled skills here.
+  possiblePaths.push(path.resolve(cwd, '.agents/skills/helios'));
 
   if (skillsRootOverride) {
       possiblePaths.push(skillsRootOverride);

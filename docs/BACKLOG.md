@@ -113,11 +113,14 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 *Helios ships as one agent plugin in the Claude directory, the ChatGPT plugin directory and the Codex marketplace. Design and gates: [`docs/rfcs/2026-10-01-ai-host-distribution.md`](rfcs/2026-10-01-ai-host-distribution.md).*
 
 ### Phase 1 — List the skill plugin
-- [ ] **SKILLS**: Merge `feat/agent-video-entry-skill` in `helios-skills` (`plugins/helios`, entry skill `make-video`).
-- [ ] **SKILLS** *(done on `helios-skills` branch `feat/plugin-manifests`, unmerged)*: Add an Agent Plugins 1.0 `plugin.json`, `.codex-plugin/plugin.json` (interface metadata, `onboardingSkill`) and `.agents/plugins/marketplace.json` to `plugins/helios`.
+- [x] **SKILLS**: Merge `feat/agent-video-entry-skill` in `helios-skills` (`plugins/helios`, entry skill `make-video`).
+  - Merged there as #4. The plugin and the skill catalog have since moved into this repository (`plugins/helios/`, `skills/`), and `helios-skills` is deprecated.
+- [x] **SKILLS**: Add an Agent Plugins 1.0 `plugin.json`, `.codex-plugin/plugin.json` (interface metadata, `onboardingSkill`) and `.agents/plugins/marketplace.json` to `plugins/helios`.
+  - The marketplace files are at this repository's root: `.claude-plugin/marketplace.json` and `.agents/plugins/marketplace.json`.
 - [x] **CLI**: `helios skills install` and Studio's `skillsRoot` ship real skills.
-  - **Problem**: `packages/cli/scripts/bundle-skills.js` copies `.agents/skills/helios`, which holds only `dummy.ts`, so both ship nothing.
+  - **Problem**: `packages/cli/scripts/bundle-skills.js` copied `.agents/skills/helios`, which held only `dummy.ts`, so both shipped nothing.
   - **Goal**: bundle the `make-video` skill.
+  - **Now**: the script bundles `make-video` from `plugins/helios/skills/` and the catalog from `skills/`, which carries the `core`, `renderer`, `player` and `studio` skills Studio's assistant reads.
   - **Verification**: `helios skills install` in an empty directory writes `make-video/SKILL.md`.
 - [x] **DOCS**: Directory assets: logo and composer icon (`assets/brand/`), screenshots, support contact (GitHub issues).
 - [ ] **DOCS**: Privacy policy and terms. Drafts are on branch `docs/legal`, awaiting the maintainer's review.
@@ -135,7 +138,8 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - Renders through `render_video`.
 - [x] **CLI**: ChatGPT extension metadata on the same tools: `openai/ui` entrypoints `thread` and `global` (on `helios_library`).
 - [ ] **CLI**: ChatGPT structured settings (`openai/settings` read/update tools): default size, fps, preset, output folder.
-- [ ] **SKILLS** *(helios-skills#6, merges after the CLI release)*: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+- [x] **SKILLS**: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
+  - `plugins/helios/.mcp.json` and `mcp.json` pin `@helios-project/cli@0.46.0`, a published release that ships `helios mcp`.
 - [x] **CLI**: Claude Desktop extension (`integrations/claude-desktop`, `.mcpb`), tested in the Chat and Code tabs.
 - [ ] **CLI**: Publish a CLI release with `helios mcp`, then attach `helios.mcpb` to a GitHub release.
 - [ ] **Gate**: In Claude Desktop and ChatGPT desktop, a brief becomes an inline preview, takes one revision by selection, and ends as an MP4 on disk without a terminal. Scripted in `tests/manual/`.
@@ -143,6 +147,21 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 ### Phase 3 — Hosted view for web and mobile
 - [ ] **INFRASTRUCTURE**: A stateless streamable-HTTP deployment of the same server: no rendering, no accounts.
 - [ ] **PLAYER**: In-view export spike. Measure frame exactness against `helios still`, find how the file leaves the sandbox, and record the decision in `docs/rfcs/`.
+
+### Checks a script can run, and music sync
+Lessons from a production that drew its motion layer with a renderer shaped like Helios (claudia.gallery): every bar that held was something a script measured.
+- [x] **CLI**: `helios analyze <audio>` writes a beat map: beats on a drifting tempo snapped to onsets, downbeats, kick/snare/hat onsets, hits, risers, sections, per-frame envelopes.
+- [x] **CLI**: `helios verify --cues <srt|vtt|json>` checks that every timed cue is on screen at its time; `--json` output.
+- [x] **CLI**: `helios check <video>`: WCAG 2.3.1 flash check, colour tags, frame count.
+- [x] **RENDERER**: Encode Y'CbCr output with the BT.709 matrix and tag it.
+- [x] **CLI**: `helios mcp` prompts (`make_video`, `music_video`), `analyze_audio`, cues in `verify_video`, `helios check` after renders.
+- [x] **CLI**: Registry components `beat-clock` and `cursor`.
+- [x] **SKILLS**: Timing rules (words to the voice, motion to the beat), checks, canvas history traps.
+- [x] **Eval**: `tests/agent-eval` drifting-tempo track with ground truth, flash and beat-sync metrics, verdict computed in code.
+- [ ] **Gate**: Run `tests/agent-eval` with the new metrics and record the scoreboard.
+- [ ] **RENDERER**: Keep the BT.709 `colr` atom when chunks are stitched by stream copy (FFmpeg 4.1 drops it), and tag `helios merge --video-codec` output.
+- [ ] **RENDERER**: Decide one transfer-curve policy for the main and portable renderers. Portable converts sRGB to the BT.709 transfer curve; the main renderer converts the matrix only, so the same grey encodes differently under the same tags.
+- [ ] **SKILLS**: Retire the `helios-skills` repository: replace its README with a pointer to this repo, then archive it.
 
 ## Product Surface (Studio, CLI, Examples)
 *Studio, CLI, and examples are first class product surfaces in V2.*
@@ -195,7 +214,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
   - **Why it matters**: this is the same root cause as the GSAP item above, and it fails
     **silently** — the CLI prints `Render complete!` and the MP4 probes as a perfectly
     valid 1920x1080/30fps file. Only frame sampling catches it. `guided/promo-video` in
-    `helios-skills` instructs agents to animate with motion.dev, so this is on the
+    `skills/` instructs agents to animate with motion.dev, so this is on the
     default authoring path.
   - **Workaround (composition side)**: retain every handle `animate()` returns and call
     `.pause()` on each before setting `window.helios`, which forces instantiation.

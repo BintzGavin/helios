@@ -11,6 +11,11 @@ import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } f
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
+import { registerHeliosPrompts } from './prompts.js';
+import {
+  beatsText, parseJsonObject, summarizeBeats, summarizeCheck, summarizeVerify, verifyText,
+  type RenderChecks,
+} from './reports.js';
 
 export const PLAYER_URI = 'ui://helios/player';
 export const PLAYER_MIME_TYPE = 'text/html;profile=mcp-app';
@@ -54,6 +59,14 @@ function revealWithSystem(absPath: string, open: boolean): Promise<void> {
   });
 }
 
+/** Timed-text files verify_video checks against the page. */
+const CUE_FILES = /\.(srt|vtt|json)$/i;
+
+/** How long a render result waits for `helios check` before saying it is still running. */
+const DEFAULT_CHECK_WAIT_MS = 15_000;
+/** `helios check` is stopped after this long; it reads the video once at a small size. */
+const CHECK_TIMEOUT_MS = 10 * 60_000;
+
 /** Largest page preview_video will save, in characters. */
 const MAX_PAGE_CHARS = 4_000_000;
 
@@ -76,6 +89,8 @@ export interface HeliosMcpOptions {
   reveal?: (absPath: string, open: boolean) => Promise<void>;
   /** Grace period between SIGTERM and SIGKILL when a render is cancelled. */
   killGraceMs?: number;
+  /** How long a finished render's result waits for `helios check` (default 15 s); it keeps running after that. */
+  checkWaitMs?: number;
 }
 
 export interface HeliosMcp {
@@ -143,6 +158,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   const viewPath = options.viewPath ?? defaultViewPath();
   const buildShim = options.buildShim ?? defaultBuildShim;
   const reveal = options.reveal ?? revealWithSystem;
+  const checkWaitMs = options.checkWaitMs ?? DEFAULT_CHECK_WAIT_MS;
 
   const server = new McpServer({ name: 'helios', version: options.version ?? packageVersion() });
 
@@ -190,6 +206,17 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     bytes: z.number().optional(),
     error: z.string().optional(),
     logTail: z.array(z.string()).optional(),
+    checks: z.object({
+      status: z.enum(['passed', 'failed', 'error', 'running']),
+      message: z.string(),
+      problems: z.array(z.string()),
+      warnings: z.array(z.string()),
+      flash: z.object({
+        ok: z.boolean(),
+        maxPerSecond: z.number().optional(),
+        worst: z.object({ t0: z.number(), t1: z.number(), count: z.number() }).nullable(),
+      }).optional(),
+    }).optional().describe('helios check on the finished MP4: flashing (WCAG 2.3.1), colour tags, frame count'),
   };
 
   // ---- Model tools that open the view ------------------------------------------------------
@@ -367,14 +394,64 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     }
   }
 
-  function renderResult(job: RenderJob): CallToolResult {
+  /** One `helios check` per finished render, started the first time a result reports it. */
+  const checks = new WeakMap<RenderJob, Promise<RenderChecks>>();
+
+  async function runChecks(job: RenderJob): Promise<RenderChecks> {
+    const failed = (reason: string): RenderChecks => ({
+      status: 'error',
+      // One line, even when the reason is the last lines of stderr.
+      message: `Checks: could not check ${job.outputRel}: ${reason.replace(/\s*\n\s*/g, ' ')}`,
+      problems: [],
+      warnings: [],
+    });
+    try {
+      const result = await runCli(runner, ['check', job.output, '--json'], root, AbortSignal.timeout(CHECK_TIMEOUT_MS));
+      const report = parseJsonObject(result.stdout);
+      // Exit 1 with a report is a failed check; exit 1 without one is a check that couldn't run.
+      if (report && (result.code === 0 || result.code === 1)) return summarizeCheck(report);
+      if (result.code === 0) return failed('helios check printed no report.');
+      return failed(result.error?.message || errorFromStderr(result.stderr, 'Check failed:') || `helios check exited with ${result.signal ?? `code ${result.code}`}`);
+    } catch (err) {
+      return failed(err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  /** The finished render's checks, or a "still running" note once checkWaitMs has passed. */
+  async function checksFor(job: RenderJob): Promise<RenderChecks> {
+    let pending = checks.get(job);
+    if (!pending) {
+      pending = runChecks(job);
+      checks.set(job, pending);
+    }
+    let timer: NodeJS.Timeout | undefined;
+    const waiting = new Promise<RenderChecks>((resolve) => {
+      timer = setTimeout(() => resolve({
+        status: 'running',
+        message: `Checks: still checking ${job.outputRel}; get_render_status with jobId "${job.id}" reports them.`,
+        problems: [],
+        warnings: [],
+      }), checkWaitMs);
+    });
+    try {
+      return await Promise.race([pending, waiting]);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function renderResult(job: RenderJob): Promise<CallToolResult> {
     const snapshot = jobs.snapshot(job);
     let text: string;
     switch (job.status) {
-      case 'completed':
+      case 'completed': {
         text = `Rendered ${job.outputRel} (${job.duration !== undefined ? `${job.duration.toFixed(1)} s requested, ` : ''}` +
           `${formatBytes(job.bytes ?? 0)}) in ${Math.round(snapshot.elapsedSeconds)} s. It is at ${job.output}`;
+        const checked = await checksFor(job);
+        snapshot.checks = checked;
+        text += `\n${checked.message}`;
         break;
+      }
       case 'failed':
         text = `Render of ${job.outputRel} failed: ${job.error ?? 'unknown error'}`;
         break;
@@ -397,7 +474,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description:
         'Renders a Helios video page to an MP4 on this machine (Chromium and FFmpeg). ' +
         'If it is not done within waitSeconds it keeps rendering in the background and returns a jobId for get_render_status. ' +
-        'Run verify_video first on a new or changed page: a page whose frames are not a function of time alone renders wrong.',
+        'Run verify_video first on a new or changed page: a page whose frames are not a function of time alone renders wrong. ' +
+        'A finished render is checked for flashing (WCAG 2.3.1) and colour tags, and the result says what failed.',
       inputSchema: {
         path: pagePath,
         output: z.string().min(1).optional().describe('Output file, relative to the project root (default: the page name with .mp4, next to the page)'),
@@ -442,7 +520,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         throw err;
       }
       await waitForJob(job, args.waitSeconds, extra);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 
@@ -465,7 +543,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       const job = jobs.get(args.jobId);
       if (!job) return toolError(`No render with jobId "${args.jobId}". Start one with render_video.`);
       await waitForJob(job, args.waitSeconds, extra);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 
@@ -482,7 +560,7 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     guard(async (args) => {
       const job = jobs.cancel(args.jobId);
       if (!job) return toolError(`No render with jobId "${args.jobId}".`);
-      return renderResult(job);
+      return await renderResult(job);
     }),
   );
 
@@ -560,36 +638,135 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       title: 'Verify video',
       description:
         'Checks that every frame of a video page depends only on its time, by rendering sample frames in order and in reverse and comparing them. ' +
+        'With cues (an .srt, .vtt or .json file of lyrics, captions or words with start and end times), it also checks that each piece of timed text is on screen during its time. ' +
         'Run it on a new or changed page before render_video. ' +
-        'A failure names the times whose frames depend on what came before: the page uses counters, timers or per-frame randomness instead of values computed from t.',
+        'A failure names the times whose frames depend on what came before (the page uses counters, timers or per-frame randomness instead of values computed from t), ' +
+        'or the cues that were not on screen and what the frame showed instead.',
       inputSchema: {
         path: pagePath,
         duration: duration.optional(),
         samples: z.number().int().min(2).max(24).optional().describe('Frames to compare (default 6)'),
+        cues: z.string().min(1).optional()
+          .describe('Timed text to check: an .srt, .vtt or .json file in the project (JSON: [{ text, start, end }] in seconds). Canvas pages report drawn text with window.heliosDrawnText?.add(text)'),
       },
-      outputSchema: { ok: z.boolean(), message: z.string() },
+      outputSchema: {
+        ok: z.boolean(),
+        message: z.string(),
+        purity: z.object({
+          ok: z.boolean(),
+          message: z.string(),
+          samples: z.number().optional(),
+          differing: z.array(z.number()).describe('Times, in seconds, whose frames depend on render order'),
+        }).optional(),
+        cues: z.object({
+          ok: z.boolean(),
+          message: z.string(),
+          total: z.number(),
+          shown: z.number(),
+          missing: z.array(z.object({ text: z.string(), start: z.number(), end: z.number(), seen: z.string().optional() })),
+        }).optional(),
+      },
       annotations: { title: 'Verify video', readOnlyHint: true, openWorldHint: false },
     },
     guard(async (args, extra) => {
       const page = await resolveInRoot(root, args.path, { kind: 'file' });
+      const cues = args.cues !== undefined ? await resolveInRoot(root, args.cues, { kind: 'file', label: 'cues' }) : undefined;
+      if (cues && !CUE_FILES.test(cues.abs)) throw new PathError(`cues "${args.cues}" must be an .srt, .vtt or .json file`);
       const cli = ['verify', page.abs];
       if (args.duration !== undefined) cli.push('--duration', String(args.duration));
       if (args.samples !== undefined) cli.push('--samples', String(args.samples));
+      if (cues) cli.push('--cues', cues.abs);
+      cli.push('--json');
 
       const result = await runCli(runner, cli, root, extra.signal);
+      const json = parseJsonObject(result.stdout);
+      // A page that fails a check is an answer, not a tool failure.
+      if (json && (result.code === 0 || result.code === 1)) {
+        const report = summarizeVerify(json);
+        return { content: [{ type: 'text', text: verifyText(report) }], structuredContent: report };
+      }
       if (result.code === 0) {
         const lines = stripAnsi(result.stdout).split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
         const message = [...lines].reverse().find((line) => line.includes('sampled frames')) ?? lines[lines.length - 1] ?? 'Verified.';
         return { content: [{ type: 'text', text: message }], structuredContent: { ok: true, message } };
       }
       const message = result.error?.message || errorFromStderr(result.stderr, 'Verify failed:') || `exit ${result.signal ?? result.code}`;
-      // A page that fails the check is an answer, not a tool failure.
       if (/^Frames at .* differ depending on what was rendered before them/.test(message)) {
         return { content: [{ type: 'text', text: message }], structuredContent: { ok: false, message } };
       }
       return toolError(`Could not verify ${page.rel}: ${message}`);
     }),
   );
+
+  // ---- Music ------------------------------------------------------------------------------------
+
+  server.registerTool(
+    'analyze_audio',
+    {
+      title: 'Analyze audio',
+      description:
+        'Finds the beats, bars, sections and biggest hits of a song or other audio file in the project, writes them to a JSON file the page can load, and summarises them. ' +
+        'Use it before timing a video to music: cut on downbeats and kicks, and land key moves on hits. ' +
+        'The tempo may drift, so the file lists every beat rather than one BPM; all times are in seconds of audio time. ' +
+        'It measures the signal only: it does not transcribe lyrics or call any generative model.',
+      inputSchema: {
+        path: z.string().min(1).describe('The audio file, relative to the project root'),
+        output: z.string().min(1).optional()
+          .describe('Where to write the beats JSON, relative to the project root (default: <audio name>.beats.json next to the audio)'),
+        fps: fps.optional().describe('Frames per second of the loudness envelope in the file (default 30); use the video\'s fps'),
+        tempoRange: z.string().regex(/^\s*\d+(\.\d+)?\s*:\s*\d+(\.\d+)?\s*$/, 'tempoRange is "min:max" in BPM').optional()
+          .describe('Limit the tempo search to "min:max" BPM, e.g. "120:140", when the result is half or double the real tempo'),
+      },
+      outputSchema: {
+        audio: z.string(),
+        path: z.string().describe('The beats JSON, relative to the project root'),
+        absolutePath: z.string(),
+        duration: z.number().nullable(),
+        bpm: z.number(),
+        tempoRange: z.object({ min: z.number(), max: z.number() }),
+        beats: z.number().describe('How many beats the file lists'),
+        bars: z.number(),
+        beatsPerBar: z.number(),
+        firstDownbeat: z.number().nullable(),
+        downbeatMethod: z.string().optional(),
+        sections: z.array(z.object({ t0: z.number(), t1: z.number(), energy: z.number().optional() })),
+        hits: z.array(z.object({ t: z.number(), score: z.number() })).describe('The strongest hits, in time order'),
+      },
+      annotations: { title: 'Analyze audio', readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    },
+    guard(async (args, extra) => {
+      const audio = await resolveInRoot(root, args.path, { kind: 'file' });
+      // The CLI's default: <name>.beats.json next to the audio.
+      const outputInput = args.output ?? path.join(path.dirname(audio.abs), `${path.parse(audio.abs).name}.beats.json`);
+      const output = await resolveInRoot(root, outputInput, { kind: 'new', label: 'output' });
+      if (!/\.json$/i.test(output.abs)) throw new PathError(`output "${output.rel}" must be a .json file`);
+      if (fs.existsSync(output.abs) && fs.statSync(output.abs).isDirectory()) {
+        throw new PathError(`output "${output.rel}" is a directory`);
+      }
+      await fs.promises.mkdir(path.dirname(output.abs), { recursive: true });
+
+      const cli = ['analyze', audio.abs, '-o', output.abs];
+      if (args.fps !== undefined) cli.push('--fps', String(args.fps));
+      if (args.tempoRange !== undefined) cli.push('--tempo-range', args.tempoRange.replace(/\s+/g, ''));
+
+      const result = await runCli(runner, cli, root, extra.signal);
+      if (result.code !== 0) {
+        return toolError(`Could not analyze ${audio.rel}: ${result.error?.message || errorFromStderr(result.stderr, 'Analyze failed:') || `exit ${result.signal ?? result.code}`}`);
+      }
+      const raw = await fs.promises.readFile(output.abs, 'utf8').catch(() => undefined);
+      if (raw === undefined) return toolError(`helios analyze finished but wrote no beats file at ${output.rel}`);
+      let data: unknown;
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        return toolError(`${output.rel} is not valid JSON`);
+      }
+      const summary = summarizeBeats(data, { audio: audio.rel, path: output.rel, absolutePath: output.abs });
+      return { content: [{ type: 'text', text: beatsText(summary) }], structuredContent: summary };
+    }),
+  );
+
+  registerHeliosPrompts(server);
 
   listSchemasWithoutDialect(server);
   return { server, jobs, root };

@@ -1,0 +1,19 @@
+{
+  "name": "helios",
+  "owner": {
+    "name": "Gavin Bintz",
+    "url": "https://github.com/BintzGavin"
+  },
+  "metadata": {
+    "description": "Make videos from code with Helios: one HTML page, rendered frame-exact to MP4."
+  },
+  "plugins": [
+    {
+      "name": "helios",
+      "source": "./plugins/helios",
+      "description": "Make videos drawn with code, such as motion graphics, launch and explainer videos, animated charts, logo reveals and social clips: write one HTML page that draws each frame from its time, render it to MP4 with Helios, check the frames, add a soundtrack.",
+      "homepage": "https://github.com/BintzGavin/helios",
+      "keywords": ["video", "mp4", "animation", "motion graphics", "music video", "explainer", "rendering"]
+    }
+  ]
+}
