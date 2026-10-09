@@ -11,7 +11,7 @@ objects, 34,272 rotoscoped ink contours and a flying wordmark. There are three p
   bloom with film halation, god rays from the star, refraction shockwaves at the ring
   collisions, heat haze on the thermal shots, light leaks on hard cuts, soft contact shadows
   under the pixel objects, lens chromatic aberration, gate weave and luma-aware grain.
-- **`promo.html`** is a Helios promo built on the film: same edit, same music, a new story
+- **`promo.html`** is an original Helios promo cut to the same soundtrack
   (see [The promo](#the-promo)).
 
 > This example reproduces another engine's film exactly, so it is a fidelity reference. It
@@ -64,7 +64,7 @@ and `helios sheet`. A `file://` URL won't work.
 | `src/text.js` | usvgr text layout | HarfBuzz (WASM) shaping and glyph outlines, filled as paths |
 | `src/libm.js` | glibc, Rust `libm` | `sinf`/`cosf`/`expf` as the Rust film computes them |
 | `src/enhance.js` | none (new) | The enhanced grade |
-| `src/promo.js` | none (new) | The Helios promo: copy, running time, worker grid, finale |
+| `src/promo/` | none (new) | The Helios promo: scenes, pages, light writing, shaders |
 
 fframes renders SVG trees with Skia, and Chrome's 2D canvas is also Skia, so the vector work
 (ink contours, glyph outlines, rectangles, strokes) matches once the geometry is the same.
@@ -107,30 +107,36 @@ Getting byte-identical frames needed the rest to follow fframes exactly:
 
 ## The promo
 
-`promo.html` (`src/promo.js`) keeps the film's cuts and soundtrack and tells the Helios story
-over them. Helios is named after the sun because video is light over time, so light and time
-run through the whole cut:
+`promo.html` (`src/promo/`) is "Light Over Time", an original Helios promo. It shares nothing
+with the film except the soundtrack, and it cuts on the soundtrack's hits. Helios is named
+after the sun because video is light over time, so the promo is made of light and time:
 
-- **The story.** "how do you turn a web page into a film?" "you don't. you give it time." The
-  cards become `html.`, `time.` and `light.`, the hand takes it "from one page to every
-  frame", and the pulses spell T-I-M-E.
-- **The running time.** A small clock in the corner shows the film's own `t` and never resets.
-  It glows when the portrait says "time.", and the `time.` card calls
+- **Light writing.** A spark writes "how do you turn a web page into a film?" along the glyph
+  outlines, like a long exposure, and the type settles into the top of the frame.
+- **A prism.** A white beam splits into a spectrum whose bands are the web: html, css, svg,
+  canvas, webgl, video. The spectrum collapses back into one gold beam.
+- **A page that needs time.** A browser window sits frozen ("you don't."). On "you give it
+  time." it comes alive, with long-exposure trails behind everything that moves.
+- **Pages orbiting a sun.** Twelve small animated pages circle a living sun (granulation,
+  corona) in 3D. The near ones are backlit and the far ones show their sunlit backs. They later
+  burst past the camera as the sun shrinks to one point.
+- **Glass.** Raymarched glass objects, a `</>`, a clock ring with a gold hand and a prism,
+  carry the `html.`, `time.` and `light.` cards and the T-I-M-E pulses. The `time.` card calls
   `window.renderAt(t)` with the live value.
-- **The worker grid.** After the `time.` card the camera pulls back from the shot into a grid of
-  sixteen tiles, each rendering a different moment of the same film at its own `t`, then dives
-  into the tile that opens the next shot: any frame, any order, any machine. It works because
-  every frame is a pure function of `t`.
-- **The finale.** The flying letters gather into HELIOS on the last hit. The paper then burns
-  away from the sun, edged with embers, into the brand's night sky. The sun mark draws its rays,
-  and "video is light over time." types itself out while the music breathes.
+- **The worker grid.** The camera pulls back from the `time.` card into sixteen tiles, each
+  rendering a different moment of the promo at its own `t`, then dives into the tile that opens
+  the next shot: any frame, any machine.
+- **Every frame.** One page becomes a helix of frames, each a later moment, flying past.
+- **Sunrise.** HELIOS arrives letter by letter on trails of light, the sun rises into the logo,
+  its rays draw out and "video is light over time." types itself.
 
-The lockup follows the Helios logo (`docs/site/logo`): the gold sun with eight rays and the
-wordmark in Space Grotesk Bold, vendored here under the SIL Open Font License.
+A running clock in the corner shows the film's own `t` throughout. The lockup follows the Helios
+logo (`docs/site/logo`): the gold sun with eight rays and the wordmark in Space Grotesk Bold,
+vendored here under the SIL Open Font License. The shaders (`src/promo/shaders.js`) are plain
+GLSL, run through the same shader stage as the film.
 
-The promo reuses the film's media, and some of it (the soundtrack, the portrait footage and the
-rotoscoped ink) traces back to the third-party reference film that fframes adapted. Replace
-those with media you have the rights to before publishing the promo.
+The soundtrack comes from the fframes example and traces back to the third-party reference film
+that fframes adapted. Replace it with music you have the rights to before publishing the promo.
 
 ## Fidelity
 

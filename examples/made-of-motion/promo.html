@@ -11,9 +11,9 @@
 <body>
 <canvas id="film" width="1440" height="1080"></canvas>
 <script type="module">
-  // A Helios promo built on the made-of-motion film (see src/promo.js). Render with:
+  // "Light Over Time", a Helios promo (see src/promo/). Render with:
   //   helios render promo.html --width 1440 --height 1080 --fps 24 --duration 20.375
-  import { Promo, FPS, FRAMES } from './src/promo.js';
+  import { Promo, FPS, FRAMES } from './src/promo/index.js';
 
   const ctx = document.getElementById('film').getContext('2d');
   const film = Promo.load('assets');

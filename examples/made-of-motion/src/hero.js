@@ -109,16 +109,13 @@ const subtitleSlide = transformTimeline([{
 }]);
 const subtitleFade = timeline([{ at: 0.041667, end: 0.166667, from: 0, to: 1, easing: Easing.EaseOut }]);
 
-/** Each card's title and the x of the cursor after it. */
-export const TITLES = {
-  code: ['code.', 1120],
-  motion: ['motion.', 1256],
-  feeling: ['feeling.', 1246],
-};
-
 /** The card's title block, as a list of draw steps for the painter. */
-export function typeBlock(t, card, titles = TITLES) {
-  const [copy, cursor] = titles[card];
+export function typeBlock(t, card) {
+  const [copy, cursor] = {
+    code: ['code.', 1120],
+    motion: ['motion.', 1256],
+    feeling: ['feeling.', 1246],
+  }[card];
   return {
     titleTransform: animate(titleSlide, t),
     copy,

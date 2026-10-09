@@ -8,12 +8,12 @@ import { textWidth } from './text.js';
 export const QUESTION = 'how do you turn a few lines of code into a feeling?';
 
 /** The question up to (not including) its `count`-th space. */
-function prefix(question, count) {
+function prefix(count) {
   let seen = 0;
-  for (let i = 0; i < question.length; i++) {
-    if (question[i] === ' ' && ++seen === Math.max(count, 1)) return question.slice(0, i);
+  for (let i = 0; i < QUESTION.length; i++) {
+    if (QUESTION[i] === ' ' && ++seen === Math.max(count, 1)) return QUESTION.slice(0, i);
   }
-  return question;
+  return QUESTION;
 }
 
 const pan = transformTimeline([
@@ -113,14 +113,11 @@ function collapse(painter, c, n) {
   });
 }
 
-/**
- * The Question scene's type, for scene-local frame `n` (never called on frame 0).
- * `openingType` is the oversized type of frame 13: the question's first four words.
- */
-export function drawOpening(painter, c, n, t, openingType, question = QUESTION) {
+/** The Question scene's type, for scene-local frame `n` (never called on frame 0). */
+export function drawOpening(painter, c, n, t, openingType) {
   if (n >= 18) {
     const count = Math.min(4 + Math.floor(((n - 13) * 8) / 32), 12);
-    const copy = prefix(question, count);
+    const copy = prefix(count);
     if ([18, 19, 20, 22].includes(n)) {
       const width = textWidth('Inter 24pt', 54, copy) - 1.25 * Math.max([...copy].length - 1, 0);
       const right = 106.25 + width + 24;
@@ -147,7 +144,7 @@ export function drawOpening(painter, c, n, t, openingType, question = QUESTION) 
   }
 
   const count = n <= 4 ? 1 : n <= 7 ? 2 : n <= 12 ? 3 : 4;
-  const copy = prefix(question, count);
+  const copy = prefix(count);
   if (n === 1) {
     c.fillStyle = '#ce101c';
     c.fillRect(0, 0, 1440, 1080);

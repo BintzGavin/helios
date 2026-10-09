@@ -6,7 +6,7 @@ import { animate, Easing, f, seconds, timeline, Transform, transformTimeline } f
 import { HAND, STAR } from './captures.js';
 import { letterFlights } from './flight.js';
 import { ShaderStage } from './gl.js';
-import { Heroes, TITLES, typeBlock } from './hero.js';
+import { Heroes, typeBlock } from './hero.js';
 import { drawDust, drawImpacts, drawQuestionInk, drawSignatureInk, VectorInk } from './ink.js';
 import { cosf } from './libm.js';
 import { choreography, hero } from './objects.js';
@@ -50,20 +50,6 @@ export const SCENES = EDIT.map(([name, end, kind], i) => ({
 }));
 
 const FULL = [0, 0, WIDTH, HEIGHT];
-
-/** The film's words. A subclass can tell another story over the same shots. */
-export const COPY = {
-  question: QUESTION,
-  // The span that turns cream when the orange ball blooms behind the question.
-  highlight: [7, 10],
-  answer: ['you don’t.', 'you give', 'you give it', 'you give it fframes.'],
-  scatter: 'from your mind',
-  scatterAt: [720, 552],
-  hand: ['from', 'from your', 'from your mind', 'to every frame.'],
-  titles: TITLES,
-  subtitles: { code: 'Rust + SVG', motion: 'timeline!', feeling: 'every frame matters.' },
-  pulse: ['M', 'O', 'V', 'E'],
-};
 
 const signalObjectsFade = timeline([{ at: 1.25, end: 1.375, from: 1, to: 0, easing: Easing.EaseIn }]);
 const thermalObjectsFade = timeline([{ at: 0, end: 0.125, from: 0, to: 0.94, easing: Easing.EaseOut }]);
@@ -166,7 +152,7 @@ export class Film {
       bitmap(`${assets}/media/objects.png`),
       bitmap(`${assets}/media/hand-field.png`),
     ]);
-    return new this(assets, ink, atlas, field, enhanced);
+    return new Film(assets, ink, atlas, field, enhanced);
   }
 
   constructor(assets, ink, atlas, field, enhanced = false) {
@@ -190,7 +176,6 @@ export class Film {
     this.painter = new Painter(WIDTH, HEIGHT);
     this.openingType = new Path2D(OPENING_TYPE);
     this.portraitFrame = -1;
-    this.copy = COPY;
     this.enhanced = enhanced;
     if (enhanced) {
       this.enhancer = new Enhancer(WIDTH, HEIGHT);
@@ -296,7 +281,7 @@ export class Film {
     switch (scene.kind) {
       case 'question':
         this.background(c, s, 0, 0);
-        if (local !== 0) drawOpening(p, c, local, t, this.openingType, this.copy.question);
+        if (local !== 0) drawOpening(p, c, local, t, this.openingType);
         drawQuestionInk(p, c, this.ink, t, frame);
         break;
       case 'signal': {
@@ -304,11 +289,10 @@ export class Film {
         this.signal(c, s);
         p.group(c, { opacity: animate(signalObjectsFade, t) }, (g) => this.ring(g, s));
         this.ink.draw(c, frame);
-        const { question, highlight: [from, to] } = this.copy;
-        const spans = textPaths('Inter 24pt', 54, 720, 554, question, {
+        const spans = textPaths('Inter 24pt', 54, 720, 554, QUESTION, {
           letterSpacing: -1.25,
           anchor: 'middle',
-          spans: [[0, from], [from, to], [to, question.length]],
+          spans: [[0, 7], [7, 10], [10, QUESTION.length]],
         });
         [color, local >= 39 ? '#fff4df' : color, color].forEach((fill, i) => {
           c.fillStyle = fill;
@@ -317,7 +301,7 @@ export class Film {
         break;
       }
       case 'portrait': {
-        const copy = this.copy.answer[local <= 34 ? 0 : local <= 38 ? 1 : local <= 42 ? 2 : 3];
+        const copy = local <= 34 ? 'you don’t.' : local <= 38 ? 'you give' : local <= 42 ? 'you give it' : 'you give it fframes.';
         this.performance(c, s);
         this.ink.draw(c, frame);
         label(c, copy, 208, 554, 46, local >= 51 ? '#181714' : '#f3eee1');
@@ -334,7 +318,7 @@ export class Film {
         this.ring(c, s);
         drawImpacts(this.stage, c, this.impacts, frame, t, local);
         this.ink.draw(c, frame);
-        if (scene.kind === 'scatter' && local > 23) label(c, this.copy.scatter, ...this.copy.scatterAt, 32, '#1d1916', true);
+        if (scene.kind === 'scatter' && local > 23) label(c, 'from your mind', 720, 552, 32, '#1d1916', true);
         break;
       case 'code':
       case 'motion':
@@ -399,7 +383,6 @@ export class Film {
       aberration: 0.0075,
       grain: dark ? 0.022 : 0.016,
       vignette: dark ? 0.16 : 0.1,
-      zoom: 1,
     };
   }
 
@@ -409,16 +392,11 @@ export class Film {
     this.ink.draw(c, s.global);
     // The other eleven tracks keep rotating off-screen; this is the selected track's pose.
     this.object(c, s, pose.object);
-    this.painter.group(c, { opacity: pose.titleOpacity }, (g) => this.typeBlock(g, s.time, card, s.global));
+    this.painter.group(c, { opacity: pose.titleOpacity }, (g) => this.typeBlock(g, s.time, card));
   }
 
-  /** The line under a card's title, at global frame `frame`. */
-  subtitle(card, frame) {
-    return this.copy.subtitles[card];
-  }
-
-  typeBlock(c, t, card, frame) {
-    const block = typeBlock(t, card, this.copy.titles);
+  typeBlock(c, t, card) {
+    const block = typeBlock(t, card);
     const p = this.painter;
     p.group(c, { transform: block.titleTransform }, (g) => {
       label(g, block.copy, 800, 559, 112, '#f4efe4');
@@ -426,16 +404,15 @@ export class Film {
       g.fillRect(block.cursor.x, block.cursor.y, block.cursor.width, block.cursor.height);
     });
     p.group(c, { transform: block.subtitleTransform, opacity: block.subtitleOpacity }, (g) => {
-      const copy = this.subtitle(card, frame);
       if (card === 'feeling') {
-        text(g, { family: 'Instrument Serif', size: 35, x: 807, y: 617, copy, fill: '#d4cabb' });
+        text(g, { family: 'Instrument Serif', size: 35, x: 807, y: 617, copy: 'every frame matters.', fill: '#d4cabb' });
         g.strokeStyle = '#ed3d27';
         g.lineWidth = 2;
         g.stroke(new Path2D('M811 653 C905 641 970 662 1045 647'));
       } else if (card === 'code') {
-        text(g, { family: 'JetBrains Mono', size: 23, x: 807, y: 611, copy, fill: '#bce788' });
+        text(g, { family: 'JetBrains Mono', size: 23, x: 807, y: 611, copy: 'Rust + SVG', fill: '#bce788' });
       } else {
-        text(g, { family: 'JetBrains Mono', size: 23, x: 807, y: 611, copy, fill: '#c0a1ef' });
+        text(g, { family: 'JetBrains Mono', size: 23, x: 807, y: 611, copy: 'timeline!', fill: '#c0a1ef' });
       }
     });
   }
@@ -451,11 +428,11 @@ export class Film {
     } else {
       this.hand(c, s);
     }
-    const words = this.copy.hand;
+    const copy = s.frame <= 2 ? 'from' : s.frame <= 5 ? 'from your' : 'from your mind';
     this.ink.draw(c, s.global);
-    label(c, words[s.frame <= 2 ? 0 : s.frame <= 5 ? 1 : 2], 208, 554, 42, '#f1ecdf');
+    label(c, copy, 208, 554, 42, '#f1ecdf');
     this.painter.group(c, { opacity: animate(handCaption, s.time) }, (g) => {
-      label(g, words[3], 1050, 554, 42, '#f1ecdf');
+      label(g, 'to every frame.', 1050, 554, 42, '#f1ecdf');
     });
   }
 
@@ -465,7 +442,7 @@ export class Film {
     const icons = [3, 0, 7, 4];
     this.background(c, s, mode, index === 3 ? 1.35 : 0.5);
     this.object(c, s, hero(icons[index], 720, 540, 370, f(s.global * f(0.13))));
-    this.copy.pulse.slice(0, index + 1).forEach((ch, i) => {
+    ['M', 'O', 'V', 'E'].slice(0, index + 1).forEach((ch, i) => {
       label(c, ch, 250 + i * 312, 552, 32, color, true);
     });
   }

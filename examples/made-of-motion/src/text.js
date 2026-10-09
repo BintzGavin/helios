@@ -147,6 +147,42 @@ function eachOutline(family, size, x, y, text, { letterSpacing, anchor }, start,
 }
 
 /**
+ * A `<text>` element's glyph outlines as polylines (one per contour), curves flattened into
+ * `steps` segments each. For drawing type as light: stroking along the outline.
+ */
+export function textContours(family, size, x, y, text, { letterSpacing = 0, anchor = 'start', steps = 8 } = {}) {
+  const contours = [];
+  let current = null;
+  let last = [0, 0];
+  eachOutline(family, size, x, y, text, { letterSpacing, anchor }, 0, text.length, (type, p) => {
+    if (type === 'M') {
+      current = [p[0]];
+      contours.push(current);
+    } else if (type === 'L') {
+      current.push(p[0]);
+    } else if (type === 'Q') {
+      const [p0, p1, p2] = [last, ...p];
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const u = 1 - t;
+        current.push([0, 1].map((k) => u * u * p0[k] + 2 * u * t * p1[k] + t * t * p2[k]));
+      }
+    } else if (type === 'C') {
+      const [p0, p1, p2, p3] = [last, ...p];
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const u = 1 - t;
+        current.push([0, 1].map((k) => u * u * u * p0[k] + 3 * u * u * t * p1[k] + 3 * u * t * t * p2[k] + t * t * t * p3[k]));
+      }
+    } else if (type === 'Z' && current && current.length) {
+      current.push(current[0]);
+    }
+    if (p.length) last = p[p.length - 1];
+  });
+  return contours.filter((c) => c.length > 1);
+}
+
+/**
  * The tight bounding box `[left, top, right, bottom]` of a `<text>` element's outlines, curve
  * extrema included, like tiny-skia's `compute_tight_bounds` that usvgr uses for layer bounds.
  */
