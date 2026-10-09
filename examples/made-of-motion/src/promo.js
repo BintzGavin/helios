@@ -181,6 +181,7 @@ export const PROMO_COPY = {
   highlight: [QUESTION.indexOf('web page'), QUESTION.indexOf('web page') + 'web page'.length],
   answer: ['you don’t.', 'you give', 'you give it', 'you give it time.'],
   scatter: 'from one page',
+  scatterAt: [720, 760], // clear of the objects gathering in the middle
   hand: ['from', 'from one', 'from one page', 'to every frame.'],
   titles: null, // measured once the fonts are in (cursor after the word)
   subtitles: { code: '<canvas> · css · webgl', motion: 'window.renderAt(t)', feeling: 'every frame, exactly.' },
@@ -322,15 +323,15 @@ export class Promo extends Film {
     // Start and end exactly on a tile's picture, so the cuts around the grid are seamless.
     const from = inset(tileRect(...SOURCE));
     const to = inset(tileRect(...TARGET));
-    const out = ease.circOut(local / 4);
-    const inward = ease.inOut((local - 8) / 3);
+    const out = ease.inOut(local / 5);
+    const inward = ease.inOut((local - 7) / 4);
     const lerpRect = (a, b, w) => {
       // Interpolate the scale in log space, so the zoom feels even.
       const s = Math.exp(mix(Math.log(a[2]), Math.log(b[2]), w));
       const k = (s - a[2]) / (b[2] - a[2] || 1);
       return [mix(a[0], b[0], k), mix(a[1], b[1], k), s, s * (HEIGHT / WIDTH)];
     };
-    const view = local < 8 ? lerpRect(from, whole, out) : lerpRect(whole, to, inward);
+    const view = local < 7 ? lerpRect(from, whole, out) : lerpRect(whole, to, inward);
     const sx = WIDTH / view[2];
     const sy = HEIGHT / view[3];
     const map = ([x, y, w, h]) => [(x - view[0]) * sx, (y - view[1]) * sy, w * sx, h * sy];
@@ -345,8 +346,8 @@ export class Promo extends Film {
       const inner = map(inset(tileRect(col, row)));
       if (inner[0] > WIDTH || inner[1] > HEIGHT || inner[0] + inner[2] < 0 || inner[1] + inner[3] < 0) return;
       // Tiles further from the source wake up later.
-      const delay = Math.hypot(col - SOURCE[0], row - SOURCE[1]) * 0.55;
-      const awake = entry === 'source' ? 1 : ease.circOut((local - 0.5 - delay) / 2.5);
+      const delay = Math.hypot(col - SOURCE[0], row - SOURCE[1]) * 0.25;
+      const awake = entry === 'source' ? 1 : ease.circOut((local + 0.5 - delay) / 1.5);
       if (awake <= 0) return;
       const source = entry === 'source' ? gridScene.start + local
         : entry === 'target' ? gridScene.end
@@ -374,12 +375,12 @@ export class Promo extends Film {
       c.restore();
     });
 
-    // "any frame. any order. any machine." lands one phrase at a time.
-    const phrases = ['any frame.', 'any order.', 'any machine.'];
-    const shown = phrases.filter((_, i) => local >= 3 + i * 1.5);
-    if (shown.length && local < 10) {
+    // "any frame, any machine." lands one phrase at a time.
+    const phrases = ['any frame,', 'any machine.'];
+    const shown = phrases.filter((_, i) => local >= 2 + i * 1.5);
+    if (shown.length && local < 9) {
       const copy = shown.join(' ');
-      const fade = local < 9 ? 1 : 10 - local;
+      const fade = local < 8 ? 1 : 9 - local;
       const { width } = layout('Inter 24pt', 58, phrases.join(' '), -1.25);
       c.save();
       c.globalAlpha = fade;

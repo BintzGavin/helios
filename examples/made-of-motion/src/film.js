@@ -58,6 +58,7 @@ export const COPY = {
   highlight: [7, 10],
   answer: ['you don’t.', 'you give', 'you give it', 'you give it fframes.'],
   scatter: 'from your mind',
+  scatterAt: [720, 552],
   hand: ['from', 'from your', 'from your mind', 'to every frame.'],
   titles: TITLES,
   subtitles: { code: 'Rust + SVG', motion: 'timeline!', feeling: 'every frame matters.' },
@@ -333,7 +334,7 @@ export class Film {
         this.ring(c, s);
         drawImpacts(this.stage, c, this.impacts, frame, t, local);
         this.ink.draw(c, frame);
-        if (scene.kind === 'scatter' && local > 23) label(c, this.copy.scatter, 720, 552, 32, '#1d1916', true);
+        if (scene.kind === 'scatter' && local > 23) label(c, this.copy.scatter, ...this.copy.scatterAt, 32, '#1d1916', true);
         break;
       case 'code':
       case 'motion':
