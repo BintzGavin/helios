@@ -363,6 +363,11 @@ export class Promo {
     const appear = ease.circOut(n / 6);
     const [x, y, w] = [650 + 40 * (1 - appear), 318, 660];
     c.save();
+    // A slow push-in: the page is frozen, the camera isn't.
+    const push = 1 + 0.06 * ease.inOut(n / 48);
+    c.translate(x + w / 2, y + 226);
+    c.scale(push, push);
+    c.translate(-(x + w / 2), -(y + 226));
     c.globalAlpha = appear;
     drawBrowser(c, x, y, w, 0, u, { live, trails: 8, exposure: 0.4 });
     if (!live) {
@@ -426,7 +431,7 @@ export class Promo {
   orbitCards(cam, t, burst = 0) {
     const R = cam.R + 2600 * burst;
     return PAGE_KINDS.map((kind, i) => {
-      const theta = (i * Math.PI * 2) / 12 + t * 0.5 + burst * 1.2;
+      const theta = (i * Math.PI * 2) / 12 + t * 0.85 + burst * 1.2;
       const x = R * Math.cos(theta);
       const z = R * Math.sin(theta);
       const zc = z * Math.cos(cam.e) + 900 * burst;
@@ -453,16 +458,16 @@ export class Promo {
     c.scale(width * s, s);
     const near = Math.exp(-toSun / 380);
     c.beginPath();
-    c.roundRect(-80, -54, 160, 108, 9);
+    c.roundRect(-100, -67, 200, 134, 11);
     if (front) {
-      drawPage(c, kind, -80, -54, 160, 108, t + i * 0.7);
+      drawPage(c, kind, -100, -67, 200, 134, t + i * 0.7);
       c.fillStyle = `rgba(6, 11, 24, ${0.12 + 0.3 * near})`;
       c.fill();
       c.strokeStyle = `rgba(255, 214, 130, ${0.2 + 0.7 * near})`;
       c.lineWidth = 2 / s;
       c.stroke();
     } else {
-      const lit = c.createLinearGradient(0, -54, 0, 54);
+      const lit = c.createLinearGradient(0, -67, 0, 67);
       lit.addColorStop(0, '#6B4A1C');
       lit.addColorStop(1, '#2A1C0C');
       c.fillStyle = lit;
@@ -474,8 +479,10 @@ export class Promo {
     c.restore();
   }
 
-  drawOrbit(c, frame, cam, burst = 0, sunScale = 1, sunGlow = 1.1) {
+  drawOrbit(c, frame, base, burst = 0, sunScale = 1, sunGlow = 1.1) {
     const t = frame / FPS;
+    // The camera drifts: a little higher and lower, a little closer and further.
+    const cam = { ...base, e: base.e + 0.05 * Math.sin(t * 0.9), zoom: base.zoom * (1 + 0.035 * Math.sin(t * 0.6 + 1)) };
     vignette(c, '#0D1838', NAVY, cam.cx, cam.cy);
     this.motes(c, frame, { alpha: 0.55 });
     const cards = this.orbitCards(cam, t, burst);
@@ -606,24 +613,24 @@ export class Promo {
 
   drawBurst(c, frame, n) {
     const cam = CAMERAS.orbitC;
-    const burst = ease.cubicIn(n / 20);
-    const shrink = ease.inOut((n - 6) / 16);
+    const burst = ease.cubicIn(n / 13);
+    const shrink = ease.inOut((n - 4) / 12);
     const surge = 1.1 + 1.3 * Math.exp(-(((n - 4) / 4) ** 2));
     const t = frame / FPS;
     vignette(c, '#0D1838', NAVY, cam.cx, cam.cy);
     this.motes(c, frame, { alpha: 0.55 });
     // Trails: where the pages were a moment ago, fainter.
     for (let g = 3; g >= 1; g--) {
-      const past = this.orbitCards(cam, t - g * 0.02, ease.cubicIn((n - g * 0.7) / 20));
+      const past = this.orbitCards(cam, t - g * 0.02, ease.cubicIn((n - g * 0.7) / 13));
       for (const card of past) this.drawCard(c, card, t, cam, 0.1 * (4 - g) * clamp01(n / 3));
     }
     const cards = this.orbitCards(cam, t, burst);
     for (const card of cards) if (card.zc < 0) this.drawCard(c, card, t, cam);
-    const r = Math.max(92 * mix(1, 0.09, shrink), 6);
+    const r = Math.max(92 * mix(1, 0.09, shrink), 6) * (1 + 0.12 * shrink * Math.sin(n * 0.9));
     const box = r * 7.5;
     this.stage.draw(c, 'sun', [cam.cx - box / 2, cam.cy - box / 2, box, box], { uRadius: r, uGlow: surge }, { time: t });
     for (const card of cards) if (card.zc >= 0) this.drawCard(c, card, t, cam);
-    const label = ease.inOut((n - 22) / 5);
+    const label = ease.inOut((n - 13) / 5);
     if (label > 0) {
       c.save();
       c.globalAlpha = label;
@@ -658,14 +665,14 @@ export class Promo {
     frames.sort((a, b) => b.z - a.z);
     if (n < 5) {
       const s = ease.backOut(n / 5);
-      drawPage(c, 'dashboard', 720 - 150 * s, 500 - 100 * s, 300 * s, 200 * s, 0.5);
+      drawPage(c, 'landscape', 720 - 150 * s, 500 - 100 * s, 300 * s, 200 * s, 2);
     } else {
       for (const f of frames) {
         const w = 300 * f.persp;
         const h = 200 * f.persp;
         c.save();
         c.globalAlpha = clamp01(1 - f.z / 5200) * clamp01((f.z + 260) / 140);
-        drawPage(c, 'dashboard', f.x - w / 2, f.y - h / 2, w, h, f.i * 0.34);
+        drawPage(c, 'landscape', f.x - w / 2, f.y - h / 2, w, h, 2 + f.i * 0.9);
         c.fillStyle = `rgba(6, 11, 24, ${clamp01(f.z / 4200) * 0.75})`;
         c.beginPath();
         c.roundRect(f.x - w / 2, f.y - h / 2, w, h, 12 * f.persp);
