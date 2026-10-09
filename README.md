@@ -14,9 +14,12 @@ For project governance and roadmap, see [`docs/AGENTS.md`](./docs/AGENTS.md).
 
 <div align="center">
 
-# ☀️ Helios
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/brand/lockup-horizontal-bone.svg">
+  <img src="assets/brand/lockup-horizontal.svg" alt="Helios" width="360">
+</picture>
 
-### Video is Light Over Time
+### Video is light over time.
 
 [![License](https://img.shields.io/badge/license-ELv2-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-beta-yellow.svg)](#project-status)

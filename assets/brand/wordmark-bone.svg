@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 506.25 132" width="506.25" height="132" role="img" aria-label="Helios wordmark">
+  <title>Helios wordmark</title>
+  <g transform="translate(16 16)">
+    <path transform="translate(0 0)" fill="#F3EEE3" d="M0 0h22v100h-22ZM58 0h22v100h-22ZM0 39h80v22h-80Z"/>
+    <path transform="translate(96 0)" fill="#F3EEE3" d="M0 0h22v100h-22ZM0 0h68v22h-68ZM0 39h60v22h-60ZM0 78h68v22h-68Z"/>
+    <path transform="translate(180 0)" fill="#F3EEE3" d="M0 0h22v100h-22ZM0 78h64v22h-64Z"/>
+    <path transform="translate(255 0)" fill="#F3EEE3" d="M0 0h22v100h-22Z"/>
+    <path transform="translate(292 0)" fill="#F3EEE3" d="M-1.5 50a51.5 51.5 0 1 0 103 0a51.5 51.5 0 1 0 -103 0ZM20.5 50a29.5 29.5 0 1 1 59 0a29.5 29.5 0 1 1 -59 0Z"/>
+    <path transform="translate(407 0)" fill="none" stroke="#F3EEE3" stroke-width="22" d="M53.54 19.63A20.25 20.25 0 1 0 36 50A20.25 20.25 0 1 1 18.46 80.38"/>
+  </g>
+</svg>

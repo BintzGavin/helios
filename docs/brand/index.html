@@ -1,0 +1,586 @@
+<title>Helios Brand Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: a printed identity manual. One column of text at reading width, full-bleed plates for the mark, numbered chapters because the manual is read in order. */
+  :root {
+    --paper: #F3EEE3;
+    --ink: #0E0D0B;
+    --ink-2: #3B3833;
+    --ink-3: #6F695F;
+    --rule: #D9D2C3;
+    --plate: #E9E3D5;
+    --sun: #F5B400;
+    --sun-text: #7F5900;
+    --ember: #E4572E;
+    --ember-text: #B8401C;
+    --noon: #2F7FE0;
+    --noon-text: #1D5FB8;
+    --display: "Jost", "Futura", "Avenir Next", "Century Gothic", sans-serif;
+    --text: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0E0D0B; --ink: #F3EEE3; --ink-2: #D4CDBF; --ink-3: #A39C90; --rule: #2A2724; --plate: #1C1A17;
+      --sun-text: #F5B400; --ember-text: #F08A6A; --noon-text: #6FA7F0; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0E0D0B; --ink: #F3EEE3; --ink-2: #D4CDBF; --ink-3: #A39C90; --rule: #2A2724; --plate: #1C1A17;
+    --sun-text: #F5B400; --ember-text: #F08A6A; --noon-text: #6FA7F0; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--text); font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding-inline: 20px; padding-block: 0 96px; }
+  h1, h2, h3, h4 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.1; }
+  h2 { font-size: clamp(32px, 5vw, 48px); font-weight: 600; letter-spacing: -0.01em; }
+  h3 { font-size: 22px; font-weight: 600; margin-top: 40px; margin-bottom: 10px; }
+  h4 { font-size: 17px; font-weight: 600; margin-top: 24px; margin-bottom: 6px; }
+  p { margin: 0 0 16px; max-width: 64ch; }
+  p.lede { font-size: 21px; line-height: 1.4; color: var(--ink-2); max-width: 48ch; }
+  a { color: inherit; text-decoration-color: var(--sun); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--sun); outline-offset: 3px; }
+  code, kbd { font-family: var(--mono); font-size: 0.92em; }
+  pre { font-family: var(--mono); font-size: 14px; line-height: 1.5; background: var(--plate); padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  ul { padding-left: 20px; margin: 0 0 16px; max-width: 64ch; }
+  li { margin-bottom: 6px; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+
+  /* Cover */
+  .cover { padding-block: 56px 48px; display: grid; gap: 40px; grid-template-columns: 1fr; align-items: center; }
+  @media (min-width: 720px) { .cover { grid-template-columns: 300px 1fr; gap: 56px; } }
+  .cover svg.mark { width: 100%; max-width: 300px; height: auto; display: block; }
+  .cover .word { width: min(100%, 520px); height: auto; display: block; margin: 12px 0 22px; }
+  .cover .tag { font-family: var(--display); font-size: clamp(22px, 3.4vw, 30px); font-weight: 500; color: var(--ink-2); margin: 0 0 18px; }
+  .meta { display: flex; flex-wrap: wrap; overflow-wrap: anywhere; gap: 8px 28px; font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
+
+  /* Contents */
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 28px; padding-block: 28px; font-family: var(--display); font-size: 18px; font-weight: 500; }
+  .toc a { text-decoration: none; display: flex; gap: 14px; padding: 6px 0; border-bottom: 1px solid var(--rule); }
+  .toc a:hover { color: var(--sun-text); }
+  .toc .num { color: var(--ink-3); min-width: 2ch; }
+
+  /* Chapters */
+  section.ch { padding-block: 64px 24px; border-top: 1px solid var(--rule); }
+  .ch-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 28px; }
+  .ch-head .num { font-size: 15px; color: var(--ink-3); }
+
+  /* Plates */
+  .plate { background: var(--plate); padding: 32px; display: grid; place-items: center; min-height: 180px; }
+  .plate.dark { background: #0E0D0B; }
+  .plate.light { background: #F3EEE3; }
+  .plate.sun { background: #F5B400; }
+  .plate svg { max-width: 100%; height: auto; }
+  .plates { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin: 18px 0 8px; }
+  .plates figure { margin: 0; }
+  .plates figcaption, .cap { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); margin-top: 8px; line-height: 1.45; }
+  .cap-row { display: grid; gap: 14px; grid-template-columns: 1fr; margin: 18px 0 8px; }
+  @media (min-width: 720px) { .cap-row { grid-template-columns: 1.2fr 1fr; align-items: start; } }
+
+  /* Sizes */
+  .sizes { display: flex; align-items: flex-end; gap: 28px; flex-wrap: wrap; padding: 28px 24px; background: var(--plate); }
+  .sizes figure { margin: 0; display: grid; justify-items: center; gap: 8px; }
+  .sizes svg { display: block; }
+
+  /* Colour */
+  .swatches { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); margin: 18px 0; }
+  .sw { display: grid; }
+  .sw .chip { aspect-ratio: 4/3; border: 1px solid var(--rule); }
+  .sw .name { font-family: var(--display); font-weight: 600; font-size: 17px; margin-top: 8px; }
+  .sw .hex { font-family: var(--mono); font-size: 13px; color: var(--ink-3); }
+  .sw .role { font-size: 13.5px; color: var(--ink-2); margin-top: 2px; }
+  .ramp { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0; margin: 18px 0; }
+  .ramp div { aspect-ratio: 1; min-width: 0; overflow: hidden; word-break: break-all; display: grid; place-items: end start; padding: 6px; font-family: var(--mono); font-size: 11px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 12px 0 20px; }
+  th, td { text-align: left; padding: 9px 12px 9px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+  .tbl { overflow-x: auto; }
+  .pass { color: var(--noon-text); font-family: var(--mono); font-size: 13px; }
+  .warn { color: var(--ember-text); font-family: var(--mono); font-size: 13px; }
+
+  /* Type */
+  .specimen { padding: 28px 24px; background: var(--plate); display: grid; gap: 22px; margin: 18px 0; }
+  .specimen .d1 { font-family: var(--display); font-size: clamp(40px, 7vw, 72px); font-weight: 600; line-height: 1; letter-spacing: -0.01em; }
+  .specimen .d2 { font-family: var(--display); font-size: clamp(26px, 4vw, 36px); font-weight: 500; line-height: 1.15; }
+  .specimen .t1 { font-size: 17px; max-width: 60ch; }
+  .specimen .m1 { font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+  .scale { display: grid; grid-template-columns: 1fr; gap: 8px 22px; align-items: baseline; margin: 12px 0 20px; }
+  .scale .k { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+  @media (min-width: 720px) { .scale { grid-template-columns: auto 1fr; } .scale .k { white-space: nowrap; } }
+  .scale > span { min-width: 0; overflow-wrap: anywhere; }
+  .cap-row > div, .motion > div, .apps figure, .plates figure { min-width: 0; }
+
+  /* Motion */
+  .motion { display: grid; gap: 18px; grid-template-columns: 1fr; margin: 18px 0; }
+  @media (min-width: 720px) { .motion { grid-template-columns: 1fr 1fr; } }
+  .seek { background: var(--plate); padding: 28px; display: grid; place-items: center; gap: 16px; }
+  .seek svg { width: 160px; height: 160px; }
+  .seek button { font: 500 14px var(--mono); background: var(--ink); color: var(--paper); border: 0; padding: 10px 16px; cursor: pointer; }
+  .seek .ray { opacity: 0; }
+  .seek.play .ray { animation: appear 0.1s steps(1) forwards; }
+  .seek.play .ray:nth-child(2) { animation-delay: 0.00s } .seek.play .ray:nth-child(3) { animation-delay: 0.08s } .seek.play .ray:nth-child(4) { animation-delay: 0.16s }
+  .seek.play .ray:nth-child(5) { animation-delay: 0.24s } .seek.play .ray:nth-child(6) { animation-delay: 0.32s } .seek.play .ray:nth-child(7) { animation-delay: 0.40s }
+  .seek.play .ray:nth-child(8) { animation-delay: 0.48s } .seek.play .ray:nth-child(9) { animation-delay: 0.56s } .seek.play .ray:nth-child(10) { animation-delay: 0.64s }
+  .seek.play .ray:nth-child(11) { animation-delay: 0.72s } .seek.play .ray:nth-child(12) { animation-delay: 0.80s } .seek.play .ray:nth-child(13) { animation-delay: 0.88s }
+  .seek.done .ray { opacity: 1; }
+  @keyframes appear { to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .seek .ray { opacity: 1; animation: none !important; } }
+
+  /* Applications */
+  .apps { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin: 18px 0; }
+  .apps figure { margin: 0; }
+  .appicon { width: 128px; height: 128px; border-radius: 28px; overflow: hidden; }
+  .appicon svg { width: 100%; height: 100%; display: block; }
+  .term { font-family: var(--mono); font-size: 13.5px; line-height: 1.45; background: #0E0D0B; color: #F3EEE3; padding: 18px 20px; overflow-x: auto; white-space: pre; }
+  .term .y { color: #F5B400; } .term .g { color: #A39C90; }
+  .docshead { background: #F3EEE3; color: #0E0D0B; border: 1px solid #D9D2C3; padding: 14px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-family: var(--text); font-size: 14px; }
+  .docshead svg { height: 26px; width: auto; }
+  .docshead span { color: #6F695F; }
+
+  /* Don'ts */
+  .donts { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin: 18px 0; }
+  .donts figure { margin: 0; }
+  .donts .plate { min-height: 150px; padding: 22px; position: relative; }
+  .donts .plate::after { content: ""; position: absolute; left: 10px; right: 10px; top: 50%; height: 3px; background: var(--ember); transform: rotate(-28deg); opacity: 0.9; }
+  .donts svg { width: 90px; height: 90px; }
+
+  /* Voice */
+  .pair { display: grid; gap: 14px; grid-template-columns: 1fr; margin: 14px 0 20px; }
+  @media (min-width: 720px) { .pair { grid-template-columns: 1fr 1fr; } }
+  .pair div { padding: 16px 18px; background: var(--plate); font-size: 15.5px; }
+  .pair .l { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+  .pair .yes .l { color: var(--noon-text); } .pair .no .l { color: var(--ember-text); }
+
+  footer { padding-top: 32px; border-top: 1px solid var(--rule); font-family: var(--mono); font-size: 13px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 28px; }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="mark" overflow="visible" viewBox="0 0 100 100"><path d="M31 50a19 19 0 1 0 38 0a19 19 0 1 0 -38 0ZM46 23L46 17L54 17L54 23ZM60.04 24.62L63.72 18.24L70.65 22.24L66.96 28.62ZM71.38 33.04L78.94 28.67L82.94 35.6L75.38 39.96ZM77 46L87.09 46L87.09 54L77 54ZM75.38 60.04L85.3 65.76L81.3 72.69L71.38 66.96ZM66.96 71.38L73.37 82.48L66.44 86.48L60.04 75.38ZM54 77L54 91.18L46 91.18L46 77ZM39.96 75.38L32.19 88.85L25.26 84.85L33.04 71.38ZM28.62 66.96L13.97 75.42L9.97 68.49L24.62 60.04ZM23 54L4.73 54L4.73 46L23 46ZM24.62 39.96L7.61 30.15L11.61 23.22L28.62 33.04ZM33.04 28.62L22.54 10.43L29.46 6.43L39.96 24.62Z"/></symbol>
+    <symbol id="mark-compact" overflow="visible" viewBox="0 0 100 100"><path d="M29 50a21 21 0 1 0 42 0a21 21 0 1 0 -42 0ZM45 21L45 14L55 14L55 21ZM66.97 25.96L73.13 19.8L80.2 26.87L74.04 33.03ZM79 45L89.43 45L89.43 55L79 55ZM74.04 66.97L82.63 75.56L75.56 82.63L66.97 74.04ZM55 79L55 92.86L45 92.86L45 79ZM33.03 74.04L22.02 85.05L14.95 77.98L25.96 66.97ZM21 55L3.71 55L3.71 45L21 45ZM25.96 33.03L12.52 19.59L19.59 12.52L33.03 25.96Z"/></symbol>
+    <symbol id="word" overflow="visible" viewBox="0 0 474.25 100"><path transform="translate(0 0)" fill="currentColor" d="M0 0h22v100h-22ZM58 0h22v100h-22ZM0 39h80v22h-80Z"/>
+    <path transform="translate(96 0)" fill="currentColor" d="M0 0h22v100h-22ZM0 0h68v22h-68ZM0 39h60v22h-60ZM0 78h68v22h-68Z"/>
+    <path transform="translate(180 0)" fill="currentColor" d="M0 0h22v100h-22ZM0 78h64v22h-64Z"/>
+    <path transform="translate(255 0)" fill="currentColor" d="M0 0h22v100h-22Z"/>
+    <path transform="translate(292 0)" fill="currentColor" d="M-1.5 50a51.5 51.5 0 1 0 103 0a51.5 51.5 0 1 0 -103 0ZM20.5 50a29.5 29.5 0 1 1 59 0a29.5 29.5 0 1 1 -59 0Z"/>
+    <path transform="translate(407 0)" fill="none" stroke="currentColor" stroke-width="22" d="M53.54 19.63A20.25 20.25 0 1 0 36 50A20.25 20.25 0 1 1 18.46 80.38"/></symbol>
+    <symbol id="lockup" overflow="visible" viewBox="0 0 698.25 180">
+      <use href="#mark" x="20" y="20" width="140" height="140"/>
+      <use href="#word" x="204" y="40" width="474.25" height="100"/>
+    </symbol>
+    <symbol id="stacked" overflow="visible" viewBox="0 0 538.25 420">
+      <use href="#mark" x="159.13" y="32" width="220" height="220"/>
+      <use href="#word" x="32" y="288" width="474.25" height="100"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <header class="cover">
+    <svg class="mark" viewBox="0 0 100 100" fill="currentColor" role="img" aria-label="Helios mark"><use href="#mark"/></svg>
+    <div>
+      <div class="eyebrow">Identity manual · First edition</div>
+      <svg class="word" viewBox="0 0 474.25 100" fill="currentColor" role="img" aria-label="Helios"><use href="#word"/></svg>
+      <p class="tag">Video is light over time.</p>
+      <p class="lede">The Helios identity in one sentence: a sun whose rays count time. This book is the single source of truth for the mark, the wordmark, colour, type, motion and voice across the engine, Studio, the CLI, the plugin listings and heliosrender.com.</p>
+      <div class="meta"><span>October 2026</span><span>Assets: <code>assets/brand/</code></span><span>Rebuild: <code>node assets/brand/generate.mjs</code></span></div>
+    </div>
+  </header>
+
+  <hr>
+  <nav class="toc" aria-label="Contents">
+    <a href="#idea"><span class="num">01</span>The idea</a>
+    <a href="#mark-ch"><span class="num">02</span>The mark</a>
+    <a href="#wordmark"><span class="num">03</span>The wordmark</a>
+    <a href="#lockups"><span class="num">04</span>Lockups</a>
+    <a href="#colour"><span class="num">05</span>Colour</a>
+    <a href="#type"><span class="num">06</span>Typography</a>
+    <a href="#motion"><span class="num">07</span>Motion</a>
+    <a href="#apps"><span class="num">08</span>Applications</a>
+    <a href="#rules"><span class="num">09</span>Rules</a>
+    <a href="#voice"><span class="num">10</span>Voice</a>
+    <a href="#assets"><span class="num">11</span>Asset index</a>
+  </nav>
+
+  <!-- 01 -->
+  <section class="ch" id="idea">
+    <div class="ch-head"><span class="num">01</span><h2>The idea</h2></div>
+    <p class="lede">Helios draws a frame from its time. Give it <code>t</code> and it returns the light that exists at that instant, every time, on any machine.</p>
+    <p>The sun has always been the Helios symbol. The new identity keeps it and makes it mean what the engine does. Twelve rays circle a solid disc. Each ray is one step longer than the one before it, clockwise from twelve o'clock, so the sun reads as a clock face and as a progress ring at the same time. The jump between the longest ray and the shortest one is the playhead, the point where a loop ends and begins again.</p>
+    <p>The construction follows the trademark suns of the mid-century modern era: one solid shape, one colour, no gradients, no outlines, drawn with a compass and a ruler. Those marks survived photocopiers, embroidery and 1-inch newspaper ads. Ours has to survive a 16-pixel favicon, a monochrome composer icon and a terminal.</p>
+    <div class="cap-row">
+      <div class="plate"><svg viewBox="0 0 100 100" width="260" height="260" fill="currentColor" role="img" aria-label="The Helios mark"><use href="#mark"/></svg></div>
+      <div>
+        <h4>Three readings of one shape</h4>
+        <ul>
+          <li><strong>A sun.</strong> The disc and rays are unmistakable at any size.</li>
+          <li><strong>A clock.</strong> Twelve rays, twelve o'clock at the top, time running clockwise.</li>
+          <li><strong>A seek bar.</strong> Rays grow like a progress ring. Frame zero is the short ray; the last frame is the long one.</li>
+        </ul>
+        <p class="cap">Every file in <code>assets/brand/</code> is written by one script from these numbers. The identity is deterministic, like the renderer.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="ch" id="mark-ch">
+    <div class="ch-head"><span class="num">02</span><h2>The mark</h2></div>
+    <h3>Construction</h3>
+    <p>The mark lives on a 100-unit square. The disc is centred at 50,50. Rays are parallel-sided bars, never tapered, so they keep their weight when scaled.</p>
+    <div class="cap-row">
+      <div class="plate">
+        <svg viewBox="-6 -6 112 112" width="360" height="360" role="img" aria-label="Construction drawing of the mark">
+          <g stroke="var(--ink-3)" stroke-width="0.25" opacity="0.6">
+            <path d="M0 0H100M0 10H100M0 20H100M0 30H100M0 40H100M0 50H100M0 60H100M0 70H100M0 80H100M0 90H100M0 100H100M0 0V100M10 0V100M20 0V100M30 0V100M40 0V100M50 0V100M60 0V100M70 0V100M80 0V100M90 0V100M100 0V100"/>
+          </g>
+          <g fill="none" stroke="var(--ember)" stroke-width="0.6" stroke-dasharray="2 1.5">
+            <circle cx="50" cy="50" r="19"/><circle cx="50" cy="50" r="27"/><circle cx="50" cy="50" r="33"/><circle cx="50" cy="50" r="48"/>
+          </g>
+          <path d="M31 50a19 19 0 1 0 38 0a19 19 0 1 0 -38 0ZM46 23L46 17L54 17L54 23ZM60.04 24.62L63.72 18.24L70.65 22.24L66.96 28.62ZM71.38 33.04L78.94 28.67L82.94 35.6L75.38 39.96ZM77 46L87.09 46L87.09 54L77 54ZM75.38 60.04L85.3 65.76L81.3 72.69L71.38 66.96ZM66.96 71.38L73.37 82.48L66.44 86.48L60.04 75.38ZM54 77L54 91.18L46 91.18L46 77ZM39.96 75.38L32.19 88.85L25.26 84.85L33.04 71.38ZM28.62 66.96L13.97 75.42L9.97 68.49L24.62 60.04ZM23 54L4.73 54L4.73 46L23 46ZM24.62 39.96L7.61 30.15L11.61 23.22L28.62 33.04ZM33.04 28.62L22.54 10.43L29.46 6.43L39.96 24.62Z" fill="none" stroke="var(--ink)" stroke-width="0.9"/>
+          <g font-family="IBM Plex Mono, monospace" font-size="3.4" fill="var(--ember-text)">
+            <text x="52" y="33.5">r 19</text><text x="52" y="25.5">r 27</text><text x="52" y="19.5">r 33</text><text x="52" y="4">r 48</text>
+            <text x="2" y="98.5">12 rays · width 8 · step 1.36</text>
+          </g>
+        </svg>
+      </div>
+      <div class="tbl">
+        <table>
+          <tr><th>Element</th><th>Value</th></tr>
+          <tr><td>Canvas</td><td class="num">100 × 100</td></tr>
+          <tr><td>Disc radius</td><td class="num">19</td></tr>
+          <tr><td>Ray inner radius</td><td class="num">27</td></tr>
+          <tr><td>Ray outer radius</td><td class="num">33 → 48, twelve equal steps</td></tr>
+          <tr><td>Ray width</td><td class="num">8</td></tr>
+          <tr><td>First ray</td><td>Twelve o'clock, shortest</td></tr>
+          <tr><td>Direction</td><td>Clockwise</td></tr>
+          <tr><td>Fill</td><td>One colour. No stroke, no gradient.</td></tr>
+        </table>
+        <p class="cap">The gap between disc and rays (8 units) equals the ray width. That is the beat the whole mark is tuned to.</p>
+      </div>
+    </div>
+
+    <h3>Clear space</h3>
+    <p>Keep a margin of at least one disc diameter (38 units, or 38% of the mark's width) free on every side. Nothing enters it: no type, no edges, no other marks.</p>
+    <div class="plate">
+      <svg viewBox="-48 -48 196 196" width="300" height="300" role="img" aria-label="Clear space around the mark">
+        <rect x="-38" y="-38" width="176" height="176" fill="none" stroke="var(--ember)" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <circle cx="50" cy="50" r="19" fill="none" stroke="var(--ember)" stroke-width="0.8" stroke-dasharray="3 2"/>
+        <path d="M31 50a19 19 0 1 0 38 0a19 19 0 1 0 -38 0ZM46 23L46 17L54 17L54 23ZM60.04 24.62L63.72 18.24L70.65 22.24L66.96 28.62ZM71.38 33.04L78.94 28.67L82.94 35.6L75.38 39.96ZM77 46L87.09 46L87.09 54L77 54ZM75.38 60.04L85.3 65.76L81.3 72.69L71.38 66.96ZM66.96 71.38L73.37 82.48L66.44 86.48L60.04 75.38ZM54 77L54 91.18L46 91.18L46 77ZM39.96 75.38L32.19 88.85L25.26 84.85L33.04 71.38ZM28.62 66.96L13.97 75.42L9.97 68.49L24.62 60.04ZM23 54L4.73 54L4.73 46L23 46ZM24.62 39.96L7.61 30.15L11.61 23.22L28.62 33.04ZM33.04 28.62L22.54 10.43L29.46 6.43L39.96 24.62Z" fill="var(--ink)"/>
+        <text x="-36" y="-41" font-family="IBM Plex Mono, monospace" font-size="5" fill="var(--ember-text)">x = disc diameter</text>
+      </svg>
+    </div>
+
+    <h3>Minimum size and the compact cut</h3>
+    <p>The full mark works down to 24 pixels. Below that the twelve rays merge, so the identity ships a compact cut with eight thicker rays and a larger disc. The compact cut is for favicons, composer icons, tab bars and anything under 24 pixels. Never scale the full mark below 24 pixels and never use the compact cut above 32.</p>
+    <div class="sizes">
+      <figure><svg viewBox="0 0 100 100" width="96" height="96" fill="currentColor"><use href="#mark"/></svg><figcaption class="cap">96 px · full</figcaption></figure>
+      <figure><svg viewBox="0 0 100 100" width="48" height="48" fill="currentColor"><use href="#mark"/></svg><figcaption class="cap">48 px · full</figcaption></figure>
+      <figure><svg viewBox="0 0 100 100" width="24" height="24" fill="currentColor"><use href="#mark"/></svg><figcaption class="cap">24 px · full, minimum</figcaption></figure>
+      <figure><svg viewBox="0 0 100 100" width="20" height="20" fill="currentColor"><use href="#mark-compact"/></svg><figcaption class="cap">20 px · compact</figcaption></figure>
+      <figure><svg viewBox="0 0 100 100" width="16" height="16" fill="currentColor"><use href="#mark-compact"/></svg><figcaption class="cap">16 px · compact</figcaption></figure>
+      <figure><svg viewBox="0 0 100 100" width="64" height="64" fill="currentColor"><use href="#mark-compact"/></svg><figcaption class="cap">compact, enlarged</figcaption></figure>
+    </div>
+
+    <h3>Colour versions</h3>
+    <p>Three, and only three. Umbra on paper is the default. Bone on Umbra is the reverse. Solar on Umbra is the signature, used where the brand speaks for itself: app icons, social cards, splash screens. Solar never sits on light backgrounds; it fails contrast there.</p>
+    <div class="plates">
+      <figure><div class="plate light"><svg viewBox="0 0 100 100" width="150" height="150" fill="#0E0D0B"><use href="#mark"/></svg></div><figcaption>Umbra on Bone · default</figcaption></figure>
+      <figure><div class="plate dark"><svg viewBox="0 0 100 100" width="150" height="150" fill="#F3EEE3"><use href="#mark"/></svg></div><figcaption>Bone on Umbra · reverse</figcaption></figure>
+      <figure><div class="plate dark"><svg viewBox="0 0 100 100" width="150" height="150" fill="#F5B400"><use href="#mark"/></svg></div><figcaption>Solar on Umbra · signature</figcaption></figure>
+      <figure><div class="plate sun"><svg viewBox="0 0 100 100" width="150" height="150" fill="#0E0D0B"><use href="#mark"/></svg></div><figcaption>Umbra on Solar · posters and swag only</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section class="ch" id="wordmark">
+    <div class="ch-head"><span class="num">03</span><h2>The wordmark</h2></div>
+    <p class="lede">HELIOS is not typed. It is drawn from the same compass and ruler as the mark.</p>
+    <p>Six capitals on a cap height of 100 with a stem of 22. H, E, L and I are bars. O is a ring with the same stem. S is two arcs of equal radius on a single centreline, cut with flat terminals. The round letters overshoot the cap line by 1.5 units so they look the same height as the flat ones.</p>
+    <div class="plate light"><svg viewBox="-20 -20 514.25 140" width="900" fill="#0E0D0B" style="color:#0E0D0B" role="img" aria-label="Helios wordmark"><use href="#word"/></svg></div>
+    <div class="cap-row">
+      <div class="plate">
+        <svg viewBox="-10 -14 514.25 128" width="900" role="img" aria-label="Wordmark construction">
+          <g stroke="var(--ember)" stroke-width="0.6" stroke-dasharray="2 1.5" fill="none">
+            <path d="M-10 0H474.25M-10 100H474.25M-10 39H474.25M-10 61H474.25"/>
+            <circle cx="342" cy="50" r="51.5"/><circle cx="443" cy="29.75" r="20.25"/><circle cx="443" cy="70.25" r="20.25"/>
+          </g>
+          <g fill="none" stroke="var(--ink)" stroke-width="0.9"><path transform="translate(0 0)" d="M0 0h22v100h-22ZM58 0h22v100h-22ZM0 39h80v22h-80Z"/>
+    <path transform="translate(96 0)" d="M0 0h22v100h-22ZM0 0h68v22h-68ZM0 39h60v22h-60ZM0 78h68v22h-68Z"/>
+    <path transform="translate(180 0)" d="M0 0h22v100h-22ZM0 78h64v22h-64Z"/>
+    <path transform="translate(255 0)" d="M0 0h22v100h-22Z"/>
+    <path transform="translate(292 0)" d="M-1.5 50a51.5 51.5 0 1 0 103 0a51.5 51.5 0 1 0 -103 0ZM20.5 50a29.5 29.5 0 1 1 59 0a29.5 29.5 0 1 1 -59 0Z"/>
+    <path transform="translate(407 0)" d="M53.54 19.63A20.25 20.25 0 1 0 36 50A20.25 20.25 0 1 1 18.46 80.38"/></g>
+          <g font-family="IBM Plex Mono, monospace" font-size="6" fill="var(--ember-text)">
+            <text x="-8" y="-4">cap 100 · stem 22 · overshoot 1.5</text>
+          </g>
+        </svg>
+      </div>
+      <div class="tbl">
+        <table>
+          <tr><th>Letter</th><th>Width</th><th>Built from</th></tr>
+          <tr><td>H</td><td class="num">80</td><td>two stems, one bar</td></tr>
+          <tr><td>E</td><td class="num">68</td><td>one stem, three bars (middle 60)</td></tr>
+          <tr><td>L</td><td class="num">64</td><td>one stem, one bar</td></tr>
+          <tr><td>I</td><td class="num">22</td><td>one stem</td></tr>
+          <tr><td>O</td><td class="num">100</td><td>ring, outer r 51.5</td></tr>
+          <tr><td>S</td><td class="num">67</td><td>two arcs, r 20.25, stroke 22</td></tr>
+        </table>
+        <p class="cap">Spacing: 16 between H·E and E·L, 11 before I, 15 either side of O. These are fixed; never re-kern the wordmark.</p>
+      </div>
+    </div>
+    <p>The wordmark is always set in capitals, always in one colour, and always as the supplied vector. Do not retype it in Jost; the proportions differ. In running text, write "Helios" in the body face, title case, no mark.</p>
+  </section>
+
+  <!-- 04 -->
+  <section class="ch" id="lockups">
+    <div class="ch-head"><span class="num">04</span><h2>Lockups</h2></div>
+    <p>The horizontal lockup is the primary signature. The mark stands 1.4 cap heights tall, centred on the wordmark's x-height line, with a gap of 44 units (two stems) between them. Use it for the docs header, the README, the CLI banner and listings that take a wide logo.</p>
+    <div class="plates">
+      <figure><div class="plate light"><svg viewBox="0 0 698.25 180" width="520" fill="#0E0D0B" style="color:#0E0D0B" role="img" aria-label="Helios horizontal lockup"><use href="#lockup"/></svg></div><figcaption>Horizontal · Umbra on Bone</figcaption></figure>
+      <figure><div class="plate dark"><svg viewBox="0 0 698.25 180" width="520" fill="#F3EEE3" style="color:#F3EEE3" role="img" aria-label="Helios horizontal lockup, reversed"><use href="#lockup"/></svg></div><figcaption>Horizontal · Bone on Umbra</figcaption></figure>
+    </div>
+    <p>The stacked lockup is for square and portrait spaces: splash screens, stickers, slide title cards. The mark is 2.2 cap heights tall with a gap of 36 units above the wordmark. Both elements are centred on the same axis.</p>
+    <div class="plates">
+      <figure><div class="plate light"><svg viewBox="0 0 538.25 420" width="260" fill="#0E0D0B" style="color:#0E0D0B" role="img" aria-label="Helios stacked lockup"><use href="#stacked"/></svg></div><figcaption>Stacked · Umbra on Bone</figcaption></figure>
+      <figure><div class="plate dark"><svg viewBox="0 0 538.25 420" width="260" fill="#F5B400" style="color:#F5B400" role="img" aria-label="Helios stacked lockup in Solar"><use href="#stacked"/></svg></div><figcaption>Stacked · Solar on Umbra</figcaption></figure>
+    </div>
+    <p>Rules: the mark and wordmark in a lockup are always the same colour. Do not build other arrangements, do not put the wordmark on the left, and do not replace the O with the mark.</p>
+  </section>
+
+  <!-- 05 -->
+  <section class="ch" id="colour">
+    <div class="ch-head"><span class="num">05</span><h2>Colour</h2></div>
+    <p class="lede">Two neutrals do most of the work. One colour is the sun. Two more are for signals.</p>
+    <p>Mid-century marks were designed for one ink. So is this one. Umbra is a warm near-black, the colour of a shadow rather than a screen. Bone is unbleached paper. Solar is the sun, saturated and slightly orange, and it is a fill colour, not a text colour, on light backgrounds.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0E0D0B"></div><div class="name">Umbra</div><div class="hex">#0E0D0B</div><div class="role">Ink, dark surfaces, the mark on paper</div></div>
+      <div class="sw"><div class="chip" style="background:#F3EEE3"></div><div class="name">Bone</div><div class="hex">#F3EEE3</div><div class="role">Paper, light surfaces, text on Umbra</div></div>
+      <div class="sw"><div class="chip" style="background:#F5B400"></div><div class="name">Solar</div><div class="hex">#F5B400</div><div class="role">The sun. Fills, the mark on Umbra, focus rings</div></div>
+      <div class="sw"><div class="chip" style="background:#7F5900"></div><div class="name">Solar Deep</div><div class="hex">#7F5900</div><div class="role">Solar as text or links on Bone</div></div>
+      <div class="sw"><div class="chip" style="background:#E4572E"></div><div class="name">Ember</div><div class="hex">#E4572E</div><div class="role">Errors, destructive actions, "don't" marks</div></div>
+      <div class="sw"><div class="chip" style="background:#2F7FE0"></div><div class="name">Noon</div><div class="hex">#2F7FE0</div><div class="role">Links in UI, selection, informational state</div></div>
+    </div>
+
+    <h3>Neutral ramp</h3>
+    <p>Every grey carries a little of Bone's warmth. Nothing in the system is a pure grey.</p>
+    <div class="ramp">
+      <div style="background:#0E0D0B;color:#F3EEE3">900<br>0E0D0B</div>
+      <div style="background:#1C1A17;color:#F3EEE3">800<br>1C1A17</div>
+      <div style="background:#3B3833;color:#F3EEE3">700<br>3B3833</div>
+      <div style="background:#6F695F;color:#F3EEE3">500<br>6F695F</div>
+      <div style="background:#A39C90;color:#0E0D0B">300<br>A39C90</div>
+      <div style="background:#D9D2C3;color:#0E0D0B">200<br>D9D2C3</div>
+      <div style="background:#F3EEE3;color:#0E0D0B;border:1px solid #D9D2C3">000<br>F3EEE3</div>
+    </div>
+
+    <h3>Themes</h3>
+    <p>Light surfaces use Bone with Umbra text and Solar Deep for emphasis. Dark surfaces use Umbra with Bone text and Solar itself for emphasis. Studio and the player are dark by default because video is judged against black. Docs and the website are light by default because they are read.</p>
+    <div class="tbl">
+      <table>
+        <tr><th>Pair</th><th>Ratio</th><th>Use for</th></tr>
+        <tr><td>Umbra on Bone</td><td class="num">16.8 : 1</td><td class="pass">text, any size</td></tr>
+        <tr><td>Bone on Umbra</td><td class="num">16.8 : 1</td><td class="pass">text, any size</td></tr>
+        <tr><td>Solar on Umbra</td><td class="num">10.6 : 1</td><td class="pass">text, icons, the mark</td></tr>
+        <tr><td>Solar Deep on Bone</td><td class="num">5.5 : 1</td><td class="pass">text, links</td></tr>
+        <tr><td>Noon on Umbra</td><td class="num">4.8 : 1</td><td class="pass">text 16 px and up</td></tr>
+        <tr><td>Ember on Umbra</td><td class="num">5.3 : 1</td><td class="pass">text 16 px and up</td></tr>
+        <tr><td>Solar on Bone</td><td class="num">1.6 : 1</td><td class="warn">fills only, never text</td></tr>
+        <tr><td>Ember on Bone</td><td class="num">3.2 : 1</td><td class="warn">large text only; use #B8401C for body</td></tr>
+      </table>
+    </div>
+    <pre>:root {
+  --helios-umbra: #0E0D0B;  --helios-bone: #F3EEE3;
+  --helios-solar: #F5B400;  --helios-solar-deep: #7F5900;
+  --helios-ember: #E4572E;  --helios-noon: #2F7FE0;
+  --helios-ink-700: #3B3833; --helios-ink-500: #6F695F;
+  --helios-ink-300: #A39C90; --helios-ink-200: #D9D2C3; --helios-ink-800: #1C1A17;
+}</pre>
+  </section>
+
+  <!-- 06 -->
+  <section class="ch" id="type">
+    <div class="ch-head"><span class="num">06</span><h2>Typography</h2></div>
+    <p class="lede">Three faces, three jobs. A geometric display face that shares the wordmark's bones, a text face built for screens, and a mono for everything the engine says.</p>
+    <div class="specimen">
+      <div class="d1">Frame 1440 of 1800, rendered in 11 ms.</div>
+      <div class="d2">Give it a time. It gives you the light.</div>
+      <div class="t1">Helios is a deterministic renderer. A composition is one HTML page that draws any frame from its time <code>t</code>, which means the same frame comes out of a laptop, a Lambda and a browser tab, pixel for pixel, with no state carried between them.</div>
+      <div class="m1">$ helios render composition.html --fps 30 --duration 60 --out launch.mp4</div>
+    </div>
+    <div class="tbl">
+      <table>
+        <tr><th>Role</th><th>Face</th><th>Weights</th><th>Where</th></tr>
+        <tr><td>Display</td><td>Jost</td><td>500, 600</td><td>Headlines, section titles, numbers that are the point. Never below 22 px.</td></tr>
+        <tr><td>Text</td><td>IBM Plex Sans</td><td>400, 500, 600</td><td>Everything read: docs, UI labels, marketing body, this book.</td></tr>
+        <tr><td>Mono</td><td>IBM Plex Mono</td><td>400, 500</td><td>Code, CLI output, timecodes, frame counts, eyebrows and captions.</td></tr>
+      </table>
+    </div>
+    <p>Jost is a Futura revival, which puts the headlines in the same family as the mark: circles, straight stems, flat terminals. Plex was drawn for engineering documentation, and that is what most Helios writing is. Both are open licensed and served by Google Fonts, so they work in the docs, the plugin view and an MCP App iframe without any build step.</p>
+    <h4>Scale</h4>
+    <div class="scale">
+      <span class="k">display-1 · 56/1.05 · Jost 600</span><span style="font-family:var(--display);font-size:56px;line-height:1.05;font-weight:600">Light over time</span>
+      <span class="k">display-2 · 36/1.15 · Jost 500</span><span style="font-family:var(--display);font-size:36px;line-height:1.15;font-weight:500">Deterministic by design</span>
+      <span class="k">title · 22/1.25 · Jost 600</span><span style="font-family:var(--display);font-size:22px;line-height:1.25;font-weight:600">Rendering a composition</span>
+      <span class="k">body · 17/1.55 · Plex Sans 400</span><span>Every frame is a function of its time.</span>
+      <span class="k">small · 14/1.5 · Plex Sans 400</span><span style="font-size:14px">Captions, table cells, secondary UI.</span>
+      <span class="k">mono · 14/1.5 · Plex Mono 400</span><span class="num" style="font-family:var(--mono);font-size:14px">00:00:48:12 · f1452 · 29.97</span>
+      <span class="k">eyebrow · 12 · Plex Mono 500 · +0.14em caps</span><span class="eyebrow">Composition settings</span>
+    </div>
+    <p>Rules: sentence case everywhere except eyebrows and the wordmark. Tabular figures for anything that counts. Body copy never wider than 65 characters. Jost is never used for paragraphs.</p>
+  </section>
+
+  <!-- 07 -->
+  <section class="ch" id="motion">
+    <div class="ch-head"><span class="num">07</span><h2>Motion</h2></div>
+    <p class="lede">The mark has exactly one move: it seeks. Rays appear clockwise from twelve o'clock, one per step, and stop.</p>
+    <div class="motion">
+      <div class="seek" id="seek">
+        <svg viewBox="0 0 100 100" fill="currentColor" role="img" aria-label="The mark seeking">
+          <path d="M31 50a19 19 0 1 0 38 0a19 19 0 1 0 -38 0Z"/>
+          <path class="ray" d="M46 23L46 17L54 17L54 23Z"/>
+          <path class="ray" d="M60.04 24.62L63.72 18.24L70.65 22.24L66.96 28.62Z"/>
+          <path class="ray" d="M71.38 33.04L78.94 28.67L82.94 35.6L75.38 39.96Z"/>
+          <path class="ray" d="M77 46L87.09 46L87.09 54L77 54Z"/>
+          <path class="ray" d="M75.38 60.04L85.3 65.76L81.3 72.69L71.38 66.96Z"/>
+          <path class="ray" d="M66.96 71.38L73.37 82.48L66.44 86.48L60.04 75.38Z"/>
+          <path class="ray" d="M54 77L54 91.18L46 91.18L46 77Z"/>
+          <path class="ray" d="M39.96 75.38L32.19 88.85L25.26 84.85L33.04 71.38Z"/>
+          <path class="ray" d="M28.62 66.96L13.97 75.42L9.97 68.49L24.62 60.04Z"/>
+          <path class="ray" d="M23 54L4.73 54L4.73 46L23 46Z"/>
+          <path class="ray" d="M24.62 39.96L7.61 30.15L11.61 23.22L28.62 33.04Z"/>
+          <path class="ray" d="M33.04 28.62L22.54 10.43L29.46 6.43L39.96 24.62Z"/>
+        </svg>
+        <button type="button" id="seekBtn">Seek from 0</button>
+      </div>
+      <div>
+        <p>The seek is a step function, not an ease. Each ray switches on, it does not fade or grow. At 30 frames per second the full seek takes 24 frames: 2 frames per ray, then the mark holds. Reverse it to wind out. Loop it only in a loading state, with a 12-frame hold on the full sun.</p>
+        <p>Everything else in the brand moves the same way the renderer does: driven by time, never by physics. Fades are linear and 6 frames. Elements enter in place; nothing slides, bounces or overshoots. Reduced-motion settings get the final frame immediately.</p>
+        <pre>// one frame of the mark, like any Helios composition
+function drawMark(t, fps = 30) {
+  const step = Math.floor(t * fps / 2);   // 2 frames per ray
+  return Math.min(12, step);              // rays lit, 0..12
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 -->
+  <section class="ch" id="apps">
+    <div class="ch-head"><span class="num">08</span><h2>Applications</h2></div>
+    <div class="apps">
+      <figure>
+        <div class="plate"><div class="appicon"><svg viewBox="0 0 1024 1024" role="img" aria-label="Helios app icon"><rect width="1024" height="1024" fill="#0E0D0B"/><use href="#mark" x="143.36" y="143.36" width="737.28" height="737.28" fill="#F5B400"/></svg></div></div>
+        <figcaption class="cap">App icon · Solar mark at 72% on Umbra. Square source; each host rounds the corners. <code>assets/brand/icon-1024.png</code></figcaption>
+      </figure>
+      <figure>
+        <div class="plate"><div style="display:flex;gap:18px;align-items:center"><svg viewBox="0 0 100 100" width="16" height="16" fill="currentColor"><use href="#mark-compact"/></svg><svg viewBox="0 0 100 100" width="20" height="20" fill="currentColor"><use href="#mark-compact"/></svg><svg viewBox="0 0 100 100" width="32" height="32" fill="currentColor"><use href="#mark-compact"/></svg></div></div>
+        <figcaption class="cap">Favicon and composer icon · compact cut, <code>currentColor</code> so the host tints it. <code>plugins/helios/assets/composer-icon.svg</code></figcaption>
+      </figure>
+      <figure>
+        <div class="plate dark" style="padding:0;aspect-ratio:1200/630"><svg viewBox="0 0 1200 630" width="100%" role="img" aria-label="Social card"><rect width="1200" height="630" fill="#0E0D0B"/><use href="#mark" x="120" y="165" width="300" height="300" fill="#F5B400"/><use href="#word" x="500" y="255.96" width="560" height="118.08" fill="#F3EEE3" style="color:#F3EEE3"/></svg></div>
+        <figcaption class="cap">Social card 1200 × 630 · the only place Solar and Bone share a surface. <code>assets/brand/social-card.png</code></figcaption>
+      </figure>
+    </div>
+
+    <h3>Docs and README</h3>
+    <p>The docs site uses the horizontal lockup at 26 pixels tall in the header, Umbra in light mode and Bone in dark mode. Noon is the link colour, Solar Deep is reserved for the current nav item.</p>
+    <div class="docshead"><svg viewBox="0 0 698.25 180" fill="#0E0D0B" style="color:#0E0D0B"><use href="#lockup"/></svg><span>Getting started · Guides · Examples · API</span></div>
+
+    <h3>Terminal</h3>
+    <p>The CLI banner sets the wordmark in text, in capitals with the mark drawn from block characters, and prints in the terminal's default foreground with Solar used only for the sun. It never clears the screen.</p>
+    <div class="term"><span class="y">  ╲ │ ╱
+ ─  ●  ─</span>   <b>HELIOS</b> 2.0.0
+<span class="y">  ╱ │ ╲</span>   <span class="g">rendering 1800 frames · 30 fps · 1920×1080</span>
+
+  <span class="g">frames</span>  ████████████████░░░░░░░░  <span class="g">1200/1800</span>
+  <span class="g">elapsed</span> 00:00:41  <span class="g">eta</span> 00:00:21</div>
+
+    <h3>Studio and the player</h3>
+    <p>Studio is a dark surface: Umbra background, ink-800 panels, ink-700 rules, Bone text, Solar for the playhead and the active frame. Noon marks selection. Ember marks dropped frames and failed renders. The player's scrubber uses the same seek mark as a loading spinner, and nothing else spins.</p>
+  </section>
+
+  <!-- 09 -->
+  <section class="ch" id="rules">
+    <div class="ch-head"><span class="num">09</span><h2>Rules</h2></div>
+    <p>The identity is small on purpose. Most mistakes are additions. Do not:</p>
+    <div class="donts">
+      <figure><div class="plate"><svg viewBox="0 0 100 100"><defs><linearGradient id="bad1" x1="0" x2="1"><stop offset="0" stop-color="#F5B400"/><stop offset="1" stop-color="#E4572E"/></linearGradient></defs><use href="#mark" fill="url(#bad1)"/></svg></div><figcaption class="cap">Use gradients or more than one colour in the mark</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100"><use href="#mark" fill="none" stroke="var(--ink)" stroke-width="1.5"/></svg></div><figcaption class="cap">Outline it</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100" style="transform:rotate(30deg)"><use href="#mark" fill="var(--ink)"/></svg></div><figcaption class="cap">Rotate it. Twelve o'clock stays at the top.</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100" style="transform:scaleX(-1)"><use href="#mark" fill="var(--ink)"/></svg></div><figcaption class="cap">Mirror it. Time runs clockwise.</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100" style="filter:drop-shadow(4px 6px 4px rgba(0,0,0,0.5))"><use href="#mark" fill="var(--ink)"/></svg></div><figcaption class="cap">Add shadows, glows or bevels</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100" style="transform:scale(1.4,0.8)"><use href="#mark" fill="var(--ink)"/></svg></div><figcaption class="cap">Stretch it</figcaption></figure>
+      <figure><div class="plate light"><svg viewBox="0 0 100 100"><use href="#mark" fill="#F5B400"/></svg></div><figcaption class="cap">Put Solar on a light background</figcaption></figure>
+      <figure><div class="plate"><svg viewBox="0 0 100 100"><use href="#mark" fill="var(--ink)"/><circle cx="50" cy="50" r="19" fill="var(--paper)"/><text x="50" y="57" text-anchor="middle" font-family="Jost, sans-serif" font-size="20" font-weight="700" fill="var(--ink)">H</text></svg></div><figcaption class="cap">Put anything inside the disc</figcaption></figure>
+    </div>
+    <p>Also: do not use the old eight-ray glyph, the ☀️ emoji, or any photograph of the sun as a stand-in for the mark. Do not make a sun out of other shapes for sub-brands. Studio, the CLI, the player and the registry all use the one mark and are named in text.</p>
+  </section>
+
+  <!-- 10 -->
+  <section class="ch" id="voice">
+    <div class="ch-head"><span class="num">10</span><h2>Voice</h2></div>
+    <p class="lede">Helios speaks like a good engineer explaining a tool they built: plainly, specifically, and without selling.</p>
+    <ul>
+      <li><strong>Accurate first.</strong> Helios is a deterministic renderer that calls no generative model. Say so. Never imply it generates footage.</li>
+      <li><strong>Concrete over clever.</strong> Numbers, file names and commands beat adjectives. "1800 frames in 41 seconds" beats "blazing fast".</li>
+      <li><strong>Short sentences.</strong> One idea each. Active voice. No exclamation marks.</li>
+      <li><strong>Web standards are the hero.</strong> The pitch is that the browser already knows how to draw; Helios adds time.</li>
+      <li><strong>No upsell in hosts.</strong> Inside Claude, ChatGPT or Codex, Helios states limits and links to heliosrender.com. No prices, plan names or prompts to upgrade.</li>
+    </ul>
+    <div class="pair">
+      <div class="yes"><div class="l">Write this</div>Helios renders one HTML page into video. The page draws any frame from its time, so rendering can start at frame 1200 on one machine and frame 0 on another, and the output stitches without re-encoding.</div>
+      <div class="no"><div class="l">Not this</div>Helios is a revolutionary AI-powered video platform that lets you create stunning cinematic content in seconds. Unleash your creativity today!</div>
+    </div>
+    <p>Naming in text: Helios, Helios Studio, the Helios CLI, the Helios player, the Helios registry. Package names stay in code: <code>@helios-project/core</code>. The tagline is "Video is light over time." It is a sentence, with a full stop, and it is the only tagline.</p>
+  </section>
+
+  <!-- 11 -->
+  <section class="ch" id="assets">
+    <div class="ch-head"><span class="num">11</span><h2>Asset index</h2></div>
+    <p>All files live in <code>assets/brand/</code> and are regenerated from <code>generate.mjs</code> (vectors) and <code>rasterize.mjs</code> (PNGs). Edit the numbers in the generator, not the files.</p>
+    <div class="tbl">
+      <table>
+        <tr><th>File</th><th>What it is</th></tr>
+        <tr><td><code>mark.svg</code> · <code>mark-bone.svg</code> · <code>mark-solar.svg</code></td><td>The mark, 512 px box, one fill each</td></tr>
+        <tr><td><code>mark-compact.svg</code></td><td>Compact cut for 24 px and below</td></tr>
+        <tr><td><code>wordmark.svg</code> · <code>wordmark-bone.svg</code></td><td>The drawn wordmark</td></tr>
+        <tr><td><code>lockup-horizontal*.svg</code></td><td>Primary signature in Umbra, Bone, and Solar on Umbra</td></tr>
+        <tr><td><code>lockup-stacked*.svg</code></td><td>Stacked signature in Umbra and Bone</td></tr>
+        <tr><td><code>icon.svg</code> · <code>icon-{128,256,512,1024}.png</code></td><td>App icon for stores, plugin directories and Claude Desktop</td></tr>
+        <tr><td><code>composer-icon.svg</code></td><td>20 px monochrome icon for ChatGPT and Codex composers</td></tr>
+        <tr><td><code>social-card.svg</code> · <code>social-card.png</code></td><td>1200 × 630 Open Graph image</td></tr>
+        <tr><td><code>docs/site/logo/light.svg</code> · <code>dark.svg</code> · <code>favicon.png</code></td><td>Docs site header and favicon, copied by the generator</td></tr>
+        <tr><td><code>plugins/helios/assets/</code></td><td>Plugin listing logo and composer icon, copied by the generator</td></tr>
+      </table>
+    </div>
+    <pre>node assets/brand/generate.mjs      # vectors, docs logo, plugin icon
+node assets/brand/rasterize.mjs     # PNGs via the bundled Chromium</pre>
+  </section>
+
+  <footer>
+    <span>Helios identity manual · first edition · October 2026</span>
+    <span>Source of truth: <code>docs/brand/</code></span>
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var box = document.getElementById('seek');
+    var btn = document.getElementById('seekBtn');
+    if (!box || !btn) return;
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function play() {
+      box.classList.remove('play', 'done');
+      if (reduced) { box.classList.add('done'); return; }
+      void box.offsetWidth;
+      box.classList.add('play');
+      setTimeout(function () { box.classList.add('done'); }, 1100);
+    }
+    btn.addEventListener('click', play);
+    play();
+  })();
+</script>
