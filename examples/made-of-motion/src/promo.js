@@ -539,6 +539,10 @@ export class Promo extends Film {
     if (scene === gridScene) {
       return { ...look, shocks: [], bloom: 0.35, threshold: 0.8, leak: [...look.leak.slice(0, 3), 0], vignette: 0.12 };
     }
+    if (scene.start === gridScene.end) {
+      // The grid dives into this shot, so it is no hard cut: no leak of light.
+      return { ...look, leak: [...look.leak.slice(0, 3), 0] };
+    }
     if (scene === finaleScene) {
       const night = local >= 20;
       const { sun } = this.lockup;
