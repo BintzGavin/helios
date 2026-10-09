@@ -1,5 +1,5 @@
 import type { DrumBand, Features } from './features.js';
-import { nearest, percentile } from './stats.js';
+import { median, nearest, percentile } from './stats.js';
 
 export interface Onset {
   /** Seconds. */
@@ -22,6 +22,12 @@ const MIN_FLUX = 0.05;
 const RELATIVE_FLUX = 0.3;
 /** A snare-band onset whose 6–16 kHz power rises more than 4× (6 dB) its 150 Hz–5 kHz rise is a hat. */
 const HAT_OVER_SNARE = 4;
+/**
+ * A click (a typewriter key, a UI tick) is over within a few ms; a snare or hat rings on. An
+ * onset whose band energy 8–16 ms after it is under 5% (13 dB) of its attack, both above the
+ * floor before it, is a click, not a drum. A hat with a 10 ms decay keeps about 10%.
+ */
+const CLICK_TAIL = { from: 0.008, to: 0.016, ratio: 0.05 };
 
 /**
  * Frames that are the largest within ±maxWin seconds, rise `delta` above the mean of the
@@ -123,9 +129,30 @@ export function refineOnset(
 }
 
 /**
+ * Whether the onset at t is a click: its energy in the band's fine envelope is gone 8–16 ms
+ * later. The floor is the median of the 30 ms before it, so the tail of an earlier click
+ * (typing runs 30–40 a second) doesn't count as a floor.
+ */
+export function isClick(fine: Float32Array, fineRate: number, t: number): boolean {
+  const at = (s: number) => Math.round(s * fineRate);
+  const start = at(t);
+  if (start < 1 || at(t + CLICK_TAIL.to) >= fine.length) return false;
+  const before: number[] = [];
+  for (let j = Math.max(0, at(t - 0.03)); j < at(t - 0.002); j++) before.push(fine[j]);
+  const floor = before.length > 0 ? median(before) : 0;
+  let peak = 0;
+  for (let j = at(t - 0.002); j <= at(t + 0.006); j++) peak = Math.max(peak, fine[j]);
+  let tail = 0;
+  const from = at(t + CLICK_TAIL.from);
+  const to = at(t + CLICK_TAIL.to);
+  for (let j = from; j < to; j++) tail += fine[j] / (to - from);
+  return peak > floor && tail - floor < CLICK_TAIL.ratio * (peak - floor);
+}
+
+/**
  * Kick, snare and hat onsets: peaks of each band's spectral flux, timed on the fine envelope.
- * Snares and hats that coincide with a kick are the kick, and a "snare" whose rise is mostly
- * above 6 kHz is a hat leaking into the snare band.
+ * Snares and hats that coincide with a kick are the kick, a "snare" whose rise is mostly above
+ * 6 kHz is a hat leaking into the snare band, and clicks (over within ~8 ms) are not drums.
  */
 export function drumOnsets(features: Features): Record<DrumBand, Onset[]> {
   const { frameRate, fineRate } = features;
@@ -151,12 +178,13 @@ export function drumOnsets(features: Features): Record<DrumBand, Onset[]> {
       if (level < gate) return false;
       return band !== 'snare' || rise(features.power.hat, i) <= HAT_OVER_SNARE * rise(power, i);
     });
+    const found = peaks
+      .map((i) => ({ t: refineOnset(features.fine[band], fineRate, i / frameRate, ATTACK_SPANS[band]), strength: flux[i] }))
+      .filter((o) => band === 'kick' || !isClick(features.fine[band], fineRate, o.t));
     // Leakage from the neighbouring bands makes small peaks: keep the ones within reach of the
-    // band's typical hit.
-    const typical = percentile(peaks.map((i) => flux[i]), 0.9);
-    result[band] = peaks
-      .filter((i) => flux[i] >= RELATIVE_FLUX * typical)
-      .map((i) => ({ t: refineOnset(features.fine[band], fineRate, i / frameRate, ATTACK_SPANS[band]), strength: flux[i] }));
+    // band's typical hit (measured without the clicks, which can outnumber a soft snare).
+    const typical = percentile(found.map((o) => o.strength), 0.9);
+    result[band] = found.filter((o) => o.strength >= RELATIVE_FLUX * typical);
   }
 
   const kicks = result.kick.map((o) => o.t);

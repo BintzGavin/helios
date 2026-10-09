@@ -223,12 +223,13 @@ helios analyze song.mp3
 - `--beats-per-bar <n>`: Beats in a bar (default: `4`).
 
 **The file** (all times in seconds of audio time):
-- `beats`: every beat. Songs drift (one went from 131.5 to 133.9 BPM), so the beats follow a local tempo, fitted on 20 s windows every 5 s, and each one is moved to the drum onset within 30 ms of it. Don't rebuild them from `bpm`: one fixed BPM ends up more than a beat off.
+- `beats`: every beat. Songs drift (one went from 131.5 to 133.9 BPM), so the beats follow a local tempo, fitted on 20 s windows every 5 s, and each one is moved to the drum onset within 30 ms of it. A beat with no drum onset that close (an intro, a break, a half-time bar) is placed evenly between the snapped beats either side, or extrapolated from the nearest ones at the start and end of the song. Don't rebuild them from `bpm`: one fixed BPM ends up more than a beat off.
 - `tempo`: the tempo every 5 s. `bpm` is its median.
 - `downbeats`: the beats that start bars; bar k starts at `downbeats[k]`. `downbeatMethod` says how beat 1 was chosen: `harmony` (where the chords change) or `kick` (where the kick hits hardest).
-- `hits`: the big moments (drops, impacts), each `{ t, score }` with a score from 0.22 to 1, on a downbeat when one is near. `risers` are `{ t0, t1 }` climbs that land on a hit.
-- `sections`: `{ t0, t1, energy }` spans where the track changes, on bar lines. They come from a loudness and harmony heuristic and carry no names.
-- `onsets`: kick (30–150 Hz), snare (150 Hz–5 kHz) and hat (6–16 kHz) onsets. A snare or hat at the same moment as a kick counts as the kick.
+- `hits`: the big moments (drops, impacts), each `{ t, score }` with a score from 0.22 to 1, on a downbeat when one is near. A hit is a jump in loudness (the mix, the drums or the bass). Where a riser lands, the kick and sub band and the riser's own climb count too, because the riser makes the build as loud as the drop. Nothing on a riser's or swell's rising edge is a hit.
+- `risers`: `{ t0, t1 }` climbs of at least 1 s, above the bass or above 4 kHz, that land on a hit (`t1` is the hit). `t0` is where the climb rises above the rest of the mix, which can be later than where the riser starts.
+- `sections`: `{ t0, t1, energy }` spans where the track changes, on bar lines. They come from a heuristic over loudness, harmony and whether the drums play, and they carry no names. A hit on a bar line starts a section, and so do the drums starting or stopping for two whole bars, as long as sections stay at least 4 bars long (2 for the first and last).
+- `onsets`: kick (30–150 Hz), snare (150 Hz–5 kHz) and hat (6–16 kHz) onsets. A snare or hat at the same moment as a kick counts as the kick. Clicks (typing or UI ticks, whose energy is gone within about 8 ms) are not drum onsets.
 - `envelope`: `level`, `low`, `mid` and `high` loudness, one value per frame at `fps`, each from 0 (48 dB below the loudest moment) to 1.
 
 ### `helios merge`

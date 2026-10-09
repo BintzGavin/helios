@@ -7,7 +7,7 @@ import { ANALYSIS_SAMPLE_RATE, decodeAudio } from './decode.js';
 import { findDownbeats } from './downbeats.js';
 import { BandEnvelope } from './envelope.js';
 import { FeatureExtractor, type Features } from './features.js';
-import { findImpacts, findRisers, type Loudness } from './hits.js';
+import { findClimbs, findImpacts, findRisers, type Loudness } from './hits.js';
 import { beatStrength, drumOnsets } from './onsets.js';
 import { findSections } from './sections.js';
 import { gaussianSmooth, median, round } from './stats.js';
@@ -100,6 +100,7 @@ export function analyzeFeatures(features: Features, source: string, options: Ana
   const loud: Loudness = {
     level: new BandEnvelope(power.all, frameRate),
     low: new BandEnvelope(power.low, frameRate),
+    kick: new BandEnvelope(power.kick, frameRate),
     mid: new BandEnvelope(power.mid, frameRate),
     high: new BandEnvelope(power.high, frameRate),
     upper: new BandEnvelope(upper, frameRate),
@@ -128,9 +129,11 @@ export function analyzeFeatures(features: Features, source: string, options: Ana
   const { downbeats, method } = findDownbeats(beats, features, beatsPerBar);
 
   const onsetTimes = [...onsets.kick, ...onsets.snare].map((o) => o.t).sort((a, b) => a - b);
-  const hits = findImpacts(loud, duration, downbeats, onsetTimes);
-  const risers = findRisers(loud, hits);
-  const sections = findSections(downbeats, duration, loud, features, hits);
+  const climbs = findClimbs(loud, duration);
+  const hits = findImpacts(loud, duration, downbeats, onsetTimes, climbs);
+  const risers = findRisers(climbs, hits);
+  const drumTimes = [...onsets.kick, ...onsets.snare, ...onsets.hat].map((o) => o.t).sort((a, b) => a - b);
+  const sections = findSections(downbeats, duration, loud, features, hits, drumTimes, beatsPerBar);
 
   const times = (list: number[]) => list.map((t) => round(t, 3));
   const values = (list: Float32Array) => Array.from(list, (v) => round(v, 3));

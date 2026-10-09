@@ -124,24 +124,76 @@ function strongestNear(candidates: Candidate[], times: number[], t: number, wind
   return best;
 }
 
+/** Unsnapped beats follow their snapped neighbours when the tracker's spacing agrees this well… */
+const GRID_AGREEMENT = 0.1;
+/** …extrapolating at most this many beats past the first or last snapped one… */
+const MAX_EXTRAPOLATE = 16;
+/** …from a line through this many snapped beats. */
+const EDGE_FIT_BEATS = 8;
+
 /**
- * Moves each beat to the strongest onset within ±30 ms. Beats with no onset nearby (a
- * breakdown) keep their place on the tempo curve, shifted by the median move of the snapped
- * ones: the onset strength peaks a little before an attack, and that is the same everywhere.
+ * Moves each beat to the strongest drum onset within ±30 ms. A beat with no drum onset nearby
+ * (a breakdown, a half-time bar, an intro with only clicks or pads) is placed on the grid of its
+ * snapped neighbours: evenly between the snapped beats either side, or extrapolated from the
+ * nearest snapped beats at the song's ends, as long as the tracker counted the same number of
+ * beats there. Otherwise it keeps its place on the tempo curve, shifted by the median move of
+ * the snapped ones: the onset strength peaks a little before an attack, and that is the same
+ * everywhere.
  */
 export function snapBeats(beats: number[], candidates: Candidate[]): number[] {
   const times = candidates.map((c) => c.t);
   const snapped = beats.map((b) => strongestNear(candidates, times, b, SNAP_WINDOW)?.t);
   const moves = beats.flatMap((b, i) => (snapped[i] === undefined ? [] : [snapped[i]! - b]));
   const shift = moves.length > 0 ? median(moves) : 0;
+  const anchors = beats.flatMap((_, i) => (snapped[i] === undefined ? [] : [i]));
+  const agrees = (i: number, j: number, period: number) => {
+    const tracked = (beats[j] - beats[i]) / (j - i);
+    return period > 0 && Math.abs(tracked / period - 1) <= GRID_AGREEMENT;
+  };
+
+  const placed = beats.map((b, i) => snapped[i] ?? b + shift);
+  for (let k = 0; k + 1 < anchors.length; k++) {
+    const [a, z] = [anchors[k], anchors[k + 1]];
+    if (z - a < 2) continue;
+    const period = (snapped[z]! - snapped[a]!) / (z - a);
+    if (!agrees(a, z, period)) continue;
+    for (let i = a + 1; i < z; i++) placed[i] = snapped[a]! + (i - a) * period;
+  }
+  if (anchors.length >= 2) {
+    const edge = (from: number[], first: number, last: number, step: 1 | -1) => {
+      const { slope, at } = fitLine(from.map((i) => [i, snapped[i]!]));
+      const anchor = from[0];
+      for (let i = first; i !== last + step && Math.abs(i - anchor) <= MAX_EXTRAPOLATE; i += step) {
+        if (!agrees(Math.min(i, anchor), Math.max(i, anchor), slope)) break;
+        placed[i] = at(i);
+      }
+    };
+    edge(anchors.slice(0, EDGE_FIT_BEATS), anchors[0] - 1, 0, -1);
+    edge(anchors.slice(-EDGE_FIT_BEATS).reverse(), anchors[anchors.length - 1] + 1, beats.length - 1, 1);
+  }
+
   const out: number[] = [];
-  beats.forEach((b, i) => {
-    const t = snapped[i] ?? b + shift;
+  for (const t of placed) {
     // Two beats never share an onset, and never cross.
-    if (out.length > 0 && t <= out[out.length - 1] + 0.05) return;
+    if (out.length > 0 && t <= out[out.length - 1] + 0.05) continue;
     out.push(t);
-  });
+  }
   return out;
+}
+
+/** Least-squares line through (beat index, time) points: its slope (seconds per beat), and its time at any index. */
+function fitLine(points: [number, number][]): { slope: number; at: (i: number) => number } {
+  const n = points.length;
+  const mx = points.reduce((s, p) => s + p[0], 0) / n;
+  const my = points.reduce((s, p) => s + p[1], 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  for (const [x, y] of points) {
+    sxy += (x - mx) * (y - my);
+    sxx += (x - mx) ** 2;
+  }
+  const slope = sxx > 0 ? sxy / sxx : 0;
+  return { slope, at: (i) => my + (i - mx) * slope };
 }
 
 /**
