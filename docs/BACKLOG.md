@@ -262,5 +262,6 @@ Lessons from a production that drew its motion layer with a renderer shaped like
 
 - [ ] [v0.79.15] PLAYER Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [x] [v0.46.66] CLI Unblocked: Generated strictly new plan /.sys/plans/2026-10-13-CLI-MCP-ChatGPT-Structured-Settings.md
 
 - [ ] [v0.79.16] PLAYER Blocked: Waiting for a new, valid plan in /.sys/plans/
