@@ -28,3 +28,6 @@
 ## [v0.46.63] - CLI Registry Client Coverage Tests
 **Learning:** Found missing coverage for early cache returns and fetch error catching in `client.ts`.
 **Action:** Add tests specifically mocking cache state and file fetch errors to hit lines 32, 85, 90-91, 96-97, 137.
+## [v0.46.66] - CLI MCP Settings Spec
+**Learning:** Found that ChatGPT structured settings tools for the MCP server were documented in BACKLOG.md but missing from implementation.
+**Action:** Drafted plan to add `read_settings` and `update_settings` tools to `server.ts`.

@@ -1,4 +1,4 @@
-**Version**: 0.46.65
+**Version**: 0.46.66
 
 [v0.46.61] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
 
@@ -8,8 +8,9 @@
 
 [v0.46.51] 🟢 Completed: CLI Command Coverage Tests Spec V9 - Created specification plan 2027-06-05-CLI-Command-Coverage-Tests-V9.md for covering missing exit prompt branches in deploy subcommands.
 
-**Version**: 0.46.65
+**Version**: 0.46.66
 
+[v0.46.66] 🟢 Completed: CLI MCP ChatGPT Structured Settings Spec - Created specification plan 2026-10-13-CLI-MCP-ChatGPT-Structured-Settings.md for implementing openai/settings tools in the MCP server.
 [v0.46.63] ✅ Completed: CLI Registry Client Coverage Tests - Implemented unit tests for caching logic and fallback handlers in RegistryClient, achieving 100% branch and line coverage.
 
 [v0.46.44] ✅ Completed: CLI Registry Types Regression Tests - Logged the duplicated plan as impossible since registry types regression tests are already fully implemented.
