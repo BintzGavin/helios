@@ -207,7 +207,7 @@ export class CaptureLoop {
 
           let i = 1;
           while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+            const chunkEnd = nextProgress < totalFrames - 1 ? nextProgress : totalFrames - 1;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -319,7 +319,7 @@ export class CaptureLoop {
 
           let i = 1;
           while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = Math.min(i + progressInterval, totalFrames - 1);
+            const chunkEnd = nextProgress < totalFrames - 1 ? nextProgress : totalFrames - 1;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;

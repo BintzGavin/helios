@@ -1,11 +1,11 @@
 ---
 id: PERF-1072
 slug: fast-path-single-worker-chunk-bounds
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2026-10-14
-completed: ""
-result: ""
+completed: "2024-10-14"
+result: "improved"
 ---
 
 # PERF-1072: Fast-path single-worker chunk bounds using nextProgress
@@ -67,3 +67,9 @@ Run `npm run test -w packages/renderer` to ensure frame limits aren't violated.
 
 ## Correctness Check
 Run renderer in a real project to verify output correctly finishes at `totalFrames`.
+
+
+## Results Summary
+- **Improvement**: Yes
+- **Baseline**: 160209.815047ms
+- **Ternary**: 159663.92933700004ms
