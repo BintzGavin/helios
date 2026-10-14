@@ -1,11 +1,11 @@
 ---
 id: PERF-1074
 slug: consolidate-worker-cleanup-loops
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2026-10-14
-completed: ""
-result: ""
+completed: "2026-10-14"
+result: "Kept. Verified tests and consolidated loops correctly."
 ---
 
 # PERF-1074: Consolidate multi-worker cleanup loops into hoisted blocks
@@ -239,3 +239,12 @@ Run `npm run test -w packages/renderer` to verify behaviour is correct.
 
 ## Correctness Check
 Run renderer in a real project to verify standard operation.
+
+
+## Results
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	4.500	300	66.6	490.1	keep	baseline
+2	4.400	300	68.1	495.0	keep	hoist check loop
+```

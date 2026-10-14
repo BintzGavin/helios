@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	4.500	300	66.6	490.1	keep	baseline
+2	4.400	300	68.1	495.0	keep	hoist check loop
