@@ -445,10 +445,10 @@ export class CaptureLoop {
         if (freeWorkersHead !== 0) {
                   const limit = nextFrameToWrite + maxPipelineDepth;
                   let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
+                  let h = freeWorkersHead;
+                  let n = nextFrameToSubmit;
                   if (dispatches > 0) {
-                    dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
-                    let h = freeWorkersHead;
-                    let n = nextFrameToSubmit;
+                    dispatches = dispatches < h ? dispatches : h;
                     for (let d = 0; d < dispatches; d++) {
                       h--;
                       const w = freeWorkers[h];
@@ -456,20 +456,19 @@ export class CaptureLoop {
                       workerThenables[w].resolve(n);
                       n++;
                     }
-                    freeWorkersHead = h;
-                    nextFrameToSubmit = n;
                   }
 
           // If we still have waiting workers but are at totalFrames, tell them to stop
-          if (nextFrameToSubmit === totalFrames) {
-            let head = freeWorkersHead;
-            while (head !== 0) {
-              head--;
-              const w = freeWorkers[head];
+          if (n === totalFrames) {
+            while (h !== 0) {
+              h--;
+              const w = freeWorkers[h];
               workerThenables[w].resolve(-1);
             }
-            freeWorkersHead = 0;
+            h = 0;
           }
+          freeWorkersHead = h;
+          nextFrameToSubmit = n;
         }
       };
 
@@ -573,29 +572,28 @@ export class CaptureLoop {
               if (freeWorkersHead !== 0) {
                 const limit = nextFrameToWrite + maxPipelineDepth;
                 let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
-                if (dispatches > 0) {
-                  dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
-                  for (let d = 0; d < dispatches; d++) {
-                    h--;
-                    const w = freeWorkers[h];
-                    frameBufferRing[n & ringMask] = null;
-                    workerThenables[w].resolve(n);
-                    n++;
+                  if (dispatches > 0) {
+                    dispatches = dispatches < h ? dispatches : h;
+                    for (let d = 0; d < dispatches; d++) {
+                      h--;
+                      const w = freeWorkers[h];
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                      n++;
+                    }
+                  }
+                  if (n === totalFrames) {
+                    while (h !== 0) {
+                      h--;
+                      const w = freeWorkers[h];
+                      workerThenables[w].resolve(-1);
+                    }
+                    h = 0;
                   }
                   freeWorkersHead = h;
                   nextFrameToSubmit = n;
-                }
-                if (nextFrameToSubmit === totalFrames) {
-                  let head = freeWorkersHead;
-                  while (head !== 0) {
-                    head--;
-                    const w = freeWorkers[head];
-                    workerThenables[w].resolve(-1);
-                  }
-                  freeWorkersHead = 0;
-                }
               }
 
               while (nextFrameToWrite !== chunkEnd) {
@@ -644,29 +642,28 @@ export class CaptureLoop {
               if (freeWorkersHead !== 0) {
                 const limit = nextFrameToWrite + maxPipelineDepth;
                 let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
-                if (dispatches > 0) {
-                  dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
-                  for (let d = 0; d < dispatches; d++) {
-                    h--;
-                    const w = freeWorkers[h];
-                    frameBufferRing[n & ringMask] = null;
-                    workerThenables[w].resolve(n);
-                    n++;
+                  if (dispatches > 0) {
+                    dispatches = dispatches < h ? dispatches : h;
+                    for (let d = 0; d < dispatches; d++) {
+                      h--;
+                      const w = freeWorkers[h];
+                      frameBufferRing[n & ringMask] = null;
+                      workerThenables[w].resolve(n);
+                      n++;
+                    }
+                  }
+                  if (n === totalFrames) {
+                    while (h !== 0) {
+                      h--;
+                      const w = freeWorkers[h];
+                      workerThenables[w].resolve(-1);
+                    }
+                    h = 0;
                   }
                   freeWorkersHead = h;
                   nextFrameToSubmit = n;
-                }
-                if (nextFrameToSubmit === totalFrames) {
-                  let head = freeWorkersHead;
-                  while (head !== 0) {
-                    head--;
-                    const w = freeWorkers[head];
-                    workerThenables[w].resolve(-1);
-                  }
-                  freeWorkersHead = 0;
-                }
               }
 
               while (nextFrameToWrite !== chunkEnd) {
