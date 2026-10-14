@@ -1,11 +1,11 @@
 ---
 id: PERF-1070
 slug: fast-path-chunk-bounds
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-14
-completed: ""
-result: ""
+completed: "2026-10-14"
+result: "improved"
 ---
 
 # PERF-1070: Fast-path multi-worker chunk bounds using nextProgress
@@ -67,3 +67,10 @@ Run `npm run test -w packages/renderer` to ensure frame limits aren't violated.
 
 ## Correctness Check
 Run renderer in a real project to verify DOM output correctly finishes at `totalFrames`.
+
+
+## Results Summary
+- **Best render time**: 4.563s (vs baseline 15.115s)
+- **Improvement**: 69.8%
+- **Kept experiments**: [PERF-1070]
+- **Discarded experiments**: none
