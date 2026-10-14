@@ -7,6 +7,7 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1072**: Fast-path single-worker chunk bounds using nextProgress instead of Math.min in CaptureLoop.ts. Improved performance from 160209.815047ms to 159663.92933700004ms.
 - Hoisted multi-worker dispatch limits and conditionally bypassed the worker dispatch and cleanup loops in `checkState` and writer chunk loops (PERF-1071). Improved render time from ~14.43s to ~4.53s (~68.6% faster).
 - **PERF-1070**: Fast-pathed multi-worker chunk bounds using nextProgress rather than Math.min.
   - **Improvement:** ~69.8% faster.
