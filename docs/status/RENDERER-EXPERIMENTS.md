@@ -2,11 +2,12 @@
   - **Improvement**: Avoided redundant synchronous CPU-bound string decoding during static periods.
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 0.196s (baseline was 21.500s, -7.9%)
-Last updated by: PERF-1043
+Current best: 4.535s (baseline was 14.430s, -68.6%)
+Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- Hoisted multi-worker dispatch limits and conditionally bypassed the worker dispatch and cleanup loops in `checkState` and writer chunk loops (PERF-1071). Improved render time from ~14.43s to ~4.53s (~68.6% faster).
 - **PERF-1070**: Fast-pathed multi-worker chunk bounds using nextProgress rather than Math.min.
   - **Improvement:** ~69.8% faster.
   - **Plan ID:** PERF-1070

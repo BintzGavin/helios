@@ -442,8 +442,9 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
-
-                  let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+        if (freeWorkersHead !== 0) {
+                  const limit = nextFrameToWrite + maxPipelineDepth;
+                  let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                   if (dispatches > 0) {
                     dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                     let h = freeWorkersHead;
@@ -459,15 +460,16 @@ export class CaptureLoop {
                     nextFrameToSubmit = n;
                   }
 
-        // If we still have waiting workers but are at totalFrames, tell them to stop
-        if (nextFrameToSubmit === totalFrames) {
-          let head = freeWorkersHead;
-          while (head !== 0) {
-            head--;
-            const w = freeWorkers[head];
-            workerThenables[w].resolve(-1);
+          // If we still have waiting workers but are at totalFrames, tell them to stop
+          if (nextFrameToSubmit === totalFrames) {
+            let head = freeWorkersHead;
+            while (head !== 0) {
+              head--;
+              const w = freeWorkers[head];
+              workerThenables[w].resolve(-1);
+            }
+            freeWorkersHead = 0;
           }
-          freeWorkersHead = 0;
         }
       };
 
@@ -568,9 +570,9 @@ export class CaptureLoop {
             while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
 
-              if (freeWorkersHead > 0) {
-
-                let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+              if (freeWorkersHead !== 0) {
+                const limit = nextFrameToWrite + maxPipelineDepth;
+                let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                 if (dispatches > 0) {
                   dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
@@ -639,9 +641,9 @@ export class CaptureLoop {
             while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
 
-              if (freeWorkersHead > 0) {
-
-                let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+              if (freeWorkersHead !== 0) {
+                const limit = nextFrameToWrite + maxPipelineDepth;
+                let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
                 if (dispatches > 0) {
                   dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
                   let h = freeWorkersHead;
