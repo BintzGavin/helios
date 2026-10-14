@@ -212,6 +212,10 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1068**: Unroll worker dispatch loops in `CaptureLoop.ts` multi-worker paths.
+  - **WHY it didn't work**: We evaluated backwards unrolled `while` loops that count down to zero to avoid the per-iteration relational boundary check (`d < dispatches`). Microbenchmarks showed this was actually a performance regression (~17% slower initially). The baseline `for` loop executes efficiently because the V8 TurboFan compiler pipelines induction variables into registers. Replacing it with manually unrolled decrements prevents the compiler from analyzing loop invariants properly.
+  - **Plan ID**: PERF-1068
+
 - **PERF-1058**: Replaced relational loop boundary check (`i < totalFrames - 1`) with strict equality (`i !== totalFrames - 1`) in single-worker `!hasProcessFn` paths of `CaptureLoop.ts`.
   - **WHY it didn't work**: Microbenchmarks showed no improvement or a slight regression (1.180s -> 1.210s) for strict equality bounds checks on single-worker paths. We will discard this change.
   - **Plan ID**: PERF-1058
