@@ -217,6 +217,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1073**: Replaced the standard `for` loop in the multi-worker chunk dispatchers with a `do-while` loop counting down to zero.
+  - **WHY it didn't work**: Microbenchmarks showed a ~9% improvement in isolation (875ms to 792ms), but in the macro test harness, render times regressed / hit noise (4.500s baseline vs 4.512s do-while). Because V8 often perfectly optimizes standard `for` loops with branch prediction in real code, manual loop unrolling/rewriting in the dispatch loop provides no reliable benefit. Discarded.
+  - **Plan ID**: PERF-1073
 - **PERF-1068**: Unroll worker dispatch loops in `CaptureLoop.ts` multi-worker paths.
   - **WHY it didn't work**: We evaluated backwards unrolled `while` loops that count down to zero to avoid the per-iteration relational boundary check (`d < dispatches`). Microbenchmarks showed this was actually a performance regression (~17% slower initially). The baseline `for` loop executes efficiently because the V8 TurboFan compiler pipelines induction variables into registers. Replacing it with manually unrolled decrements prevents the compiler from analyzing loop invariants properly.
   - **Plan ID**: PERF-1068
