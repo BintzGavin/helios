@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	4.535	150	33.08	61.2	keep	Fast-path multi-worker dispatch limits

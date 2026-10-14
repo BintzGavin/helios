@@ -1,11 +1,11 @@
 ---
 id: PERF-1071
 slug: fast-path-worker-dispatch-bounds
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2026-10-14
-completed: ""
-result: ""
+completed: "2026-10-14"
+result: "improved"
 ---
 
 # PERF-1071: Fast-path multi-worker dispatch limits
@@ -81,3 +81,9 @@ Run `npm run test -w packages/renderer` to ensure frame limits aren't violated.
 
 ## Correctness Check
 Verify DOM and Canvas output are still correct and don't hang due to starvation.
+
+## Results Summary
+- **Best render time**: 4.535s (vs baseline 14.430s)
+- **Improvement**: 68.6%
+- **Kept experiments**: Hoisted limits and conditional bypass of empty queue check in multi-worker dispatches.
+- **Discarded experiments**: None.
