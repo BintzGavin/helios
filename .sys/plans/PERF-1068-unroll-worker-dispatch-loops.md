@@ -1,11 +1,11 @@
 ---
 id: PERF-1068
 slug: unroll-worker-dispatch-loops
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-13
-completed: ""
-result: ""
+completed: "2026-10-14"
+result: failed
 ---
 
 # PERF-1068: Unroll Worker Dispatch Loops
