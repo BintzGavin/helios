@@ -267,6 +267,7 @@ Both class-level and instance-level properties are provided for standard media s
 - `onaudiometering` (function | null): Event handler for the `audiometering` event.
 - `onabort` (function | null): Event handler for the `abort` event.
 - `onencrypted` (function | null): Event handler for the `encrypted` event.
+- `onwaitingforkey` (function | null): Event handler for the `waitingforkey` event.
 - `onemptied` (function | null): Event handler for the `emptied` event.
 - `onprogress` (function | null): Event handler for the `progress` event.
 
@@ -296,6 +297,7 @@ The element dispatches the following custom events:
 - `canplaythrough`: Fired when the browser estimates it can play through the media without buffering.
 - `abort`: Fired when the loading of the media has been aborted.
 - `encrypted`: Fired when the media is encrypted.
+- `waitingforkey`: Fired when playback is blocked while waiting for an encryption key.
 - `emptied`: Fired when the media has become empty.
 - `progress`: Fired periodically as the browser loads a resource.
 - `resize`: Fired when the player dimensions change.
