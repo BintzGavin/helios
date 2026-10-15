@@ -1,11 +1,11 @@
 ---
 id: PERF-1079
 slug: inline-typeof
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-15
-completed: ""
-result: ""
+completed: "2024-10-15"
+result: "keep"
 ---
 
 # PERF-1079: Inline typeof check for final buffer write
