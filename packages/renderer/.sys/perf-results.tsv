@@ -300,3 +300,4 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 1	4.549	150	32.98	61.1	keep	inline final buffer check
 2	4.577	150	32.77	61.0	keep	inline final buffer check
 3	4.535	150	33.07	61.1	keep	inline final buffer check
+1	4.593	150	32.66	60.9	keep	inline freeWorkers array lookups

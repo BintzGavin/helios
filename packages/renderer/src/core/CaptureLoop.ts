@@ -451,9 +451,8 @@ export class CaptureLoop {
                     dispatches = dispatches < h ? dispatches : h;
                     for (let d = 0; d < dispatches; d++) {
                       h--;
-                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
+                      workerThenables[freeWorkers[h]].resolve(n);
                       n++;
                     }
                   }
@@ -462,8 +461,7 @@ export class CaptureLoop {
           if (n === totalFrames) {
             while (h !== 0) {
               h--;
-              const w = freeWorkers[h];
-              workerThenables[w].resolve(-1);
+              workerThenables[freeWorkers[h]].resolve(-1);
             }
             h = 0;
           }
@@ -578,17 +576,15 @@ export class CaptureLoop {
                     dispatches = dispatches < h ? dispatches : h;
                     for (let d = 0; d < dispatches; d++) {
                       h--;
-                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
+                      workerThenables[freeWorkers[h]].resolve(n);
                       n++;
                     }
                   }
                   if (n === totalFrames) {
                     while (h !== 0) {
                       h--;
-                      const w = freeWorkers[h];
-                      workerThenables[w].resolve(-1);
+                      workerThenables[freeWorkers[h]].resolve(-1);
                     }
                     h = 0;
                   }
@@ -648,17 +644,15 @@ export class CaptureLoop {
                     dispatches = dispatches < h ? dispatches : h;
                     for (let d = 0; d < dispatches; d++) {
                       h--;
-                      const w = freeWorkers[h];
                       frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
+                      workerThenables[freeWorkers[h]].resolve(n);
                       n++;
                     }
                   }
                   if (n === totalFrames) {
                     while (h !== 0) {
                       h--;
-                      const w = freeWorkers[h];
-                      workerThenables[w].resolve(-1);
+                      workerThenables[freeWorkers[h]].resolve(-1);
                     }
                     h = 0;
                   }

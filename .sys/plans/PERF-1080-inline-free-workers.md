@@ -1,11 +1,11 @@
 ---
 id: PERF-1080
 slug: inline-free-workers
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-10-15
-completed: ""
-result: ""
+completed: "2024-10-15"
+result: "keep"
 ---
 
 # PERF-1080: Inline freeWorkers array lookups in multi-worker dispatcher loops
@@ -48,6 +48,11 @@ Change to:
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
 ```
+And similarly for:
+```typescript
+                      const w = freeWorkers[h];
+                      workerThenables[w].resolve(-1);
+```
 
 ### Step 2: Inline the lookup in DOM strategy chunk loop
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
@@ -63,6 +68,11 @@ Change to:
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
 ```
+And similarly for:
+```typescript
+                      const w = freeWorkers[h];
+                      workerThenables[w].resolve(-1);
+```
 
 ### Step 3: Inline the lookup in non-DOM strategy chunk loop
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
@@ -77,6 +87,11 @@ Change to:
 ```typescript
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
+```
+And similarly for:
+```typescript
+                      const w = freeWorkers[h];
+                      workerThenables[w].resolve(-1);
 ```
 
 **Why**: Removes intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8's TurboFan compiler.
