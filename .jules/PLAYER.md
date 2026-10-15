@@ -22,3 +22,7 @@
 ## [v0.79.16] - Implement encrypted Event
 **Learning:** Found that standard events like `encrypted` should be included for HTMLMediaElement parity even if the underlying feature (EME/DRM) is not explicitly supported by the core, in order to complete the standard API surface and pass standard compliance checkers.
 **Action:** Include all standard HTMLMediaElement event handlers and document them for API parity.
+
+## [v0.79.17] - Implement setMediaKeys
+**Learning:** Found that standard methods and properties like `setMediaKeys` and `mediaKeys` for EME (Encrypted Media Extensions) should be included for HTMLMediaElement parity even if the underlying feature is not explicitly supported by the core. This completes the standard API surface and passes standard compliance checkers.
+**Action:** Include standard HTMLMediaElement EME methods and properties and document them for API parity.
