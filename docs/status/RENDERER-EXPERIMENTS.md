@@ -421,3 +421,7 @@ $entry
 - **PERF-1053**: Inlined `dispatches` evaluation directly into its expression in the multi-worker assignment paths of `CaptureLoop.ts`.
   - **Improvement**: Slightly reduced V8 AST complexity by eliminating the intermediate variable `limit`. Yielded a ~2.8% microbenchmark improvement (92.1ms -> 89.4ms for 100M iterations) when dynamically calculating bounds.
   - **Plan ID**: PERF-1053
+
+- **PERF-1078**: Inlined the `typeof` check for the final buffer write (`typeof finalBuffer === 'string'`) in `CaptureLoop.ts`.
+  - **Improvement**: Marginally reduced AST complexity and local variable assignments in the JS engine by removing the intermediate `isString` variable. Yielded identical microbenchmark performance (~218ms for 100M iterations) but structurally simplifies the single-use cleanup block.
+  - **Plan ID**: PERF-1078

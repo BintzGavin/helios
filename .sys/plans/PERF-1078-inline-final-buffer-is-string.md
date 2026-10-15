@@ -65,3 +65,10 @@ Review DOM test results to verify final frame finishes properly.
 ## Prior Art
 PERF-986: simplify-buffer-drain-check-in-captureloop
 PERF-1053: Inlined `dispatches` evaluation directly into its expression in the multi-worker assignment paths of `CaptureLoop.ts`.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	0.218	0	0.00	0.0	keep	baseline
+2	0.218	0	0.00	0.0	keep	inlined typeof check
+```
