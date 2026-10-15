@@ -272,7 +272,6 @@ PERF-831	Cache DomStrategy lastFrameData Locally	33.791	9.127
 1	0.000	0	0.00	0.0	discard	PERF-805 discarded as obsolete because DomStrategy logic was moved to CaptureLoop
 1	0.000	0	0.00	0.0	discard	PERF-800: Obsolete (Base64 buffer allocation hoisted to CaptureLoop.ts with exponential growth)
 
-2	0.000	0	0.0	0.0	discard	PERF-836: Unroll Branching in Multi-Worker Loop Submissionrun	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	14.461	600	0.00	0.0	keep	PERF-835: hoist progress check multi-worker
 2	15.338	600	0.00	0.0	keep	PERF-835: hoist progress check multi-worker
 3	20.075	600	0.00	0.0	keep	PERF-835: hoist progress check multi-worker
@@ -298,3 +297,6 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 1042	0.000	0	0.00	0.0	keep	PERF-1042 remove dead isDomStrategy branch multi-worker
 1	15.115	150	9.92	61.3	keep	baseline
 2	4.563	150	32.88	61.0	keep	experiment
+1	4.549	150	32.98	61.1	keep	inline final buffer check
+2	4.577	150	32.77	61.0	keep	inline final buffer check
+3	4.535	150	33.07	61.1	keep	inline final buffer check

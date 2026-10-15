@@ -7,6 +7,8 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1079**: Inlined `typeof finalBuffer === "string"` in final cleanup block of `CaptureLoop.ts`. Reduced V8 AST complexity and local variable assignments for minor performance footprint improvement.
+
 - **PERF-1074**: Consolidated multi-worker cleanup loops in `CaptureLoop.ts` into their respective hoisted local variable blocks (using `let h` and `let n`).
   - **Improvement**: Replaced redundant closure evaluations and duplicated loops when `nextFrameToSubmit === totalFrames`. Removed the closure lookups, speeding up multi-worker limits checking.
   - **Plan ID**: PERF-1074
