@@ -33,6 +33,7 @@
 - `suspend`: Fired when media data loading has been suspended.
 - `stalled`: Fired when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
 - `abort`: Fired when media data loading has been aborted.
+- `encrypted`: Fired when the media is encrypted.
 - `emptied`: Fired when the media has become empty.
 - `progress`: Fired periodically as the user agent is downloading media data.
 
