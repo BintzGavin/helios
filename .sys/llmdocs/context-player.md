@@ -34,6 +34,7 @@
 - `stalled`: Fired when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
 - `abort`: Fired when media data loading has been aborted.
 - `encrypted`: Fired when the media is encrypted.
+- `waitingforkey`: Fired when playback is blocked while waiting for an encryption key.
 - `emptied`: Fired when the media has become empty.
 - `progress`: Fired periodically as the user agent is downloading media data.
 

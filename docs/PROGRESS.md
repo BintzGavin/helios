@@ -1,3 +1,6 @@
+## PLAYER v0.79.18
+- ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
+
 ### PLAYER v0.79.17
 - ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
 
