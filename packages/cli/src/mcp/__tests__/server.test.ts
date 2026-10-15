@@ -163,7 +163,7 @@ describe('helios MCP server: listing', () => {
 
     expect(Object.keys(byName).sort()).toEqual([
       'analyze_audio', 'cancel_render', 'get_frames', 'get_render_status', 'helios_library', 'list_videos',
-      'preview_video', 'read_page', 'render_video', 'reveal_file', 'verify_video',
+      'preview_video', 'read_page', 'read_settings', 'render_video', 'reveal_file', 'update_settings', 'verify_video',
     ]);
     expect(client.getServerVersion()).toEqual({ name: 'helios', version: '9.9.9' });
 

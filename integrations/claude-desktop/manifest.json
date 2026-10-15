@@ -31,6 +31,8 @@
     { "name": "get_render_status", "description": "Follow a long render" },
     { "name": "cancel_render", "description": "Stop a render" },
     { "name": "analyze_audio", "description": "Find a song's beats, bars, sections and hits" },
+    { "name": "read_settings", "description": "Reads the user's default settings for Helios renders and previews." },
+    { "name": "update_settings", "description": "Updates the user's default settings for Helios renders and previews." },
     { "name": "helios_library", "description": "Your video pages and renders" }
   ],
   "prompts": [
