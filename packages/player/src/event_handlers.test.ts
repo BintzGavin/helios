@@ -49,7 +49,7 @@ describe('HeliosPlayer Event Handlers', () => {
 
   it('should support all standard event handlers', () => {
     const events = [
-      'abort', 'emptied', 'progress',
+      'abort', 'emptied', 'progress', 'encrypted',
       'pause', 'ended', 'timeupdate', 'volumechange', 'ratechange',
       'durationchange', 'seeking', 'seeked', 'resize', 'loadstart',
       'loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough',

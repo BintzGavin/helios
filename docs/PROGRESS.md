@@ -1,3 +1,6 @@
+### PLAYER v0.79.17
+- ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
+
 ### PLAYER v0.79.15
 - ✅ Completed: Implement Promise for play() - Modified play() to return a Promise that resolves when playback begins or rejects if it fails, matching HTMLMediaElement parity.
 

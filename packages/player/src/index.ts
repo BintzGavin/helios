@@ -985,6 +985,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     if (handler) this.addEventListener('abort', handler);
   }
 
+  private _onencrypted: ((event: Event) => void) | null = null;
+  public get onencrypted() { return this._onencrypted; }
+  public set onencrypted(handler: ((event: Event) => void) | null) {
+    if (this._onencrypted) this.removeEventListener('encrypted', this._onencrypted);
+    this._onencrypted = handler;
+    if (handler) this.addEventListener('encrypted', handler);
+  }
+
   private _onemptied: ((event: Event) => void) | null = null;
   public get onemptied() { return this._onemptied; }
   public set onemptied(handler: ((event: Event) => void) | null) {
