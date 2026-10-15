@@ -1,10 +1,10 @@
 ---
 id: PERF-1082
 slug: inline-stream-write
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-15
-completed: ""
+completed: "2026-10-15"
 result: ""
 ---
 
