@@ -210,4 +210,4 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.46.62] 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Command Scaffold - Plan already implemented.
 [v0.46.64] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Components List Command - Plan already implemented.
 
-- [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
+- [x] [v0.46.65] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/[v0.47.0] ✅ Completed: CLI MCP ChatGPT Structured Settings - Implemented `read_settings` and `update_settings` tools to read and write default settings, and updated render/preview handlers to apply these defaults.

@@ -10,6 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
 import { createCliRunner, errorFromStderr, runCli, stripAnsi, type CliRunner } from './cli-runner.js';
 import { JobLimitError, RenderJobs, type RenderJob } from './jobs.js';
 import { bundlePage } from './page-bundle.js';
+import { SettingsSchema, X264_PRESETS, getSettings, updateSettings } from './settings.js';
 import { PathError, resolveInRoot, toRootRelative } from './paths.js';
 import { registerHeliosPrompts } from './prompts.js';
 import {
@@ -36,8 +37,6 @@ const APP_ONLY_META = { ui: { visibility: ['app'] }, 'openai/visibility': 'priva
 /** Model tools the view also calls (render, follow, cancel). ChatGPT's Apps SDK keys alongside MCP Apps. */
 const VIEW_CALLABLE_META = { 'openai/widgetAccessible': true };
 
-/** The encoder presets `helios render --preset` accepts (X264_PRESETS in commands/render.ts). */
-const X264_PRESETS = ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow', 'placebo'] as const;
 
 const DEFAULT_WIDTH = 1920;
 const DEFAULT_HEIGHT = 1080;
@@ -220,6 +219,45 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
   };
 
   // ---- Model tools that open the view ------------------------------------------------------
+  server.registerTool(
+    'read_settings',
+    {
+      title: 'Read settings',
+      description: 'Reads the user\'s default settings for Helios renders and previews.',
+      inputSchema: {},
+      outputSchema: SettingsSchema,
+      annotations: { title: 'Read settings', readOnlyHint: true, openWorldHint: false },
+      _meta: { 'openai/settings': 'read' },
+    },
+    guard(async () => {
+      const settings = await getSettings(root);
+      return {
+        content: [{ type: 'text', text: JSON.stringify(settings, null, 2) }],
+        structuredContent: settings,
+      };
+    }),
+  );
+
+  server.registerTool(
+    'update_settings',
+    {
+      title: 'Update settings',
+      description: 'Updates the user\'s default settings for Helios renders and previews.',
+      inputSchema: SettingsSchema.partial(),
+      outputSchema: SettingsSchema,
+      annotations: { title: 'Update settings', readOnlyHint: false, idempotentHint: true, openWorldHint: false },
+      _meta: { 'openai/settings': 'update' },
+    },
+    guard(async (args) => {
+      const updated = await updateSettings(root, args);
+      return {
+        content: [{ type: 'text', text: 'Settings updated successfully:\n' + JSON.stringify(updated, null, 2) }],
+        structuredContent: updated,
+      };
+    }),
+  );
+
+
 
   server.registerTool(
     'preview_video',
@@ -257,7 +295,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         await fs.promises.writeFile(target.abs, args.html, 'utf8');
         saved = true;
       }
-      const page = await resolveInRoot(root, args.path, { kind: 'file' });
+      const page = await resolveInRoot(root, args.path, { kind: 'file' });      const settings = await getSettings(root);
+
       const structured = {
         mode: 'player' as const,
         path: page.rel,
@@ -493,8 +532,9 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       _meta: VIEW_CALLABLE_META,
     },
     guard(async (args, extra) => {
-      const page = await resolveInRoot(root, args.path, { kind: 'file' });
-      const outputInput = args.output ?? path.join(path.dirname(page.abs), `${path.parse(page.abs).name}.mp4`);
+      const page = await resolveInRoot(root, args.path, { kind: 'file' });      const settings = await getSettings(root);
+      const defaultOutput = settings.outputFolder ? path.join(settings.outputFolder, `${path.parse(page.abs).name}.mp4`) : path.join(path.dirname(page.abs), `${path.parse(page.abs).name}.mp4`);
+      const outputInput = args.output ?? defaultOutput;
       const output = await resolveInRoot(root, outputInput, { kind: 'new', label: 'output' });
       if (output.abs === page.abs) throw new PathError('output would overwrite the page itself');
       if (fs.existsSync(output.abs) && fs.statSync(output.abs).isDirectory()) {
@@ -504,12 +544,12 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       await fs.promises.mkdir(path.dirname(output.abs), { recursive: true });
 
       const cli = ['render', page.abs, '-o', output.abs];
-      if (args.duration !== undefined) cli.push('--duration', String(args.duration));
-      if (args.width !== undefined) cli.push('--width', String(args.width));
-      if (args.height !== undefined) cli.push('--height', String(args.height));
-      if (args.fps !== undefined) cli.push('--fps', String(args.fps));
-      if (audio) cli.push('--audio', audio.abs);
-      if (args.preset !== undefined) cli.push('--preset', args.preset);
+      if (args.duration !== undefined) cli.push('--duration', String(args.duration));      const width = args.width ?? settings.width;
+      if (width !== undefined) cli.push('--width', String(width));      const height = args.height ?? settings.height;
+      if (height !== undefined) cli.push('--height', String(height));      const fps = args.fps ?? settings.fps;
+      if (fps !== undefined) cli.push('--fps', String(fps));
+      if (audio) cli.push('--audio', audio.abs);      const preset = args.preset ?? settings.preset;
+      if (preset !== undefined) cli.push('--preset', preset);
       if (args.mode !== undefined) cli.push('--mode', args.mode);
 
       let job: RenderJob;
@@ -599,9 +639,10 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
           if (args.every !== undefined) cli.push('--every', String(args.every));
           if (args.duration !== undefined) cli.push('--duration', String(args.duration));
         }
-        cli.push('--cell-width', String(args.cellWidth));
-        if (args.width !== undefined) cli.push('--width', String(args.width));
-        if (args.height !== undefined) cli.push('--height', String(args.height));
+        cli.push('--cell-width', String(args.cellWidth));        const settings = await getSettings(root);
+        const width = args.width ?? settings.width;
+        if (width !== undefined) cli.push('--width', String(width));        const height = args.height ?? settings.height;
+        if (height !== undefined) cli.push('--height', String(height));
         if (args.crop !== undefined) cli.push('--crop', args.crop.replace(/\s+/g, ''));
 
         const result = await runCli(runner, cli, root, extra.signal);
