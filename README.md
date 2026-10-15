@@ -39,13 +39,6 @@ Stop reinventing animation in JavaScript. Use the platform.
 
 
 
-https://github.com/user-attachments/assets/6713cddb-e509-400d-bb43-9961c7dbd128
-
-
-
-(Video created with Opus 5.5 + Helios)
-
-
 ---
 
 ## ⚡️ Recommended Quickstart: Helios Skills
@@ -71,28 +64,6 @@ Then tell your agent something like:
 ```bash
 generate a product demo video using the guided helios skill.
 ```
-
-### Or install the Helios plugin
-
-The plugin gives Claude Code and Codex the `make-video` skill and the Helios MCP server.
-
-**Claude Code**
-
-```text
-/plugin marketplace add BintzGavin/helios
-/plugin install helios@helios
-```
-
-**Codex**
-
-```bash
-codex plugin marketplace add BintzGavin/helios
-codex plugin add helios@helios
-```
-
-The skills live in [`skills/`](./skills/) and the plugin in [`plugins/helios/`](./plugins/helios/). For Claude Desktop, ChatGPT and other MCP hosts, see [Use Helios from Claude, ChatGPT and Codex](./docs/site/guides/ai-assistants.md).
-
----
 
 ## Quick Start
 
