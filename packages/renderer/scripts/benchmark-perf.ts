@@ -21,7 +21,7 @@ async function main() {
     width: 600,
     height: 600,
     fps: 30,
-    durationInSeconds: 1,
+    durationInSeconds: 5,
     mode: mode,
     intermediateImageFormat: 'png'
   });

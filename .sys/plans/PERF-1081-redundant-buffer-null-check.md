@@ -1,11 +1,11 @@
 ---
 id: PERF-1081
 slug: redundant-buffer-null-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-10-15
-completed: ""
-result: ""
+completed: "2024-10-15"
+result: "discard"
 ---
 
 # PERF-1081: Remove redundant buffer null check in multi-worker writer wait loops
@@ -66,3 +66,21 @@ Run `node --import tsx packages/renderer/scripts/benchmark-perf.ts --mode=canvas
 
 ## Correctness Check
 Run `node --import tsx packages/renderer/scripts/benchmark-perf.ts --mode=dom` to verify the DOM render completes successfully and does not hang.
+
+## Results Summary
+
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1		150			keep	baseline
+2		150			keep	baseline
+3		150			keep	baseline
+1	18.862	150	7.95	64.8	keep	baseline
+2	8.699	150	17.24	64.8	keep	baseline
+3	8.759	150	17.13	64.9	keep	baseline
+4	6.206	150	24.17	64.7	keep	experiment
+5	8.686	150	17.27	64.8	keep	experiment
+6	8.697	150	17.25	64.8	keep	experiment
+7	8.711	150	17.22	64.8	keep	experiment
+8	8.714	150	17.21	64.7	keep	experiment
+9	8.704	150	17.23	64.8	keep	experiment
+```
