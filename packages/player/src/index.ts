@@ -1766,6 +1766,14 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
 
   private _pendingPlayPromise: Promise<void> | null = null;
 
+
+  private _mediaKeys: MediaKeys | null = null;
+  public get mediaKeys(): MediaKeys | null { return this._mediaKeys; }
+  public async setMediaKeys(mediaKeys: MediaKeys | null): Promise<void> {
+    this._mediaKeys = mediaKeys;
+    console.warn('HeliosPlayer: EME is not fully supported.');
+  }
+
   public async play(): Promise<void> {
     // If already playing, resolve immediately
     if (!this.paused && this.isLoaded) {

@@ -149,6 +149,7 @@ Both class-level and instance-level properties are provided for standard media s
 - `NETWORK_NO_SOURCE` (3): No source network state.
 
 ### Methods
+- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`: Sets the MediaKeys for the player.
 
 - `setDuration(seconds: number): void` - Updates the composition duration dynamically.
 - `setFps(fps: number): void` - Updates the composition framerate dynamically.
@@ -179,6 +180,7 @@ Both class-level and instance-level properties are provided for standard media s
 - `cancelVideoFrameCallback(handle: number): void` - Cancels a previously registered video frame callback.
 
 ### Properties
+- `mediaKeys` (MediaKeys | null): The MediaKeys object for decrypting media.
 - `disableRemotePlayback` (boolean): Reflected disableremoteplayback attribute.
 - `remote` (RemotePlayback): Returns a mock RemotePlayback object to complete HTMLMediaElement parity.
 - `mediaGroup` (string): Reflected mediagroup attribute.

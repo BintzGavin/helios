@@ -728,4 +728,12 @@ describe('HeliosPlayer API Parity', () => {
     expect(playingSpy).toHaveBeenCalledTimes(1);
     expect(pauseSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('should support mediaKeys and setMediaKeys', async () => {
+    const mockMediaKeys = {} as any;
+    await player.setMediaKeys(mockMediaKeys);
+    expect(player.mediaKeys).toBe(mockMediaKeys);
+    await player.setMediaKeys(null);
+    expect(player.mediaKeys).toBeNull();
+  });
 });
