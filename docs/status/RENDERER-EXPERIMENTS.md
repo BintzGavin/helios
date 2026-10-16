@@ -425,3 +425,7 @@ $entry
 - **PERF-1078**: Inlined the `typeof` check for the final buffer write (`typeof finalBuffer === 'string'`) in `CaptureLoop.ts`.
   - **Improvement**: Marginally reduced AST complexity and local variable assignments in the JS engine by removing the intermediate `isString` variable. Yielded identical microbenchmark performance (~218ms for 100M iterations) but structurally simplifies the single-use cleanup block.
   - **Plan ID**: PERF-1078
+
+- **PERF-1085**: Combine await loop boundary checks in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The microbenchmarks showed slight improvement (~9%) when tested alone, however, the macro benchmark running the full project showed no measurable difference in the `dom` test (actually slightly slower). Because we cannot ensure a clear performance win in the main benchmark and want to avoid introducing bugs or changes for negligible differences, we're discarding this change.
+  - **Plan ID**: PERF-1085

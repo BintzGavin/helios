@@ -1,7 +1,7 @@
 ---
 id: PERF-1085
 slug: combined-await-check
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-16
 completed: ""
