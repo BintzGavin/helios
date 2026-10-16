@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.689	150	17.26	65.3	discard	baseline
+2	8.683	150	17.28	65.7	discard	baseline
+3	8.679	150	17.28	64.4	discard	baseline
+4	8.719	150	17.20	64.5	discard	PERF-1085: Combine await loop boundary checks
