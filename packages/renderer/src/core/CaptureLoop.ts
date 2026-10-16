@@ -130,6 +130,8 @@ export class CaptureLoop {
     const compTimeStep = 1 / fps;
     const poolLen = this.pool.length;
 
+    const isDomStrategy = this.pool[0].strategy.constructor.name === 'DomStrategy';
+
     // FAST PATH FOR SINGLE WORKER
     if (poolLen === 1) {
       const worker = this.pool[0];
@@ -546,11 +548,10 @@ export class CaptureLoop {
       const stream = stdin!;
       let pendingBytes = 0;
 
-      const isDomStrategyWriter = this.pool[0].strategy.constructor.name === 'DomStrategy';
 
       try {
         let nextProgress = progressInterval;
-        if (isDomStrategyWriter) {
+        if (isDomStrategy) {
           if (nextFrameToWrite < totalFrames && !aborted) {
             while (nextFrameToWrite !== totalFrames && !aborted) {
               const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
@@ -709,13 +710,9 @@ export class CaptureLoop {
 
     console.log("Finishing render strategy...");
     const finalBuffer = await this.pool[0].strategy.finish(this.pool[0].page);
-    if (
-      finalBuffer &&
-      ((Buffer.isBuffer(finalBuffer) && finalBuffer.length > 0) ||
-        (typeof finalBuffer === "string" && finalBuffer.length > 0))
-    ) {
+    if (finalBuffer && finalBuffer.length > 0) {
       console.log(`Writing final buffer...`);
-      if (typeof finalBuffer === "string") {
+      if (isDomStrategy) {
         if (!stdin!.write(finalBuffer as any, "base64")) {
           await this.drainPromise;
         }
