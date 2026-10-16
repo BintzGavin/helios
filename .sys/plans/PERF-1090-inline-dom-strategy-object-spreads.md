@@ -1,11 +1,11 @@
 ---
 id: PERF-1090
 slug: inline-dom-strategy-object-spreads
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-16
-completed: ""
-result: ""
+completed: "2026-10-16"
+result: "improved"
 ---
 
 # PERF-1090: Inline DOM Strategy Object Spreads
