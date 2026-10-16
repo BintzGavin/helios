@@ -1,4 +1,5 @@
 ## PLAYER v0.79.18
+- ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 - ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
 
 ### PLAYER v0.79.17

@@ -51,6 +51,7 @@
 - `mediagroup`: Links multiple media elements together.
 
 # Public Methods (HTMLMediaElement Parity)
+- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
 - `play(): Promise<void>`
 - `pause(): void`
 - `load(): void`
@@ -64,6 +65,7 @@
 - `cancelVideoFrameCallback(handle: number): void`
 
 # Public Properties (HTMLMediaElement Parity)
+- `mediaKeys: MediaKeys | null`
 - `currentTime: number`
 - `duration: number`
 - `paused: boolean`
