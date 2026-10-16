@@ -1,11 +1,11 @@
 ---
 id: PERF-1087
 slug: simplify-final-buffer-check-is-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-16
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1087: Simplify finalBuffer type check by caching strategy type globally in CaptureLoop
