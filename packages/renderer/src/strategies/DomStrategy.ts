@@ -16,6 +16,7 @@ export class DomStrategy implements RenderStrategy {
   private emptyImageBase64: string = "";
   private frameInterval: number = 0;
   private beginFrameParams: any = {};
+  private cachedCaptureParams: any = null;
 
   constructor(private options: RendererOptions) {
     if (this.options.videoCodec === 'copy') {
@@ -133,6 +134,9 @@ export class DomStrategy implements RenderStrategy {
 
 
 
+
+
+
     if (this.options.targetSelector) {
       const element = await page.waitForSelector(this.options.targetSelector, { state: 'attached', timeout: 5000 }).catch(() => null);
       if (!element) {
@@ -151,7 +155,13 @@ export class DomStrategy implements RenderStrategy {
       }
     }
 
-
+    this.cachedCaptureParams = {
+      ...this.cdpScreenshotParams,
+      fromSurface: true,
+      ...(this.beginFrameParams.screenshot?.clip
+        ? { clip: this.beginFrameParams.screenshot.clip }
+        : {}),
+    };
   }
 
 
@@ -169,13 +179,7 @@ export class DomStrategy implements RenderStrategy {
 
     try {
       const result = await Promise.race([
-        this.cdpSession!.send('Page.captureScreenshot', {
-          ...this.cdpScreenshotParams,
-          fromSurface: true,
-          ...(this.beginFrameParams.screenshot?.clip
-            ? { clip: this.beginFrameParams.screenshot.clip }
-            : {}),
-        }),
+        this.cdpSession!.send('Page.captureScreenshot', this.cachedCaptureParams),
         new Promise<never>((_, reject) => {
           timeoutId = setTimeout(() => {
             reject(new Error(
