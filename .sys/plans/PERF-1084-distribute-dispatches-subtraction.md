@@ -1,11 +1,11 @@
 ---
 id: PERF-1084
 slug: distribute-dispatches-subtraction
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-15
-completed: ""
-result: ""
+completed: "2024-10-16"
+result: "no-improvement"
 ---
 
 # PERF-1084: Distribute subtraction in multi-worker limit calculation
@@ -63,3 +63,9 @@ Run `node --import tsx packages/renderer/scripts/benchmark-perf.ts --mode=canvas
 
 ## Correctness Check
 Run `node --import tsx packages/renderer/scripts/benchmark-perf.ts --mode=dom` to verify the DOM path outputs valid frames and finishes rendering.
+
+## Results Summary
+- **Best render time**: 8.691s (vs baseline 8.688s)
+- **Improvement**: 0%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-1084]

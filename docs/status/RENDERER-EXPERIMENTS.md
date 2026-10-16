@@ -233,6 +233,10 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1084**: Distribute subtraction in multi-worker limit calculation in CaptureLoop.ts.
+  - **WHY it didn't work**: While microbenchmarks previously showed a ~20% improvement, in macro-level execution on the current V8 version/node environment within this setup, the change yielded virtually identical render times (baseline ~8.70s, experiment ~8.69s). It did not provide a statistically significant macro-level performance improvement and will be discarded to avoid unnecessary churn.
+  - **Plan ID**: PERF-1084
+
 - PERF-1081: Removed redundant buffer null check in multi-worker writer wait loops.
   - WHY it didn't work: Test suite failed completely (36 tests failed). It appears the null check is not redundant after all and is actually required for correct operation and avoiding race conditions/deadlocks during multi-worker processing.
 - **PERF-1073**: Replaced the standard `for` loop in the multi-worker chunk dispatchers with a `do-while` loop counting down to zero.
