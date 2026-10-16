@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.731	150	17.18	64.4	keep	baseline
+2	8.688	150	17.27	64.5	keep	baseline
+3	8.716	150	17.21	64.9	keep	baseline
+4	8.701	150	17.24	64.4	discard	distributed subtraction
+5	8.672	150	17.30	64.6	discard	distributed subtraction
+6	6.264	150	23.94	65.2	discard	distributed subtraction
