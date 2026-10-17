@@ -207,7 +207,7 @@ export class CaptureLoop {
 
           let i = 1;
           while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = nextProgress < totalFrames - 1 ? nextProgress : totalFrames - 1;
+            const chunkEnd = Math.min(nextProgress, totalFrames - 1);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -313,7 +313,7 @@ export class CaptureLoop {
 
           let i = 1;
           while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = nextProgress < totalFrames - 1 ? nextProgress : totalFrames - 1;
+            const chunkEnd = Math.min(nextProgress, totalFrames - 1);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -552,7 +552,7 @@ export class CaptureLoop {
         if (isDomStrategy) {
           if (nextFrameToWrite < totalFrames && !aborted) {
             while (nextFrameToWrite !== totalFrames && !aborted) {
-              const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
+              const chunkEnd = Math.min(nextProgress, totalFrames);
 
               if (freeWorkersHead !== 0) {
                 let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
@@ -616,7 +616,7 @@ export class CaptureLoop {
         } else {
           if (nextFrameToWrite < totalFrames && !aborted) {
             while (nextFrameToWrite !== totalFrames && !aborted) {
-              const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
+              const chunkEnd = Math.min(nextProgress, totalFrames);
 
               if (freeWorkersHead !== 0) {
                 let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
