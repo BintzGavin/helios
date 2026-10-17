@@ -4,8 +4,8 @@ slug: hoist-limit-in-dispatches
 status: unclaimed
 claimed_by: ""
 created: 2024-10-16
-completed: ""
-result: ""
+completed: "2026-10-17"
+result: "improved"
 ---
 
 # PERF-1093: Inline dispatch bound in CaptureLoop

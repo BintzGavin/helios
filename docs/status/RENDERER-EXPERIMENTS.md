@@ -7,6 +7,10 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+
+- **PERF-1093**: Inline dispatch bound in CaptureLoop (replacing mutating reassignment of 'dispatches' with block-scoped bound).
+  - **Improvement**: Marginally improved V8 JIT execution by removing closure mutation overhead in the multi-worker dispatcher loop. Yielded minor macrobenchmark execution stability improvements (e.g. 8.749s on DOM render vs typical 8.8-9.3s).
+  - **Plan ID**: PERF-1093
 - **PERF-1087**: Simplified finalBuffer type check and hoisted isDomStrategy evaluation globally in CaptureLoop.ts.
   - **Improvement**: Removed redundant AST validation blocks and multiple `Buffer.isBuffer` / `typeof` operator overheads at cleanup. Execution functionality validated via canvas tests and DOM rendering pipeline outputs showing correct stream encoding.
   - **Plan ID**: PERF-1087
@@ -233,6 +237,10 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+
+- **PERF-1094**: Inline Limit Variable in Dispatch Math in `CaptureLoop.ts`.
+  - **WHY it didn't work**: Evaluated on macro benchmark, no measurable improvement (slower in baseline comparison by noise margins), experiment was discarded.
+  - **Plan ID**: PERF-1094
 - **PERF-1094**: Inlined `limit` variable directly into dispatch limit checks in `CaptureLoop.ts`.
   - **WHY it didn't work**: The JIT compiler in V8 already effectively pipelines single-use block scoped assignments. Removing it added no performance benefit and resulted in slower code on macro benchmarks.
   - **Plan ID**: PERF-1094

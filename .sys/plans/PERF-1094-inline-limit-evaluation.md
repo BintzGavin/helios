@@ -4,8 +4,8 @@ slug: inline-limit-evaluation
 status: complete
 claimed_by: ""
 created: 2024-10-18
-completed: ""
-result: ""
+completed: "2026-10-17"
+result: "failed"
 ---
 
 # PERF-1094: Inline Limit Variable in Dispatch Math
