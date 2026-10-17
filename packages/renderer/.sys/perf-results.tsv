@@ -306,3 +306,4 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 1	9.075	150	16.53	64.5	keep	PERF-1094 inline multi-worker dispatch limits into ternary
 2	8.943	150	16.77	64.4	keep	PERF-1094 inline multi-worker dispatch limits into ternary
 3	8.788	150	17.07	64.3	keep	PERF-1094 inline multi-worker dispatch limits into ternary
+4	8.780	150	17.08	64.4	keep	PERF-1096-math-min-chunk-end

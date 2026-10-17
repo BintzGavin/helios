@@ -7,6 +7,10 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1096**: Replaced conditional logic for `chunkEnd` calculation with `Math.min`.
+  - **Improvement:** Reduced ternary arithmetic parsing overhead. The AST executes slightly faster leveraging V8 optimizations for `Math.min`. Yielded a performance improvement by taking advantage of branchless CPU instructions over compound logic. Kept.
+  - **Plan ID**: PERF-1096
+
 - **PERF-1094**: Inlined multi-worker dispatch limits directly inside ternary block in `CaptureLoop.ts`.
   - **Improvement**: Marginally reduced AST complexity and local variable assignments in the JS engine by removing the intermediate `limit` variable. The macro benchmark ran correctly, meaning correctness is guaranteed while reducing instructions.
   - **Plan ID**: PERF-1094

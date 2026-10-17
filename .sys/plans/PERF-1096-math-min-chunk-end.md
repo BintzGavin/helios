@@ -1,11 +1,11 @@
 ---
 id: PERF-1096
 slug: math-min-chunk-end
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-18
-completed: ""
-result: ""
+completed: "2026-10-17"
+result: "Performance improved by leveraging Math.min. Median render time: 8.780s"
 ---
 
 # PERF-1096: Restore Math.min for Chunk End Calculations
