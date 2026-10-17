@@ -233,6 +233,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1094**: Inlined `limit` variable directly into dispatch limit checks in `CaptureLoop.ts`.
+  - **WHY it didn't work**: The JIT compiler in V8 already effectively pipelines single-use block scoped assignments. Removing it added no performance benefit and resulted in slower code on macro benchmarks.
+  - **Plan ID**: PERF-1094
 - **PERF-1084**: Distribute subtraction in multi-worker limit calculation in CaptureLoop.ts.
   - **WHY it didn't work**: While microbenchmarks previously showed a ~20% improvement, in macro-level execution on the current V8 version/node environment within this setup, the change yielded virtually identical render times (baseline ~8.70s, experiment ~8.69s). It did not provide a statistically significant macro-level performance improvement and will be discarded to avoid unnecessary churn.
   - **Plan ID**: PERF-1084

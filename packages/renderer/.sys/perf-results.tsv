@@ -244,7 +244,7 @@ run	28.646	600	20.95	60.0	discard	PERF-739 Eager CDP Session Initialization in D
 115	0.046	1000000	N/A	N/A	keep	Bypass multi-frame sync media branching
 785	62.662138	1000000	0	0	keep	baseline
 785	11.354684	1000000	0	0	keep	opt
-1	0.000	0	0.00	0.0	crash	N-frame lookahead (Protocol error: Another frame is pending)
+1	0.000	0	0.00	0.0	crash	N-frame lookahead (Protocol error: Another frame is discard)
 1	6.042	0	0	0	keep	unswitch buffer vs string single and multi worker
 2	6.121	0	0	0	keep	unswitch buffer vs string single and multi worker
 3	6.043	0	0	0	keep	unswitch buffer vs string single and multi worker
@@ -301,3 +301,5 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 2	4.577	150	32.77	61.0	keep	inline final buffer check
 3	4.535	150	33.07	61.1	keep	inline final buffer check
 1	4.593	150	32.66	60.9	keep	inline freeWorkers array lookups
+1	8.715	150	17.21	64.3	keep	baseline
+1	8.722	150	17.20	64.5	discard	inline limit var in dispatch math
