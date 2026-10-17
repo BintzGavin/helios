@@ -1,6 +1,6 @@
 ---
-id: PERF-1098
-slug: inline-dombeginframe-single-worker
+id: PERF-1099
+slug: inline-dombeginframe
 status: unclaimed
 claimed_by: ""
 created: 2024-10-18
@@ -8,36 +8,27 @@ completed: ""
 result: ""
 ---
 
-# PERF-1098: Inline domBeginFrame and Simplify Buffer Assignment
+# PERF-1099: Inline domBeginFrame and Simplify Buffer Assignment across all workers
 
 ## Focus Area
-The DOM strategy worker dispatch loop inside `packages/renderer/src/core/CaptureLoop.ts`. Specifically, removing the intermediate `domBeginFrame` arrow function and simplifying the final buffer assignment logic.
+The `packages/renderer/src/core/CaptureLoop.ts` file, where the `domBeginFrame` arrow function is defined and used for executing strategy.capture for the DOM capturing strategy in both single and multi-worker modes.
 
 ## Background Research
-Currently, in `CaptureLoop.ts`, the DOM capture path defines a closure:
-`const domBeginFrame = isDomStrategy ? (frameTime: number) => strategy.capture(page, frameTime) : null;`
-and inside the single worker loop, it uses an intermediate buffer variable:
+Currently, inside the capture loop, `domBeginFrame` is defined as an intermediate variable. For single-workers:
 ```typescript
-              let buf: Buffer;
-              nextCapturePromise = domBeginFrame!((i + 1) * timeStep);
-              const data = rawResult.screenshotData;
-              if (data) {
-                buf = Buffer.from(data as string, "base64");
-                domLastFrameBuffer = buf;
-              } else {
-                buf = domLastFrameBuffer!;
-              }
+      const domBeginFrame = isDomStrategy
+        ? (frameTime: number) => strategy.capture(page, frameTime)
+        : null;
 ```
-By inlining `strategy.capture(page, ...)` directly where `domBeginFrame` was used, we eliminate the arrow function invocation overhead.
+And similarly for multi-workers inside `runWorker`:
+```typescript
+          const domBeginFrame = (frameTime: number) => strategy.capture(page, frameTime);
+```
 
-Also, we can eliminate the block-scoped `buf` variable in buffer assignment paths across `CaptureLoop.ts` when `data` exists:
-```typescript
-              const data = rawResult.screenshotData;
-              if (data) {
-                domLastFrameBuffer = Buffer.from(data as string, "base64");
-              }
-```
-And replace the usages of `buf` with `domLastFrameBuffer!`. This streamlines the assignment, removing the `else` branch entirely. This reduces AST complexity, local variable lookups, and JS execution time per frame.
+In tight capture loops, making `nextCapturePromise = domBeginFrame!(0)` and `await domBeginFrame!(i * timeStep)` executes this intermediate closure function instead of making a direct method call on `strategy.capture`. This adds an unnecessary execution frame.
+
+Additionally, in both the single and multi-worker chunk loops, `let buf: Buffer;` is locally instantiated to conditionally decide between reading a new `screenshotData` Buffer or referencing `domLastFrameBuffer`.
+Instead, we can assign directly to `domLastFrameBuffer`, and write `domLastFrameBuffer!` directly. Eliminating the conditional block entirely and avoiding the intermediate `let buf: Buffer;`.
 
 ## Benchmark Configuration
 - **Composition URL**: standard DOM benchmark
@@ -47,18 +38,19 @@ And replace the usages of `buf` with `domLastFrameBuffer!`. This streamlines the
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Bottleneck analysis**: Unnecessary closure invocation and intermediate variables within the tight capture loops in the JS JS Engine.
+- **Bottleneck analysis**: The intermediate function `domBeginFrame` executes within extremely hot capture loops on every frame execution, and a temporary variable allocates an `else` branch overhead.
 
 ## Implementation Spec
 
-### Step 1: Inline domBeginFrame and Simplify Buffer Assignment
+### Step 1: Inline domBeginFrame and Buffer Variables
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-Replace the `domBeginFrame` arrow function with direct method calls, and streamline buffer assignments inside single-worker paths (both initial and chunk loops).
-**Why**: Avoids extra function closure overhead and reduces variable declarations and conditional branching in the V8 JIT.
-**Risk**: Very low, functionally identical.
+1. Remove both definitions of `domBeginFrame`.
+2. Replace all calls to `domBeginFrame!(time)` with `strategy.capture(page, time)`.
+3. In single worker initialization loop and multi worker loops, replace `let buf: Buffer; if (data) { buf = ...; domLastFrameBuffer = buf; } else { buf = domLastFrameBuffer!; } frameBufferRing[...] = buf;` with `if (data) { domLastFrameBuffer = ... } frameBufferRing[...] = domLastFrameBuffer!;` and pass `domLastFrameBuffer!` to the stream.
 
-Execute the following script via heredoc to apply the text replacement carefully across the file:
+Execute the following script via heredoc to apply the patch cleanly:
+
 ```bash
 cat << 'PATCH_EOF' > implement-plan.js
 const fs = require('fs');
@@ -120,6 +112,30 @@ const replaceLoop2 = \`            const data = rawResult.screenshotData;
             if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {\`;
 
 code = code.replace(searchLoop2, replaceLoop2);
+
+
+const searchCode2 = \`          const domBeginFrame = (frameTime: number) => strategy.capture(page, frameTime);
+          let domLastFrameBuffer: Buffer | null = null;\`;
+const replaceCode2 = \`          let domLastFrameBuffer: Buffer | null = null;\`;
+code = code.replace(searchCode2, replaceCode2);
+
+const searchLoop3 = \`              const rawResult = await strategy.capture(page, i * timeStep);
+              const data = (rawResult as any).screenshotData;
+              let buf: Buffer;
+              if (data) {
+                buf = Buffer.from(data as string, "base64");
+                domLastFrameBuffer = buf;
+              } else {
+                buf = domLastFrameBuffer!;
+              }
+              frameBufferRing[i & ringMask] = buf;\`;
+const replaceLoop3 = \`              const rawResult = await strategy.capture(page, i * timeStep);
+              const data = (rawResult as any).screenshotData;
+              if (data) {
+                domLastFrameBuffer = Buffer.from(data as string, "base64");
+              }
+              frameBufferRing[i & ringMask] = domLastFrameBuffer!;\`;
+code = code.replace(searchLoop3, replaceLoop3);
 
 fs.writeFileSync(file, code);
 PATCH_EOF
