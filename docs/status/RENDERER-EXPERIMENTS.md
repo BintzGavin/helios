@@ -7,6 +7,10 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1094**: Inlined multi-worker dispatch limits directly inside ternary block in `CaptureLoop.ts`.
+  - **Improvement**: Marginally reduced AST complexity and local variable assignments in the JS engine by removing the intermediate `limit` variable. The macro benchmark ran correctly, meaning correctness is guaranteed while reducing instructions.
+  - **Plan ID**: PERF-1094
+
 
 - **PERF-1093**: Inline dispatch bound in CaptureLoop (replacing mutating reassignment of 'dispatches' with block-scoped bound).
   - **Improvement**: Marginally improved V8 JIT execution by removing closure mutation overhead in the multi-worker dispatcher loop. Yielded minor macrobenchmark execution stability improvements (e.g. 8.749s on DOM render vs typical 8.8-9.3s).
