@@ -1,7 +1,7 @@
 ---
 id: PERF-1094
 slug: inline-limit-evaluation
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-18
 completed: ""
