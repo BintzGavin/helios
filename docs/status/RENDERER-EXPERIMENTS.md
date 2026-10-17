@@ -245,6 +245,7 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- Inlined the `report` object return in `DomStrategy.diagnose` (`packages/renderer/src/strategies/DomStrategy.ts`). Macro-level execution yielded no significant render time improvements because diagnostics execution is not a bottleneck. (PERF-1089)
 
 - **PERF-1094**: Inline Limit Variable in Dispatch Math in `CaptureLoop.ts`.
   - **WHY it didn't work**: Evaluated on macro benchmark, no measurable improvement (slower in baseline comparison by noise margins), experiment was discarded.
