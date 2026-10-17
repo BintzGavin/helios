@@ -87,3 +87,4 @@ key or sidebar button, improving usability.
 - [v0.122.14] ✅ Completed: STUDIO-Improve-MCP-Coverage - Added test cases for missing branches in mcp.ts to reach 100% coverage.
 
 - [v0.123.1] ✅ Completed: STUDIO-Improve-AssetsPanel-Coverage - Achieved 100% test coverage for AssetsPanel by adding missing drag-and-drop edge cases.
+- [v0.123.2] ✅ Completed: STUDIO-Improve-ComponentsPanel-Coverage - Created plan to test missing error branches in ComponentsPanel (2026-07-27-STUDIO-Improve-ComponentsPanel-Coverage.md).
