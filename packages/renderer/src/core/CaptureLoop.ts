@@ -438,8 +438,7 @@ export class CaptureLoop {
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
                   if (dispatches > 0) {
-                    dispatches = dispatches < h ? dispatches : h;
-                    for (let d = 0; d < dispatches; d++) {
+                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                       h--;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
@@ -562,8 +561,7 @@ export class CaptureLoop {
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
                   if (dispatches > 0) {
-                    dispatches = dispatches < h ? dispatches : h;
-                    for (let d = 0; d < dispatches; d++) {
+                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                       h--;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
@@ -628,8 +626,7 @@ export class CaptureLoop {
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
                   if (dispatches > 0) {
-                    dispatches = dispatches < h ? dispatches : h;
-                    for (let d = 0; d < dispatches; d++) {
+                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                       h--;
                       frameBufferRing[n & ringMask] = null;
                       workerThenables[freeWorkers[h]].resolve(n);
