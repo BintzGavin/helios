@@ -549,132 +549,66 @@ export class CaptureLoop {
 
       try {
         let nextProgress = progressInterval;
-        if (isDomStrategy) {
-          if (nextFrameToWrite < totalFrames && !aborted) {
-            while (nextFrameToWrite !== totalFrames && !aborted) {
-              const chunkEnd = Math.min(nextProgress, totalFrames);
+        if (nextFrameToWrite < totalFrames && !aborted) {
+          while (nextFrameToWrite !== totalFrames && !aborted) {
+            const chunkEnd = Math.min(nextProgress, totalFrames);
 
-              if (freeWorkersHead !== 0) {
-                let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
-                      h--;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[freeWorkers[h]].resolve(n);
-                      n++;
-                    }
+            if (freeWorkersHead !== 0) {
+              let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+                let h = freeWorkersHead;
+                let n = nextFrameToSubmit;
+                if (dispatches > 0) {
+                  for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
+                    h--;
+                    frameBufferRing[n & ringMask] = null;
+                    workerThenables[freeWorkers[h]].resolve(n);
+                    n++;
                   }
-                  if (n === totalFrames) {
-                    while (h !== 0) {
-                      h--;
-                      workerThenables[freeWorkers[h]].resolve(-1);
-                    }
-                    h = 0;
+                }
+                if (n === totalFrames) {
+                  while (h !== 0) {
+                    h--;
+                    workerThenables[freeWorkers[h]].resolve(-1);
                   }
-                  freeWorkersHead = h;
-                  nextFrameToSubmit = n;
+                  h = 0;
+                }
+                freeWorkersHead = h;
+                nextFrameToSubmit = n;
+            }
+
+            while (nextFrameToWrite !== chunkEnd) {
+              const ringIndex = nextFrameToWrite & ringMask;
+              if (frameBufferRing[ringIndex] === null) {
+                break;
               }
 
-              while (nextFrameToWrite !== chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
-                  break;
-                }
-
-                const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
-                pendingBytes += buffer.length;
-                if (!stream.write(buffer) && pendingBytes >= 16777216) {
-                  await this.drainPromise;
-                  pendingBytes = 0;
-                }
-
-                nextFrameToWrite++;
+              const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
+              pendingBytes += buffer.length;
+              if (!stream.write(buffer) && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
               }
 
-              if (aborted) break;
-              if (nextFrameToWrite !== chunkEnd) {
-                const awaitIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[awaitIndex] === null) {
-                  do {
-                    await writerWaiterPromise;
-                  } while (frameBufferRing[awaitIndex] === null && !aborted);
-                  if (aborted) break;
-                }
-              }
+              nextFrameToWrite++;
+            }
 
-              if (nextFrameToWrite === nextProgress) {
-                nextProgress += progressInterval;
-                console.log(
-                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-                );
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
+            if (aborted) break;
+            if (nextFrameToWrite !== chunkEnd) {
+              const awaitIndex = nextFrameToWrite & ringMask;
+              if (frameBufferRing[awaitIndex] === null) {
+                do {
+                  await writerWaiterPromise;
+                } while (frameBufferRing[awaitIndex] === null && !aborted);
+                if (aborted) break;
               }
             }
-          }
-        } else {
-          if (nextFrameToWrite < totalFrames && !aborted) {
-            while (nextFrameToWrite !== totalFrames && !aborted) {
-              const chunkEnd = Math.min(nextProgress, totalFrames);
 
-              if (freeWorkersHead !== 0) {
-                let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
-                      h--;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[freeWorkers[h]].resolve(n);
-                      n++;
-                    }
-                  }
-                  if (n === totalFrames) {
-                    while (h !== 0) {
-                      h--;
-                      workerThenables[freeWorkers[h]].resolve(-1);
-                    }
-                    h = 0;
-                  }
-                  freeWorkersHead = h;
-                  nextFrameToSubmit = n;
-              }
-
-              while (nextFrameToWrite !== chunkEnd) {
-                const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
-                  break;
-                }
-
-                const buffer = frameBufferRing[ringIndex]!;
-                pendingBytes += (buffer as any).length;
-                if (!stream.write(buffer as any) && pendingBytes >= 16777216) {
-                  await this.drainPromise;
-                  pendingBytes = 0;
-                }
-
-                nextFrameToWrite++;
-              }
-
-              if (aborted) break;
-              if (nextFrameToWrite !== chunkEnd) {
-                const awaitIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[awaitIndex] === null) {
-                  do {
-                    await writerWaiterPromise;
-                  } while (frameBufferRing[awaitIndex] === null && !aborted);
-                  if (aborted) break;
-                }
-              }
-
-              if (nextFrameToWrite === nextProgress) {
-                nextProgress += progressInterval;
-                console.log(
-                  `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
-                );
-                if (onProgress) onProgress(nextFrameToWrite / totalFrames);
-              }
+            if (nextFrameToWrite === nextProgress) {
+              nextProgress += progressInterval;
+              console.log(
+                `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
+              );
+              if (onProgress) onProgress(nextFrameToWrite / totalFrames);
             }
           }
         }

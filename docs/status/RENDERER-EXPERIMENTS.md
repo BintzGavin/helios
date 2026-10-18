@@ -1,6 +1,7 @@
 - **PERF-969**: Cached decoded Base64 buffers for unchanged frames in the initial block of the single-worker `!hasProcessFn` loop of `CaptureLoop.ts`.
   - **Improvement**: Avoided redundant synchronous CPU-bound string decoding during static periods.
   - **Plan ID**: PERF-969## Performance Trajectory
+- **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 4.535s (baseline was 14.430s, -68.6%)
 Last updated by: PERF-1071
