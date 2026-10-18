@@ -1,3 +1,6 @@
+### CLI v0.47.1
+- ✅ Completed: CLI Add Component Command - Documented as duplicated plan since it was already implemented.
+
 ### CLI v0.46.65
 - 🛑 Blocked: Waiting for a new, valid plan in /.sys/plans/
 
