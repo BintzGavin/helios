@@ -1,10 +1,10 @@
 ---
 id: PERF-1101
 slug: remove-promise-race-watchdog
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-18
-completed: ""
+completed: "2026-10-18"
 result: ""
 ---
 
@@ -143,3 +143,14 @@ Run \`npm run test -w packages/renderer\` to ensure changes haven't introduced r
 
 ### Step 6: Complete pre commit steps
 Complete pre-commit steps to ensure proper testing, verification, review, and reflection are done.
+
+## Results Summary
+| Run | Render Time | FPS   | Status | Note |
+|-----|-------------|-------|--------|------|
+| 1   | 8.905s      | 16.84 | keep   | baseline |
+| 2   | 6.590s      | 22.76 | keep   | remove-promise-race |
+| 3   | 8.668s      | 17.31 | keep   | remove-promise-race |
+| 4   | 8.677s      | 17.29 | keep   | remove-promise-race |
+| 5   | 8.665s      | 17.31 | keep   | remove-promise-race |
+
+Median improvement: ~2.6% faster (8.905s -> 8.668s)
