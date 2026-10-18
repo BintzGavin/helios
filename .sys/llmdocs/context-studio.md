@@ -1,36 +1,34 @@
-# Helios Studio Context
+# STUDIO DOMAIN CONTEXT
 
 ## Section A: Architecture
-Helios Studio is the browser-based development environment for video composition. It consists of:
-- **CLI (`packages/cli`)**: Provides the `npx helios studio` command which starts the dev server.
-- **Server (`src/server`)**: A Vite-based dev server that serves the Studio UI, discovers user compositions/assets via `HELIOS_PROJECT_ROOT`, and handles rendering/MCP requests.
-- **UI (`src/components`)**: React-based frontend providing a visual interface for timeline, properties, and asset management.
+Helios Studio is a browser-based development environment for video composition. It consists of:
+- **CLI Entry**: `npx helios studio` command for starting the dev server.
+- **Dev Server**: A Vite-based server providing hot-reloading and serving local files.
+- **UI Structure**: A React-based UI allowing users to preview, edit props, manage assets, and trigger renders.
 
 ## Section B: File Tree
-```
 packages/studio/
-├── bin/
 ├── src/
-│   ├── components/       # React UI components (Timeline, Stage, Panels)
-│   ├── context/          # React Contexts (StudioContext for global state)
+│   ├── components/       # Reusable UI components
+│   ├── context/          # React Context providers (StudioContext, ToastContext)
 │   ├── hooks/            # Custom React hooks
-│   ├── server/           # Vite plugin, API endpoints, rendering integrations
-│   └── utils/            # Helper functions
-├── vite.config.ts
-└── package.json
-```
+│   ├── server/           # Vite plugin, APIs, and Render Management
+│   ├── ui/               # Layout and view level components
+│   └── utils/            # Utility functions
+├── vite.config.ts        # Vite configuration
+└── vitest.config.ts      # Vitest configuration
 
 ## Section C: CLI Interface
-The Studio is launched via the CLI package using: `npx helios studio`. The CLI injects `HELIOS_PROJECT_ROOT` pointing to the user's CWD to allow Studio to discover their compositions and assets dynamically.
+- `npx helios studio`: Starts the Studio environment on a local port.
 
 ## Section D: UI Components
+- **Timeline**: Visual representation of the composition timeline.
+- **Props Editor**: Dynamic editor for composition properties.
+- **Assets Panel**: File management UI for composition assets.
+- **Components Panel**: Registry UI for managing standard Helios components.
 - **Stage**: The main preview area integrating `<helios-player>`.
-- **Timeline**: Visual track-based editor for sequencing assets.
-- **PropsEditor**: JSON-based property editor for composition variables.
-- **AssetsPanel**: Drag-and-drop asset management interface.
-- **PlaybackControls**: Centralized playback state control.
 
 ## Section E: Integration
-- **Core**: Consumes the `Helios` class for composition management.
-- **Player**: Integrates the `<helios-player>` Web Component into the Stage.
-- **Renderer**: Uses `@helios-project/renderer` via `/api/render` to execute real video exports based on the timeline.
+- **Core**: Studio wraps `Helios` instances to introspect and manage state.
+- **Player**: Utilizes `<helios-player>` for high-performance preview and playback.
+- **Renderer**: Communicates with `packages/renderer` via an API to dispatch render jobs and report progress.
