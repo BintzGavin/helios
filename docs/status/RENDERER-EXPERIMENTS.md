@@ -8,6 +8,9 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+- **PERF-1104**: Unroll isDomStrategy checks in single-worker initial frame processing.
+  - **Improvement:** Reduced AST complexity by evaluating isDomStrategy once instead of up to three times during single worker frame loop initialization, yielding minor speedups and lowering peak memory use marginally.
+  - **Plan ID:** PERF-1104
 
 - **PERF-1101**: Removed the per-frame `Promise.race` watchdog timer and dynamic closure creation in the `capture` method of `DomStrategy.ts`.
   - **Improvement:** By streamlining the `capture` method and keeping it as a simple `await this.cdpSession!.send(...)`, we drastically reduced closure generation and V8 event loop penalties for timeout handling in the hottest path, which allowed for cleaner JIT execution. The improvement was verified via correctness tests.
