@@ -463,3 +463,7 @@ $entry
 - **PERF-1085**: Combine await loop boundary checks in `CaptureLoop.ts`.
   - **WHY it didn't work**: The microbenchmarks showed slight improvement (~9%) when tested alone, however, the macro benchmark running the full project showed no measurable difference in the `dom` test (actually slightly slower). Because we cannot ensure a clear performance win in the main benchmark and want to avoid introducing bugs or changes for negligible differences, we're discarding this change.
   - **Plan ID**: PERF-1085
+
+- **PERF-1102**: Merged single-worker strategy loop blocks in `CaptureLoop.ts`.
+  - **Improvement:** Removed practically identical blocks nested under `isDomStrategy` wrapper inside the fast single worker loop to reduce parser complexity and AST logic. Code remains performant.
+  - **Plan ID**: PERF-1102
