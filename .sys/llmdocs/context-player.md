@@ -49,6 +49,7 @@
 - `playsinline`: Indicates that the video is to be played "inline".
 - `disableremoteplayback`: Disables remote playback.
 - `mediagroup`: Links multiple media elements together.
+- `autopictureinpicture`: Automatically enters Picture-in-Picture mode.
 
 # Public Methods (HTMLMediaElement Parity)
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
@@ -65,6 +66,9 @@
 - `cancelVideoFrameCallback(handle: number): void`
 
 # Public Properties (HTMLMediaElement Parity)
+- `onencrypted: (event: Event) => void | null`
+- `onwaitingforkey: (event: Event) => void | null`
+
 - `mediaKeys: MediaKeys | null`
 - `currentTime: number`
 - `duration: number`

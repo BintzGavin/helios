@@ -218,6 +218,7 @@ Both class-level and instance-level properties are provided for standard media s
 - `inputProps` (object): Get or set the input properties passed to the composition.
 - `playsInline` (boolean): Reflected playsinline attribute.
 - `disablePictureInPicture` (boolean): Hides the Picture-in-Picture button.
+- `autopictureinpicture` (boolean): Reflected autopictureinpicture attribute.
 - `autoPictureInPicture` (boolean): If true, automatically enters Picture-in-Picture when the user switches tabs or apps.
 - `error` (MediaError | null, read-only): The current media error, or `null` if no error occurred.
 - `currentSrc` (string, read-only): The absolute URL of the chosen media resource.

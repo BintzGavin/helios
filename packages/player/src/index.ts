@@ -992,6 +992,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
     this._onencrypted = handler;
     if (handler) this.addEventListener('encrypted', handler);
   }
+
   private _onwaitingforkey: ((event: Event) => void) | null = null;
   public get onwaitingforkey() { return this._onwaitingforkey; }
   public set onwaitingforkey(handler: ((event: Event) => void) | null) {
@@ -1903,7 +1904,7 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   }
 
   static get observedAttributes() {
-    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork", "export-mode", "canvas-selector", "playsinline", "crossorigin"];
+    return ["src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork", "export-mode", "canvas-selector", "playsinline", "crossorigin", "disableremoteplayback", "mediagroup", "autopictureinpicture"];
   }
 
   constructor() {
