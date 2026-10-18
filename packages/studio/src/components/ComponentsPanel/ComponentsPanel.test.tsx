@@ -220,4 +220,160 @@ describe('ComponentsPanel', () => {
     expect(screen.getByText('Install')).toBeDefined();
     expect(screen.queryByText('Installing...')).toBeNull();
   });
+
+  it('handles Install flow with no error message from API', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockResolvedValueOnce({ // Install POST error
+        ok: false,
+        json: async () => ({}) // No error property
+      });
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Timer'));
+
+    const installBtn = screen.getByText('Install');
+    fireEvent.click(installBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Installation failed', 'error');
+    });
+  });
+
+  it('handles Update flow with no error message from API', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockResolvedValueOnce({ // Update PUT error
+        ok: false,
+        json: async () => ({}) // No error property
+      });
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Watermark'));
+
+    const updateBtn = screen.getByText('Update');
+    fireEvent.click(updateBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Update failed', 'error');
+    });
+  });
+
+  it('handles Remove flow with no error message from API', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockResolvedValueOnce({ // Remove DELETE error
+        ok: false,
+        json: async () => ({}) // No error property
+      });
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Watermark'));
+
+    const removeBtn = screen.getByText('Remove');
+    fireEvent.click(removeBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Removal failed', 'error');
+    });
+  });
+
+  it('handles Remove flow cancellation', async () => {
+    (global.fetch as any).mockResolvedValueOnce({ // Initial fetch
+      ok: true,
+      json: async () => mockComponents
+    });
+
+    // User cancels the confirm dialog
+    global.confirm = vi.fn(() => false);
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Watermark'));
+
+    const removeBtn = screen.getByText('Remove');
+    fireEvent.click(removeBtn);
+
+    // Fetch should not be called for DELETE
+    expect(global.fetch).toHaveBeenCalledTimes(1); // Only the initial fetch
+    expect(mockAddToast).not.toHaveBeenCalledWith('Component "Watermark" removed', 'success');
+  });
+
+  it('handles fetch component non-ok response', async () => {
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({})
+    });
+
+    render(<ComponentsPanel />);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Failed to load components', 'error');
+    });
+  });
+
+  it('handles Install flow with non-error object catch', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockRejectedValueOnce('string error'); // Promise rejection with string
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Timer'));
+
+    const installBtn = screen.getByText('Install');
+    fireEvent.click(installBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Installation failed', 'error');
+    });
+  });
+
+  it('handles Update flow with non-error object catch', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockRejectedValueOnce('string error'); // Promise rejection with string
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Watermark'));
+
+    const updateBtn = screen.getByText('Update');
+    fireEvent.click(updateBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Update failed', 'error');
+    });
+  });
+
+  it('handles Remove flow with non-error object catch', async () => {
+     (global.fetch as any)
+      .mockResolvedValueOnce({ // Initial fetch
+        ok: true,
+        json: async () => mockComponents
+      })
+      .mockRejectedValueOnce('string error'); // Promise rejection with string
+
+    render(<ComponentsPanel />);
+    await waitFor(() => screen.getByText('Watermark'));
+
+    const removeBtn = screen.getByText('Remove');
+    fireEvent.click(removeBtn);
+
+    await waitFor(() => {
+        expect(mockAddToast).toHaveBeenCalledWith('Removal failed', 'error');
+    });
+  });
 });
