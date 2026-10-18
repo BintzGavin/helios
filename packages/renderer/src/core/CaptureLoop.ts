@@ -430,28 +430,28 @@ export class CaptureLoop {
         const { timeDriver, strategy, page } = worker;
         const isDomStrategy = !!(strategy as any).beginFrameParams;
 
-        if (isDomStrategy) {
-          const domBeginFrame = (frameTime: number) => strategy.capture(page, frameTime);
-          let domLastFrameBuffer: Buffer | null = null;
+        let domLastFrameBuffer: Buffer | null = null;
 
-          while (nextFrameToSubmit !== totalFrames && !aborted) {
-            let i: number;
-            if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
-              i = nextFrameToSubmit++;
-              frameBufferRing[i & ringMask] = null;
-            } else {
-              freeWorkers[freeWorkersHead++] = workerIndex;
-              i = (await workerThenables[workerIndex]) as any as number;
+        while (nextFrameToSubmit !== totalFrames && !aborted) {
+          let i: number;
+          if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
+            i = nextFrameToSubmit++;
+            frameBufferRing[i & ringMask] = null;
+          } else {
+            freeWorkers[freeWorkersHead++] = workerIndex;
+            i = (await workerThenables[workerIndex]) as any as number;
+          }
+
+          if (i === -1) break;
+
+          try {
+            const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+            if (timePromise) {
+              await timePromise;
             }
 
-            if (i === -1) break;
-
-            try {
-              const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) {
-                await timePromise;
-              }
-              const rawResult = await domBeginFrame!(i * timeStep);
+            if (isDomStrategy) {
+              const rawResult = await strategy.capture(page, i * timeStep);
               const data = (rawResult as any).screenshotData;
               let buf: Buffer;
               if (data) {
@@ -461,39 +461,15 @@ export class CaptureLoop {
                 buf = domLastFrameBuffer!;
               }
               frameBufferRing[i & ringMask] = buf;
-            } catch (e) {
-              fatalError = e;
-              aborted = true;
-              checkState();
-            }
-            writerWaiterPromise.resolve();
-          }
-        } else {
-          while (nextFrameToSubmit !== totalFrames && !aborted) {
-            let i: number;
-            if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
-              i = nextFrameToSubmit++;
-              frameBufferRing[i & ringMask] = null;
             } else {
-              freeWorkers[freeWorkersHead++] = workerIndex;
-              i = (await workerThenables[workerIndex]) as any as number;
-            }
-
-            if (i === -1) break;
-
-            try {
-              const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) {
-                await timePromise;
-              }
               frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
-            } catch (e) {
-              fatalError = e;
-              aborted = true;
-              checkState();
             }
-            writerWaiterPromise.resolve();
+          } catch (e) {
+            fatalError = e;
+            aborted = true;
+            checkState();
           }
+          writerWaiterPromise.resolve();
         }
       };
 
