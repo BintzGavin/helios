@@ -391,13 +391,11 @@ export class CaptureLoop {
                   let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
                   let h = freeWorkersHead;
                   let n = nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
-                      h--;
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[freeWorkers[h]].resolve(n);
-                      n++;
-                    }
+                  for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
+                    h--;
+                    frameBufferRing[n & ringMask] = null;
+                    workerThenables[freeWorkers[h]].resolve(n);
+                    n++;
                   }
 
           // If we still have waiting workers but are at totalFrames, tell them to stop
@@ -488,14 +486,12 @@ export class CaptureLoop {
               let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
                 let h = freeWorkersHead;
                 let n = nextFrameToSubmit;
-                if (dispatches > 0) {
-                  for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
+                for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                     h--;
                     frameBufferRing[n & ringMask] = null;
                     workerThenables[freeWorkers[h]].resolve(n);
                     n++;
                   }
-                }
                 if (n === totalFrames) {
                   while (h !== 0) {
                     h--;

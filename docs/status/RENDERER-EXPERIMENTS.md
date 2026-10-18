@@ -471,3 +471,7 @@ $entry
 - **PERF-1102**: Merged single-worker strategy loop blocks in `CaptureLoop.ts`.
   - **Improvement:** Removed practically identical blocks nested under `isDomStrategy` wrapper inside the fast single worker loop to reduce parser complexity and AST logic. Code remains performant.
   - **Plan ID**: PERF-1102
+## What Works
+- **PERF-1106**: Inlined the multi-worker `dispatches` check in `CaptureLoop.ts` to improve V8 AST parsing.
+  - **Improvement:** Reduced redundant branch parser instructions, simplifying the hot multi-worker loop. Showed a small wall-clock speedup on DOM rendering.
+  - **Plan ID:** PERF-1106
