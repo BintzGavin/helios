@@ -279,7 +279,7 @@
 [v0.78.1] ✅ Completed: Discovered missing HTMLMediaElement parity method (`setMediaKeys`). Created plan `.sys/plans/2027-03-02-PLAYER-Implement-setMediaKeys.md` to implement it.
 [v0.78.2] ✅ Completed: Implement setMediaKeys - Added mediaKeys property and setMediaKeys method to complete HTMLMediaElement parity.
 [v0.78.3] ✅ Completed: Discovered that `.sys/plans/2024-05-24-PLAYER-Instance-Constants.md` is an IMPOSSIBLE: DUPLICATION plan. The missing constants are already implemented. Created plan `.sys/plans/2027-03-03-PLAYER-Document-Instance-Constants.md` to document them.
-**Version**: 0.79.15
+**Version**: 0.79.19
 
 [v0.78.3] ✅ Completed: Document HTMLMediaElement Constants - Added documentation for HTMLMediaElement instance and class constants to the README.
 [v0.78.4] ✅ Completed: Document Playback Range Methods - Added `setPlaybackRange` and `clearPlaybackRange` to the README methods section.
@@ -319,3 +319,5 @@
 - 2026-10-15 - Implement mediaKeys for HTMLMediaElement parity - Planned (.sys/plans/2026-10-15-PLAYER-Implement-mediaKeys.md)
 
 [v0.79.18] ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
+
+[v0.79.19] ✅ Completed: Implement Missing Attributes - Added `disableremoteplayback`, `mediagroup`, and `autopictureinpicture` to `observedAttributes` for API parity.
