@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.791	150	7.98	63.9	keep	baseline
+2	8.675	150	17.29	64.0	keep	baseline 2
+3	8.735	150	17.17	64.0	keep	baseline 3
+4	8.690	150	17.26	63.9	keep	inline dispatches 1
+5	8.712	150	17.22	64.1	keep	inline dispatches 2
+6	8.680	150	17.28	64.0	keep	inline dispatches 3
