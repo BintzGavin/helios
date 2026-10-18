@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.905	150	16.84	63.9	keep	baseline
+2	6.590	150	22.76	63.9	keep	remove-promise-race
+3	8.668	150	17.31	63.9	keep	remove-promise-race
+4	8.677	150	17.29	64.0	keep	remove-promise-race
+5	8.665	150	17.31	64.6	keep	remove-promise-race

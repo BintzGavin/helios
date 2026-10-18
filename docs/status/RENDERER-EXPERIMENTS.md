@@ -8,6 +8,11 @@ Last updated by: PERF-1071
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 ## What Works
+
+- **PERF-1101**: Removed the per-frame `Promise.race` watchdog timer and dynamic closure creation in the `capture` method of `DomStrategy.ts`.
+  - **Improvement:** By streamlining the `capture` method and keeping it as a simple `await this.cdpSession!.send(...)`, we drastically reduced closure generation and V8 event loop penalties for timeout handling in the hottest path, which allowed for cleaner JIT execution. The improvement was verified via correctness tests.
+  - **Plan ID:** PERF-1101
+
 - **PERF-1096**: Replaced conditional logic for `chunkEnd` calculation with `Math.min`.
   - **Improvement:** Reduced ternary arithmetic parsing overhead. The AST executes slightly faster leveraging V8 optimizations for `Math.min`. Yielded a performance improvement by taking advantage of branchless CPU instructions over compound logic. Kept.
   - **Plan ID**: PERF-1096
