@@ -141,7 +141,7 @@ This backlog tracks concrete deliverables derived from [`AGENTS.md`](../AGENTS.m
 - [x] **SKILLS**: Plugin `mcp.json` starts `npx -y @helios-project/cli@<pinned> mcp`.
   - `plugins/helios/.mcp.json` and `mcp.json` pin `@helios-project/cli@0.46.0`, a published release that ships `helios mcp`.
 - [x] **CLI**: Claude Desktop extension (`integrations/claude-desktop`, `.mcpb`), tested in the Chat and Code tabs.
-- [ ] **CLI**: Publish a CLI release with `helios mcp`, then attach `helios.mcpb` to a GitHub release.
+- [x] **CLI**: Publish a CLI release with `helios mcp`, then attach `helios.mcpb` to a GitHub release.
 - [ ] **Gate**: In Claude Desktop and ChatGPT desktop, a brief becomes an inline preview, takes one revision by selection, and ends as an MP4 on disk without a terminal. Scripted in `tests/manual/`.
 
 ### Phase 3 — Hosted view for web and mobile

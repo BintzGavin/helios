@@ -1,3 +1,6 @@
+### CLI v0.47.2
+- 🟢 IMPOSSIBLE: CREDENTIALS - CLI Publish a CLI release - Publishing NPM packages and creating GitHub releases requires credentials and gh CLI which the agent does not possess.
+
 ## PLAYER v0.79.18
 - ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 - ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
