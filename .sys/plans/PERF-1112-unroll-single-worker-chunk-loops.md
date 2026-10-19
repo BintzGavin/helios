@@ -1,11 +1,11 @@
 ---
 id: PERF-1112
 slug: unroll-single-worker-chunk-loops
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "Jules"
 created: 2024-10-19
-completed: ""
-result: ""
+completed: "2024-10-19"
+result: "keep"
 ---
 
 # PERF-1112: Unroll `isDomStrategy` Checks in Single-Worker Chunk Loops

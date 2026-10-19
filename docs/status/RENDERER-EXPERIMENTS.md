@@ -3,12 +3,16 @@
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 8.693s (baseline was 19.398s, -55%)
-Last updated by: PERF-1109
+Current best: 8.681s (baseline was 19.398s, -55%)
+Last updated by: PERF-1112
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **PERF-1112**: Unrolled `isDomStrategy` loop-invariant checks inside the main single-worker chunk loops in `CaptureLoop.ts`.
+  - **Improvement:** Marginally reduced AST complexity and avoided per-chunk single-frame branch evaluation. Wall-clock render time effectively matched the previous baseline minimum (improving from 8.693s -> 8.681s) maintaining steady state performance and keeping correctness intact.
+  - **Plan ID**: PERF-1112
+
 - **Merged `runWorker` Chunk Loops (Multi-Worker)** (PERF-1103): ~55% faster. Merged the duplicated `isDomStrategy` multi-worker `runWorker` chunk loops in CaptureLoop.ts by hoisting the branch into the logic block itself.
 - **PERF-1104**: Unroll isDomStrategy checks in single-worker initial frame processing.
   - **Improvement:** Reduced AST complexity by evaluating isDomStrategy once instead of up to three times during single worker frame loop initialization, yielding minor speedups and lowering peak memory use marginally.

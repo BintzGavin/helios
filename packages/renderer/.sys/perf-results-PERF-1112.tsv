@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.691	150	17.26	63.9	keep	Unroll isDomStrategy single-worker loop
+2	8.681	150	17.28	63.9	keep	Unroll isDomStrategy single-worker loop
+3	8.700	150	17.24	63.9	keep	Unroll isDomStrategy single-worker loop
