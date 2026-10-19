@@ -736,4 +736,17 @@ describe('HeliosPlayer API Parity', () => {
     await player.setMediaKeys(null);
     expect(player.mediaKeys).toBeNull();
   });
+
+  it('should support autoPictureInPicture property', () => {
+    // Mock pipVideo
+    (player as any).pipVideo = { autoPictureInPicture: false, addEventListener: vi.fn(), removeEventListener: vi.fn() };
+
+    expect(player.autoPictureInPicture).toBe(false);
+
+    player.autoPictureInPicture = true;
+    expect(player.autoPictureInPicture).toBe(true);
+
+    player.autoPictureInPicture = false;
+    expect(player.autoPictureInPicture).toBe(false);
+  });
 });
