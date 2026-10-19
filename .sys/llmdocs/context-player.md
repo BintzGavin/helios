@@ -50,6 +50,7 @@
 - `disableremoteplayback`: Disables remote playback.
 - `mediagroup`: Links multiple media elements together.
 - `autopictureinpicture`: Automatically enters Picture-in-Picture mode.
+- `defaultmuted`: Indicates that the audio output should be muted by default.
 
 # Public Methods (HTMLMediaElement Parity)
 - `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`

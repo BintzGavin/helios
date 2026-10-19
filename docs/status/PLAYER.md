@@ -1,4 +1,4 @@
-**Version**: 0.79.18
+**Version**: 0.79.19
 
 [v0.79.17] ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
@@ -321,3 +321,5 @@
 [v0.79.18] ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 
 [v0.79.19] ✅ Completed: Implement Missing Attributes - Added `disableremoteplayback`, `mediagroup`, and `autopictureinpicture` to `observedAttributes` for API parity.
+
+[v0.79.19] ✅ Completed: Add Missing Attributes and autoPictureInPicture Tests - Added defaultmuted to observedAttributes and autoPictureInPicture tests in api_parity.test.ts for HTMLMediaElement parity.

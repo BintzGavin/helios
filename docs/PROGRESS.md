@@ -5,6 +5,8 @@
 - ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 - ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
 
+### PLAYER v0.79.19
+- ✅ Completed: Add Missing Attributes and autoPictureInPicture Tests - Added defaultmuted to observedAttributes and autoPictureInPicture tests in api_parity.test.ts for HTMLMediaElement parity.
 ### PLAYER v0.79.17
 - ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
 
