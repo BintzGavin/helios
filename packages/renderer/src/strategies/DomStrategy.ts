@@ -173,13 +173,11 @@ export class DomStrategy implements RenderStrategy {
     return this.lastFrameData as string | Buffer;
   }
 
-  async capture(page: Page, frameTime: number): Promise<any> {
-    const result = await this.cdpSession!.send('Page.captureScreenshot', this.cachedCaptureParams);
-
-    return {
+  capture(page: Page, frameTime: number): Promise<any> {
+    return this.cdpSession!.send('Page.captureScreenshot', this.cachedCaptureParams).then(r => ({
       hasDamage: true,
-      screenshotData: result.data,
-    };
+      screenshotData: r.data,
+    }));
   }
 
   async finish(page: Page): Promise<void> {

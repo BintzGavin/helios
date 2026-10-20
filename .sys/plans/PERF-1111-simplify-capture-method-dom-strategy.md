@@ -1,11 +1,11 @@
 ---
 id: PERF-1111
 slug: simplify-capture-method-dom-strategy
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-19
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1111: Simplify Capture Method in DomStrategy.ts
