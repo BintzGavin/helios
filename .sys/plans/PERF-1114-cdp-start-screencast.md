@@ -1,11 +1,11 @@
 ---
 id: PERF-1114
 slug: cdp-start-screencast
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-19
-completed: ""
-result: ""
+completed: "2024-10-19"
+result: "failed"
 ---
 
 # PERF-1114: CDP startScreencast IPC Optimization
@@ -53,3 +53,9 @@ Run `npm run test -w packages/renderer` to ensure canvas and dom modes output fr
 
 ## Prior Art
 "Would Page.startScreencast with JPEG compression beat raw CDP screenshots?" was mentioned in the `RENDERER-EXPERIMENTS.md` journal's open questions.
+
+## Results Summary
+- **Best render time**: 4.652s
+- **Improvement**: 46.41%
+- **Kept experiments**: []
+- **Discarded experiments**: [PERF-1114]
