@@ -325,38 +325,61 @@ export class CaptureLoop {
         }
 
         if (!aborted && totalFrames > 1) {
-          try {
-            const rawResult = await nextCapturePromise;
+          if (isDomStrategy) {
+            try {
+              const rawResult = await nextCapturePromise;
 
-            let buf;
-            if (isDomStrategy) {
+              let buf;
               const data = (rawResult as any).screenshotData;
               if (data) {
                 domLastFrameBuffer = Buffer.from(data as string, "base64");
               }
               buf = domLastFrameBuffer!;
-            } else {
-              buf = rawResult;
-            }
 
-            pendingBytes += buf.length;
-            if (!stream.write(buf) && pendingBytes >= 16777216) {
-              await this.drainPromise;
-              pendingBytes = 0;
-            }
-
-            i++;
-            if (i === nextProgress || i === totalFrames) {
-              if (i === nextProgress) nextProgress += progressInterval;
-              console.log(
-                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-              );
-              if (onProgress) {
-                onProgress((i - 1) / totalFrames);
+              pendingBytes += buf.length;
+              if (!stream.write(buf) && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
               }
+
+              i++;
+              if (i === nextProgress || i === totalFrames) {
+                if (i === nextProgress) nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                );
+                if (onProgress) {
+                  onProgress((i - 1) / totalFrames);
+                }
+              }
+            } catch (e) {
+              if (!aborted) throw e;
             }
-          } catch (e) {
-            if (!aborted) throw e;
+          } else {
+            try {
+              const rawResult = await nextCapturePromise;
+
+              let buf = rawResult;
+
+              pendingBytes += buf.length;
+              if (!stream.write(buf) && pendingBytes >= 16777216) {
+                await this.drainPromise;
+                pendingBytes = 0;
+              }
+
+              i++;
+              if (i === nextProgress || i === totalFrames) {
+                if (i === nextProgress) nextProgress += progressInterval;
+                console.log(
+                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+                );
+                if (onProgress) {
+                  onProgress((i - 1) / totalFrames);
+                }
+              }
+            } catch (e) {
+              if (!aborted) throw e;
+            }
           }
         }
 
