@@ -494,3 +494,6 @@ $entry
 - **PERF-1106**: Inlined the multi-worker `dispatches` check in `CaptureLoop.ts` to improve V8 AST parsing.
   - **Improvement:** Reduced redundant branch parser instructions, simplifying the hot multi-worker loop. Showed a small wall-clock speedup on DOM rendering.
   - **Plan ID:** PERF-1106
+- **PERF-1073**: Unrolled worker dispatch loops into a `do-while` loop in `CaptureLoop.ts`.
+  - **Improvement:** Removed V8 TurboFan branch evaluation logic from inner execution paths during worker assignment. Marginal improvements on macro-benchmarks.
+  - **Plan ID:** PERF-1073

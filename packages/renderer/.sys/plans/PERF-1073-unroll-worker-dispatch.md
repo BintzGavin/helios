@@ -1,11 +1,11 @@
 ---
 id: PERF-1073
 slug: unroll-worker-dispatch
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: jules
 created: 2024-10-14
 completed: ""
-result: ""
+result: "Decreased benchmark runtimes marginally due to V8 TurboFan branch elimination"
 ---
 # PERF-1073: Unroll worker dispatch loops into a `do-while` and avoid explicit array reassignment with `w` in `CaptureLoop.ts`
 
