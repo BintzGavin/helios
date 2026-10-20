@@ -445,7 +445,6 @@ export class CaptureLoop {
                   let n = nextFrameToSubmit;
                   for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                     h--;
-                    frameBufferRing[n & ringMask] = null;
                     workerThenables[freeWorkers[h]].resolve(n);
                     n++;
                   }
@@ -486,7 +485,6 @@ export class CaptureLoop {
           let i: number;
           if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
             i = nextFrameToSubmit++;
-            frameBufferRing[i & ringMask] = null;
           } else {
             freeWorkers[freeWorkersHead++] = workerIndex;
             i = (await workerThenables[workerIndex]) as any as number;
@@ -540,7 +538,6 @@ export class CaptureLoop {
                 let n = nextFrameToSubmit;
                 for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                     h--;
-                    frameBufferRing[n & ringMask] = null;
                     workerThenables[freeWorkers[h]].resolve(n);
                     n++;
                   }
@@ -562,6 +559,7 @@ export class CaptureLoop {
               }
 
               const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
+              frameBufferRing[ringIndex] = null;
               pendingBytes += buffer.length;
               if (!stream.write(buffer) && pendingBytes >= 16777216) {
                 await this.drainPromise;
