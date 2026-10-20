@@ -2,6 +2,7 @@
 - 🟢 IMPOSSIBLE: CREDENTIALS - CLI Publish a CLI release - Publishing NPM packages and creating GitHub releases requires credentials and gh CLI which the agent does not possess.
 
 ## PLAYER v0.79.18
+
 - ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 - ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
 
@@ -932,3 +933,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.19
 - ✅ Completed: Implement Missing Attributes - Added `disableremoteplayback`, `mediagroup`, and `autopictureinpicture` to `observedAttributes` array in `HeliosPlayer` for HTMLMediaElement API parity.
+
+### PLAYER v0.79.20
+- ✅ Completed: Added specific test blocks for the `onencrypted` event in `packages/player/src/event_handlers.test.ts` to improve test coverage and ensure API parity for HTMLMediaElement standard compliance.

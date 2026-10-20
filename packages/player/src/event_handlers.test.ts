@@ -47,6 +47,32 @@ describe('HeliosPlayer Event Handlers', () => {
     expect(handler).not.toHaveBeenCalled();
   });
 
+
+  it('should call onencrypted handler when encrypted event is dispatched', () => {
+    const handler = vi.fn();
+    player.onencrypted = handler;
+    player.dispatchEvent(new Event('encrypted'));
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  it('should remove old onencrypted handler when replaced', () => {
+    const handler1 = vi.fn();
+    const handler2 = vi.fn();
+    player.onencrypted = handler1;
+    player.onencrypted = handler2;
+    player.dispatchEvent(new Event('encrypted'));
+    expect(handler1).not.toHaveBeenCalled();
+    expect(handler2).toHaveBeenCalledTimes(1);
+  });
+
+  it('should remove onencrypted handler when set to null', () => {
+    const handler = vi.fn();
+    player.onencrypted = handler;
+    player.onencrypted = null;
+    player.dispatchEvent(new Event('encrypted'));
+    expect(handler).not.toHaveBeenCalled();
+  });
+
   it('should support all standard event handlers', () => {
     const events = [
       'abort', 'emptied', 'progress', 'encrypted', 'waitingforkey',
