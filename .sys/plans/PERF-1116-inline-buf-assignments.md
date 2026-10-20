@@ -1,11 +1,11 @@
 ---
 id: PERF-1116
 slug: inline-buf-assignments
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: perf/1116-inline-buf-assignments
 created: 2024-10-20
 completed: ""
-result: ""
+result: no-improvement
 ---
 
 # PERF-1116: Inline Buf Variables in Single-Worker Loop

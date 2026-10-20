@@ -198,10 +198,9 @@ export class CaptureLoop {
             if (data || !domLastFrameBuffer) {
               domLastFrameBuffer = Buffer.from((data || (strategy as any).lastFrameData) as string, "base64");
             }
-            let buf = domLastFrameBuffer!;
 
-            pendingBytes += buf.length;
-            if (!stream.write(buf) && pendingBytes >= 16777216) {
+            pendingBytes += domLastFrameBuffer!.length;
+            if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -231,10 +230,8 @@ export class CaptureLoop {
               onProgress(0 / totalFrames);
             }
 
-            let buf = rawResult;
-
-            pendingBytes += buf.length;
-            if (!stream.write(buf) && pendingBytes >= 16777216) {
+            pendingBytes += rawResult.length;
+            if (!stream.write(rawResult) && pendingBytes >= 16777216) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -329,15 +326,13 @@ export class CaptureLoop {
             try {
               const rawResult = await nextCapturePromise;
 
-              let buf;
               const data = (rawResult as any).screenshotData;
               if (data) {
                 domLastFrameBuffer = Buffer.from(data as string, "base64");
               }
-              buf = domLastFrameBuffer!;
 
-              pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= 16777216) {
+              pendingBytes += domLastFrameBuffer!.length;
+              if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -359,10 +354,8 @@ export class CaptureLoop {
             try {
               const rawResult = await nextCapturePromise;
 
-              let buf = rawResult;
-
-              pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= 16777216) {
+              pendingBytes += rawResult.length;
+              if (!stream.write(rawResult) && pendingBytes >= 16777216) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
