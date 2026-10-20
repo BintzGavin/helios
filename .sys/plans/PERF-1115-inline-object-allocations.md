@@ -1,11 +1,11 @@
 ---
 id: PERF-1115
 slug: inline-object-allocations
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "PERF-1115-inline-object-allocations"
 created: 2024-10-20
-completed: ""
-result: ""
+completed: "2024-10-20"
+result: "improved"
 ---
 
 # PERF-1115: Inline Object Allocations in `capture` Return
