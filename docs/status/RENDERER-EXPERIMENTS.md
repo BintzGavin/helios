@@ -3,7 +3,7 @@
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 8.681s (baseline was 19.398s, -55%)
+Current best: 4.652s (baseline was 19.398s, -55%)
 Last updated by: PERF-1112
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
@@ -260,6 +260,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1114**: Replaced `captureScreenshot` with `startScreencast`.
+  - **WHY it didn't work**: While much faster on paper, it breaks the core renderer contract of frame-accurate deterministic rendering. Screencasts only emit frames when the compositor registers damage, meaning static scenes or paused animations will hang the `capture()` queue indefinitely. Furthermore, the push-based nature breaks timeline synchronization. Reverted to request-response model.
+  - **Plan ID**: PERF-1114
 - Inlined the `report` object return in `DomStrategy.diagnose` (`packages/renderer/src/strategies/DomStrategy.ts`). Macro-level execution yielded no significant render time improvements because diagnostics execution is not a bottleneck. (PERF-1089)
 
 - **PERF-1094**: Inline Limit Variable in Dispatch Math in `CaptureLoop.ts`.

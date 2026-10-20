@@ -307,3 +307,5 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 2	8.943	150	16.77	64.4	keep	PERF-1094 inline multi-worker dispatch limits into ternary
 3	8.788	150	17.07	64.3	keep	PERF-1094 inline multi-worker dispatch limits into ternary
 4	8.780	150	17.08	64.4	keep	PERF-1096-math-min-chunk-end
+1	4.652	150	32.25	70.2	keep	cdp start screencast
+1	0.000	0	0.00	0.0	crash	cdp start screencast breaks deterministic frame syncing
