@@ -4,11 +4,14 @@
 - **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 4.652s (baseline was 19.398s, -55%)
-Last updated by: PERF-1112
+Last updated by: PERF-1110
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **PERF-1110**: Shifted buffer nulling to single-threaded writer loop in `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST complexity and avoided overlapping array manipulations in the dispatcher logic without negatively impacting baseline.
+  - **Plan ID**: PERF-1110
 - **PERF-1112**: Unrolled `isDomStrategy` loop-invariant checks inside the main single-worker chunk loops in `CaptureLoop.ts`.
   - **Improvement:** Marginally reduced AST complexity and avoided per-chunk single-frame branch evaluation. Wall-clock render time effectively matched the previous baseline minimum (improving from 8.693s -> 8.681s) maintaining steady state performance and keeping correctness intact.
   - **Plan ID**: PERF-1112
