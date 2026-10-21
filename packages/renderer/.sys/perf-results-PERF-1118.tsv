@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.717	150	17.21	64.4	keep	baseline
+2	8.682	150	17.28	64.5	keep	simplify capture() return type
+3	8.709	150	17.22	64.4	keep	benchmark re-verification

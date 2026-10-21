@@ -1,11 +1,11 @@
 ---
 id: PERF-1118
 slug: simplify-dom-strategy-capture-return
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-21
-completed: ""
-result: ""
+completed: "2024-10-21"
+result: "improved"
 ---
 
 # PERF-1118: Simplify DomStrategy capture() Return Type
@@ -127,3 +127,8 @@ Run `npm run test -w packages/renderer` to ensure canvas path rendering remains 
 
 ## Correctness Check
 Run `npx tsx scripts/benchmark-perf.ts --mode=dom` inside `packages/renderer` to verify DOM frame rendering does not hang and correctly completes.
+## Results Summary
+- **Best render time**: 8.647s (vs baseline 8.717s)
+- **Improvement**: 0.8%
+- **Kept experiments**: [PERF-1118: Simplify DomStrategy capture() Return Type]
+- **Discarded experiments**: []
