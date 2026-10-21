@@ -194,10 +194,7 @@ export class CaptureLoop {
               onProgress(0 / totalFrames);
             }
 
-            const data = (rawResult as any).screenshotData;
-            if (data || !domLastFrameBuffer) {
-              domLastFrameBuffer = Buffer.from((data || (strategy as any).lastFrameData) as string, "base64");
-            }
+            domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
 
             pendingBytes += domLastFrameBuffer!.length;
             if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
@@ -256,10 +253,7 @@ export class CaptureLoop {
                 nextCapturePromise = domBeginFrame!((i + 1) * timeStep);
               }
 
-              const data = (rawResult as any).screenshotData;
-              if (data) {
-                domLastFrameBuffer = Buffer.from(data as string, "base64");
-              }
+              domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
               const buf = domLastFrameBuffer!;
 
               pendingBytes += buf.length;
@@ -326,10 +320,7 @@ export class CaptureLoop {
             try {
               const rawResult = await nextCapturePromise;
 
-              const data = (rawResult as any).screenshotData;
-              if (data) {
-                domLastFrameBuffer = Buffer.from(data as string, "base64");
-              }
+              domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
 
               pendingBytes += domLastFrameBuffer!.length;
               if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
@@ -493,14 +484,8 @@ export class CaptureLoop {
 
             if (isDomStrategy) {
               const rawResult = await strategy.capture(page, i * timeStep);
-              const data = (rawResult as any).screenshotData;
-              let buf: Buffer;
-              if (data) {
-                buf = Buffer.from(data as string, "base64");
-                domLastFrameBuffer = buf;
-              } else {
-                buf = domLastFrameBuffer!;
-              }
+              let buf: Buffer = Buffer.from(rawResult as string, "base64");
+              domLastFrameBuffer = buf;
               frameBufferRing[i & ringMask] = buf;
             } else {
               frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
