@@ -9,16 +9,20 @@ import { NativeBackend } from './backend.js';
 import { FileStore } from './storage.js';
 import { RenderService } from './jobs.js';
 import { createRenderServer, runWorker, HandlerOptions } from './server.js';
+import { inspectPlan } from './inspect.js';
 
 const help = `helios-portable (experimental)
   render PLAN.json --assets DIRECTORY --output VIDEO.mp4
   frame PLAN.json --assets DIRECTORY --frame 0 --output IMAGE.png
-  inspect PLAN.json --assets DIRECTORY
+  inspect PLAN.json --assets DIRECTORY [--every 0.25] [--strict]
   serve --data DIRECTORY --host 127.0.0.1 --port 8787
 
 Assets are files named by their SHA-256 digest in DIRECTORY.
 Render flags: --rasterizer native|wasm|skia|gpu --ffmpeg PATH --ffprobe PATH
 Serve flags: --auth-module PATH | --trusted-network; --chunk-frames 60
+Inspect lays out a frame every --every seconds plus each node's first and last frame,
+without rasterizing, and lists text outside the canvas, wrapped text taller than its box
+and empty frames. --strict exits with code 2 when it finds a warning.
 A public listener requires an authorization module or an explicitly trusted network.
 The Wasm option replaces rasterization only; codecs still run as native processes.`;
 
@@ -27,12 +31,12 @@ export async function runCli(argv: string[]): Promise<void> {
   if (!command || command === '--help' || command === 'help') { console.log(help); return; }
   if (!['render', 'frame', 'inspect', 'serve'].includes(command)) throw new RenderError('INVALID_ARGUMENT', 'Unknown command; use --help');
   const flags = new Map<string, string>(), positional: string[] = [];
-  const allowed = command === 'serve' ? ['data', 'host', 'port', 'auth-module', 'trusted-network', 'chunk-frames', 'ffmpeg', 'ffprobe', 'rasterizer'] : ['assets', 'output', 'frame', 'ffmpeg', 'ffprobe', 'rasterizer'];
+  const allowed = command === 'serve' ? ['data', 'host', 'port', 'auth-module', 'trusted-network', 'chunk-frames', 'ffmpeg', 'ffprobe', 'rasterizer'] : command === 'inspect' ? ['assets', 'ffmpeg', 'ffprobe', 'rasterizer', 'every', 'strict'] : ['assets', 'output', 'frame', 'ffmpeg', 'ffprobe', 'rasterizer'];
   for (let i = 0; i < args.length; i++) {
     if (!args[i].startsWith('--')) { positional.push(args[i]); continue; }
     const name = args[i].slice(2);
     if (!allowed.includes(name) || flags.has(name)) throw new RenderError('INVALID_ARGUMENT', 'Unknown or repeated option');
-    if (name === 'trusted-network') { flags.set(name, 'true'); continue; }
+    if (name === 'trusted-network' || name === 'strict') { flags.set(name, 'true'); continue; }
     if (!args[i + 1] || args[i + 1].startsWith('--')) throw new RenderError('INVALID_ARGUMENT', `Missing value for ${name}`);
     flags.set(name, args[++i]);
   }
@@ -66,7 +70,14 @@ export async function runCli(argv: string[]): Promise<void> {
   const plan = parsePlan(JSON.parse(await readFile(resolve(positional[0]), 'utf8')));
   const assets = new Map(Object.entries(plan.assets).map(([id, asset]) => [id, join(resolve(flags.get('assets') ?? dirname(positional[0])), asset.sha256)]));
   const prepared = await prepareScene(plan, assets, options, true);
-  if (command === 'inspect') { console.log(JSON.stringify({ profile: plan.version, qualification: 'experimental', frames: plan.frameCount, assets: assets.size, rasterizer })); return; }
+  if (command === 'inspect') {
+    const every = Number(flags.get('every') ?? 0.25);
+    if (!Number.isFinite(every) || every <= 0) throw new RenderError('INVALID_ARGUMENT', 'Every must be a positive number of seconds');
+    const report = inspectPlan(plan, prepared, { every });
+    console.log(JSON.stringify({ profile: plan.version, qualification: 'experimental', frames: plan.frameCount, assets: assets.size, rasterizer, ...report }));
+    if (flags.has('strict') && report.findings.some(f => f.severity === 'warning')) process.exitCode = 2;
+    return;
+  }
   if (!flags.has('output')) throw new RenderError('INVALID_ARGUMENT', 'Supply --output');
   const output = resolve(flags.get('output')!); await mkdir(dirname(output), { recursive: true });
   if (command === 'frame') await writeFile(output, (await renderFrame(plan, Number(flags.get('frame') ?? 0), assets, { ...options, prepared })).png);

@@ -2,6 +2,8 @@ export { parsePlan, evaluate, frameTime, sampleCount, PROFILE, LIMITS, RenderErr
 export type { Plan, Node, Asset, AudioTrack, Scalar, Length, Paint, Fps } from './plan.js';
 export { prepareScene, renderFrame, renderVideo, probeVideo } from './render.js';
 export type { RenderOptions, PreparedScene, AssetFiles, Rasterizer } from './render.js';
+export { inspectPlan, sampleFrames } from './inspect.js';
+export type { InspectReport, Finding, FindingCode } from './inspect.js';
 export { RenderService } from './jobs.js';
 export type { JobView, JobState, ServiceOptions } from './jobs.js';
 export { NativeBackend } from './backend.js';

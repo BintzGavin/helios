@@ -58,6 +58,23 @@ node packages/portable/dist/cli.js render /tmp/plan.json --rasterizer skia --out
 
 For assets, declare `{ "sha256": "…", "bytes": 1234, "type": "font" }` under an asset ID in `plan.assets`. Put each file at `ASSET_DIRECTORY/SHA256` and pass `--assets ASSET_DIRECTORY`. The renderer verifies bytes against the declared identity. It uses no system fonts and fetches no asset URLs.
 
+### Check a plan before rendering
+
+```sh
+node packages/portable/dist/cli.js inspect /tmp/plan.json --assets ASSET_DIRECTORY --strict
+```
+
+`inspect` lays out a frame every 0.25 seconds (`--every`), the last frame, and the first and last frame of each node plus the frame after it ends. It does not rasterize. Missing fonts and glyphs, a grapheme wider than its box and failed asset checks still stop preparation, as they stop a render. The JSON report adds `findings` for problems that render without an error:
+
+| Code | Severity | Meaning |
+|---|---|---|
+| `TEXT_CLIPPED` | warning | Text ink crosses the canvas edge. `bounds` gives its canvas pixels at the first such frame. |
+| `TEXT_OFF_CANVAS` | warning | Visible text is drawn entirely outside the canvas. |
+| `TEXT_BOX_OVERFLOW` | warning | Wrapped text runs below the node's declared `height`. Text is not clipped to its box, so it overlaps what is below. |
+| `EMPTY_FRAME` | info | Only the background is visible. |
+
+The same code on the same node across sampled frames is one finding, with its first and last sampled frame and seconds. Text under a `clip`, at opacity 0 or at zero scale is skipped. Text that slides in from off the canvas is reported for the frames it is cut; read the frame range before changing it. `--strict` exits with code 2 when there is a warning. The ink box comes from glyph outlines; under rotation it is the box around the rotated outline box, so it can extend a few pixels beyond the drawn glyphs.
+
 ## Render a trusted Canvas composition on CPU
 
 The experimental Canvas API runs installed drawing code on native CPU Skia and software x264. It supports direct frame seeking and exact half-open ranges. It does not execute callbacks supplied through the JSON HTTP API. Canvas fonts are explicit byte buffers; use the family aliases passed into `draw` to avoid relying on machine fonts. A frame must depend on its index and declared assets, and drawing code must balance its `save`/`restore` calls.
