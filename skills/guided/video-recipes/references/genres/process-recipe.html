@@ -1,0 +1,216 @@
+<!doctype html>
+<!--
+  Process / recipe demo — classic lemonade, 1 : 1 : 4 (lemon juice : simple syrup : water) over ice.
+  Render: npx -y @helios-project/cli@latest render process-recipe.html -o process-recipe.mp4 --duration 18.5 --mode canvas
+  Core idea: one cumulative-volume function V(t) drives the liquid level (through the glass profile minus the ice),
+  the jug's remaining level, the stream width (its derivative) and every number on screen.
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@500;700&family=IBM+Plex+Mono:wght@500;600&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#f6efe2}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, s, d) => clamp((t - s) / d);
+const ease = u => 1 - Math.pow(1 - clamp(u), 3), easeIn = u => Math.pow(clamp(u), 3);
+const inOut = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const inOutD = u => u <= 0 || u >= 1 ? 0 : u < .5 ? 12 * u * u : 3 * Math.pow(-2 * u + 2, 2);   // derivative of inOut
+const lerp = (a, b, u) => a + (b - a) * u;
+const SERIF = 'Fraunces, Georgia, serif', SANS = 'Inter, "Helvetica Neue", Arial, sans-serif', MONO = '"IBM Plex Mono", Menlo, monospace';
+const INK = '#1f2a2e', CREAM = '#f6efe2', LEMON = '#f2c53d', TEAL = '#2b6f6b';
+
+// ---- Facts: the recipe (classic 1 : 1 : 4 lemonade). Everything on screen reads from here. ------------------------
+const STEPS = [
+  { name: 'Ice', cubes: 5 },
+  { name: 'Lemon juice', ml: 45, rgb: [246, 208, 72] },
+  { name: 'Simple syrup', ml: 45, rgb: [252, 240, 208] },
+  { name: 'Cold water', ml: 180, rgb: [214, 236, 244] },
+];
+const S0 = 1.0, STEP = 3.7, POUR = 1.25, PDUR = 1.7, ENDT = S0 + STEPS.length * STEP;   // end card at 15.8 s
+const st = s => S0 + s * STEP;
+const vol = (s, t) => STEPS[s].ml ? STEPS[s].ml * inOut(span(t, st(s) + POUR, PDUR)) : 0;
+const rate = (s, t) => STEPS[s].ml ? STEPS[s].ml * inOutD((t - st(s) - POUR) / PDUR) / PDUR : 0;  // ml/s
+const V = t => STEPS.reduce((a, _, s) => a + vol(s, t), 0);                                        // THE function
+
+// ---- Glass: inner profile in px, 1 px = 0.024 cm; ice cubes are 2.4 cm (100 px) and rest at fixed spots. -------------
+const GX = 620, GB = 880, GT = 360, R0 = 120, R1 = 150, CM = 0.024, CUBE = 100;
+const rAt = y => R0 + (R1 - R0) * (GB - y) / (GB - GT);
+const ICE = [[566, 828, -0.08], [676, 827, 0.1], [592, 728, 0.16], [682, 727, -0.12], [626, 630, 0.3]];
+const iceT = i => S0 + 0.55 + i * 0.3;                         // drop time of cube i
+let avail;                                                      // avail[h] = free ml below height h px
+const ready = (async () => {
+  avail = new Float64Array(GB - GT + 1);
+  for (let h = 1; h <= GB - GT; h++) {
+    const y = GB - h + 0.5, area = Math.PI * Math.pow(rAt(y) * CM, 2);
+    const ice = ICE.filter(([, cy]) => Math.abs(y - cy) < CUBE / 2).length * Math.pow(CUBE * CM, 2);
+    avail[h] = avail[h - 1] + (area - ice) * CM;               // cm³ = ml
+  }
+  const sample = 'Lemonade. Stir once. Taste before more sugar. CLASSIC LEMONADE · 1 : 1 : 4 STEP / 0123456789 ml oz cubes of IN THE GLASS Ice Lemon juice Simple syrup Cold water';
+  await Promise.all([`800 80px ${SERIF}`, `600 80px ${SERIF}`, `700 30px ${SANS}`, `500 30px ${SANS}`, `600 30px ${MONO}`, `500 30px ${MONO}`].map(f => document.fonts.load(f, sample)));
+})();
+function levelY(v) {                                            // invert avail[] (binary search + lerp)
+  if (v <= 0) return GB;
+  let lo = 0, hi = avail.length - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (avail[m] < v) lo = m; else hi = m; }
+  return GB - (lo + (v - avail[lo]) / (avail[hi] - avail[lo] || 1));
+}
+function mixColor(t) {                                          // colour = volume-weighted mix of what's been poured
+  let r = 0, g = 0, b = 0, tot = 0;
+  STEPS.forEach((s, i) => { const v = vol(i, t); if (v > 0) { r += s.rgb[0] * v; g += s.rgb[1] * v; b += s.rgb[2] * v; tot += v; } });
+  return tot ? [r / tot, g / tot, b / tot] : [255, 255, 255];
+}
+const rgba = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+
+function cube(x, y, rot, a = 1) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.globalAlpha = a;
+  ctx.fillStyle = 'rgba(236,246,250,0.78)'; ctx.strokeStyle = 'rgba(120,160,175,0.7)'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(-46, -46, 92, 92, 16); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.roundRect(-34, -34, 30, 12, 6); ctx.fill();
+  ctx.restore();
+}
+function cubePos(i, t) {                                        // closed-form fall + damped bounce
+  const [x, y, r] = ICE[i], g = 7000, y0 = -140, tf = Math.sqrt(2 * (y - y0) / g), tau = t - iceT(i);
+  if (tau < 0) return null;
+  if (tau < tf) return [x, y0 + 0.5 * g * tau * tau, r + 0.9 * (1 - tau / tf)];
+  const b = tau - tf; return [x, y - 22 * Math.exp(-7 * b) * Math.abs(Math.sin(13 * b)), r];
+}
+function glassPath(y0, y1) {                                    // interior trapezoid between two heights
+  ctx.beginPath(); ctx.moveTo(GX - rAt(y0), y0); ctx.lineTo(GX - rAt(y1), y1);
+  ctx.ellipse(GX, y1, rAt(y1), rAt(y1) * 0.13, 0, Math.PI, 0, true); ctx.lineTo(GX + rAt(y0), y0);
+  ctx.ellipse(GX, y0, rAt(y0), rAt(y0) * 0.13, 0, 0, Math.PI, false); ctx.closePath();
+}
+
+function jug(s, t) {                                            // pitcher: slides in, tilts about its spout, pours, leaves
+  const S = STEPS[s]; if (!S.ml) return null;
+  const a0 = st(s), slide = 1 - ease(span(t, a0 + 0.2, 0.7)) + easeIn(span(t, a0 + 3.05, 0.55));
+  if (slide >= 1) return null;
+  const px = 722, py = 250 - 560 * slide;
+  const tilt = inOut(span(t, a0 + 0.9, 0.45)) * (1 - inOut(span(t, a0 + 2.9, 0.4))), ang = -1.2 * tilt;
+  const rem = 1 - vol(s, t) / S.ml, c = Math.cos(ang), sn = Math.sin(ang), tw = (x, y) => [px + x * c - y * sn, py + x * sn + y * c];
+  const corners = [[6, 12], [124, 12], [124, 196], [6, 196]].map(p => tw(...p));
+  const yBot = Math.max(...corners.map(p => p[1])), yFull = lerp(py + 40, py + 2, tilt), yl = lerp(yBot, yFull, rem);
+  ctx.save(); ctx.translate(px, py); ctx.rotate(ang);
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(6, 12); ctx.lineTo(6, 196); ctx.quadraticCurveTo(6, 206, 18, 206); ctx.lineTo(112, 206);
+  ctx.quadraticCurveTo(124, 206, 124, 196); ctx.lineTo(124, 12); ctx.closePath();
+  ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.fill(); ctx.save(); ctx.clip();
+  ctx.rotate(-ang); ctx.translate(-px, -py); ctx.fillStyle = rgba(S.rgb, 0.92); ctx.fillRect(px - 400, yl, 800, 600); ctx.restore();
+  ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.lineJoin = 'round'; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(124, 40); ctx.bezierCurveTo(170, 40, 175, 150, 124, 160); ctx.lineWidth = 9; ctx.stroke();   // handle
+  ctx.restore();
+  return { x: px - 4, y: py + 6, rgb: S.rgb };
+}
+
+function straw(t) {
+  const gq = ease(span(t, ENDT + 0.2, 0.7)); if (gq <= 0) return;
+  ctx.save(); ctx.translate(GX + 70, GT + 120 - 260 * (1 - gq)); ctx.rotate(0.28); ctx.fillStyle = TEAL; ctx.fillRect(-9, -330, 18, 700);
+  ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(-9, -330, 6, 700); ctx.restore();
+}
+function scene(t) {
+  const v = V(t), ly = levelY(v), col = mixColor(t);
+  ctx.fillStyle = 'rgba(31,42,46,0.10)'; ctx.beginPath(); ctx.ellipse(GX + 14, 918, 210, 26, 0, 0, 7); ctx.fill();   // shadow
+  ctx.save(); glassPath(GB, GT); ctx.clip();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(0, 0, W, H);
+  ICE.forEach((_, i) => { const p = cubePos(i, t); if (p) cube(...p); });
+  straw(t);                                                     // under the liquid: tinted where submerged
+  if (v > 0.2) {
+    glassPath(GB, ly); ctx.fillStyle = rgba(col, 0.78); ctx.fill();
+    ctx.fillStyle = rgba(col.map(c => c + 18), 0.95); ctx.beginPath(); ctx.ellipse(GX, ly, rAt(ly), rAt(ly) * 0.13, 0, 0, 7); ctx.fill();
+  }
+  ctx.restore();
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, ly - rAt(ly) * 0.13); ctx.clip(); straw(t); ctx.restore();   // above the surface: clean
+  let pour = null;
+  for (let s = 1; s < STEPS.length; s++) { const j = jug(s, t); if (j) pour = { ...j, s }; }
+  if (pour) {                                                   // stream: head falls in, tail falls away, width = rate
+    const s = pour.s, g = 9000, t0 = st(s) + POUR, t1 = t0 + PDUR, r = rate(s, t);
+    const head = pour.y + 0.5 * g * Math.pow(Math.max(0, t - t0), 2), tail = pour.y + 0.5 * g * Math.pow(Math.max(0, t - t1 + 0.05), 2);
+    const bottom = Math.min(head, ly - 4), w = 3 + 0.11 * r;
+    if (t > t0 && tail < bottom) {
+      ctx.fillStyle = rgba(pour.rgb, 0.95); ctx.beginPath();
+      for (let y = tail; y <= bottom; y += 8) ctx.lineTo(pour.x - w / 2 + 1.5 * Math.sin(y * 0.05 - t * 30), y);
+      for (let y = bottom; y >= tail; y -= 8) ctx.lineTo(pour.x + w / 2 + 1.5 * Math.sin(y * 0.05 - t * 30), y);
+      ctx.fill();
+      if (head >= ly - 4) for (let k = 0; k < 3; k++) {         // ripples at impact
+        const p = (t * 1.8 + k / 3) % 1; ctx.strokeStyle = `rgba(255,255,255,${0.8 * (1 - p) * clamp(r / 30)})`; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.ellipse(pour.x, ly, 10 + 60 * p, (10 + 60 * p) * 0.13, 0, 0, 7); ctx.stroke();
+      }
+    }
+  }
+  ctx.strokeStyle = INK; ctx.lineWidth = 6; ctx.lineCap = 'round';      // glass front
+  ctx.beginPath(); ctx.moveTo(GX - R1 - 8, GT); ctx.lineTo(GX - R0 - 8, GB); ctx.moveTo(GX + R1 + 8, GT); ctx.lineTo(GX + R0 + 8, GB); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(GX, GT, R1 + 8, (R1 + 8) * 0.13, 0, 0, 7); ctx.lineWidth = 5; ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.moveTo(GX - R0 - 8, GB); ctx.ellipse(GX, GB, R0 + 8, 16, 0, Math.PI, 0, true);
+  ctx.lineTo(GX + R0 + 8, GB + 30); ctx.ellipse(GX, GB + 30, R0 + 8, 16, 0, 0, Math.PI); ctx.closePath(); ctx.fill(); ctx.lineWidth = 5; ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(GX - R1 + 22, GT + 40); ctx.lineTo(GX - R0 + 16, GB - 60); ctx.stroke();
+  const gq = ease(span(t, ENDT + 0.2, 0.7));                   // garnish: straw + lemon wheel on the rim
+  if (gq > 0) {
+    const wq = ease(span(t, ENDT + 0.5, 0.7)); ctx.save(); ctx.translate(GX - R1 + 10, GT - 300 * (1 - wq)); ctx.rotate(-0.6 + 2 * (1 - wq));
+    ctx.fillStyle = LEMON; ctx.beginPath(); ctx.arc(0, 0, 62, 0, 7); ctx.fill(); ctx.fillStyle = '#fbe9a6'; ctx.beginPath(); ctx.arc(0, 0, 52, 0, 7); ctx.fill();
+    ctx.strokeStyle = LEMON; ctx.lineWidth = 4; for (let k = 0; k < 8; k++) { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(52 * Math.cos(k * Math.PI / 4), 52 * Math.sin(k * Math.PI / 4)); ctx.stroke(); }
+    ctx.restore();
+  }
+  return v;
+}
+
+function rollDigit(txt, prev, x, y, u, font) {                 // digit rolls only while changing, then sits sharp
+  const a0 = ctx.globalAlpha; ctx.font = font; ctx.save(); ctx.beginPath(); ctx.rect(x - 4, y - 70, 80, 90); ctx.clip();
+  if (u >= 1 || prev === null) ctx.fillText(txt, x, y);
+  else { const e = inOut(u); ctx.globalAlpha = a0 * (1 - e); ctx.fillText(prev, x, y - 80 * e); ctx.globalAlpha = a0 * e; ctx.fillText(txt, x, y + 80 * (1 - e)); }
+  ctx.restore();
+}
+function panel(t, v) {
+  const s = clamp(Math.floor((t - S0) / STEP), 0, STEPS.length - 1), S = STEPS[s], X = 1060, endq = ease(span(t, ENDT, 0.6));
+  ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left'; ctx.fillStyle = INK;
+  ctx.font = `600 26px ${MONO}`; ctx.fillStyle = TEAL; ctx.fillText('CLASSIC LEMONADE · 1 : 1 : 4', X, 150);
+  ctx.save(); ctx.globalAlpha = 1 - endq;
+  ctx.fillStyle = INK; ctx.font = `600 34px ${MONO}`; ctx.fillText('STEP', X, 228);
+  const u = t < S0 ? 1 : span(t, st(s), 0.45);
+  rollDigit(String(s + 1), s > 0 ? String(s) : null, X + 100, 228, u, `600 34px ${MONO}`); ctx.fillText(`/ ${STEPS.length}`, X + 132, 228);
+  const nq = ease(span(t, st(s) + 0.05, 0.5));
+  ctx.globalAlpha = (1 - endq) * (t < S0 ? 1 : nq); ctx.font = `800 96px ${SERIF}`; ctx.fillText(S.name, X, 340 + 20 * (1 - nq));
+  ctx.globalAlpha = 1 - endq;
+  const sv = S.ml ? vol(s, t) : ICE.filter((_, i) => { const p = cubePos(i, t); return p && t - iceT(i) > 0.35; }).length;
+  const big = S.ml ? String(Math.round(sv)) : String(sv), unit = S.ml ? 'ml' : 'cubes';
+  ctx.font = `600 150px ${MONO}`; ctx.fillText(big, X, 510); const bw = ctx.measureText(big).width;
+  ctx.font = `500 48px ${MONO}`; ctx.fillText(unit, X + bw + 18, 510);
+  ctx.fillStyle = 'rgba(31,42,46,.6)'; ctx.font = `500 34px ${MONO}`;
+  ctx.fillText(S.ml ? `${(sv / 29.5735).toFixed(1)} oz  ·  of ${S.ml} ml` : `of ${S.cubes}`, X, 562);
+  const frac = S.ml ? sv / S.ml : sv / S.cubes;
+  ctx.fillStyle = 'rgba(31,42,46,.12)'; ctx.fillRect(X, 590, 640, 12); ctx.fillStyle = LEMON; ctx.fillRect(X, 590, 640 * frac, 12);
+  STEPS.forEach((it, i) => {                                    // checklist
+    const y = 680 + i * 62, done = ease(span(t, st(i) + 3.1, 0.35)), cur = i === s && t >= S0;
+    ctx.globalAlpha = (1 - endq) * (cur ? 1 : 0.62);
+    ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.strokeRect(X, y - 30, 36, 36);
+    if (done > 0) { ctx.fillStyle = TEAL; ctx.fillRect(X, y - 30, 36, 36); ctx.strokeStyle = CREAM; ctx.lineWidth = 5; ctx.beginPath();
+      const pts = [[X + 8, y - 12], [X + 16, y - 3], [X + 29, y - 22]]; ctx.moveTo(...pts[0]);
+      if (done < 0.5) ctx.lineTo(lerp(pts[0][0], pts[1][0], done * 2), lerp(pts[0][1], pts[1][1], done * 2)); else { ctx.lineTo(...pts[1]); ctx.lineTo(lerp(pts[1][0], pts[2][0], done * 2 - 1), lerp(pts[1][1], pts[2][1], done * 2 - 1)); }
+      ctx.stroke(); }
+    ctx.fillStyle = INK; ctx.font = `${cur ? 700 : 500} 34px ${SANS}`; ctx.fillText(it.name, X + 60, y);
+    ctx.font = `500 30px ${MONO}`; ctx.textAlign = 'right'; ctx.fillText(it.ml ? `${it.ml} ml` : `${it.cubes} cubes`, X + 640, y); ctx.textAlign = 'left';
+  });
+  ctx.globalAlpha = 1 - endq; ctx.fillStyle = 'rgba(31,42,46,.12)'; ctx.fillRect(X, 950, 640, 2);
+  ctx.fillStyle = INK; ctx.font = `500 30px ${MONO}`; ctx.fillText('IN THE GLASS', X, 1000); ctx.textAlign = 'right';
+  ctx.font = `600 30px ${MONO}`; ctx.fillText(`${Math.round(v)} / 270 ml`, X + 640, 1000); ctx.textAlign = 'left';
+  ctx.restore();
+  if (endq > 0) {                                              // end card
+    ctx.save(); ctx.globalAlpha = endq; ctx.fillStyle = INK;
+    ctx.font = `800 150px ${SERIF}`; ctx.fillText('Lemonade.', X, 420 + 30 * (1 - endq));
+    ctx.font = `600 40px ${MONO}`; ctx.fillStyle = TEAL; ctx.fillText(`${Math.round(v)} ml  ·  4 steps  ·  1 glass`, X, 500);
+    const pq = ease(span(t, ENDT + 0.9, 0.6)); ctx.globalAlpha = pq; ctx.fillStyle = INK;
+    ctx.font = `600 64px ${SERIF}`; ctx.fillText('Stir once.', X, 680 + 20 * (1 - pq));
+    ctx.fillStyle = 'rgba(31,42,46,.7)'; ctx.fillText('Taste before more sugar.', X, 760 + 20 * (1 - pq));
+    ctx.restore();
+  }
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = CREAM; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#f1e3c4'; ctx.beginPath(); ctx.arc(GX + 20 * Math.sin(t * 0.3), 600 + 12 * Math.cos(t * 0.25), 420, 0, 7); ctx.fill();   // sun disc
+  ctx.fillStyle = '#e9dcc3'; ctx.fillRect(0, 912, 980, 168);                                                                        // counter
+  ctx.fillStyle = 'rgba(31,42,46,.18)'; ctx.fillRect(0, 912, 980, 3);
+  const v = scene(t);
+  panel(t, v);
+};
+</script></body></html>

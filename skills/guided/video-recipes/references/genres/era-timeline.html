@@ -1,0 +1,174 @@
+<!doctype html>
+<!--
+  Era timeline demo — five eras of writing tools in boiling pencil-and-ink line. Dates are approximate ("c.").
+  Render: npx -y @helios-project/cli@latest render era-timeline.html -o era-timeline.mp4 --duration 16 --fps 24 --mode canvas
+  Core idea: one chapter function c(t) drives the drawing (undraw → redraw), the rolling year and the timeline marker;
+  every line is resampled by arc length and offset along its normal by a phase that steps 12×/s (boils on twos).
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#f2e9d6}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, s, d) => clamp((t - s) / d);
+const inOut = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const ease = u => 1 - Math.pow(1 - clamp(u), 3);
+const R = s => { const x = Math.sin(s * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+const HAND = 'Caveat, "Comic Sans MS", cursive', INK = '#2a2520', PAPER = '#f2e9d6';
+
+// ---- shape builders (plain point lists; resampled by arc length in ready) -------------------------------------------
+const circ = (cx, cy, r, a0 = 0, a1 = Math.PI * 2, n = 48) => Array.from({ length: n + 1 }, (_, i) => { const a = a0 + (a1 - a0) * i / n; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; });
+const rr = (x, y, w, h, r) => [...circ(x + w - r, y + r, r, -Math.PI / 2, 0, 8), ...circ(x + w - r, y + h - r, r, 0, Math.PI / 2, 8),
+  ...circ(x + r, y + h - r, r, Math.PI / 2, Math.PI, 8), ...circ(x + r, y + r, r, Math.PI, Math.PI * 1.5, 8), [x + w - r, y]];
+const quad = (a, b, c, n = 24) => Array.from({ length: n + 1 }, (_, i) => { const u = i / n, v = 1 - u; return [v * v * a[0] + 2 * u * v * b[0] + u * u * c[0], v * v * a[1] + 2 * u * v * b[1] + u * u * c[1]]; });
+const wedge = (x, y, s, a) => { const p = (d, o) => [x + Math.cos(a + o) * d, y + Math.sin(a + o) * d]; return [p(s, 0), p(s * 0.7, 2.5), p(s * 0.7, -2.5), p(s, 0)]; };
+const wave = (x0, x1, y, amp, f, ph) => Array.from({ length: 40 }, (_, i) => { const x = x0 + (x1 - x0) * i / 39; return [x, y + amp * Math.sin(x * f + ph)]; });
+const rays = (cx, cy, r0, r1, n, ph = 0) => Array.from({ length: n }, (_, i) => { const a = ph + i * Math.PI * 2 / n; return [[cx + r0 * Math.cos(a), cy + r0 * Math.sin(a)], [cx + r1 * Math.cos(a), cy + r1 * Math.sin(a)]]; });
+const SX = 850, SY = 390;                                   // the recurring motif — a small sun — always lives here
+
+// ---- Facts: eras (approximate dates). Each era: strokes in draw order (motif first), washes, solid fills. ---------------
+const ERAS = [
+  { year: -3200, motif: 9, wash: [[rr(640, 250, 400, 520, 50), '#c98a5c']], strokes: [   // clay tablet + stylus
+      ...Array.from({ length: 8 }, (_, i) => wedge(SX + 52 * Math.cos(i * Math.PI / 4), SY + 52 * Math.sin(i * Math.PI / 4), 30, i * Math.PI / 4)), wedge(SX, SY, 22, -1.2),
+      rr(640, 250, 400, 520, 50), [[675, 520], [1005, 522]], [[675, 610], [1005, 606]], [[675, 700], [1005, 702]],
+      ...Array.from({ length: 18 }, (_, i) => wedge(700 + (i % 6) * 55, 560 + Math.floor(i / 6) * 90 + (i % 2) * 6, 22, -1.9 + R(i) * 0.6)),
+      [[1120, 840], [1370, 300]], [[1138, 848], [1388, 308]], [[1120, 840], [1112, 880], [1138, 848]] ] },
+  { year: 600, motif: 13, wash: [[[...wave(620, 1040, 240, 8, 0.02, 0), [1040, 790], ...wave(1040, 620, 790, 8, 0.02, 1)], '#dcb978']], strokes: [   // quill on parchment
+      circ(SX, SY, 46), ...rays(SX, SY, 62, 100, 12),
+      [...wave(620, 1040, 240, 8, 0.02, 0), ...wave(1040, 1040, 240, 0, 0, 0), [1040, 790], ...wave(1040, 620, 790, 8, 0.02, 1), [620, 240]],
+      circ(1010, 270, 28, Math.PI * 0.5, Math.PI * 1.9, 20),
+      ...Array.from({ length: 5 }, (_, i) => wave(670, 990 - (i === 4) * 160, 540 + i * 50, 7, 0.09, i)),
+      quad([1170, 815], [1240, 520], [1420, 240]), quad([1300, 400], [1300, 280], [1420, 240]), quad([1300, 400], [1420, 360], [1420, 240]),
+      rr(1110, 830, 120, 70, 18), rr(1140, 810, 60, 24, 5) ] },
+  { year: 1450, motif: 13, wash: [[[[1080, 230], [1400, 230], [1400, 840], [1080, 840]], '#b98d62'], [rr(620, 300, 380, 470, 6), '#efe3c6']], strokes: [   // movable-type press
+      circ(SX, SY, 44, 0, Math.PI * 2, 40), ...rays(SX, SY, 58, 96, 12, 0.13),
+      rr(620, 300, 380, 470, 6), ...Array.from({ length: 12 }, (_, i) => [[650 + (i % 2) * 170, 520 + Math.floor(i / 2) * 38], [800 + (i % 2) * 170, 520 + Math.floor(i / 2) * 38]]),
+      [[1100, 840], [1100, 230], [1130, 230], [1130, 840]], [[1350, 840], [1350, 230], [1380, 230], [1380, 840]], rr(1080, 220, 320, 50, 8),
+      [[1240, 270], [1225, 300], [1255, 330], [1225, 360], [1255, 390], [1240, 430]], rr(1140, 430, 200, 46, 6), [[1240, 330], [1450, 312]], circ(1462, 311, 14, 0, Math.PI * 2, 16),
+      rr(1110, 610, 260, 36, 6), [[1060, 840], [1420, 840]] ],
+    fills: [[circ(SX, SY, 44), INK, 0.04]] },
+  { year: 1870, motif: 9, my: -60, rs: 0.9, wash: [[[[660, 820], [1260, 820], [1180, 560], [740, 560]], '#8d9e95']], strokes: [   // typewriter
+      ...rays(SX, SY - 60, 0, 34, 8, 0.39), circ(SX, SY - 60, 9, 0, Math.PI * 2, 12),
+      ...Array.from({ length: 3 }, (_, i) => [[790, 400 + i * 34], [1020 - i * 70, 400 + i * 34]]),
+      [[760, 500], [760, 230], [1060, 230], [1060, 500]], rr(700, 480, 520, 52, 26), circ(690, 506, 22, 0, Math.PI * 2, 20), [[1230, 506], [1280, 470]],
+      [[660, 820], [1260, 820], [1180, 560], [740, 560], [660, 820]],
+      ...Array.from({ length: 27 }, (_, i) => { const r = Math.floor(i / 9), k = i % 9; return circ(800 + r * 22 + k * 40, 620 + r * 50, 14, 0, Math.PI * 2, 12); }),
+      rr(870, 765, 180, 24, 12) ] },
+  { year: 1980, motif: 0, wash: [[rr(700, 230, 520, 330, 18), '#93b6c6'], [[[660, 580], [1260, 580], [1320, 770], [600, 770]], '#b8b2a5']], strokes: [   // laptop
+      rr(700, 230, 520, 330, 18), rr(730, 260, 460, 270, 6),
+      ...Array.from({ length: 4 }, (_, i) => [[960, 330 + i * 40], [1150 - (i === 3) * 90, 330 + i * 40]]),
+      [[660, 580], [1260, 580], [1320, 770], [600, 770], [660, 580]],
+      ...Array.from({ length: 4 }, (_, i) => [[668 - i * 13 + 40, 605 + i * 30], [1252 + i * 13 - 40, 605 + i * 30]]),
+      ...Array.from({ length: 13 }, (_, i) => [[740 + i * 37 - 6, 605], [732 + i * 39 - 18, 695]]), rr(880, 710, 160, 46, 8) ],
+    fills: [...[[0, 0, 0, 1, 0, 1, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 1, 1, 1, 0, 0, 0], [1, 0, 1, 1, 1, 1, 1, 0, 1], [0, 0, 1, 1, 1, 1, 1, 0, 0],
+      [1, 0, 1, 1, 1, 1, 1, 0, 1], [0, 0, 0, 1, 1, 1, 0, 0, 0], [0, 1, 0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 1, 0, 1, 0, 0, 0]].flatMap((row, j) => row.map((on, i) => on ?
+      [[[SX - 63 + i * 14, SY - 63 + j * 14], [SX - 50 + i * 14, SY - 63 + j * 14], [SX - 50 + i * 14, SY - 50 + j * 14], [SX - 63 + i * 14, SY - 50 + j * 14]], '#2f5f7a', 0.02] : null).filter(Boolean))] },
+];
+const N = ERAS.length, HOLD = 1.6, TR = 1.5, P = HOLD + TR, UND = 0.5, ENDT = HOLD + (N - 1) * P;   // last era complete at 14.0 s
+// The ONE chapter function: c = i + eased transition progress. Drawing, year and marker all read it.
+const chapter = t => { let c = 0; for (let i = 0; i < N - 1; i++) c += inOut(span(t, HOLD + i * P, TR)); return c; };
+function drawState(t) {                                      // [[era, drawn fraction], ...] on paper right now
+  const i = Math.min(N - 2, Math.floor(Math.max(0, t - HOLD) / P)), s = HOLD + i * P;
+  if (t < s) return [[i, 1]];
+  const out = [], u = (t - s) / UND, d = (t - s - UND * 0.6) / (TR - UND * 0.6);
+  if (u < 1) out.push([i, 1 - inOut(u)]);                    // the old era un-draws (the line rewinds)…
+  if (d > 0) out.push([i + 1, ease(d)]);                     // …while the new one is already being drawn
+  return out;
+}
+
+function resample(pts, step = 5) {                           // even spacing by arc length
+  const out = [pts[0]]; let carry = 0;
+  for (let k = 1; k < pts.length; k++) {
+    const [ax, ay] = pts[k - 1], [bx, by] = pts[k], d = Math.hypot(bx - ax, by - ay);
+    let u = step - carry; while (u <= d) { out.push([ax + (bx - ax) * u / d, ay + (by - ay) * u / d]); u += step; } carry = (carry + d) % step;
+  }
+  out.push(pts[pts.length - 1]); return out;
+}
+let paper;
+const ready = (async () => {
+  ERAS.forEach(e => { e.lines = e.strokes.map(s => resample(s)); e.total = e.lines.reduce((a, l) => a + l.length, 0); });
+  paper = document.createElement('canvas'); paper.width = W; paper.height = H; const g = paper.getContext('2d');
+  g.fillStyle = PAPER; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 9000; i++) { g.fillStyle = `rgba(90,70,40,${0.03 + 0.06 * R(i * 3.3)})`; g.fillRect(R(i) * W, R(i + 0.5) * H, 1 + 2 * R(i * 7), 1 + 2 * R(i * 9)); }
+  const v = g.createRadialGradient(W / 2, H / 2, 300, W / 2, H / 2, 1150); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(90,60,20,0.22)');
+  g.fillStyle = v; g.fillRect(0, 0, W, H);
+  await document.fonts.load(`700 200px ${HAND}`, 'c. 0123456789 BCE'); await document.fonts.load(`500 40px ${HAND}`, 'c. 0123456789 BCE dates are approximate');
+})();
+
+// ---- boiling ink line: offset along the normal by a phase that changes 12× per second, stroked twice ------------------
+function inkLine(pts, n, seed, boil, w, col = INK) {
+  n = Math.min(n, pts.length); if (n < 2) return;
+  for (let pass = 0; pass < 2; pass++) {
+    const ph1 = R(seed * 7.1 + boil * 3.7 + pass * 11) * 6.28, ph2 = R(seed * 3.3 + boil * 1.9 + pass * 5) * 6.28, A = pass ? 2.4 : 1.5;
+    ctx.beginPath();
+    for (let k = 0; k < n; k++) {
+      const a = pts[Math.max(0, k - 1)], b = pts[Math.min(pts.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      const o = A * (0.7 * Math.sin(k * 0.23 + ph1) + 0.6 * Math.sin(k * 0.071 + ph2));
+      ctx.lineTo(pts[k][0] - dy / L * o, pts[k][1] + dx / L * o);
+    }
+    ctx.strokeStyle = col; ctx.globalAlpha = pass ? 0.45 : 0.92; ctx.lineWidth = pass ? w * 0.5 : w; ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+function drawEra(e, p, boil, scale = 1, ox = 0, oy = 0) {
+  ctx.save(); ctx.translate(ox, oy); ctx.scale(scale, scale); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const wa = clamp((p - 0.35) / 0.4);                         // watercolour wash blooms in after the outlines
+  (e.wash || []).forEach(([pts, col], k) => {
+    const j = (R(boil * 1.3 + k) - 0.5) * 4; ctx.globalAlpha = 0.42 * wa; ctx.fillStyle = col; ctx.beginPath();
+    pts.forEach(([x, y]) => ctx.lineTo(x + j + 6, y + 6)); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  let budget = p * e.total;
+  e.lines.forEach((pts, k) => { const n = Math.min(pts.length, Math.floor(budget)); budget -= pts.length; inkLine(pts, n, k + 1, boil, 4.5 / scale); });
+  (e.fills || []).forEach(([pts, col, at], k) => {
+    const a = clamp((p - at) / 0.06); if (a <= 0) return; const j = (R(boil + k * 0.37) - 0.5) * 1.6;
+    ctx.globalAlpha = a; ctx.fillStyle = col; ctx.beginPath(); pts.forEach(([x, y]) => ctx.lineTo(x + j, y - j)); ctx.fill();
+  });
+  ctx.restore(); ctx.globalAlpha = 1;
+}
+
+const fmtYear = y => { const r = Math.round(y) || 1; return [String(Math.abs(r)), r < 0 ? 'BCE' : 'CE']; };
+function yearCounter(c, boil) {                              // eased roll, fixed digit slots, sharp once settled
+  const i = Math.min(N - 2, Math.floor(c)), f = c - i, y = ERAS[i].year + (ERAS[i + 1].year - ERAS[i].year) * f;
+  const [digits, era] = fmtYear(c >= N - 1 ? ERAS[N - 1].year : y), slot = 92, x0 = 150 + slot * (4 - digits.length);
+  ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.font = `500 64px ${HAND}`; ctx.fillText('c.', 110, 250);
+  ctx.font = `700 200px ${HAND}`; [...digits].forEach((d, k) => ctx.fillText(d, x0 + slot * k + slot / 2, 250));
+  ctx.font = `700 72px ${HAND}`; ctx.textAlign = 'left'; ctx.fillText(era, 150 + slot * 4 + 18, 250);
+  inkLine(resample([[110, 285], [560, 280]]), 92, 99, boil, 3);
+}
+function timeline(c, t, boil) {
+  const x0 = 300, x1 = 1620, y = 975, xs = i => x0 + (x1 - x0) * i / (N - 1);
+  inkLine(resample([[x0 - 60, y], [x1 + 60, y + 3]]), 9999, 77, boil, 3);
+  ctx.font = `500 34px ${HAND}`; ctx.textAlign = 'center'; ctx.fillStyle = INK;
+  ERAS.forEach((e, i) => {
+    inkLine(resample([[xs(i), y - 14], [xs(i), y + 14]]), 99, 80 + i, boil, 3);
+    const [d, era] = fmtYear(e.year); ctx.globalAlpha = c >= i - 0.5 ? 0.9 : 0.35; ctx.fillText(`c. ${d} ${era}`, xs(i), y + 54); ctx.globalAlpha = 1;
+  });
+  const mx = x0 + (x1 - x0) * c / (N - 1);
+  ctx.fillStyle = '#c0492f'; ctx.beginPath(); ctx.arc(mx, y, 13, 0, 7); ctx.fill();
+  inkLine(resample(circ(mx, y, 15, 0, Math.PI * 2, 20)), 99, 90, boil, 3);
+  const rq = span(t, ENDT + 0.2, 1.4);                        // end: the motif from every era, side by side above its date
+  ERAS.forEach((e, i) => {
+    const p = clamp(rq * N - i); if (p <= 0) return;
+    const m = { ...e, wash: [], lines: e.lines.slice(0, e.motif) };
+    m.total = m.lines.reduce((a, l) => a + l.length, 0);
+    const rs = e.rs || 0.42; drawEra(m, p, boil, rs, xs(i) - SX * rs, y - 95 - (SY + (e.my || 0)) * rs);
+  });
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(paper, 0, 0);
+  const boil = Math.floor(t * 12 + 1e-4), c = chapter(t);
+  const endq = span(t, ENDT + 0.1, 0.8), lift = -60 * inOut(endq);
+  const sc = 1 - 0.12 * inOut(endq);
+  drawState(t).forEach(([ei, p]) => drawEra(ERAS[ei], p, boil, sc, 1010 * (1 - sc) + 50 + 60 * inOut(endq), 520 * (1 - sc) + lift));
+  yearCounter(c, boil);
+  timeline(c, t, boil);
+  ctx.font = `500 30px ${HAND}`; ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(42,37,32,.6)'; ctx.fillText('c. = approximate', W - 70, 70);
+};
+</script></body></html>

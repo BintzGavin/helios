@@ -1,0 +1,242 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render synthwave-vhs.html -o synthwave-vhs.mp4 --duration 8 --preset medium -->
+<!-- Add ?novhs to the URL to see the clean Canvas 2D picture without the WebGL tape pass. -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@1,125,900&family=Michroma&family=Mr+Dafoe&family=VT323&display=block" rel="stylesheet">
+<style>
+html,body{margin:0;overflow:hidden;background:#05000c;width:1920px;height:1080px}
+canvas{position:absolute;left:0;top:0;width:1920px;height:1080px}
+</style></head><body>
+<canvas id="scene" width="1920" height="1080"></canvas>
+<canvas id="vhs" width="1920" height="1080"></canvas>
+<canvas id="osd" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, FPS = 30, HY = 640;            // HY = horizon line
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const smooth = k => (k = clamp(k), k * k * (3 - 2 * k));
+const outExpo = k => (k = clamp(k), k === 1 ? 1 : 1 - Math.pow(2, -10 * k));
+const outCubic = k => 1 - Math.pow(1 - clamp(k), 3);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const CUE = { titleIn: 2.2, rew: 4.5, slam: 4.8, strike: 5.05, kick: 0.6 };
+
+// ---- tape time-remap: the picture runs on its own clock (pure function of t) ----
+function sceneTime(t) {
+  const fr = Math.round(t * FPS), r0 = Math.round(CUE.rew * FPS), s0 = Math.round(CUE.slam * FPS);
+  if (fr < 30) return Math.floor(fr / 2) * 2 / FPS;                 // tracking-in: 15 fps
+  if (fr >= r0 && fr < r0 + 2) return (r0 - 1 - (fr - r0)) / FPS;   // two frames backwards
+  if (fr >= r0 + 2 && fr < s0) return Math.floor(fr / 2) * 2 / FPS; // 15 fps drag into the slam
+  return t;
+}
+// ---- camera speed (units/s); position is its integral, tabulated once in ready ----
+const speed = t => t < 1 ? 7 : t < 2.6 ? lerp(7, 15, smooth(t - 1)) : t < 4.4 ? lerp(15, 19, smooth((t - 2.6) / 1.8))
+  : t < CUE.slam ? lerp(19, 9, smooth((t - 4.4) / 0.4)) : 9 + 12 * Math.exp(-(t - CUE.slam) * 2.2);
+const DT = 1 / 600, ZT = [];
+const camZ = t => { const f = clamp(t, 0, 8.4) / DT, i = Math.floor(f); return lerp(ZT[i], ZT[i + 1], f - i); };
+
+const scene = document.getElementById('scene'), sc = scene.getContext('2d', { willReadFrequently: true });
+const osd = document.getElementById('osd').getContext('2d');
+const mk = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const TITLE = 'HALCYON', TF = 'italic 900 expanded 230px Archivo';
+const sunC = mk(500, 500);
+let chrome, faceMask, glintC, TB, stars = [], ridgeL = [], ridgeR = [];
+
+// ---- chrome title, built once: extrusion stack, horizon-split face, grid reflection, bevels ----
+function buildChrome() {
+  const m = (sc.font = TF, sc.measureText(TITLE)), asc = m.actualBoundingBoxAscent, tw = m.width, pad = 80;
+  chrome = mk(Math.ceil(tw + pad * 2 + 40), Math.ceil(asc + pad * 2 + 30));
+  faceMask = mk(chrome.width, chrome.height); glintC = mk(chrome.width, chrome.height);
+  const g = chrome.getContext('2d'), x = pad, y = pad + asc, y0 = pad, N = 14, dx = 0.35, dy = 1.15;
+  const setF = c => { c.font = TF; c.textBaseline = 'alphabetic'; c.lineJoin = 'round'; };
+  setF(g);
+  g.save(); g.shadowColor = 'rgba(255,0,176,.9)'; g.shadowBlur = 18; g.strokeStyle = '#ff49d6'; g.lineWidth = 3;
+  g.strokeText(TITLE, x + N * dx, y + N * dy); g.restore();                        // neon rim at the back
+  for (let k = N; k >= 1; k--) { const q = k / N;                                  // offset-fillText extrusion
+    g.fillStyle = `rgb(${lerp(96, 22, q) | 0},${lerp(18, 4, q) | 0},${lerp(132, 46, q) | 0})`; g.fillText(TITLE, x + k * dx, y + k * dy); }
+  g.strokeStyle = '#0a0014'; g.lineWidth = 10; g.strokeText(TITLE, x, y);
+  const rim = g.createLinearGradient(0, y0 - 6, 0, y + 6);
+  [[0, '#fff'], [.22, '#8ea4dc'], [.47, '#fff'], [.53, '#3a1830'], [.78, '#ffab66'], [1, '#fff4e0']].forEach(s => rim.addColorStop(...s));
+  g.strokeStyle = rim; g.lineWidth = 5; g.strokeText(TITLE, x, y);
+  const face = g.createLinearGradient(0, y0, 0, y);                                 // sky above, horizon split, ground below
+  [[0, '#0b1a4d'], [.14, '#1d4fae'], [.32, '#5fb8ff'], [.46, '#d8f6ff'], [.495, '#fff'], [.505, '#2b0a26'], [.56, '#5a1438'],
+   [.70, '#c2452f'], [.84, '#ff9a3c'], [.94, '#ffd98a'], [1, '#fff6dc']].forEach(s => face.addColorStop(...s));
+  g.fillStyle = face; g.fillText(TITLE, x, y);
+  const hz = y0 + asc * 0.5, L = mk(chrome.width, chrome.height), l = L.getContext('2d');   // grid reflected in the lower face
+  setF(l); l.fillText(TITLE, x, y); l.globalCompositeOperation = 'source-in';
+  for (let k = 1; k <= 7; k++) { l.fillStyle = `rgba(255,${80 + k * 14},${210 - k * 12},${.5 - k * .04})`; l.fillRect(0, hz + (y - hz) * Math.pow(k / 7.4, 1.55), L.width, 2); }
+  l.strokeStyle = 'rgba(255,120,190,.16)'; l.lineWidth = 1.6;
+  for (let k = -9; k <= 9; k++) { l.beginPath(); l.moveTo(L.width / 2 + k * 60, hz + 2); l.lineTo(L.width / 2 + k * 260, y + 40); l.stroke(); }
+  g.drawImage(L, 0, 0);
+  const sliver = (ox, oy, col, a) => { const S = mk(chrome.width, chrome.height), s = S.getContext('2d'); setF(s);
+    s.fillStyle = col; s.fillText(TITLE, x, y); s.globalCompositeOperation = 'destination-out'; s.fillText(TITLE, x + ox, y + oy);
+    g.globalAlpha = a; g.drawImage(S, 0, 0); g.globalAlpha = 1; };
+  sliver(2.4, 3.4, '#fff', .9); sliver(-2.2, -2.8, '#1a0620', .55);                 // bevel highlight / shade
+  const f = faceMask.getContext('2d'); setF(f); f.fillText(TITLE, x, y);
+  TB = { cx: x + tw / 2, cy: y0 + asc / 2, w: chrome.width, h: chrome.height };
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(TF, TITLE), document.fonts.load('200px "Mr Dafoe"', 'Nights'),
+    document.fonts.load('30px Michroma', 'SUMMER'), document.fonts.load('80px VT323', 'PLAY')]);
+  await document.fonts.ready;
+  for (let i = 0, z = 0; i <= 8.4 / DT + 1; i++) { ZT.push(z); z += 0.5 * (speed(i * DT) + speed((i + 1) * DT)) * DT; }
+  for (let i = 0; i < 260; i++) stars.push([hash(i) * W, hash(i + 500) * (HY - 60), hash(i + 900)]);
+  for (let i = 0; i <= 56; i++) { const u = i / 56, env = Math.pow(1 - u, 0.8) * smooth(u * 8);     // tall at the frame edge, low near the sun
+    const n = (s) => .55 + .25 * Math.sin(u * 13 + s) + .14 * Math.sin(u * 37 + 2 * s) + .06 * Math.sin(u * 91 + s);
+    ridgeL.push([u * 820, HY - 8 - 230 * env * n(1)]); ridgeR.push([W - u * 820, HY - 8 - 210 * env * n(4)]); }
+  buildChrome();
+})();
+
+function sky(ts, t) {
+  const g = sc.createLinearGradient(0, 0, 0, HY);
+  g.addColorStop(0, '#06010f'); g.addColorStop(.45, '#1a0636'); g.addColorStop(.8, '#4d0c55'); g.addColorStop(1, '#a8237a');
+  sc.fillStyle = g; sc.fillRect(0, 0, W, HY);
+  for (const [x, y, h] of stars) { if (h < .35) continue; sc.globalAlpha = (h - .35) * (.6 + .4 * Math.sin(t * (2 + h * 5) + h * 40)) * (1 - y / HY);
+    sc.fillStyle = '#f2e8ff'; sc.fillRect(x, y, h > .95 ? 3 : 2, h > .95 ? 3 : 2); }
+  sc.globalAlpha = 1;
+  // sun: vertical gradient disc with slats that widen toward the bottom and scroll down
+  const R = 250, cy = lerp(HY + 120, HY - 150, outCubic((ts - 0.3) / 2.4));
+  const hal = sc.createRadialGradient(W / 2, cy, R * .8, W / 2, cy, R * 2.2);
+  hal.addColorStop(0, 'rgba(255,60,150,.35)'); hal.addColorStop(1, 'rgba(255,60,150,0)'); sc.fillStyle = hal; sc.fillRect(0, 0, W, HY);
+  const g2 = sunC.getContext('2d'); g2.setTransform(1, 0, 0, 1, 0, 0); g2.globalCompositeOperation = 'source-over'; g2.clearRect(0, 0, 2 * R, 2 * R);
+  const sg2 = g2.createLinearGradient(0, 0, 0, 2 * R); [[0, '#fff3a0'], [.3, '#ffd23f'], [.55, '#ff8a3c'], [.8, '#ff3d7f'], [1, '#e0237a']].forEach(s => sg2.addColorStop(...s));
+  g2.fillStyle = sg2; g2.beginPath(); g2.arc(R, R, R, 0, Math.PI * 2); g2.fill();
+  g2.globalCompositeOperation = 'destination-out';                                   // slats: gaps widen downward, scroll down
+  for (let k = -1; k < 8; k++) { const v = -0.1 + (k + (ts * 0.4) % 1) * 0.16; if (v < -0.1) continue;
+    const w = 0.012 + 0.07 * clamp((v + 0.1) / 1.1); g2.fillRect(0, (v + 1) * R, 2 * R, w * R * 2); }
+  sc.save(); sc.beginPath(); sc.rect(0, 0, W, HY); sc.clip(); sc.drawImage(sunC, W / 2 - R, cy - R); sc.restore();
+  // mountains: dark silhouettes with a wireframe of struts to the base
+  for (const [ridge, col] of [[ridgeL, '#3ee8ff'], [ridgeR, '#ff4fd8']]) {
+    sc.fillStyle = '#12021f'; sc.beginPath(); sc.moveTo(ridge[0][0], HY); ridge.forEach(p => sc.lineTo(...p)); sc.lineTo(ridge.at(-1)[0], HY); sc.fill();
+    sc.strokeStyle = col; sc.globalAlpha = .35; sc.lineWidth = 1.5; sc.beginPath();
+    ridge.forEach((p, i) => { if (i % 2) return; const bx = lerp(ridge[0][0], ridge.at(-1)[0], i / (ridge.length - 1));
+      sc.moveTo(bx - 14, HY); sc.lineTo(...p); sc.lineTo(bx + 14, HY); sc.moveTo(p[0], lerp(p[1], HY, .5)); sc.lineTo(...(ridge[i + 2] || p).map((v, j) => j ? lerp(v, HY, .5) : v)); }); sc.stroke();
+    sc.globalAlpha = 1; sc.lineWidth = 3; sc.shadowColor = col; sc.shadowBlur = 12; sc.beginPath(); ridge.forEach((p, i) => i ? sc.lineTo(...p) : sc.moveTo(...p)); sc.stroke();
+    sc.shadowBlur = 0;
+  }
+}
+
+function floor(ts, t) {
+  const g = sc.createLinearGradient(0, HY, 0, H); g.addColorStop(0, '#2a0640'); g.addColorStop(.25, '#10021e'); g.addColorStop(1, '#05000c');
+  sc.fillStyle = g; sc.fillRect(0, HY, W, H - HY);
+  sc.save(); sc.translate(W / 2, HY); sc.scale(1, 3.2);                               // sun streak on the glossy floor
+  const refl = sc.createRadialGradient(0, 0, 0, 0, 0, 130); refl.addColorStop(0, 'rgba(255,140,90,.5)'); refl.addColorStop(1, 'rgba(255,60,120,0)');
+  sc.fillStyle = refl; sc.fillRect(-130, 0, 260, 130); sc.restore();
+  const f = 900, camH = 1.6, camX = 0.35 * Math.sin(ts * 0.7), z = camZ(ts), S = 2;
+  const kickAge = t >= CUE.slam ? ((t - CUE.slam) % CUE.kick) : 9, pump = 1 + .35 * Math.exp(-kickAge * 7);
+  const P = (x, d) => [W / 2 + f * (x - camX) / d, HY + f * camH / d];
+  sc.globalCompositeOperation = 'lighter'; sc.lineCap = 'round';
+  for (const [lw, col] of [[9, 'rgba(255,30,190,.16)'], [2.4, 'rgba(255,110,230,.95)']]) {
+    sc.lineWidth = lw; sc.strokeStyle = col; sc.globalAlpha = Math.min(1, pump * .9); sc.beginPath();
+    for (let i = -40; i <= 40; i++) { const a = P(i * S, 0.4), b = P(i * S, 400); sc.moveTo(...a); sc.lineTo(...b); }
+    sc.stroke();
+    for (let k = 1; k < 90; k++) { const d = k * S - (z % S); if (d < 0.3) continue;
+      const y = HY + f * camH / d; sc.globalAlpha = clamp(1.15 - d / 34) * Math.min(1, pump * .9);
+      sc.lineWidth = lw * clamp(3 / d + .4, .4, 1.6); sc.beginPath(); sc.moveTo(0, y); sc.lineTo(W, y); sc.stroke(); }
+  }
+  sc.globalAlpha = 1; sc.globalCompositeOperation = 'source-over';
+  const hz = sc.createLinearGradient(0, HY - 70, 0, HY + 40);                        // horizon haze + hot line
+  hz.addColorStop(0, 'rgba(255,70,170,0)'); hz.addColorStop(.6, 'rgba(255,70,170,.55)'); hz.addColorStop(1, 'rgba(255,70,170,0)');
+  sc.fillStyle = hz; sc.fillRect(0, HY - 70, W, 110); sc.fillStyle = '#ffe2f6'; sc.fillRect(0, HY - 1, W, 2.5);
+}
+
+function title(t) {
+  const p = outExpo((t - CUE.titleIn) / 0.55); if (p <= 0) return;
+  const s = lerp(1.7, 1, p) + 0.006 * Math.sin(t * 1.3), cx = W / 2, cy = 360 + 4 * Math.sin(t * 1.1);
+  sc.save(); sc.globalAlpha = clamp(p * 1.6); sc.translate(cx, cy); sc.scale(s, s); sc.translate(-TB.cx, -TB.cy);
+  sc.drawImage(chrome, 0, 0);
+  const gp = (t - CUE.slam) / 0.7, flash = t >= CUE.slam ? Math.exp(-(t - CUE.slam) * 9) : 0;   // glint sweep + slam flash, inside the face only
+  if ((gp > 0 && gp < 1) || flash > .01) {
+    const g = glintC.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, TB.w, TB.h);
+    const gx = lerp(-300, TB.w + 300, gp), lg = g.createLinearGradient(gx - 120, 0, gx + 120, 0);
+    lg.addColorStop(0, 'rgba(255,250,240,0)'); lg.addColorStop(.5, 'rgba(255,250,240,.85)'); lg.addColorStop(1, 'rgba(255,250,240,0)');
+    g.setTransform(1, 0, -0.5, 1, TB.h * 0.25, 0); g.fillStyle = lg; g.fillRect(-TB.w, 0, TB.w * 3, TB.h);
+    g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = `rgba(255,240,250,${flash * .8})`; g.fillRect(0, 0, TB.w, TB.h);
+    g.globalCompositeOperation = 'destination-in'; g.drawImage(faceMask, 0, 0);
+    sc.globalCompositeOperation = 'lighter'; sc.drawImage(glintC, 0, 0);
+  }
+  sc.restore();
+}
+
+function script(t) {   // neon script: dim glass tube, then strikes on (one off-frame, low contrast) and holds
+  if (t < CUE.slam) return;
+  const s = t - CUE.strike, lit = s < 0 ? 0 : s < .07 ? 1 : s < .2 ? .25 : 1;
+  sc.save(); sc.translate(1270, 590); sc.rotate(-0.12); sc.font = '210px "Mr Dafoe"'; sc.textAlign = 'center';
+  sc.lineWidth = 3; sc.strokeStyle = 'rgba(255,170,230,.35)'; sc.strokeText('Nights', 0, 0);
+  if (lit > 0) { sc.globalAlpha = lit;
+    sc.shadowColor = 'rgba(255,0,168,1)'; sc.shadowBlur = 46; sc.lineWidth = 9; sc.strokeStyle = '#ff1fb0'; sc.strokeText('Nights', 0, 0);
+    sc.shadowBlur = 14; sc.fillStyle = '#ff3dc8'; sc.fillText('Nights', 0, 0);
+    sc.shadowBlur = 0; sc.fillStyle = '#ffd6f4'; sc.save(); sc.scale(.985, .985); sc.fillText('Nights', 0, -2); sc.restore(); }
+  sc.restore();
+}
+
+function tagline(t) {
+  const k = clamp((t - 1.5) / 1.2); if (k <= 0) return;
+  const sp = lerp(30, 13, outCubic(k)), txt = 'SUMMER EDITION  ·  IN HI-FI STEREO';
+  sc.save(); sc.font = '28px Michroma'; sc.letterSpacing = sp + 'px'; sc.textAlign = 'center'; sc.globalAlpha = clamp(k * 2);
+  sc.shadowColor = 'rgba(0,220,255,.9)'; sc.shadowBlur = 18; sc.fillStyle = '#c8fbff'; sc.fillText(txt, W / 2 + sp / 2, 175);
+  sc.restore();
+}
+
+function drawOSD(t) {   // the deck's own overlay: never recorded on tape, so it skips the VHS pass
+  osd.setTransform(1, 0, 0, 1, 0, 0); osd.clearRect(0, 0, W, H);
+  osd.font = '84px VT323'; osd.textBaseline = 'top';
+  const txt = (s, x, y, al = 'left') => { osd.textAlign = al; osd.fillStyle = 'rgba(0,0,0,.8)'; osd.fillText(s, x + 4, y + 4); osd.fillStyle = '#f4f4ff'; osd.fillText(s, x, y); };
+  const fr = Math.round(t * FPS);
+  if (t < 2.4) txt('PLAY ▶', 110, 56);
+  else if (fr >= Math.round(CUE.rew * FPS) && fr < Math.round(CUE.slam * FPS)) txt('◀◀ REW', 110, 56);
+  const sec = Math.floor(t + 7);
+  txt(`SP  0:00:${String(sec).padStart(2, '0')}`, W - 110, H - 150, 'right');
+}
+
+// ---- optional VHS pass (raw WebGL): chroma smear + red shift, 3 px scanlines, tracking band, vignette ----
+const gl = location.search.includes('novhs') ? null : document.getElementById('vhs').getContext('webgl', { preserveDrawingBuffer: true, antialias: false });
+let prog, U = {};
+if (gl) {
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+  prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, 'attribute vec2 p; varying vec2 uv; void main(){ uv = p*.5+.5; uv.y = 1.-uv.y; gl_Position = vec4(p,0,1); }'));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `precision highp float; varying vec2 uv; uniform sampler2D tex; uniform float frame, track;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233)))*43758.5453); }
+    vec3 yc(vec3 c){ float Y = dot(c, vec3(.299,.587,.114)); return vec3(Y, (c.b-Y)*.564, (c.r-Y)*.713); }
+    void main(){
+      vec2 px = uv * vec2(1920., 1080.), s = 1. / vec2(1920., 1080.);
+      float line = floor(px.y), bandY = fract(.2 + frame * .021) * 1080.;
+      float band = smoothstep(60., 0., abs(px.y - bandY)) * track;
+      float wob = (h(vec2(line, frame)) - .5) * (0.6 + 30. * band) + sin(px.y * .02 + frame * .3) * .4;
+      wob += (1. - smoothstep(1050., 1072., px.y)) > .5 ? 0. : 10. * h(vec2(line, frame * 2.));   // head-switch rows
+      vec2 q = uv + vec2(wob, 0.) * s;
+      float Y = yc(texture2D(tex, q).rgb).x * .7 + .15 * (yc(texture2D(tex, q + vec2(s.x, 0.)).rgb).x + yc(texture2D(tex, q - vec2(s.x, 0.)).rgb).x);
+      float cb = 0., cr = 0.;
+      for (int i = -3; i <= 3; i++) { float fi = float(i);
+        cb += yc(texture2D(tex, q + vec2(fi * s.x, 0.)).rgb).y; cr += yc(texture2D(tex, q + vec2((fi - 2.) * s.x, 0.)).rgb).z; }
+      cb /= 7.; cr /= 7.;
+      vec3 c = vec3(Y + 1.403 * cr, Y - .344 * cb - .714 * cr, Y + 1.773 * cb);
+      c = mix(c, vec3(h(vec2(floor(px.x / 3.), line) + frame)), band * .45);
+      c *= mod(px.y, 3.) < 1. ? .86 : 1.;                                     // scanline every 3 px
+      vec2 v = uv - .5; c *= 1. - dot(v, v) * .55;
+      gl_FragColor = vec4(clamp(c, 0., 1.), 1.); }`));
+  gl.bindAttribLocation(prog, 0, 'p'); gl.linkProgram(prog); gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+  for (const n of ['frame', 'track']) U[n] = gl.getUniformLocation(prog, n);
+} else document.getElementById('vhs').style.display = 'none';
+
+window.renderAt = async (t) => {
+  await ready;
+  const ts = sceneTime(t), fr = Math.round(t * FPS);
+  sc.setTransform(1, 0, 0, 1, 0, 0); sc.globalAlpha = 1; sc.globalCompositeOperation = 'source-over'; sc.shadowBlur = 0; sc.letterSpacing = '0px';
+  sky(ts, t); floor(ts, t); tagline(t); title(t); script(t);
+  drawOSD(t);
+  if (gl) {
+    const rewind = fr >= Math.round(CUE.rew * FPS) && fr < Math.round(CUE.slam * FPS);
+    const track = t < 1 ? 1 - smooth(t) * .8 : rewind ? 1 : 0;
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
+    gl.uniform1f(U.frame, fr); gl.uniform1f(U.track, track);
+    gl.viewport(0, 0, W, H); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+};
+</script></body></html>

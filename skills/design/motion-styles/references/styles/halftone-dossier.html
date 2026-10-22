@@ -1,0 +1,211 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render halftone-dossier.html -o halftone-dossier.mp4 --duration 8 -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Bagel+Fat+One&family=Archivo:wght@900&family=JetBrains+Mono:wght@800&display=block" rel="stylesheet">
+<style>
+  html,body{margin:0;background:#F4ECDD;overflow:hidden;width:1920px;height:1080px}
+  svg,canvas{position:absolute;left:0;top:0}
+  #paper{mix-blend-mode:multiply}
+  .mul{mix-blend-mode:multiply}
+</style>
+</head>
+<body>
+<svg id="stage" width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- line boil: displacement reseeded at 10 fps + fine ink grain. Figures only, never text or dots. -->
+    <filter id="boil" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence id="boilT" type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="1" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="4" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -22 15.2" result="gm"/>
+      <feComposite in="d" in2="gm" operator="in"/>
+    </filter>
+    <!-- rubber stamp: coarse displacement for rough edges + mottled ink -->
+    <filter id="stampInk" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" seed="11" result="w"/>
+      <feDisplacementMap in="SourceGraphic" in2="w" scale="8" xChannelSelector="R" yChannelSelector="G" result="d"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="3" seed="21" result="g"/>
+      <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -9 5.9" result="gm"/>
+      <feComposite in="d" in2="gm" operator="in"/>
+    </filter>
+    <clipPath id="numClip-01"><text x="1130" y="1000" font-family="'Bagel Fat One', sans-serif" font-size="820">01</text></clipPath>
+  </defs>
+  <g id="cam">
+    <rect width="1920" height="1080" fill="#F4ECDD"/>
+    <path id="htEdge" fill="#1D2340"/>
+    <path id="htCorner" class="mul" fill="#FF5A87"/>
+    <g id="numeral">
+      <text x="1130" y="1000" font-family="'Bagel Fat One', sans-serif" font-size="820" fill="#FFC628">01</text>
+      <path id="htNum" clip-path="url(#numClip-01)" fill="#F58A34"/>
+    </g>
+    <path id="htHalo" class="mul" fill="#2E55D6"/>
+    <g id="plant" filter="url(#boil)"></g>
+    <g id="headline"></g>
+    <g id="caption"></g>
+    <g id="stamp" opacity="0"><g filter="url(#stampInk)" id="stampInner"></g></g>
+  </g>
+  <g id="hud" font-family="'JetBrains Mono', monospace" font-weight="800"></g>
+  <g id="wipe"></g>
+  <rect id="flash" width="1920" height="1080" fill="#FFFFFF" opacity="0"/>
+</svg>
+<canvas id="paper" width="1920" height="1080"></canvas>
+<canvas id="fx" width="1920" height="1080"></canvas>
+<script>
+const C = { paper: '#F4ECDD', navy: '#1D2340', blue: '#2E55D6', pink: '#FF5A87', yellow: '#FFC628', orange: '#F58A34', red: '#E8384F', cream: '#FFF4E2', mint: '#56C29E' };
+const NS = 'http://www.w3.org/2000/svg', $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const E = { out: p => 1 - Math.pow(1 - p, 3), in: p => p * p * p, back: p => 1 + 2.70158 * Math.pow(p - 1, 3) + 1.70158 * Math.pow(p - 1, 2) };
+function el(tag, attrs = {}, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function rng(s) { return () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const mctx = document.createElement('canvas').getContext('2d');
+const measure = (s, font) => { mctx.font = font; return mctx.measureText(s).width; };
+
+// halftone: circles on a rotated grid, radius = density × step × k. Step ≥ 14 px so dots survive encoding.
+function halftone(f, { x0 = 0, y0 = 0, w = 1920, h = 1080, step = 22, angle = 15, k = .66 }) {
+  const a = angle * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a), n = Math.ceil(Math.hypot(w, h) / step / 2) + 2;
+  let d = '';
+  for (let i = -n; i <= n; i++) for (let j = -n; j <= n; j++) {
+    const u = i * step, v = j * step, x = x0 + w / 2 + u * ca - v * sa, y = y0 + h / 2 + u * sa + v * ca;
+    if (x < x0 - step || x > x0 + w + step || y < y0 - step || y > y0 + h + step) continue;
+    const s = clamp(f(x, y)); if (s < .06) continue;
+    const r = (s * step * k).toFixed(1);
+    d += `M${(x - r).toFixed(1)} ${y.toFixed(1)}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+  }
+  return d;
+}
+const radial = (cx, cy, R, pw = 1.2) => (x, y) => Math.pow(clamp(1 - Math.hypot(x - cx, y - cy) / R), pw);
+const edge = (R, pw = 1.5) => (x, y) => Math.pow(clamp(Math.hypot(x - 960, y - 540) / R - .35), pw) * 1.3;
+
+// ---------- build the page once ----------
+const B = {};
+function build() {
+  $('htCorner').setAttribute('d', halftone(radial(0, 1080, 560, 1.1), { step: 22, angle: 70, k: .62 }));
+  $('htNum').setAttribute('d', halftone((x, y) => .2 + .75 * clamp((y - 380) / 600), { x0: 1110, y0: 300, w: 810, h: 780, step: 20, angle: 25, k: .7 }));
+  // the suspect: a potted plant. Chunky shapes, 7 px ink outline, flat fills, glossy eyes.
+  const p = $('plant'), o = { stroke: C.navy, 'stroke-width': 7, 'stroke-linejoin': 'round' };
+  B.stem = el('g', {}, p);
+  el('path', { d: 'M0 0 C -8 -120 10 -220 0 -330', fill: 'none', ...o, 'stroke-width': 14 }, B.stem);
+  B.leaves = [[-1, -120, 1.4], [1, -190, 1.3], [-1, -260, 1.15], [1, -320, 1.0]].map(([s, y, k]) => {
+    const g = el('g', { transform: `translate(0 ${y})` }, B.stem);
+    el('path', { d: `M0 0 C ${s * 40} ${-60 * k} ${s * 150 * k} ${-50 * k} ${s * 170 * k} ${-10 * k} C ${s * 120 * k} ${30 * k} ${s * 40} ${20 * k} 0 0Z`, fill: C.mint, ...o }, g);
+    el('path', { d: `M${s * 10} ${-4} Q ${s * 80 * k} ${-24 * k} ${s * 150 * k} ${-12 * k}`, fill: 'none', stroke: C.navy, 'stroke-width': 4 }, g);
+    return g;
+  });
+  el('path', { d: 'M-150 -40 L150 -40 L120 170 L-120 170 Z', fill: C.orange, ...o }, p);
+  el('rect', { x: -170, y: -70, width: 340, height: 50, rx: 10, fill: '#D9621E', ...o }, p);
+  el('path', { d: 'M-60 60 Q 0 30 60 60 L 50 140 Q 0 150 -50 140Z', fill: '#FBD3A8', stroke: 'none' }, p);   // lighter belly
+  B.eyes = el('g', { transform: 'translate(0 70)' }, p);
+  for (const x of [-48, 48]) { const g = el('g', { transform: `translate(${x} 0)` }, B.eyes); el('ellipse', { rx: 22, ry: 28, fill: C.navy }, g); el('circle', { cx: 7, cy: -10, r: 8, fill: '#fff' }, g); el('circle', { cx: -7, cy: 8, r: 4, fill: '#fff' }, g); }
+  el('path', { d: 'M-20 118 Q 0 132 20 118', fill: 'none', stroke: C.navy, 'stroke-width': 6, 'stroke-linecap': 'round' }, p);
+  // headline: one <text> per glyph so each can pop; misregistration shadow in the overprint ink
+  const hl = $('headline'); B.chars = [];
+  [['THE CASE OF', 110, 250, 84], ['THE PLANT', 110, 420, 156]].forEach(([str, x0, y, size], line) => {
+    const font = `400 ${size}px "Alfa Slab One"`; let x = x0;
+    [...str].forEach((ch, i) => {
+      const g = el('g', {}, hl), at = { 'font-family': "'Alfa Slab One', serif", 'font-size': size };
+      el('text', { ...at, x: 8, y: 8, fill: C.pink, class: 'mul' }, g).textContent = ch;
+      el('text', { ...at, fill: C.navy }, g).textContent = ch;
+      B.chars.push({ g, x, y, t0: (line ? 0.85 : 0.45) + i * (line ? 0.06 : 0.03) }); x += measure(ch, font);
+    });
+  });
+  // caption bars: dark pill, overprint-ink shadow, keyword in the highlight ink
+  B.caps = [[2.0, 4.85, [['Grew ', C.cream], ['40 cm', C.yellow], [' since Monday.', C.cream]]], [5.35, 99, [['Verdict: ', C.cream], ['needs a bigger pot', C.yellow], ['.', C.cream]]]].map(([t0, t1, parts]) => {
+    const g = el('g', { opacity: 0 }, $('caption')), size = 46, font = `900 ${size}px Archivo`;
+    const w = parts.reduce((a, [s]) => a + measure(s, font), 0), h = size * 1.7;
+    el('rect', { x: -w / 2 - 34 + 8, y: -h / 2 + 8, width: w + 68, height: h, rx: 14, fill: C.pink, class: 'mul' }, g);
+    el('rect', { x: -w / 2 - 34, y: -h / 2, width: w + 68, height: h, rx: 14, fill: C.navy }, g);
+    const tx = el('text', { x: -w / 2, y: size * .36, 'font-family': 'Archivo, sans-serif', 'font-weight': 900, 'font-size': size }, g);
+    parts.forEach(([s, c]) => { el('tspan', { fill: c }, tx).textContent = s; });
+    return { g, t0, t1 };
+  });
+  // stamp
+  const si = $('stampInner'), sw = measure('OVERGROWN', '900 130px Archivo') + 100, sh = 130 * 1.08 + 52;
+  el('rect', { x: -sw / 2, y: -sh / 2, width: sw, height: sh, rx: 22, fill: 'none', stroke: C.red, 'stroke-width': 12 }, si);
+  el('rect', { x: -sw / 2 + 22, y: -sh / 2 + 22, width: sw - 44, height: sh - 44, rx: 12, fill: 'none', stroke: C.red, 'stroke-width': 4 }, si);
+  el('text', { y: 47, 'text-anchor': 'middle', 'font-family': 'Archivo, sans-serif', 'font-weight': 900, 'font-size': 130, fill: C.red }, si).textContent = 'OVERGROWN';
+  // HUD: case number, chapter chip, REC + clock
+  const hud = $('hud');
+  el('rect', { x: 52, y: 40, width: 360, height: 40, rx: 6, fill: C.cream }, hud);
+  el('text', { x: 64, y: 70, 'font-size': 26, fill: C.navy }, hud).textContent = 'CASE No. 2026-PLT-014';
+  el('rect', { x: 60, y: 86, width: 312, height: 44, rx: 8, fill: C.navy }, hud);
+  el('text', { x: 78, y: 117, 'font-size': 24, fill: C.yellow }, hud).textContent = 'EXHIBIT 01 · GROWTH';
+  el('rect', { x: 1640, y: 38, width: 236, height: 56, rx: 10, fill: C.cream, stroke: C.navy, 'stroke-width': 4 }, hud);
+  B.rec = el('circle', { cx: 1672, cy: 66, r: 11, fill: C.red }, hud);
+  el('text', { x: 1694, y: 76, 'font-size': 28, fill: C.navy }, hud).textContent = 'MON 09:00';
+  // opening dot wipe
+  B.wipe = []; for (let y = 0; y <= 1080 + 96; y += 96) for (let x = 0; x <= 1920 + 96; x += 96) B.wipe.push([el('circle', { cx: x, cy: y, r: 0, fill: C.navy }, $('wipe')), x, y]);
+}
+
+// paper (multiply, built once) + dust specks (reseeded every 2 frames at 30 fps)
+function buildPaper() {
+  const cv = $('paper'), ctx = cv.getContext('2d', { willReadFrequently: true }), r = rng(3);
+  const small = document.createElement('canvas'); small.width = 96; small.height = 54;
+  const s = small.getContext('2d'), si = s.createImageData(96, 54);
+  for (let i = 0; i < si.data.length; i += 4) { const v = 242 + r() * 13; si.data[i] = si.data[i + 1] = si.data[i + 2] = v; si.data[i + 3] = 255; }
+  s.putImageData(si, 0, 0); ctx.drawImage(small, 0, 0, 1920, 1080);
+  const im = ctx.getImageData(0, 0, 1920, 1080);
+  for (let i = 0; i < im.data.length; i += 4) { const n = (r() - .5) * 24; im.data[i] += n; im.data[i + 1] += n; im.data[i + 2] += n - 4; }
+  ctx.putImageData(im, 0, 0);
+  const gr = ctx.createRadialGradient(960, 540, 400, 960, 540, 1150); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(120,100,80,.32)');
+  ctx.fillStyle = gr; ctx.fillRect(0, 0, 1920, 1080);
+  ctx.strokeStyle = 'rgba(140,120,100,.18)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(960, 0); ctx.lineTo(962, 1080); ctx.stroke();
+}
+function drawFx(t) {
+  const ctx = $('fx').getContext('2d'), r = rng(1000 + Math.floor(t * 15 + 1e-4));
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, 1920, 1080);
+  ctx.fillStyle = 'rgba(255,248,235,.75)'; for (let i = 0; i < 420; i++) { ctx.beginPath(); ctx.arc(r() * 1920, r() * 1080, .6 + r() * 1.6, 0, 7); ctx.fill(); }
+  ctx.fillStyle = 'rgba(29,35,64,.25)'; for (let i = 0; i < 80; i++) { ctx.beginPath(); ctx.arc(r() * 1920, r() * 1080, .6 + r() * 1.2, 0, 7); ctx.fill(); }
+}
+
+const STAMP = 5.0;
+const ready = (async () => {
+  await Promise.all(['400 100px "Alfa Slab One"', '400 100px "Bagel Fat One"', '900 50px Archivo', '800 26px "JetBrains Mono"'].map(f => document.fonts.load(f, 'THE CASE OF PLANT 01 Grew 40 cm since Monday Verdict needs a bigger pot OVERGROWN No. 2026-PLT-014 EXHIBIT · GROWTH MON 09:00 CM')));
+  await document.fonts.ready;
+  build(); buildPaper();
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  $('boilT').setAttribute('seed', 1 + Math.floor(t * 10 + 1e-4) % 40);           // boil at 10 fps
+  // dots: edge crowding tightens into the verdict, the blue halo blooms on it
+  const tension = .3 + .5 * seg(t, 3.6, 4.95) - .4 * E.out(seg(t, 5.0, 6.0));
+  $('htEdge').setAttribute('d', halftone(edge(1250 - 260 * tension, 1.6), { step: 24, angle: 20, k: .68 }));
+  const haloR = 300 + 120 * E.out(seg(t, 1.0, 1.6)) + 160 * E.out(seg(t, STAMP, STAMP + .5)) + 10 * Math.sin(t * 3);
+  $('htHalo').setAttribute('d', halftone(radial(1460, 600, haloR, .9), { x0: 1000, y0: 120, w: 920, h: 960, step: 22, angle: 60, k: .64 }));
+  // numeral rises with overshoot
+  const pn = seg(t, 0.3, 0.75);
+  $('numeral').setAttribute('transform', `translate(0 ${(1 - E.back(pn)) * 500})`);
+  // the plant: rises with a squash landing, grows, sways; eyes blink at scripted times
+  const pr = seg(t, 1.0, 1.4), land = Math.max(0, t - 1.4), sq = 1 + .12 * Math.exp(-land * 9) * Math.cos(land * 26) * (t > 1.4);
+  $('plant').setAttribute('transform', `translate(1460 ${790 + (1 - E.back(pr)) * 700}) scale(${.9 / sq} ${.9 * sq})`);
+  const grow = .55 + .45 * E.out(seg(t, 1.6, 4.6)) + .12 * E.back(seg(t, STAMP, STAMP + .3));
+  B.stem.setAttribute('transform', `translate(0 -40) scale(1 ${grow})`);
+  B.leaves.forEach((g, i) => g.setAttribute('transform', `translate(0 ${[-120, -190, -260, -320][i]}) rotate(${6 * Math.sin(t * 2.2 + i)}) scale(1 ${1 / grow})`));
+  const blink = [2.6, 4.2, 6.8].some(b => t > b && t < b + .14) ? .1 : (t > STAMP && t < STAMP + .6 ? 1.25 : 1);
+  B.eyes.setAttribute('transform', `translate(0 70) scale(1 ${blink})`);
+  // headline: per-glyph drop + squash, back ease
+  B.chars.forEach(c => { const p = seg(t, c.t0, c.t0 + .38); c.g.setAttribute('opacity', p > 0 ? 1 : 0); const s = 1 + .25 * (1 - E.out(p)); c.g.setAttribute('transform', `translate(${c.x} ${c.y - 80 * (1 - E.back(p))}) scale(${1 / s} ${s})`); });
+  // captions: pop up from below with overshoot; leave on a hard cut
+  B.caps.forEach(c => { const on = t >= c.t0 && t < c.t1, p = seg(t, c.t0, c.t0 + .4); c.g.setAttribute('opacity', on ? 1 : 0); c.g.setAttribute('transform', `translate(960 ${980 + 40 * (1 - E.out(p))}) scale(${.8 + .2 * E.back(p)}) rotate(${-1.2 * (1 - p) - .6})`); });
+  // stamp slam: 2.6× → 1× in 0.09 s (ease-in), damped bounce
+  const ps = seg(t, STAMP - .09, STAMP), after = Math.max(0, t - STAMP), bounce = 1 + .05 * Math.sin(after * 30) * Math.exp(-after * 9);
+  $('stamp').setAttribute('opacity', t < STAMP - .09 ? 0 : ps < 1 ? .3 + .7 * ps : .93);
+  $('stamp').setAttribute('transform', `translate(640 690) rotate(-8) scale(${(2.6 - 1.6 * E.in(ps)) * bounce})`);
+  // camera: beat pulse + quadratic-decay shake on the stamp
+  let dx = 0, dy = 0; if (t >= STAMP && t < STAMP + .4) { const k = 1 - (t - STAMP) / .4; dx = 20 * k * k * Math.sin(t * 91); dy = 20 * k * k * Math.cos(t * 77); }
+  const pulse = 1 + .006 * Math.exp(-((t % .5) / .07));
+  $('cam').setAttribute('transform', `translate(${dx + 960 * (1 - pulse)} ${dy + 540 * (1 - pulse)}) scale(${pulse})`);
+  // one small flash on the slam (≤ 0.35, 0.12 s): flash-safe
+  $('flash').setAttribute('opacity', t >= STAMP && t < STAMP + .12 ? .35 * (1 - (t - STAMP) / .12) : 0);
+  B.rec.setAttribute('opacity', Math.floor(t * 2 + 1e-4) % 2 ? .25 : 1);
+  // opening dot wipe: full navy cover shrinks away with a diagonal delay
+  B.wipe.forEach(([c, x, y]) => { const d = (x + y) / 3000 * .22, p = seg(t, d, d + .22); c.setAttribute('r', (1 - E.in(p)) * 70); });
+  drawFx(t);
+};
+</script>
+</body>
+</html>

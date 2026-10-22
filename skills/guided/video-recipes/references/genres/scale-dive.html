@@ -1,0 +1,284 @@
+<!doctype html>
+<!--
+  Scale dive ("powers of ten") demo — workbench → circuit board → chip die → transistors → silicon atoms.
+  Render: npx -y @helios-project/cli@latest render scale-dive.html -o scale-dive.mp4 --duration 17 --mode canvas
+  Core idea: z(t) is an eased level index; camera scale = exp(f·ln s) inside the current level, zooming about
+  the fixed point p = b/(1−s); every level is drawn in its own units relative to the current one.
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#111}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, s, d) => clamp((t - s) / d);
+const smooth = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
+const inOut = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const R = s => { const x = Math.sin(s * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); };
+const SANS = '"Space Grotesk", "Helvetica Neue", Arial, sans-serif', MONO = '"JetBrains Mono", Menlo, Consolas, monospace';
+
+// ---- Levels: w = view width in metres, s = child/parent width ratio, b = child centre in parent units,
+// reg = the child's region (the parent feature it lives inside) in the child's own units.
+const L = [
+  { name: 'Workbench',     note: 'a desk, one metre across',            w: 1,    s: 0.1,  b: [0.10, 0.03], draw: desk },
+  { name: 'Circuit board', note: 'the board inside a small device',      w: 0.1,  s: 0.1,  b: [0.02, -0.01], draw: board, reg: [-2, -1.2, 3, 2] },
+  { name: 'Chip die',      note: 'the silicon under the package lid',    w: 0.01, s: 1e-3, b: [-0.2, 0.06], draw: die,  reg: [-1, -0.7, 1.6, 1.6] },
+  { name: 'Transistors',   note: 'rows of logic cells',                  w: 1e-5, s: 2e-4, b: [0, -0.105],  draw: cells, reg: [-100, -60, 200, 140] },
+  { name: 'Silicon atoms', note: 'crystal lattice (2-D schematic)',      w: 2e-9, s: 0.5,  b: [0, 0],       draw: atoms, reg: [-112.5, -325, 225, 650] },
+];
+const N = L.length, T0 = 1.3, HOLD = 1.1, TR = 2.4, P = HOLD + TR;   // one transition per level, equal time each
+const END = T0 + (N - 1) * P - HOLD;                                // arrival at the last level (14.2 s)
+
+// z = continuous level index: eased transition + a small linear creep so holds never freeze.
+function zoomZ(t) {
+  let z = 0;
+  for (let i = 0; i < N; i++) {
+    const s0 = T0 + i * P;
+    if (i < N - 1) z += 0.06 * span(t, s0 - HOLD, P) + 0.94 * inOut(span(t, s0, TR));
+    else z += 0.05 * span(t, s0 - HOLD, P + 1);
+  }
+  return z;
+}
+
+// Bond wires: one list in board units, drawn by the board AND (mapped) by the die so they meet exactly.
+const wires = [];
+let atomSprite;
+const ready = (async () => {
+  for (let side = 0; side < 4; side++) for (let i = 0; i < 9; i++) {
+    const u = -0.06 + i * 0.015, rot = (x, y) => [[x, y], [-y, x], [-x, -y], [y, -x]][side];
+    wires.push([rot(0.0745, u), rot(0.15, u * 1.65)]);
+  }
+  atomSprite = document.createElement('canvas'); atomSprite.width = atomSprite.height = 128;
+  const g = atomSprite.getContext('2d'), gr = g.createRadialGradient(46, 44, 4, 64, 64, 62);
+  gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.35, '#cfe3ee'); gr.addColorStop(1, '#5d8597');
+  g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 62, 0, 7); g.fill();
+  await Promise.all([document.fonts.load(`700 40px ${SANS}`), document.fonts.load(`500 40px ${MONO}`), document.fonts.load(`700 40px ${MONO}`)]);
+})();
+
+// helpers that work in level units: lod() fades an element in by its size on screen, label() draws crisp text
+const lod = (size, S, a = 1.2, b = 4) => smooth(a, b, size * S);
+function rect(c, x, y, w, h, col, a = 1) { if (a <= 0) return; c.globalAlpha = a; c.fillStyle = col; c.fillRect(x, y, w, h); c.globalAlpha = 1; }
+function label(c, s, x, y, size, col, align = 'center') {
+  const m = c.getTransform(), px = size * m.a; if (px < 5) return;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = smooth(5, 9, px) * 0.9;
+  c.font = `700 ${px}px ${SANS}`; c.fillStyle = col; c.textAlign = align; c.textBaseline = 'middle';
+  c.fillText(s, m.a * x + m.e, m.d * y + m.f); c.restore();
+}
+
+function desk(c, S) {
+  rect(c, -0.7, -0.45, 1.4, 0.9, '#6f4b31');
+  c.lineWidth = 0.0016;
+  for (let i = 0; i < 64; i++) {
+    const y = -0.45 + i * 0.0145; c.strokeStyle = `rgba(38,20,8,${0.12 + 0.16 * R(i)})`; c.beginPath();
+    for (let x = -0.7; x <= 0.71; x += 0.02) c.lineTo(x, y + 0.004 * Math.sin(x * 8 + R(i + 5) * 6) + 0.002 * Math.sin(x * 29 + i));
+    c.stroke();
+  }
+  rect(c, -0.425, -0.155, 0.16, 0.22, 'rgba(0,0,0,.3)'); rect(c, -0.43, -0.16, 0.16, 0.22, '#efe7d4');   // notebook
+  for (let i = 0; i < 18; i++) rect(c, -0.43, -0.13 + i * 0.011, 0.16, 0.0012, '#9db6cf');
+  rect(c, -0.405, -0.16, 0.0015, 0.22, '#d98b84');
+  c.save(); c.translate(-0.21, 0.1); c.rotate(-0.5);                                                      // pencil
+  rect(c, 0, -0.0035, 0.15, 0.007, '#e8b73a'); rect(c, 0.15, -0.0035, 0.015, 0.007, '#c9c2b0'); rect(c, 0.165, -0.0035, 0.01, 0.007, '#d98b84');
+  c.fillStyle = '#e9cfa0'; c.beginPath(); c.moveTo(0, -0.0035); c.lineTo(-0.022, 0); c.lineTo(0, 0.0035); c.fill(); c.restore();
+  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.arc(0.385, -0.145, 0.046, 0, 7); c.fill();               // mug, top view
+  c.fillStyle = '#e9eef0'; c.beginPath(); c.arc(0.38, -0.15, 0.045, 0, 7); c.fill();
+  c.fillStyle = '#3d2416'; c.beginPath(); c.arc(0.38, -0.15, 0.036, 0, 7); c.fill();
+  rect(c, 0.42, -0.158, 0.03, 0.016, '#e9eef0');
+  rect(c, -0.094, -0.084, 0.3, 0.2, 'rgba(0,0,0,.35)');                                                     // board shadow (board itself = level 1)
+}
+
+function board(c, S, v) {
+  c.fillStyle = '#1c6a4a'; c.beginPath(); c.roundRect(-2, -1.2, 3, 2, 0.12); c.fill();
+  c.strokeStyle = '#2f8d65'; c.lineWidth = 0.012; c.lineCap = 'round';
+  for (let side = 0; side < 4; side++) for (let i = 0; i < 12; i++) {                                     // fan-out traces
+    const u = -0.132 + i * 0.024, rot = (x, y) => [[x, y], [-y, x], [-x, -y], [y, -x]][side];
+    const run = 0.35 + 0.5 * R(side * 31 + i), pts = [[0.2, u], [0.27, u], [0.27 + Math.abs(u) * 1.8, u * 2.8], [0.27 + Math.abs(u) * 1.8 + run, u * 2.8]];
+    c.beginPath(); pts.forEach(([x, y]) => c.lineTo(...rot(x, y))); c.stroke();
+    const [ex, ey] = rot(...pts[3]); c.fillStyle = '#c9a959'; c.beginPath(); c.arc(ex, ey, 0.016, 0, 7); c.fill();
+    rect(c, ex - 0.006, ey - 0.006, 0.012, 0.012, '#173f2e');
+  }
+  for (const [x, y] of [[-1.85, -1.05], [0.85, -1.05], [-1.85, 0.65], [0.85, 0.65]]) {                      // mounting holes
+    c.fillStyle = '#c9a959'; c.beginPath(); c.arc(x, y, 0.07, 0, 7); c.fill(); c.fillStyle = '#3a2618'; c.beginPath(); c.arc(x, y, 0.042, 0, 7); c.fill();
+  }
+  rect(c, -1.55, -1.09, 1.05, 0.075, '#141414');                                                           // pin header, 2.54 mm pitch
+  for (let i = 0; i < 40; i++) for (let r = 0; r < 2; r++) rect(c, -1.535 + i * 0.0254, -1.08 + r * 0.03, 0.012, 0.012, '#d8b65a', lod(0.012, S));
+  for (let i = 0; i < 60; i++) {                                                                            // 0603 passives
+    const x = -1.8 + R(i * 3.1) * 2.5, y = -0.9 + R(i * 7.7) * 1.6;
+    if (Math.abs(x) < 0.32 && Math.abs(y) < 0.32 || Math.abs(x + 1.15) < 0.36 && Math.abs(y + 0.35) < 0.24) continue;
+    const vert = R(i) > 0.5, w = vert ? 0.008 : 0.016, h = vert ? 0.016 : 0.008;
+    rect(c, x, y, w, h, R(i + 9) > 0.4 ? '#b8915e' : '#2b2b2b'); rect(c, x, y, vert ? w : 0.003, vert ? 0.003 : h, '#cfcfcf', lod(0.003, S));
+  }
+  chip(c, S, -1.15, -0.35, 0.5, 0.28, 'U2', false); chip(c, S, 0.55, 0.42, 0.2, 0.2, 'U3', true);
+  c.fillStyle = '#c8ccd0'; c.beginPath(); c.roundRect(0.3, -0.33, 0.11, 0.045, 0.02); c.fill(); label(c, 'Y1', 0.355, -0.255, 0.04, '#e9efe9');
+  chip(c, S, 0, 0, 0.34, 0.34, 'U1', true);
+  rect(c, -0.08, -0.08, 0.16, 0.16, '#5c5a52'); rect(c, -0.0745, -0.0745, 0.149, 0.149, '#2b2545');          // decapped die window
+  c.strokeStyle = '#e2c46b'; c.lineWidth = 0.0012;
+  for (const [a, b] of wires) { c.beginPath(); c.moveTo(...a); c.lineTo(...b); c.stroke(); }
+}
+function chip(c, S, x, y, w, h, name, quad) {
+  const n = Math.round(w / 0.024);
+  for (let i = 0; i < n; i++) {
+    const o = -w / 2 + (i + 0.5) * w / n;
+    rect(c, x + o - 0.005, y - h / 2 - 0.035, 0.01, h + 0.07, '#b9bdc2');
+    if (quad) rect(c, x - w / 2 - 0.035, y + o - 0.005, w + 0.07, 0.01, '#b9bdc2');
+  }
+  c.fillStyle = '#18191c'; c.beginPath(); c.roundRect(x - w / 2, y - h / 2, w, h, 0.01); c.fill();
+  c.fillStyle = '#2c2e33'; c.beginPath(); c.arc(x - w / 2 + 0.03, y - h / 2 + 0.03, 0.012, 0, 7); c.fill();
+  label(c, name, x, y + h / 2 + 0.07, 0.045, '#e9efe9');
+}
+
+function die(c, S, v) {
+  const g = c.createLinearGradient(-1, -0.7, 0.6, 0.9); g.addColorStop(0, '#2f2850'); g.addColorStop(0.5, '#3b3157'); g.addColorStop(1, '#262040');
+  c.fillStyle = g; c.fillRect(-1, -0.7, 1.6, 1.6);
+  c.strokeStyle = '#a08a52'; c.lineWidth = 0.006; c.strokeRect(-0.975, -0.675, 1.55, 1.55);
+  for (const [a, b] of wires) {                                                                            // same wires, die units
+    const m = p => [(p[0] - 0.02) / 0.1, (p[1] + 0.01) / 0.1], A = m(a), B = m(b);
+    rect(c, A[0] - 0.022, A[1] - 0.022, 0.044, 0.044, '#d7b65e');
+    c.strokeStyle = '#e2c46b'; c.lineWidth = 0.012; c.beginPath(); c.moveTo(...A); c.lineTo(...B); c.stroke();
+  }
+  const cores = [[-0.85, -0.5], [-0.43, -0.5], [-0.85, -0.08], [-0.43, -0.08]];
+  const blocks = [[0.02, 0.02, 0.09, 0.2, '#5a4c86'], [0.13, 0.02, 0.23, 0.04, '#4b4176'], [0.13, 0.08, 0.2, 0.14, '#295c5a'],
+                  [0.34, 0.08, 0.02, 0.14, '#6a5a94'], [0.02, 0.24, 0.34, 0.12, '#463c70']];
+  for (const [cx, cy] of cores) {
+    rect(c, cx, cy, 0.38, 0.38, '#3a3263'); c.strokeStyle = '#7363ab'; c.lineWidth = 0.004; c.strokeRect(cx, cy, 0.38, 0.38);
+    blocks.forEach(([x, y, w, h, col], k) => {
+      rect(c, cx + x, cy + y, w, h, col);
+      const pitch = k === 2 ? 0.0005 : 0.004, a = lod(pitch, S, 1.5, 5) * 0.55;
+      if (a > 0) for (let yy = cy + y + pitch / 2; yy < cy + y + h; yy += pitch) {                         // cell rows / bit lines
+        if (yy < v[1] - pitch || yy > v[1] + v[3] + pitch) continue;
+        rect(c, cx + x, yy, w, pitch * 0.075, k === 2 ? '#4f8fc9' : '#8f80c2', a);
+      }
+    });
+  }
+  for (let b = 0; b < 4; b++) {                                                                            // cache banks
+    const x = 0.02 + (b % 2) * 0.25, y = -0.5 + Math.floor(b / 2) * 0.41;
+    rect(c, x, y, 0.23, 0.38, '#4a3d6e'); rect(c, x + 0.1, y, 0.03, 0.38, '#6b5a92');
+    const a = lod(0.003, S, 1.5, 5) * 0.5; if (a > 0) for (let yy = y; yy < y + 0.38; yy += 0.003) rect(c, x, yy, 0.23, 0.0006, '#a596d0', a);
+  }
+  for (let i = 0; i < 7; i++) rect(c, -0.85 + i * 0.195, 0.37, 0.17, 0.12 + 0.2 * R(i + 40), ['#463c70', '#523f6c', '#3c3a6a'][i % 3]);
+  label(c, 'CORE 0', -0.66, -0.535, 0.03, '#b9aee0'); label(c, 'L2 CACHE', 0.26, -0.535, 0.03, '#b9aee0');
+}
+
+function cells(c, S, v) {
+  rect(c, v[0], v[1], v[2], v[3], '#295c5a');                      // far away: the rows' average colour
+  const d = smooth(3, 10, 0.5 * S); if (d <= 0) return;            // near: real rows fade in over it
+  rect(c, v[0], v[1], v[2], v[3], '#141d2a', d);
+  const k0 = Math.max(-120, Math.floor((v[1] - 0.25) / 0.5)), k1 = Math.min(160, Math.ceil((v[1] + v[3] + 0.25) / 0.5));
+  const x0 = Math.max(-100, v[0]), x1 = Math.min(100, v[0] + v[2]), aD = d, aR = d;
+  for (let k = k0; k <= k1; k++) {
+    const y = k * 0.5;
+    rect(c, x0, y - 0.25, x1 - x0, 0.035, '#3f74a8', aR); rect(c, x0, y + 0.215, x1 - x0, 0.035, '#3f74a8', aR);
+    rect(c, x0, y - 0.17, x1 - x0, 0.13, '#2c7a5a', aD); rect(c, x0, y + 0.04, x1 - x0, 0.13, '#2c7a5a', aD);
+    rect(c, x0, y - 0.012, x1 - x0, 0.024, '#a78bfa', aR * 0.35);
+    if (S < 70) continue;
+    const aG = lod(0.025, S, 2, 5);
+    for (let n = Math.floor(x0 / 0.07) - 1; n <= x1 / 0.07; n++) {
+      const x = n * 0.07, seed = k * 977 + n * 13.1, keep = (k === 0 && (n === 0 || n === -1)) || R(seed) > 0.15;
+      if (keep) rect(c, x + 0.035 - 0.0125, y - 0.2, 0.025, 0.4, '#e0675a', aG);
+      for (const side of [-1, 1]) {
+        if ((k === 0 && n === 0) || R(seed + side * 3) < 0.5) continue;
+        const cy = y + side * 0.105;
+        if (R(seed + side * 7) > 0.5) rect(c, x - 0.015, Math.min(cy, y + side * 0.232), 0.03, 0.127, '#5aa9e6', aG * 0.45);
+        rect(c, x - 0.011, cy - 0.011, 0.022, 0.022, '#f1e6cf', aG);
+      }
+    }
+  }
+}
+
+function atoms(c, S, v, t) {
+  rect(c, v[0], v[1], v[2], v[3], '#2c7a5a');
+  for (let o = 0; o < 3; o++) {                                     // octave stipple: something always expands
+    const cs = Math.pow(10, 2 - o) * 0.37, a = smooth(25, 90, cs * S) * (1 - smooth(500, 1400, cs * S)) * 0.5;
+    if (a <= 0) continue;
+    c.fillStyle = `rgba(190,235,215,${a})`;
+    for (let ix = Math.floor(v[0] / cs); ix <= (v[0] + v[2]) / cs; ix++) for (let iy = Math.floor(v[1] / cs); iy <= (v[1] + v[3]) / cs; iy++) {
+      const sd = ix * 157.3 + iy * 311.7 + o * 71; if (R(sd) > 0.45) continue;
+      c.beginPath(); c.arc((ix + R(sd + 1)) * cs, (iy + R(sd + 2)) * cs, cs * 0.025, 0, 7); c.fill();
+    }
+  }
+  const d = 0.1175, aA = smooth(200, 420, S); if (aA <= 0) return;  // Si–Si bond 0.235 nm; view = 2 nm
+  const a1 = Math.sqrt(3) * d, j0 = Math.floor(v[1] / (1.5 * d)) - 1, j1 = Math.ceil((v[1] + v[3]) / (1.5 * d)) + 1;
+  c.globalAlpha = aA; c.strokeStyle = '#9fd0bd'; c.lineWidth = 0.014; c.beginPath();
+  const each = fn => { for (let j = j0; j <= j1; j++) { const i0 = Math.floor((v[0] - j * a1 / 2) / a1) - 1; for (let i = i0; i <= i0 + v[2] / a1 + 2; i++) fn(i * a1 + j * a1 / 2, j * 1.5 * d); } };
+  each((x, y) => { c.moveTo(x, y + d); c.lineTo(x, y); c.moveTo(x, y + d); c.lineTo(x + a1 / 2, y + 1.5 * d); c.moveTo(x, y + d); c.lineTo(x - a1 / 2, y + 1.5 * d); });
+  c.stroke();
+  each((x, y) => { c.drawImage(atomSprite, x - 0.042, y - 0.042, 0.084, 0.084); c.drawImage(atomSprite, x - 0.042, y + d - 0.042, 0.084, 0.084); });
+  const q = smooth(END + 0.5, END + 1.3, t);                       // measured callout on one bond
+  if (q > 0) {
+    c.globalAlpha = q; c.strokeStyle = '#ffd36b'; c.lineWidth = 0.006; c.beginPath();
+    c.moveTo(0.075, 0); c.lineTo(0.075, d); c.moveTo(0.06, 0); c.lineTo(0.09, 0); c.moveTo(0.06, d); c.lineTo(0.09, d); c.stroke();
+    c.fillStyle = 'rgba(10,12,18,.72)'; c.beginPath(); c.roundRect(0.096, d / 2 - 0.022, 0.305, 0.044, 0.012); c.fill();
+    label(c, 'Si–Si bond ≈ 0.235 nm', 0.105, d / 2, 0.026, '#ffd36b', 'left');
+  }
+  c.globalAlpha = 1;
+}
+
+// ---- camera + level stack -------------------------------------------------------------------------------
+const covers = (ox, oy, S, r) => ox + r[0] * S <= 0 && oy + r[1] * S <= 0 && ox + (r[0] + r[2]) * S >= W && oy + (r[1] + r[3]) * S >= H;
+function scene(t) {
+  const z = zoomZ(t), i = Math.min(N - 1, Math.floor(z + 1e-9)), f = z - i, Li = L[i];
+  const k = Math.exp(f * Math.log(Li.s));                          // fraction of level i's width in view (log-linear in f)
+  const px = Li.b[0] / (1 - Li.s), py = Li.b[1] / (1 - Li.s);       // fixed point: no swing while zooming off-centre
+  let S = W / k, ox = W / 2 - px * (1 - k) * S, oy = H / 2 - py * (1 - k) * S;
+  for (let j = i; j < N && j <= i + 2; j++) {
+    const Lj = L[j], cS = S * Lj.s, cox = ox + Lj.b[0] * S, coy = oy + Lj.b[1] * S;
+    if (j > i && Lj.reg[2] * S < 2) break;
+    const childCovers = j + 1 < N && covers(cox, coy, cS, L[j + 1].reg);
+    if (!childCovers) {                                           // drop a level as soon as its child fills the frame
+      ctx.save(); ctx.setTransform(S, 0, 0, S, ox, oy);
+      if (j > i) { const r = Lj.reg; ctx.beginPath(); ctx.rect(r[0], r[1], r[2], r[3]); ctx.clip(); }
+      Lj.draw(ctx, S, [-ox / S, -oy / S, W / S, H / S], t); ctx.restore();
+    }
+    S = cS; ox = cox; oy = coy;
+  }
+  return { z, viewW: Li.w * k };
+}
+
+// ---- HUD ---------------------------------------------------------------------------------------------------
+const UNITS = [[1, 'm'], [1e-2, 'cm'], [1e-3, 'mm'], [1e-6, 'µm'], [1e-9, 'nm']];
+const si = m => { const [u, n] = UNITS.find(([u]) => m >= u * 0.999) || UNITS[4]; const x = m / u; return [x >= 100 ? x.toFixed(0) : x >= 10 ? x.toFixed(1) : x.toFixed(2), n]; };
+const siNice = m => { const [u, n] = UNITS.find(([u]) => m >= u * 0.999) || UNITS[4]; return `${+(m / u).toPrecision(2)} ${n}`; };
+function panel(x, y, w, h) { ctx.fillStyle = 'rgba(10,12,18,0.62)'; ctx.beginPath(); ctx.roundRect(x, y, w, h, 14); ctx.fill(); }
+function hud(t, z, viewW) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.textBaseline = 'alphabetic';
+  const base = Math.min(N - 1, Math.floor(z)), q = smooth(0.42, 0.6, z - base), intro = smooth(0.1, 0.7, t);
+  ctx.globalAlpha = intro; panel(64, 56, 600, 168);
+  ctx.save(); ctx.beginPath(); ctx.rect(64, 56, 600, 168); ctx.clip();
+  [[base, 1 - q, -170 * q], [base + 1, q, 170 * (1 - q)]].forEach(([j, a, dy]) => {   // old label slides up, new slides in
+    if (j >= N || a <= 0) return; const lv = L[j]; ctx.globalAlpha = intro * a;
+    ctx.fillStyle = '#ffd36b'; ctx.font = `700 24px ${MONO}`; ctx.fillText(`LEVEL ${String(j + 1).padStart(2, '0')} / ${String(N).padStart(2, '0')}`, 96, 104 + dy);
+    ctx.fillStyle = '#fff'; ctx.font = `700 64px ${SANS}`; ctx.fillText(lv.name, 96, 168 + dy);
+    ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = `500 26px ${SANS}`; ctx.fillText(lv.note, 96, 204 + dy);
+  });
+  ctx.restore(); ctx.globalAlpha = intro;
+  const e = Math.log10(viewW), lx = 120, lw = 900, ly = H - 92, ex = n => lx + lw * (-n / 9);   // power ladder
+  panel(64, H - 168, lw + 112, 120);
+  ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx + lw, ly); ctx.stroke();
+  ctx.font = `500 17px ${MONO}`; ctx.textAlign = 'center';
+  for (let n = 0; n >= -9; n--) {
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillRect(ex(n) - 1, ly - 9, 2, 18); ctx.fillText(siNice(Math.pow(10, n)), ex(n), ly + 38);
+  }
+  L.forEach(l => { ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.arc(ex(Math.log10(l.w)), ly, 6, 0, 7); ctx.fill(); });
+  const mx = ex(clamp(e, -9, 0)); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(mx, ly - 14); ctx.lineTo(mx - 11, ly - 32); ctx.lineTo(mx + 11, ly - 32); ctx.fill();
+  const [num, unit] = si(viewW);                                   // field of view + exponent + scale bar
+  panel(W - 560, H - 312, 496, 264); ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,.7)'; ctx.font = `500 22px ${MONO}`; ctx.fillText('FIELD OF VIEW', W - 96, H - 268);
+  ctx.fillStyle = '#fff'; ctx.font = `700 64px ${MONO}`; ctx.fillText(`${num} ${unit}`, W - 96, H - 196);
+  const ex10 = Math.round(e); ctx.font = `700 34px ${MONO}`; ctx.fillStyle = '#ffd36b';
+  const sup = `${ex10 < 0 ? '−' : ''}${Math.abs(ex10)}`; ctx.fillText('m', W - 96, H - 146);
+  ctx.font = `700 22px ${MONO}`; ctx.fillText(sup, W - 130, H - 162); const sw = ctx.measureText(sup).width;
+  ctx.font = `700 34px ${MONO}`; ctx.fillText('≈10', W - 136 - sw, H - 146);
+  const target = viewW * 300 / W, p10 = Math.pow(10, Math.floor(Math.log10(target))), nice = [5, 2, 1].map(m => m * p10).find(m => m <= target) || p10;
+  const bw = nice / viewW * W; ctx.fillStyle = '#fff'; ctx.fillRect(W - 96 - bw, H - 92, bw, 6); ctx.fillRect(W - 96 - bw, H - 104, 3, 24); ctx.fillRect(W - 99, H - 104, 3, 24);
+  ctx.font = `500 22px ${MONO}`; ctx.textAlign = 'right'; ctx.fillText(siNice(nice), W - 96, H - 112 + 0);
+  ctx.textAlign = 'left'; ctx.globalAlpha = 1;
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = '#111'; ctx.fillRect(0, 0, W, H);
+  const { z, viewW } = scene(t);
+  hud(t, z, viewW);
+};
+</script></body></html>

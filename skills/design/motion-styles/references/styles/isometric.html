@@ -1,0 +1,160 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render isometric.html -o isometric.mp4 --duration 9 -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#DCD5F6}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const W = 1920, H = 1080;
+const C = { void: '#DCD5F6', lav: '#EEEAFB', lavDeep: '#B7AAEE', road: '#D3CBF3', mint: '#BDEBD4', peach: '#FFD6C4', sky: '#C9E3F8', butter: '#FFEFB0',
+  ink: '#3B3A8C', cyan: '#2ED3EA', white: '#FBFAFF', unlit: '#D9D3F4' };
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const span = (t, a, d) => clamp((t - a) / d);
+const eio = u => (u = clamp(u), u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const outBack = (u, s = 1.6) => (u = clamp(u) - 1, 1 + (s + 1) * u * u * u + s * u * u);
+const mulberry = s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+// damped spring 0→1; ζ .61, ω 14.8 peaks ~9 % over at ~8 frames
+function spring(tau, w = 14.8, z = .61) { if (tau <= 0) return 0; const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * tau) * (Math.cos(wd * tau) + z * w / wd * Math.sin(wd * tau)); }
+
+// ---------- renderer, true isometric orthographic camera (looks down (1,1,1), never rotates) ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const FR = 5.6, camera = new THREE.OrthographicCamera(-FR * W / H, FR * W / H, FR, -FR, 1, 200);
+const bg = document.createElement('canvas'); bg.width = 4; bg.height = 256; { const g = bg.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#F1EEFC'); gr.addColorStop(1, '#CFC6F3'); g.fillStyle = gr; g.fillRect(0, 0, 4, 256); }
+scene.background = new THREE.CanvasTexture(bg); scene.background.colorSpace = THREE.SRGBColorSpace;
+scene.add(new THREE.HemisphereLight('#ffffff', '#A99BE6', 2.4));
+const sun = new THREE.DirectionalLight('#FFF6EC', 1.6); sun.position.set(-6, 14, 8); sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 40 }); sun.shadow.radius = 5; sun.shadow.bias = -.0006;
+scene.add(sun);
+const mat = {}; const M = c => mat[c] || (mat[c] = new THREE.MeshLambertMaterial({ color: c }));
+const box = (w, h, d, c, r = .06) => { const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, r), M(c)); m.castShadow = m.receiveShadow = true; return m; };
+
+// ---------- the island: 9×9 tiles on a layered slab ----------
+const N = 9, R = mulberry(4), island = new THREE.Group(); scene.add(island);
+[[-.45, .5, C.lavDeep], [-.85, .3, '#A497E6']].forEach(([y, h, c], i) => { const s = box(N + .3 - i * .1, h, N + .3 - i * .1, c, .12); s.position.y = y; island.add(s); });
+const ring = (i, j) => Math.max(Math.abs(i - 4), Math.abs(j - 4));
+const kind = (i, j) => { const r = ring(i, j); if (r === 0) return 'tower'; if (r === 1) return 'bldg'; if (r === 2) return 'road';
+  if ((i >= 7 && j <= 1)) return 'water'; if ((i + j * 3) % 5 === 0 || (i <= 1 && j >= 6)) return 'park'; return 'plain'; };
+const tiles = [];
+for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+  const k = kind(i, j), col = { road: C.road, water: C.sky, park: C.mint, tower: C.butter }[k] || C.lav;
+  const g = new THREE.Group(), m = box(.94, .2, .94, col, .07); m.position.y = -.1; g.add(m);
+  g.position.set(i - 4, 0, j - 4); island.add(g);
+  tiles.push({ g, d: Math.hypot(i - 4, j - 4), ax: R() < .5 ? 'x' : 'z' });
+}
+// ---------- buildings: slab, walls on a spring, roof 2–3 frames later; windows light in sequence ----------
+const bldgs = [], WALLS = [C.white, C.peach, C.sky, C.white, C.mint, C.white, C.peach, C.sky];
+let bi = 0;
+for (let i = 3; i <= 5; i++) for (let j = 3; j <= 5; j++) {
+  const tower = i === 4 && j === 4; if (!tower && ring(i, j) !== 1) continue;
+  const hgt = tower ? 5.2 : 1.1 + R() * 1.7, wcol = tower ? '#8D86E8' : WALLS[bi % 8], w = tower ? .62 : .72;
+  const g = new THREE.Group(); g.position.set(i - 4, 0, j - 4); island.add(g);
+  const slab = box(.86, .1, .86, C.road, .04);
+  const walls = box(w, 1, w, wcol, .05); walls.geometry.translate(0, .5, 0);
+  const roof = box(w + .08, .12, w + .08, tower ? C.ink : C.lavDeep, .04);
+  const wins = []; const floors = Math.floor(hgt / .34);
+  for (let f = 0; f < floors; f++) for (const [dx, dz, rx, rz] of [[w / 2 + .005, -.16, .02, .12], [w / 2 + .005, .16, .02, .12], [-.16, w / 2 + .005, .12, .02], [.16, w / 2 + .005, .12, .02]]) {
+    const win = new THREE.Mesh(new THREE.BoxGeometry(rx, .14 / hgt, rz), new THREE.MeshBasicMaterial({ color: C.unlit })); win.position.set(dx, (f + .55) * .34 / hgt, dz); win.userData.f = f; walls.add(win); wins.push(win); }
+  g.add(slab, walls, roof);
+  const t0 = tower ? 5.35 : 1.7 + bi * .3; bi += tower ? 0 : 1;
+  bldgs.push({ slab, walls, roof, wins, hgt, t0, tower, g });
+}
+// trees on park tiles, a wind turbine, a few cars on the ring road
+const trees = [];
+tiles.forEach(({ g }, n) => { const i = Math.round(g.position.x + 4), j = Math.round(g.position.z + 4); if (kind(i, j) !== 'park') return;
+  for (let k = 0; k < 2; k++) { const tr = new THREE.Group(), trunk = box(.06, .16, .06, '#B79C8E', .02), top = new THREE.Mesh(new THREE.SphereGeometry(.17, 16, 12), M('#7FD8AA'));
+    trunk.position.y = .08; top.position.y = .28; top.castShadow = true; tr.add(trunk, top); tr.position.set(g.position.x + (k ? .2 : -.2), 0, g.position.z + (k ? -.18 : .16)); island.add(tr);
+    trees.push({ tr, t0: 2.2 + Math.hypot(i - 4, j - 4) * .25 + k * .07 }); } });
+const turbine = new THREE.Group(), mast = box(.07, 2.2, .07, C.white, .03); mast.position.y = 1.1; turbine.add(mast);
+const hub = new THREE.Group(); hub.position.set(.05, 2.2, .05); turbine.add(hub);
+for (let k = 0; k < 3; k++) { const b = box(.05, .9, .02, C.white, .01); b.geometry.translate(0, .45, 0); b.rotation.x = 0; const p = new THREE.Group(); p.rotation.z = k * 2.094; p.add(b); hub.add(p); }
+hub.rotation.y = Math.PI / 4; turbine.position.set(-3.6, 0, 3.4); island.add(turbine);
+const cars = [0, .27, .55, .8].map((o, k) => { const c = box(.26, .14, .16, [C.ink, C.peach, C.sky, C.butter][k], .04); island.add(c); return { c, o }; });
+const ringPos = u => { u = ((u % 1) + 1) % 1; const s = u * 4, e = Math.floor(s), f = s - e, a = 2.0;   // square loop on the road ring
+  return [[-a + 2 * a * f, -a, 0], [a, -a + 2 * a * f, Math.PI / 2], [a - 2 * a * f, a, Math.PI], [-a, a - 2 * a * f, -Math.PI / 2]][e]; };
+// data links: cyan arcs from each building to the tower, with pulses
+const cyanM = new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true }), links = [];
+bldgs.filter(b => !b.tower).forEach((b, k) => { const a = new THREE.Vector3(b.g.position.x, b.hgt + .12, b.g.position.z), e = new THREE.Vector3(0, 3.2, 0);
+  const curve = new THREE.QuadraticBezierCurve3(a, a.clone().lerp(e, .5).add(new THREE.Vector3(0, 1.1, 0)), e);
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 32, .018, 6), cyanM); island.add(tube);
+  const pulse = new THREE.Mesh(new THREE.SphereGeometry(.07, 12, 8), cyanM); island.add(pulse); links.push({ curve, tube, pulse, k }); });
+const rings = [0, 1, 2].map(() => { const r = new THREE.Mesh(new THREE.TorusGeometry(.62, .03, 8, 48), cyanM.clone()); r.rotation.x = Math.PI / 2; island.add(r); return r; });
+const beam = new THREE.Mesh(new THREE.CylinderGeometry(.05, .12, 7, 16, 1, true), new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, depthWrite: false }));
+beam.position.y = 5.35 + 3.5; island.add(beam);
+// parallax layers: near clouds slide faster than the island, far islets slower
+const clouds = new THREE.Group(), far = new THREE.Group(); scene.add(clouds, far);
+const cloudM = new THREE.MeshLambertMaterial({ color: '#FFFFFF', transparent: true, opacity: .92 });
+[[-7.3, 6, 8.3], [6, 7, -7], [9, 5.5, 1]].forEach(([x, y, z]) => { const c = new THREE.Group();
+  [[0, 0, .7], [.6, .1, .55], [-.6, -.05, .5], [.25, .35, .5]].forEach(([dx, dy, r]) => { const s = new THREE.Mesh(new THREE.SphereGeometry(r, 20, 14), cloudM); s.position.set(dx, dy, -dx * .4); c.add(s); });
+  c.position.set(x, y, z); clouds.add(c); });
+[[-15, -3, -1], [7.7, -4, -7.1], [-6.8, -5, -16.7]].forEach(([x, y, z], k) => { const s = box(1.6 - k * .3, .3, 1.6 - k * .3, '#CBC2F2', .1); s.position.set(x, y, z); far.add(s); });
+// title set ON the iso ground plane, lower left of the island
+const tc = document.createElement('canvas'); tc.width = 2048; tc.height = 512; const tctx = tc.getContext('2d');
+const titleTex = new THREE.CanvasTexture(tc); titleTex.colorSpace = THREE.SRGBColorSpace; titleTex.anisotropy = 8;
+const title = new THREE.Mesh(new THREE.PlaneGeometry(8, 2), new THREE.MeshBasicMaterial({ map: titleTex, transparent: true }));
+title.rotation.x = -Math.PI / 2; title.position.set(-3.2, -.48, 7.6); scene.add(title);
+function drawTitle(p) {
+  tctx.setTransform(1, 0, 0, 1, 0, 0); tctx.clearRect(0, 0, 2048, 512);
+  const str = 'HALCYON GRID', n = str.length; tctx.font = '700 230px "Space Grotesk", Arial, sans-serif'; tctx.letterSpacing = '6px'; let x = 40;
+  for (let k = 0; k < n; k++) { const a = clamp(p * (n + 3) - k, 0, 1); tctx.globalAlpha = a; tctx.fillStyle = C.ink; tctx.fillText(str[k], x, 250 + 60 * (1 - a)); x += tctx.measureText(str[k]).width + 6; }
+  tctx.globalAlpha = clamp(p * 2 - 1); tctx.font = '500 92px "Space Grotesk", Arial, sans-serif'; tctx.letterSpacing = '18px'; tctx.fillStyle = '#6F69C9'; tctx.fillText('A CITY THAT BUILDS ITSELF', 48, 420);
+  tctx.fillStyle = C.cyan; tctx.fillRect(48, 448, 380 * clamp(p * 2 - 1), 14); titleTex.needsUpdate = true;
+}
+const ready = Promise.all([document.fonts.load('700 230px "Space Grotesk"', 'HALCYON'), document.fonts.load('500 92px "Space Grotesk"', 'CITY')]).then(() => document.fonts.ready);
+
+// ---------- camera grammar: parallel slides + ortho zoom, never rotation ----------
+const ISO = new THREE.Vector3(1, 1, 1).normalize().multiplyScalar(40), RIGHT = new THREE.Vector3(1, 0, -1).normalize();
+function setCamera(t) {
+  const slide = lerp(1.3, 0, eio(span(t, 0, 6.2))) - 1.0 * eio(span(t, 6.1, 1.5));        // along screen-right
+  const drop = lerp(.4, 0, eio(span(t, 0, 6.2))) + .75 * eio(span(t, 6.1, 1.5)) + .08 * Math.sin(t * .9); // along ground "down" (+x+z)
+  const target = RIGHT.clone().multiplyScalar(slide).add(new THREE.Vector3(drop * .7, .8 * eio(span(t, 6.1, 1.5)), drop * .7));
+  camera.position.copy(target).add(ISO); camera.up.set(0, 1, 0); camera.lookAt(target);
+  camera.zoom = lerp(1.24, 1.0, eio(span(t, 0, 6))) * lerp(1, .8, eio(span(t, 6.1, 1.5))); camera.updateProjectionMatrix();
+  clouds.position.copy(RIGHT).multiplyScalar(-slide * .35).add(new THREE.Vector3(.25 * t, 0, -.25 * t)); // faster than the island
+  far.position.copy(RIGHT).multiplyScalar(slide * .4);                                                 // slower than the island
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  setCamera(t);
+  for (const T of tiles) {                         // tiles flip in as a wave from the centre, 0.32 s each, with a little bounce
+    const p = span(t, -.3 + T.d * .2, .32), e = outBack(p, 2.2);
+    T.g.visible = p > 0; T.g.rotation.set(0, 0, 0); T.g.rotation[T.ax] = (1 - e) * Math.PI; T.g.position.y = .5 * Math.sin(Math.PI * clamp(p * 1.1));
+  }
+  for (const b of bldgs) {
+    const tau = t - b.t0, drop = clamp(tau / .16);
+    b.slab.visible = tau > 0; b.slab.position.y = .05 + 1.4 * (1 - drop * drop);
+    const s = spring(tau - .12); b.walls.visible = s > .001; b.walls.scale.set(1, Math.max(.001, s * b.hgt), 1); b.walls.position.y = .1;
+    const rp = clamp((tau - .2) / .12);              // roof caps ~3 frames after the walls start
+    b.roof.visible = rp > 0; b.roof.position.y = .1 + s * b.hgt + .06 + .7 * (1 - outBack(rp, 1.2));
+    const sweep = b.tower ? span(t, 5.6, .6) : span(t, 5.45 + b.g.position.x * .05, .5);   // windows light in a sweep at the hero beat
+    for (const w of b.wins) w.material.color.set(C.unlit).lerp(new THREE.Color(C.butter), clamp(sweep * 4 - w.userData.f * .25));
+  }
+  for (const { tr, t0 } of trees) { const s = spring(t - t0, 22, .45); tr.visible = s > .001; tr.scale.setScalar(Math.max(.001, s)); }
+  turbine.scale.setScalar(Math.max(.001, spring(t - 2.6, 16, .6))); hub.children.forEach((p, k) => p.rotation.z = k * 2.094 + t * 2.4);
+  for (const { c, o } of cars) { const [x, z, r] = ringPos(o + t * .07), a = span(t, 3.2, .4); c.visible = a > 0; c.position.set(x, .12, z); c.rotation.y = -r; }
+  for (const L of links) { const a = span(t, 4.9 + L.k * .05, .4); L.tube.visible = L.pulse.visible = a > 0;
+    L.pulse.position.copy(L.curve.getPoint(((t - 4.9) * .7 + L.k * .13) % 1)); }
+  cyanM.opacity = .85;
+  rings.forEach((r, k) => { const u = ((t - 5.7 - k * .45) / 1.35); r.visible = u > 0; const f = ((u % 1) + 1) % 1;
+    r.position.y = .4 + f * 5; r.scale.setScalar(1 + .25 * Math.sin(f * Math.PI)); r.material.opacity = .9 * Math.sin(f * Math.PI); });
+  const bp = span(t, 5.75, .25); beam.visible = bp > 0; beam.scale.set(1, bp, 1); beam.position.y = 5.4 + 3.5 * bp;   // hero: the data beam fires
+  beam.material.opacity = .55 * bp * (.8 + .2 * Math.sin(t * 7));
+  drawTitle(span(t, 6.6, 1.3));
+  renderer.render(scene, camera);
+};
+</script>
+</body>
+</html>

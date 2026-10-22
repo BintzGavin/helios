@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render sticker-explainer.html -o sticker-explainer.mp4 --duration 9 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#E9EEF2}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d');
+const BG = '#E9EEF2', DOT = '#CBD4DC', INK = '#25313D', MID = '#8C9AA8', CARD = '#F7F9FB', OR = '#FF5A36', LEAF = '#4FA36F', KRAFT = '#C9A27A';
+const SANS = 'Inter, "Helvetica Neue", Arial, sans-serif';
+
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const span = (t, a, d) => clamp((t - a) / d);
+const eo = u => 1 - Math.pow(1 - clamp(u), 3);
+const eio = u => (u = clamp(u), u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const wob = (dt, f = 4.5, k = 10) => dt < 0 ? 0 : Math.exp(-k * dt) * Math.cos(2 * Math.PI * f * dt);   // damped impulse
+
+// ---------- camera: keyframes; 'fly' segments use van Wijk smooth zoom, others ease in log-zoom ----------
+const KEYS = [
+  { t: 0, x: 830, y: 640, z: 1.08 }, { t: 1.45, x: 840, y: 645, z: 1.0 },
+  { t: 2.45, x: 1520, y: 1500, z: 1.08, fly: 1.1 }, { t: 3.55, x: 1530, y: 1505, z: 1.04 },
+  { t: 4.4, x: 2520, y: 720, z: 1.0, fly: 1.0 }, { t: 6.35, x: 2530, y: 715, z: 1.05 },
+  { t: 7.55, x: 1740, y: 1110, z: .55, fly: 1.3 }, { t: 9.2, x: 1740, y: 1105, z: .565 },
+];
+function vanWijk(a, b, rho, s) {           // a,b = [cx, cy, viewWidth]; returns the same at s∈[0,1]
+  const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy), r2 = rho * rho;
+  if (d < 1e-6) { const S = Math.log(b[2] / a[2]) / rho; return [a[0], a[1], a[2] * Math.exp(rho * s * S)]; }
+  const b0 = (b[2] * b[2] - a[2] * a[2] + r2 * r2 * d * d) / (2 * a[2] * r2 * d), b1 = (b[2] * b[2] - a[2] * a[2] - r2 * r2 * d * d) / (2 * b[2] * r2 * d);
+  const r0 = Math.log(Math.sqrt(b0 * b0 + 1) - b0), r1 = Math.log(Math.sqrt(b1 * b1 + 1) - b1), S = (r1 - r0) / rho, q = rho * s * S + r0;
+  const u = a[2] / (r2 * d) * (Math.cosh(r0) * Math.tanh(q) - Math.sinh(r0));
+  return [a[0] + dx * u, a[1] + dy * u, a[2] * Math.cosh(r0) / Math.cosh(q)];
+}
+function cam(t) {
+  if (t <= KEYS[0].t) return { ...KEYS[0] };
+  for (let i = 1; i < KEYS.length; i++) { const a = KEYS[i - 1], b = KEYS[i]; if (t > b.t) continue;
+    const u = (t - a.t) / (b.t - a.t);
+    if (b.fly) { const v = vanWijk([a.x, a.y, W / a.z], [b.x, b.y, W / b.z], b.fly, eio(u)); return { x: v[0], y: v[1], z: W / v[2] }; }
+    const e = u * u * (3 - 2 * u); return { x: lerp(a.x, b.x, e), y: lerp(a.y, b.y, e), z: Math.exp(lerp(Math.log(a.z), Math.log(b.z), e)) }; }
+  return { ...KEYS[KEYS.length - 1] };
+}
+const LAND = { cup: .2, branch: 2.4, sack: 2.6, pinA: 4.3, pinB: 5.35, slam: 5.7, word1: 7.5, word2: 7.68 };
+const jolt = t => 9 * wob(t - LAND.cup, 4, 16) + 5 * wob(t - LAND.branch, 4, 16) + 14 * wob(t - LAND.slam, 4, 14) + 6 * wob(t - LAND.word1, 4, 16);
+
+// ---------- stickers: drawn art -> die-cut white outline by dilation -> cached sprite ----------
+function sticker(w, h, art, pad = 14) {
+  const mkC = () => { const c = document.createElement('canvas'); c.width = w + pad * 4; c.height = h + pad * 4; return c; };
+  const A = mkC(), a = A.getContext('2d'); a.translate(pad * 2, pad * 2); a.lineJoin = 'round'; a.lineCap = 'round'; art(a);
+  const sil = mkC(), s = sil.getContext('2d'); s.drawImage(A, 0, 0); s.globalCompositeOperation = 'source-in'; s.fillStyle = '#fff'; s.fillRect(0, 0, sil.width, sil.height);
+  const out = mkC(), o = out.getContext('2d');
+  for (let i = 0; i < 32; i++) { const q = i / 32 * Math.PI * 2; o.drawImage(sil, Math.cos(q) * pad, Math.sin(q) * pad); }
+  o.drawImage(sil, 0, 0); o.drawImage(A, 0, 0);
+  return out;
+}
+const S = {};
+function ink(c, lw = 6) { c.strokeStyle = INK; c.lineWidth = lw; c.stroke(); }
+function blob(c, pts) { c.beginPath(); pts.forEach(([x, y]) => c.lineTo(x, y)); c.closePath(); }
+function buildStickers() {
+  S.cup = sticker(240, 330, c => {
+    blob(c, [[30, 70], [210, 70], [182, 330], [58, 330]]); c.fillStyle = CARD; c.fill(); ink(c);
+    blob(c, [[44, 150], [196, 150], [186, 245], [54, 245]]); c.fillStyle = OR; c.fill(); ink(c);
+    c.beginPath(); c.roundRect(14, 34, 212, 40, 14); c.fillStyle = INK; c.fill();
+    c.beginPath(); c.roundRect(46, 8, 148, 32, 12); c.fillStyle = INK; c.fill();
+    c.fillStyle = CARD; c.beginPath(); c.arc(120, 197, 22, 0, 7); c.fill();
+  });
+  S.branch = sticker(360, 300, c => {
+    c.beginPath(); c.moveTo(10, 250); c.bezierCurveTo(110, 200, 220, 170, 350, 60); c.strokeStyle = '#6B4E37'; c.lineWidth = 16; c.stroke();
+    for (const [x, y, r, a] of [[90, 200, 70, -2.2], [200, 150, 80, -1.9], [290, 90, 64, -2.5], [150, 190, 70, .9], [260, 130, 66, .7]]) {
+      c.save(); c.translate(x, y); c.rotate(a); c.beginPath(); c.ellipse(r * .55, 0, r * .6, r * .24, 0, 0, 7); c.fillStyle = LEAF; c.fill(); ink(c, 5);
+      c.beginPath(); c.moveTo(4, 0); c.lineTo(r * 1.05, 0); c.strokeStyle = '#2F6B47'; c.lineWidth = 3; c.stroke(); c.restore(); }
+    for (const [x, y] of [[120, 222], [150, 236], [176, 214], [232, 182], [258, 196], [214, 206]]) {
+      c.beginPath(); c.arc(x, y, 21, 0, 7); c.fillStyle = '#E2463F'; c.fill(); ink(c, 5); c.beginPath(); c.arc(x - 7, y - 7, 5, 0, 7); c.fillStyle = '#fff8'; c.fill(); }
+  });
+  S.sack = sticker(230, 250, c => {
+    blob(c, [[40, 60], [190, 60], [222, 232], [8, 232]]); c.fillStyle = KRAFT; c.fill(); ink(c);
+    blob(c, [[70, 18], [160, 18], [190, 62], [40, 62]]); c.fillStyle = '#B88D63'; c.fill(); ink(c);
+    c.beginPath(); c.roundRect(58, 52, 114, 18, 9); c.fillStyle = INK; c.fill();
+    c.fillStyle = '#7A5A3C'; c.font = `800 46px ${SANS}`; c.textAlign = 'center'; c.fillText('Nº 1', 115, 170);
+  });
+  const pin = col => sticker(110, 150, c => { c.beginPath(); c.arc(55, 52, 50, Math.PI * .82, Math.PI * 2.18); c.lineTo(55, 148); c.closePath(); c.fillStyle = col; c.fill(); ink(c);
+    c.beginPath(); c.arc(55, 52, 19, 0, 7); c.fillStyle = CARD; c.fill(); ink(c, 5); });
+  S.pinA = pin(LEAF); S.pinB = pin(OR);
+  S.ship = sticker(250, 130, c => {
+    [[40, 22, OR], [84, 22, CARD], [128, 22, MID], [62, -16, CARD], [106, -16, OR]].forEach(([x, y, col]) => { c.beginPath(); c.rect(x, y + 30, 42, 36); c.fillStyle = col; c.fill(); ink(c, 5); });
+    c.beginPath(); c.roundRect(188, 4, 34, 84, 6); c.fillStyle = CARD; c.fill(); ink(c, 5);
+    blob(c, [[0, 88], [250, 88], [222, 128], [24, 128]]); c.fillStyle = INK; c.fill(); ink(c);
+  });
+  const word = (str, size, col) => { const m = document.createElement('canvas').getContext('2d'); m.font = `800 ${size}px ${SANS}`;
+    const w = Math.ceil(m.measureText(str).width) + 8; return sticker(w, size * 1.05, c => { c.font = `800 ${size}px ${SANS}`; c.letterSpacing = '-2px'; c.fillStyle = col; c.fillText(str, 4, size * .86); }, 16); };
+  S.word1 = word('Every cup', 170, INK); S.word2 = word('is a world tour.', 150, OR);
+}
+const ready = Promise.all([document.fonts.load(`800 100px Inter`, '9,700 km'), document.fonts.load(`600 24px Inter`, 'EXPLAINER'), document.fonts.load(`500 30px Inter`, 'above')])
+  .then(() => document.fonts.ready).then(buildStickers);
+
+// slap: scale 1.3→1, rotate +6°→0, shadow lift 1→0 over 0.2 s, then a damped wobble on contact
+function slap(t, land, dur = .2) {
+  const p = (t - (land - dur)) / dur;
+  if (p < 0) return null;
+  if (p < 1) { const L = 1 - p * p; return { s: 1 + .3 * L, r: 6 * L, lift: L, o: clamp(p * 5) }; }
+  const w = wob(t - land); return { s: 1 - .035 * w, r: -.8 * w, lift: 0, o: 1 };
+}
+function drawSticker(c, img, x, y, rot, t, land, k = 1) {
+  const sl = slap(t, land); if (!sl) return;
+  c.save(); c.translate(x, y); c.rotate((rot + sl.r) * Math.PI / 180); c.scale(sl.s * k, sl.s * k); c.globalAlpha *= sl.o;
+  c.shadowColor = `rgba(22,34,46,${.22 - .06 * sl.lift})`; c.shadowBlur = 14 + 40 * sl.lift; c.shadowOffsetY = 6 + 30 * sl.lift;
+  c.drawImage(img, -img.width / 2, -img.height / 2); c.restore();
+}
+// count-up with tabular digits: every digit sits in a fixed cell, so the number never jitters
+function tabular(c, str, x, y, size, col) {
+  c.font = `800 ${size}px ${SANS}`; c.fillStyle = col; c.textAlign = 'center';
+  const cell = c.measureText('0').width; let cx = x;
+  for (const ch of str) { const w = /\d/.test(ch) ? cell : c.measureText(ch).width; c.fillText(ch, cx + w / 2, y); cx += w; }
+  c.textAlign = 'left'; return cx;
+}
+const fmt = n => Math.round(n).toLocaleString('en-US');
+function text(c, str, x, y, font, col, a = 1, track = 0) { c.font = font; c.letterSpacing = track + 'px'; c.fillStyle = col; c.globalAlpha = a; c.fillText(str, x, y); c.globalAlpha = 1; c.letterSpacing = '0px'; }
+function kicker(c, label, x, y, a) { if (a <= 0) return; c.globalAlpha = a; c.fillStyle = OR; c.fillRect(x, y - 18, 18, 18); text(c, label, x + 32, y, `600 22px ${SANS}`, MID, a, 4); }
+function rise(c, str, x, y, font, col, p) {   // a line of type rising out of a mask
+  if (p <= 0) return; c.save(); c.beginPath(); c.rect(x - 10, y - 120, 1600, 140); c.clip(); text(c, str, x, y + 90 * (1 - eo(p)), font, col); c.restore();
+}
+
+// ---------- the world (drawn in world units under the camera matrix) ----------
+function drawWorld(c, t, C) {
+  c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = 1; c.shadowColor = 'transparent'; c.fillStyle = BG; c.fillRect(0, 0, W, H);
+  c.setTransform(C.z, 0, 0, C.z, W / 2 - C.x * C.z, H / 2 - C.y * C.z + jolt(t));
+  const x0 = C.x - W / 2 / C.z, y0 = C.y - H / 2 / C.z, x1 = C.x + W / 2 / C.z, y1 = C.y + H / 2 / C.z;
+  c.fillStyle = DOT;                                 // world-anchored dot grid: it is what makes camera moves read
+  for (let gy = Math.floor(y0 / 56) * 56; gy < y1; gy += 56) for (let gx = Math.floor(x0 / 56) * 56; gx < x1; gx += 56) c.fillRect(gx - 2.2, gy - 2.2, 4.4, 4.4);
+  // the journey line between sections, drawn while the camera flies along it
+  c.save(); c.setLineDash([2, 22]); c.lineCap = 'round'; c.lineWidth = 7; c.strokeStyle = MID;
+  const seg = (ax, ay, bx, by, p) => { if (p <= 0) return; c.beginPath(); c.moveTo(ax, ay); c.lineTo(lerp(ax, bx, p), lerp(ay, by, p)); c.stroke(); };
+  seg(1180, 1000, 1180, 1300, eio(span(t, 1.5, .9))); seg(1900, 1220, 2060, 1080, eio(span(t, 3.6, .8))); seg(2780, 1160, 2700, 1400, eio(span(t, 6.4, .9))); c.restore();
+
+  // A — title
+  kicker(c, 'EXPLAINER  ·  Nº 07', 220, 420, span(t, 0, .25));
+  rise(c, 'One cup of coffee.', 214, 540, `800 92px ${SANS}`, INK, span(t, .05, .5));
+  rise(c, 'How far did it travel?', 214, 650, `800 92px ${SANS}`, INK, span(t, .25, .5));
+  const ul = eo(span(t, .8, .4)); if (ul > 0) { c.fillStyle = OR; c.fillRect(218, 668, 345 * ul, 12); }
+  text(c, 'A journey in three numbers', 220, 740, `500 30px ${SANS}`, MID, span(t, .95, .3));
+  drawSticker(c, S.cup, 1420, 650, -5, t, LAND.cup);
+  for (let i = 0; i < 3; i++) { const a = clamp((t - .5 - i * .1) * 3); if (a <= 0) continue;   // steam: live strokes over the sticker
+    c.beginPath(); for (let k = 0; k <= 12; k++) { const yy = 470 - k * 9; c.lineTo(1378 + i * 32 + 9 * Math.sin(k * .7 + t * 5 + i), yy); }
+    c.strokeStyle = `rgba(140,154,168,${.7 * a})`; c.lineWidth = 6; c.lineCap = 'round'; c.stroke(); }
+
+  // B — origin
+  kicker(c, '01  ORIGIN', 1560, 1330, span(t, 2.3, .3));
+  const alt = eo(span(t, 2.5, .9));
+  if (alt > 0) { const e = tabular(c, fmt(1400 * alt), 1554, 1490, 150, INK); text(c, 'm', e + 14, 1490, `800 80px ${SANS}`, INK); }
+  text(c, 'above sea level, where the cherries ripen', 1562, 1552, `500 30px ${SANS}`, MID, span(t, 2.9, .3));
+  drawSticker(c, S.branch, 1170, 1470, -4, t, LAND.branch);
+  drawSticker(c, S.sack, 1330, 1680, 9, t, LAND.sack, .8);
+  const lp = eo(span(t, 3.0, .35));                  // leader line from a cherry to its label
+  if (lp > 0) { c.strokeStyle = INK; c.lineWidth = 3; c.beginPath(); c.moveTo(1216, 1540); c.lineTo(lerp(1216, 1550, lp), lerp(1540, 1626, lp)); c.stroke();
+    c.fillStyle = INK; c.beginPath(); c.arc(1216, 1540, 7, 0, 7); c.fill(); text(c, 'one cherry  =  two beans', 1562, 1636, `600 26px ${SANS}`, INK, span(t, 3.25, .2), 1); }
+
+  // C — route
+  kicker(c, '02  ROUTE', 2080, 420, span(t, 4.2, .3));
+  const A = [2140, 860], B = [2900, 640], Q = [2470, 330], bez = u => [(1 - u) * (1 - u) * A[0] + 2 * u * (1 - u) * Q[0] + u * u * B[0], (1 - u) * (1 - u) * A[1] + 2 * u * (1 - u) * Q[1] + u * u * B[1]];
+  const rp = eio(span(t, 4.45, .95));
+  if (rp > 0) { c.save(); c.setLineDash([22, 16]); c.lineDashOffset = -t * 40; c.lineWidth = 8; c.strokeStyle = INK; c.lineCap = 'round';
+    c.beginPath(); for (let i = 0; i <= 60 * rp; i++) { const p = bez(i / 60); c.lineTo(p[0], p[1]); } c.stroke(); c.restore(); }
+  drawSticker(c, S.pinA, A[0], A[1] - 70, -6, t, LAND.pinA, .9);
+  drawSticker(c, S.pinB, B[0], B[1] - 70, 5, t, LAND.pinB, .9);
+  if (rp > 0 && t < LAND.pinB) { const u = Math.min(rp, .999), p = bez(u), q = bez(Math.min(1, u + .01)), ang = Math.atan2(q[1] - p[1], q[0] - p[0]) * 180 / Math.PI;
+    c.globalAlpha = clamp((LAND.pinB - t) * 6); drawSticker(c, S.ship, p[0], p[1] - 40, ang * .5, t, 4.45, .55); c.globalAlpha = 1; }
+  text(c, 'farm', A[0] - 34, A[1] + 50, `600 26px ${SANS}`, INK, span(t, 4.35, .2), 2);
+  text(c, 'roaster', B[0] - 52, B[1] + 50, `600 26px ${SANS}`, INK, span(t, 5.4, .2), 2);
+  const km = eo(span(t, 4.5, 1.2)), hs = 1 + .22 * Math.max(0, 1 - (t - LAND.slam) / .12) * (t >= LAND.slam ? 1 : 0) - .05 * wob(t - LAND.slam, 4, 9);
+  if (km > 0) { c.save(); c.translate(2220, 1050); c.scale(hs, hs); const e = tabular(c, fmt(9700 * km), 0, 0, 170, t >= LAND.slam ? OR : INK);
+    text(c, 'km', e + 16, 0, `800 90px ${SANS}`, t >= LAND.slam ? OR : INK); c.restore(); }
+  text(c, 'by sea, from farm to roaster', 2228, 1112, `500 30px ${SANS}`, MID, span(t, 5.0, .3));
+
+  // D — end card stickers, sized to read at the pulled-back zoom
+  drawSticker(c, S.word1, 2640, 1560, -3, t, LAND.word1);
+  drawSticker(c, S.word2, 2740, 1760, 2, t, LAND.word2);
+}
+
+const acc = document.createElement('canvas'); acc.width = W; acc.height = H; const actx = acc.getContext('2d');
+window.renderAt = async (t) => {
+  await ready;
+  const C = cam(t), P = cam(t - 1 / 60);
+  const speed = Math.hypot((C.x - P.x) * C.z, (C.y - P.y) * C.z) + Math.abs(Math.log(C.z / P.z)) * 1400;  // screen px per half-frame
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
+  if (speed < 6) { drawWorld(ctx, t, C); return; }
+  // camera motion blur only on fast flights: average N sub-frames across a 180° shutter
+  const N = Math.min(20, 2 + Math.ceil(speed / 3));                  // keep sub-frames ≤ ~3 px apart
+  for (let i = 0; i < N; i++) {
+    const ts = t - (i / (N - 1)) / 60;
+    drawWorld(actx, ts, cam(ts)); actx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1 / (i + 1); ctx.drawImage(acc, 0, 0);
+  }
+  ctx.globalAlpha = 1;
+};
+</script>
+</body>
+</html>

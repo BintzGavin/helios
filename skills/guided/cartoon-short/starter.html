@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Cartoon-short starter: an original character ("Bean") with acted emotions on boiling ink-and-paint.
+     Render: npx -y @helios-project/cli@latest render starter.html -o bean.mp4 --duration 6 --fps 24 --mode canvas -->
+<style>html,body{margin:0;overflow:hidden;background:#f3ebdc}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, TAU = Math.PI * 2;
+const ctx = document.getElementById('c').getContext('2d');
+
+// ---------- maths ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const ease = (x) => { x = clamp(x); return x * x * (3 - 2 * x); };
+const easeIn = (x) => clamp(x) ** 3;
+const backOut = (x) => { x = clamp(x); const s = 1.9; return 1 + (s + 1) * (x - 1) ** 3 + s * (x - 1) ** 2; };
+const hash = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }; // never boils
+const mixCol = (a, b, k) => {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const c = (s) => Math.round(lerp((pa >> s) & 255, (pb >> s) & 255, clamp(k)));
+  return '#' + ((1 << 24) + (c(16) << 16) + (c(8) << 8) + c(0)).toString(16).slice(1);
+};
+
+// ---------- boil: one seed per element per drawing ----------
+const BOIL = 12;                       // drawings per second; render at --fps 24 so each holds exactly 2 frames
+let BN = 0;                            // current boil drawing, set at the top of renderAt
+function rng(key) {                    // FNV-1a of (key, drawing) -> mulberry32 stream
+  let h = 2166136261;
+  for (const ch of key + '|' + BN) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  return () => { h = (h + 0x6D2B79F5) | 0; let x = Math.imul(h ^ (h >>> 15), 1 | h);
+    x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+}
+const wob = (P, r, j) => P.map(([x, y]) => [x + (r() * 2 - 1) * j, y + (r() * 2 - 1) * j]);
+function smooth(P, closed = true, begin = true) { // quadratic curve through midpoints; begin = false adds to the current path (shaped iris)
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  if (begin) ctx.beginPath();
+  if (!closed) { ctx.moveTo(...P[0]); for (let i = 1; i < P.length - 1; i++) ctx.quadraticCurveTo(...P[i], ...mid(P[i], P[i + 1])); ctx.lineTo(...P.at(-1)); return; }
+  ctx.moveTo(...mid(P.at(-1), P[0]));
+  P.forEach((p, i) => ctx.quadraticCurveTo(p[0], p[1], ...mid(p, P[(i + 1) % P.length])));
+  ctx.closePath();
+}
+const PAL = { ink: '#2b2233', paper: '#f3ebdc', cream: '#fff5e2', sky: '#c9d8e6', hill: '#a9c49a', hillDk: '#86a77c' };
+
+// One painted shape: fill slightly off the line (misregistration), a light pool, a dark settle, ink last.
+function paint(P, { key, fill, lt, dk, ink = PAL.ink, w = 4, j = 2 }) {
+  const r = rng(key);
+  if (fill) {
+    smooth(wob(P, r, j * 1.4)); ctx.fillStyle = fill; ctx.fill();
+    if (lt || dk) {
+      ctx.save(); ctx.clip();
+      const ys = P.map((p) => p[1]), xs = P.map((p) => p[0]);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+      if (lt) { ctx.globalAlpha = .45; ctx.fillStyle = lt; ctx.beginPath();
+        ctx.ellipse(lerp(x0, x1, .36), lerp(y0, y1, .28), (x1 - x0) * .26, (y1 - y0) * .16, -.3, 0, TAU); ctx.fill(); }
+      if (dk) { ctx.globalAlpha = .4; ctx.fillStyle = dk; ctx.fillRect(x0 - 9, lerp(y0, y1, .8 + r() * .02), x1 - x0 + 18, y1 - y0); }
+      ctx.restore();
+    }
+  }
+  if (!ink) return;
+  const O = wob(P, r, j);
+  ctx.strokeStyle = ink; ctx.lineJoin = ctx.lineCap = 'round';
+  smooth(O); ctx.lineWidth = w; ctx.stroke();                                     // main stroke
+  ctx.globalAlpha = .45; smooth(wob(O, r, j * .6)); ctx.lineWidth = w * .45; ctx.stroke(); ctx.globalAlpha = 1; // dry second pass
+}
+function inkLine(P, { key, w = 4, j = 1.5, ink = PAL.ink }) {
+  const r = rng(key); ctx.strokeStyle = ink; ctx.lineCap = ctx.lineJoin = 'round'; ctx.lineWidth = w;
+  smooth(wob(P, r, j), false); ctx.stroke();
+}
+const rectPts = (x, y, w, h) => [[x, y], [x + w / 2, y], [x + w, y], [x + w, y + h / 2], [x + w, y + h], [x + w / 2, y + h], [x, y + h], [x, y + h / 2]];
+const ellPts = (cx, cy, rx, ry, n = 16, rot = 0) => Array.from({ length: n }, (_, i) => {
+  const a = i / n * TAU; const x = Math.cos(a) * rx, y = Math.sin(a) * ry;
+  return [cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)];
+});
+
+// ---------- paper and grain: generated once, seeded ----------
+let paper, grain;
+function makePaper() {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  let s = 7; const R = () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296;
+  g.fillStyle = PAL.paper; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 60; i++) { const x = R() * W, y = R() * H, r = 60 + R() * 260;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(160,130,90,${.03 + R() * .04})`); gr.addColorStop(1, 'rgba(160,130,90,0)');
+    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+  g.strokeStyle = 'rgba(120,100,70,.08)'; g.lineWidth = 1;
+  for (let i = 0; i < 1400; i++) { const x = R() * W, y = R() * H, a = R() * TAU, l = 6 + R() * 18;
+    g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + Math.cos(a) * l / 2 + R() * 4, y + Math.sin(a) * l / 2, x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+  return c;
+}
+function makeGrain() {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  const img = g.createImageData(W, H); let s = 99;
+  for (let i = 0; i < img.data.length; i += 4) {
+    s = (s * 1664525 + 1013904223) >>> 0; const px = (i / 4) % W, py = Math.floor(i / 4 / W);
+    const v = Math.hypot(px / W - .5, py / H - .5); const k = 255 - (s >>> 24) * .09 - Math.max(0, v - .35) * 120;
+    img.data[i] = img.data[i + 1] = img.data[i + 2] = k; img.data[i + 3] = 255;
+  }
+  g.putImageData(img, 0, 0); return c;
+}
+
+// ---------- motion, closed form ----------
+const spring = (t, t0, k = 6, w = 18) => t < t0 ? 0 : Math.exp(-k * (t - t0)) * Math.sin(w * (t - t0));
+function jump(t, t0, t1, h = 3) {     // crouch, stretch on takeoff, parabola, squash and settle on landing
+  if (t < t0 - .12) return { dy: 0, sq: 0 };
+  if (t < t0) return { dy: 0, sq: .18 * ease(seg(t, t0 - .12, t0)) };
+  if (t < t1) { const k = (t - t0) / (t1 - t0); return { dy: -h * 4 * k * (1 - k), sq: -.16 * Math.abs(1 - 2 * k) }; }
+  const a = t - t1; return { dy: 0, sq: .22 * Math.exp(-8 * a) * Math.cos(20 * a) };
+}
+function take(t, t0, amt = 1) {       // surprise: tiny squash just before t0, big stretch that springs back
+  if (t < t0 - .1) return { sq: 0, dy: 0 };
+  if (t < t0) return { sq: .12 * amt * ease(seg(t, t0 - .1, t0)), dy: 0 };
+  const a = t - t0; return { sq: -.28 * amt * Math.exp(-7 * a) * Math.cos(16 * a), dy: -.8 * amt * Math.exp(-9 * a) };
+}
+const BPM = 100, beat = (t) => t * BPM / 60;   // one pulse for every idle, even with no music
+const abs1 = (t) => Math.abs(Math.sin(beat(t) * Math.PI));
+
+// ---------- emotions are data ----------
+const EMO = {
+  bored:     { eyes: 'half',  mouth: 'flat',  take: .2, body: (t) => ({ dy: -.1 * abs1(t), rot: .03 * Math.sin(t * 1.3), lookX: -.4 }) },
+  surprised: { eyes: 'wide',  mouth: 'O',     take: 1.3, emote: '!', body: (t) => ({ sq: -.05, aL: 1.2, aR: 1.0 }) },
+  happy:     { eyes: 'happy', mouth: 'smile', take: .6, blush: .5, body: (t) => ({ dy: -.9 * abs1(t), aL: .5 + .4 * Math.sin(beat(t) * Math.PI), aR: .3 - .3 * Math.sin(beat(t) * Math.PI) }) },
+  sad:       { eyes: 'sad',   mouth: 'frown', take: .3, tint: '#8fb3c9', body: (t) => ({ dy: .3, sq: .05, aL: -.5, aR: -.6, lookY: .5 }) },
+};
+const POSE = { dy: 0, sq: 0, rot: 0, aL: .2, aR: .2, lookX: 0, lookY: 0 };
+function feel(name, t) { const E = EMO[name]; return { eyes: E.eyes, mouth: E.mouth, blush: E.blush || 0, tint: E.tint, emote: E.emote, ...POSE, ...E.body(t) }; }
+// Acted changes: squint shut 0.1s before a key, swap the face under it, open over 0.14s;
+// a take sized by the new emotion; pose blends with overshoot over 0.4s; colour cross-fades over 0.3s.
+function emotions(t, keys) {
+  let i = 0; while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
+  const [tc, name] = keys[i], age = t - tc, cur = feel(name, t), tn = keys[i + 1]?.[0] ?? Infinity;
+  let squint = 0;
+  if (tn - t < .1) squint = 1 - (tn - t) / .1;
+  if (i > 0 && age < .14) squint = Math.max(squint, 1 - age / .14);
+  if (i > 0 && age < .5) {
+    const prev = feel(keys[i - 1][1], t), k = backOut(seg(age, 0, .4)), kc = ease(seg(age, 0, .3));
+    for (const f in POSE) cur[f] = lerp(prev[f], cur[f], k);
+    cur.blush = lerp(prev.blush, cur.blush, kc);
+    cur.tintFrom = prev.tint; cur.tintK = kc;
+  }
+  const a = i > 0 ? take(t, tc, EMO[name].take) : { sq: 0, dy: 0 };
+  const b = i + 1 < keys.length ? take(t, tn, EMO[keys[i + 1][1]].take) : { sq: 0, dy: 0 }; // next key's anticipation
+  cur.sq += a.sq + b.sq; cur.dy += a.dy + b.dy;
+  cur.squint = squint; cur.emoteK = cur.emote ? backOut(seg(age, .06, .32)) * (1 - seg(age, 1.4, 1.8)) : 0;
+  return cur;
+}
+
+// ---------- the character: designed for this video, not borrowed ----------
+const BEAN = { col: '#7fc8a9', lt: '#c9f0dc', dk: '#4f9a80' };
+function bean(x, gy, u, o, key = 'bean') {
+  const col = mixCol(o.tintFrom || BEAN.col, o.tint || BEAN.col, o.tintK ?? 1); // fades into and out of a tint
+  ctx.save(); ctx.translate(x, gy);
+  // shadow shrinks as the body rises
+  const lift = clamp(-o.dy / 4, 0, 1);
+  ctx.globalAlpha = .18 * (1 - lift * .6); ctx.fillStyle = PAL.ink; ctx.beginPath();
+  ctx.ellipse(0, 0, 4.4 * u * (1 - lift * .4), .8 * u, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+  ctx.translate(o.dx * u || 0, o.dy * u); ctx.rotate(o.rot); ctx.scale(1 + o.sq * .6, 1 - o.sq); // volume-keeping squash
+  const sw = clamp(u / 7, 1.5, 7), J = u * .07;
+  // legs (behind), then arms behind, body, face, arms in front
+  for (const [lx, k] of [[-1.6, 'legL'], [1.6, 'legR']]) inkLine([[lx * u, -1.2 * u], [lx * u * 1.05, -.4 * u], [lx * u * 1.1, 0]], { key: key + k, w: sw * 1.4, j: J });
+  const body = [[0, -9], [2.6, -8.6], [4, -6.6], [4.3, -3.6], [3.4, -1.3], [0, -.6], [-3.4, -1.3], [-4.3, -3.6], [-4, -6.6], [-2.6, -8.6]].map(([a, b]) => [a * u, b * u]);
+  paint(body, { key: key + 'body', fill: col, lt: BEAN.lt, dk: BEAN.dk, w: sw, j: J });
+  // face: eye drawers + mouth drawers; the eye shape carries the brow
+  const ex = 1.6 * u, ey = -6 * u, lx = o.lookX * .5 * u, ly = o.lookY * .4 * u;
+  const blink = ((beatT + (o.seed || 0) * 1.7) % 3.3) < .12;
+  const sq = Math.max(o.squint, blink && ['wide', 'dot'].includes(o.eyes) ? 1 : 0);
+  for (const s of [-1, 1]) {
+    const cx = s * ex + lx, cy = ey + ly, k = key + 'eye' + s;
+    if (sq > .8 || o.eyes === 'happy') { // closed or happy arc
+      const up = o.eyes === 'happy' && sq <= .8 ? -1 : 1;
+      inkLine([[cx - .6 * u, cy], [cx, cy + up * .45 * u], [cx + .6 * u, cy]], { key: k, w: sw, j: J * .5 });
+    } else {
+      const ry = (o.eyes === 'wide' ? 1.0 : o.eyes === 'half' ? .45 : .8) * u * (1 - sq);
+      paint(ellPts(cx, cy, (o.eyes === 'wide' ? .8 : .6) * u, ry, 10), { key: k, fill: PAL.cream, w: sw * .7, j: J * .4 });
+      ctx.fillStyle = PAL.ink; ctx.beginPath(); ctx.arc(cx + lx * .4, cy + ry * .15 + ly * .3, Math.min(ry, .32 * u), 0, TAU); ctx.fill();
+      if (o.eyes === 'half') inkLine([[cx - .7 * u, cy - .1 * u], [cx + .7 * u, cy - .1 * u]], { key: k + 'lid', w: sw, j: J * .3 });
+      if (o.eyes === 'sad') inkLine([[cx - .6 * u * s, cy - 1.1 * u], [cx + .6 * u * s, cy - 1.4 * u]], { key: k + 'brow', w: sw * .8, j: J * .3 });
+    }
+  }
+  const my = -4.2 * u + ly * .5, mx = lx * .6, mk = key + 'mouth';
+  if (o.mouth === 'smile') inkLine([[mx - 1.2 * u, my - .2 * u], [mx, my + .6 * u], [mx + 1.2 * u, my - .2 * u]], { key: mk, w: sw, j: J * .4 });
+  if (o.mouth === 'frown') inkLine([[mx - .9 * u, my + .4 * u], [mx, my - .2 * u], [mx + .9 * u, my + .4 * u]], { key: mk, w: sw, j: J * .4 });
+  if (o.mouth === 'flat') inkLine([[mx - .7 * u, my + .1 * u], [mx + .8 * u, my]], { key: mk, w: sw, j: J * .3 });
+  if (o.mouth === 'O') paint(ellPts(mx, my + .2 * u, .55 * u, .75 * u, 10), { key: mk, fill: '#7a3d4a', w: sw * .8, j: J * .3 });
+  if (o.blush > .02) { ctx.globalAlpha = .5 * o.blush; ctx.fillStyle = '#f08a8a';
+    for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(s * 2.8 * u, -4.7 * u, .8 * u, .4 * u, 0, 0, TAU); ctx.fill(); } ctx.globalAlpha = 1; }
+  // arms: angle 0 = out, + = up; offset springs keep the two arms from twinning
+  for (const [s, a, k] of [[-1, o.aL, 'armL'], [1, o.aR, 'armR']]) {
+    const px = s * 3.9 * u, py = -4.4 * u, len = 2.4 * u, ang = -a;
+    const ex2 = px + s * Math.cos(ang) * len, ey2 = py + Math.sin(ang) * len;
+    inkLine([[px, py], [lerp(px, ex2, .5) + s * .2 * u, lerp(py, ey2, .5) - .2 * u], [ex2, ey2]], { key: key + k, w: sw * 1.3, j: J });
+  }
+  // emote: a painted mark, never a typed letter
+  if (o.emoteK > .01 && o.emote === '!') {
+    ctx.save(); ctx.translate(3.6 * u, -10.6 * u); ctx.scale(o.emoteK, o.emoteK); ctx.rotate(.15);
+    paint([[-.35 * u, -1.6 * u], [.35 * u, -1.6 * u], [.15 * u, 0], [-.15 * u, 0]], { key: key + 'emote', fill: '#e8553a', w: sw * .8, j: J * .3 });
+    paint(ellPts(0, .6 * u, .25 * u, .25 * u, 8), { key: key + 'emoteDot', fill: '#e8553a', w: sw * .8, j: J * .3 });
+    ctx.restore();
+  }
+  ctx.restore();
+}
+let beatT = 0;
+
+// ---------- transitions ----------
+function iris(cx, cy, r) {             // ink everywhere except a circle of radius r
+  ctx.save(); ctx.fillStyle = PAL.ink; ctx.beginPath(); ctx.rect(-50, -50, W + 100, H + 100);
+  if (r > 2) ctx.arc(cx, cy, r, 0, TAU, true); ctx.fill('evenodd'); ctx.restore();
+}
+
+// ---------- shots: each paints the whole frame and is pure in (t, lt, dur) ----------
+function meadow(t, lt, dur) {
+  const cam = 1 + .015 * lt;                                   // slow push: the camera is never dead
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(cam, cam); ctx.translate(-W / 2, -H / 2);
+  paint(rectPts(-300, -300, W + 600, 1250), { key: 'sky', fill: PAL.sky, ink: null, j: 6 });
+  paint(ellPts(560, 1020, 1100, 380, 24), { key: 'hillBack', fill: PAL.hillDk, ink: null, j: 6 });
+  paint(ellPts(1300, 1080, 1300, 330, 24), { key: 'hill', fill: PAL.hill, w: 3, j: 4 });
+  for (let i = 0; i < 14; i++) {                                // tufts: positions from hash, sway from t, boil per tuft
+    const x = hash(i) * W, y = 820 + hash(i + 40) * 160, s = Math.sin(t * 2 + i) * 6;
+    inkLine([[x - 10, y], [x + s, y - 22 - hash(i + 9) * 18], [x + 10, y]], { key: 'tuft' + i, w: 3, j: 1.5 });
+  }
+  const mood = emotions(lt, [[0, 'bored'], [1.9, 'surprised'], [3.1, 'happy']]);
+  const hop = jump(lt, 3.6, 4.2, 3.2);
+  bean(960, 900, 46, { ...mood, dy: mood.dy + hop.dy, sq: mood.sq + hop.sq });
+  ctx.restore();
+  if (lt < .5) iris(960, 700, lerp(0, 1300, easeIn(lt / .5)));                      // in
+  if (lt > dur - .5) iris(960, 700, lerp(1300, 0, easeIn((lt - (dur - .5)) / .5))); // out
+}
+const SHOTS = [[0, meadow]];
+const DURATION = 6;
+
+const ready = (async () => { await document.fonts.ready; paper = makePaper(); grain = makeGrain(); })();
+
+window.renderAt = async (t) => {
+  await ready;
+  BN = Math.floor(t * BOIL + 1e-4); beatT = t;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.drawImage(paper, 0, 0);
+  let s = 0; while (s + 1 < SHOTS.length && t >= SHOTS[s + 1][0]) s++;
+  const t0 = SHOTS[s][0], t1 = SHOTS[s + 1]?.[0] ?? DURATION;
+  SHOTS[s][1](t, t - t0, t1 - t0);
+  ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(grain, 0, 0); ctx.globalCompositeOperation = 'source-over';
+};
+</script>
+</body>
+</html>

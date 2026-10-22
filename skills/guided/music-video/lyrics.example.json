@@ -1,0 +1,148 @@
+{
+ "approx": false,
+ "lines": [
+  {
+   "text": "we built a little light",
+   "start": 1.2,
+   "end": 3.6,
+   "first": 0,
+   "last": 4
+  },
+  {
+   "text": "and carried it through the night",
+   "start": 3.6,
+   "end": 6.6,
+   "first": 5,
+   "last": 10
+  },
+  {
+   "text": "every window one by one",
+   "start": 7.2,
+   "end": 10.2,
+   "first": 11,
+   "last": 15
+  }
+ ],
+ "words": [
+  {
+   "w": "we",
+   "start": 1.2,
+   "end": 1.5
+  },
+  {
+   "w": "built",
+   "start": 1.5,
+   "end": 1.8
+  },
+  {
+   "w": "a",
+   "start": 1.8,
+   "end": 1.95
+  },
+  {
+   "w": "little",
+   "start": 1.95,
+   "end": 2.55,
+   "syl": [
+    [
+     1.95,
+     2.25
+    ],
+    [
+     2.25,
+     2.55
+    ]
+   ]
+  },
+  {
+   "w": "light",
+   "start": 2.55,
+   "end": 3.6
+  },
+  {
+   "w": "and",
+   "start": 3.6,
+   "end": 3.9
+  },
+  {
+   "w": "carried",
+   "start": 3.9,
+   "end": 4.5,
+   "syl": [
+    [
+     3.9,
+     4.2
+    ],
+    [
+     4.2,
+     4.5
+    ]
+   ]
+  },
+  {
+   "w": "it",
+   "start": 4.5,
+   "end": 4.65
+  },
+  {
+   "w": "through",
+   "start": 4.65,
+   "end": 5.1
+  },
+  {
+   "w": "the",
+   "start": 5.1,
+   "end": 5.25
+  },
+  {
+   "w": "night",
+   "start": 5.25,
+   "end": 6.6
+  },
+  {
+   "w": "every",
+   "start": 7.2,
+   "end": 7.8,
+   "syl": [
+    [
+     7.2,
+     7.5
+    ],
+    [
+     7.5,
+     7.8
+    ]
+   ]
+  },
+  {
+   "w": "window",
+   "start": 7.8,
+   "end": 8.4,
+   "syl": [
+    [
+     7.8,
+     8.1
+    ],
+    [
+     8.1,
+     8.4
+    ]
+   ]
+  },
+  {
+   "w": "one",
+   "start": 8.4,
+   "end": 8.7
+  },
+  {
+   "w": "by",
+   "start": 8.7,
+   "end": 9.0
+  },
+  {
+   "w": "one",
+   "start": 9.0,
+   "end": 10.2
+  }
+ ]
+}

@@ -28,6 +28,8 @@
   "type": "module",
   "files": [
     "**/*.md",
+    "**/*.html",
+    "**/*.json",
     "LICENSE"
   ],
   "publishConfig": {

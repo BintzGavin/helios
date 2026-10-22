@@ -1,0 +1,146 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render variety-captions.html -o variety-captions.mp4 --duration 9 --width 1080 --height 1920 -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&display=block">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&text=%E5%A5%BD%E5%90%83%EF%BC%81&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#2BC8E4;width:1080px;height:1920px}svg{display:block}</style>
+</head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <pattern id="stripes" width="90" height="90" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><rect width="90" height="90" fill="#38D3EC"/><rect width="44" height="90" fill="#5EE0F3"/></pattern>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#1E2A78" flood-opacity=".35"/></filter>
+    <clipPath id="cardclip"><rect x="-400" y="-470" width="800" height="940" rx="34"/></clipPath>
+  </defs>
+  <rect id="bg" x="-200" y="-200" width="1480" height="2320" fill="url(#stripes)"/>
+  <g id="confetti"></g>
+  <g id="stage"></g>
+  <g id="fx"></g>
+</svg>
+<script>
+const NS = 'http://www.w3.org/2000/svg', FPS = 30, F = 1 / FPS;
+const PINK = '#FF3D7F', YEL = '#FFD23F', CYAN = '#38D3EC', NAVY = '#1E2A78';
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const el = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+const X = (e, x, y, r = 0, s = 1, sy = s) => e.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${r.toFixed(2)}) scale(${s.toFixed(4)} ${sy.toFixed(4)})`);
+const mulberry = s => () => { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+// damped spring: ζ .517, ω 22 → peaks at 1.15 around frame 5, settles ~1.0 by frame 8
+function spring(u, z = .517, w = 22) { if (u <= 0) return 0; const wd = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-z * w * u) * (Math.cos(wd * u) + z * w / wd * Math.sin(wd * u)); }
+// decaying shake impulse for punch-ins
+function kick(t, t0, A, k = 7, f = 11) { const u = t - t0; if (u < 0 || u > 1.2) return { x: 0, y: 0, r: 0 }; const e = A * Math.exp(-k * u);
+  return { x: e * Math.sin(2 * Math.PI * f * u), y: e * .8 * Math.cos(2 * Math.PI * f * .83 * u + .7), r: e * .04 * Math.sin(2 * Math.PI * f * .6 * u) }; }
+let gid = 0;
+function grad(stops) { const id = 'g' + gid++, g = el('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 }, document.querySelector('defs'));
+  stops.forEach(([o, c, a = 1]) => el('stop', { offset: o, 'stop-color': c, 'stop-opacity': a }, g)); return `url(#${id})`; }
+
+// ---------- the caption component: extrusion ×2 → coloured outer stroke → white stroke → gradient fill → gloss ----------
+const meas = document.createElement('canvas').getContext('2d');
+function caption(spec) {
+  const { text, size, font, x, y, rot = 0, white = 12, outer = 11, outerColor, ext = 14, extColor, fill, at, until = 99, gloss = .55, track = 4 } = spec;
+  const root = el('g', { filter: 'url(#soft)' }, $('fx')), fillP = grad(fill), glossP = grad([[0, '#fff', gloss], [.46, '#fff', 0], [1, '#fff', 0]]);
+  meas.font = `${font.includes('ZCOOL') ? 400 : 800} ${size}px ${font}`;
+  const chars = [...text], adv = chars.map(c => (c === ' ' ? size * .3 : meas.measureText(c).width) + track), total = adv.reduce((a, b) => a + b, 0) - track;
+  let cx = -total / 2, k = 0;
+  const items = chars.map((ch, i) => {
+    const g = el('g', {}, root), base = { 'font-family': font, 'font-size': size, 'font-weight': font.includes('ZCOOL') ? 400 : 800, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'stroke-linejoin': 'round' };
+    const W = 2 * (white + outer), mk = a => { const e = el('text', { ...base, ...a }, g); e.textContent = ch; return e; };
+    mk({ y: ext, fill: extColor, stroke: extColor, 'stroke-width': W }); mk({ y: ext / 2, fill: extColor, stroke: extColor, 'stroke-width': W });
+    mk({ fill: outerColor, stroke: outerColor, 'stroke-width': W });
+    if (white) mk({ fill: '#fff', stroke: '#fff', 'stroke-width': 2 * white });
+    mk({ fill: fillP }); mk({ fill: glossP });
+    const lx = cx + adv[i] / 2; cx += adv[i];
+    const isGlyph = ch.trim() !== ''; const t0 = at + 2.5 * F + (isGlyph ? k++ : k) * 2 * F;   // land 2–3 frames after the beat, 2-frame stagger
+    return { g, lx, t0, ph: i * 1.7, glyph: isGlyph };
+  });
+  return { root, items, x, y, rot, at, until, size };
+}
+function drive(cap, t, shake) {
+  const out = t >= cap.until ? clamp((t - cap.until) / .17) : 0;          // pop-out: 1 → 1.12 → 0 over ~5 frames
+  const outS = out <= 0 ? 1 : out < .3 ? 1 + .12 * out / .3 : 1.12 * (1 - Math.pow((out - .3) / .7, 3));
+  for (const c of cap.items) {
+    const u = t - c.t0; if (u < 0 || out >= 1 || !c.glyph) { c.g.setAttribute('visibility', 'hidden'); continue; }
+    c.g.setAttribute('visibility', 'visible');
+    const s = spring(u), drop = -cap.size * .35 * (1 - spring(u, .55, 20)), rin = 14 * (1 - spring(u, .45, 18)) * (c.ph % 2 ? 1 : -1);
+    const hold = clamp((u - .25) / .4);                                       // gentle wiggle while holding
+    const r = rin + hold * 2.2 * Math.sin(2 * Math.PI * 1.1 * t + c.ph), bob = hold * 4 * Math.sin(2 * Math.PI * 1.1 * t + c.ph + 1.9);
+    const a = cap.rot * Math.PI / 180, px = cap.x + c.lx * Math.cos(a) + shake.x, py = cap.y + c.lx * Math.sin(a) + drop + bob + shake.y;
+    X(c.g, px, py, cap.rot + r, Math.max(.001, s * outS * (1 + hold * .012 * Math.sin(4.4 * Math.PI * t + c.ph))));
+  }
+}
+
+// ---------- the "footage": a drawn vlog scene on a tilted photo card ----------
+const R = mulberry(9), stage = $('stage'), fx = $('fx');
+const card = el('g', {}, stage); el('rect', { x: -424, y: -494, width: 848, height: 988, rx: 46, fill: '#fff', filter: 'url(#soft)' }, card);
+const inner = el('g', { 'clip-path': 'url(#cardclip)' }, card);
+el('rect', { x: -400, y: -470, width: 800, height: 940, fill: '#FFC93C' }, inner);
+const rays = el('g', {}, inner);
+for (let i = 0; i < 18; i++) { const a0 = i / 18 * Math.PI * 2, a1 = a0 + Math.PI / 18;
+  el('path', { d: `M0 0L${Math.cos(a0) * 900} ${Math.sin(a0) * 900}L${Math.cos(a1) * 900} ${Math.sin(a1) * 900}Z`, fill: '#FF7FB0' }, rays); }
+el('rect', { x: -400, y: 170, width: 800, height: 300, fill: '#FFE7D6' }, inner); el('rect', { x: -400, y: 170, width: 800, height: 14, fill: '#F5C8B0' }, inner);
+const food = el('g', {}, inner);
+el('ellipse', { cx: 0, cy: 250, rx: 300, ry: 74, fill: '#fff', stroke: NAVY, 'stroke-width': 9 }, food);
+const cakes = [0, 1, 2, 3].map(i => { const g = el('g', {}, food); el('ellipse', { cx: 0, cy: 14, rx: 210, ry: 52, fill: '#C9802F', stroke: NAVY, 'stroke-width': 8 }, g);
+  el('ellipse', { cx: 0, cy: 0, rx: 210, ry: 50, fill: '#F2B65B', stroke: NAVY, 'stroke-width': 8 }, g); X(g, 0, 210 - i * 46); return g; });
+const flipper = el('g', {}, food); el('ellipse', { cx: 0, cy: 14, rx: 210, ry: 52, fill: '#C9802F', stroke: NAVY, 'stroke-width': 8 }, flipper);
+el('ellipse', { cx: 0, cy: 0, rx: 210, ry: 50, fill: '#F7C46E', stroke: NAVY, 'stroke-width': 8 }, flipper);
+el('path', { d: 'M-120 -6Q-60 -40 40 -20Q140 -30 150 6Q120 40 60 30Q40 90 20 30Q-40 50 -60 20Q-90 70 -110 16Z', fill: '#B8661F', stroke: NAVY, 'stroke-width': 6, 'stroke-linejoin': 'round' }, flipper);
+el('rect', { x: -36, y: -46, width: 72, height: 46, rx: 10, fill: '#FFF2A6', stroke: NAVY, 'stroke-width': 6 }, flipper);
+const steam = [0, 1, 2].map(i => el('path', { fill: 'none', stroke: '#fff', 'stroke-width': 12, 'stroke-linecap': 'round', opacity: .85 }, inner));
+// badge
+const badge = el('g', {}, fx); el('rect', { x: 0, y: 0, width: 360, height: 92, rx: 30, fill: YEL, stroke: NAVY, 'stroke-width': 7 }, badge);
+el('text', { x: 180, y: 61, 'text-anchor': 'middle', 'font-family': '"Baloo 2", sans-serif', 'font-weight': 800, 'font-size': 46, fill: NAVY }, badge).textContent = 'Halcyon Kitchen';
+el('rect', { x: 372, y: 20, width: 118, height: 58, rx: 16, fill: PINK, stroke: NAVY, 'stroke-width': 6 }, badge);
+el('text', { x: 431, y: 61, 'text-anchor': 'middle', 'font-family': '"Baloo 2", sans-serif', 'font-weight': 800, 'font-size': 36, fill: '#fff' }, badge).textContent = 'EP.12';
+// hero burst + speed lines + sparkles
+const burst = el('path', { fill: YEL, stroke: NAVY, 'stroke-width': 10, 'stroke-linejoin': 'round' }, fx);
+{ let d = ''; for (let i = 0; i < 28; i++) { const a = i / 28 * Math.PI * 2, r = i % 2 ? 300 + R() * 30 : 390 + R() * 60; d += (i ? 'L' : 'M') + (Math.cos(a) * r * 1.1).toFixed(1) + ' ' + (Math.sin(a) * r * .55).toFixed(1); } burst.setAttribute('d', d + 'Z'); }
+const speed = el('g', {}, fx); for (let i = 0; i < 22; i++) { const a = i / 22 * Math.PI * 2 + R() * .1;
+  el('path', { d: `M${Math.cos(a) * 520} ${Math.sin(a) * 300}L${Math.cos(a) * 760} ${Math.sin(a) * 440}`, stroke: i % 2 ? '#fff' : NAVY, 'stroke-width': 9, 'stroke-linecap': 'round' }, speed); }
+const sparkD = r => { const k = r * .16; return `M0 ${-r}Q${k} ${-k} ${r} 0Q${k} ${k} 0 ${r}Q${-k} ${k} ${-r} 0Q${-k} ${-k} 0 ${-r}Z`; };
+const sparks = [[150, 1350, 40, 5.5], [930, 1380, 30, 5.6], [960, 1690, 46, 5.7], [120, 1700, 28, 5.8], [880, 420, 34, 2.5], [200, 1120, 30, 7.0]]
+  .map(([x, y, r, t0]) => ({ x, y, t0, e: el('path', { d: sparkD(r), fill: '#fff', stroke: YEL, 'stroke-width': 4 }, fx) }));
+const dots = Array.from({ length: 26 }, () => ({ x: R() * 1080, y: R() * 1920, v: 20 + R() * 40, r: 6 + R() * 10, e: el('circle', { fill: [PINK, YEL, '#fff'][Math.floor(R() * 3)], opacity: .8 }, $('confetti')) }));
+
+// ---------- the cue sheet: "audio moments" the captions land on ----------
+const SANS = '"Baloo 2", "Arial Rounded MT Bold", sans-serif', CJK = '"ZCOOL KuaiLe", "Baloo 2", sans-serif';
+let CAPS = [];
+const HIT = { flip: 2.4, perfect: 5.4 };
+const ready = Promise.all([document.fonts.load(`800 120px "Baloo 2"`, 'Pancake'), document.fonts.load(`400 120px "ZCOOL KuaiLe"`, '好吃！')]).then(() => document.fonts.ready).then(() => { CAPS = [
+  caption({ text: 'Pancake day!', size: 134, font: SANS, x: 540, y: 330, rot: -4, outerColor: PINK, extColor: '#A3124F', fill: [[0, '#FFF7C2'], [1, YEL]], at: .25, until: 2.15 }),
+  caption({ text: 'FLIP!', size: 190, font: SANS, x: 760, y: 560, rot: 8, outerColor: NAVY, extColor: '#0E1440', fill: [[0, '#FFFFFF'], [1, '#9FF0FF']], at: HIT.flip, until: 3.95, track: 8 }),
+  caption({ text: '(so fluffy)', size: 76, font: SANS, x: 720, y: 1270, rot: -6, white: 9, outer: 0, outerColor: '#fff', ext: 0, extColor: '#fff', fill: [[0, NAVY], [1, '#3A4BB0']], gloss: 0, at: 3.7, until: 5.3 }),
+  caption({ text: 'PERFECT!!', size: 178, font: SANS, x: 540, y: 1545, rot: -3, white: 13, outer: 13, outerColor: NAVY, extColor: '#0E1440', ext: 18, fill: [[0, '#FFB3D3'], [1, PINK]], at: HIT.perfect }),
+  caption({ text: '好吃！', size: 170, font: CJK, x: 300, y: 1250, rot: -8, outerColor: NAVY, extColor: '#0E1440', fill: [[0, '#F2FEFF'], [1, CYAN]], at: 6.9 }),
+]; });
+
+window.renderAt = async (t) => {
+  await ready;
+  // punch-ins: snap zoom on the beat, then a decaying shake (stage shakes more than the captions)
+  const punch = (t0, amt) => t < t0 ? 0 : amt * Math.exp(-3.2 * (t - t0)) * Math.min(1, (t - t0) / (2 * F));
+  const zoom = 1 + punch(HIT.flip, .07) + punch(HIT.perfect, .12);
+  const k1 = kick(t, HIT.flip, 14), k2 = kick(t, HIT.perfect, 26), sh = { x: k1.x + k2.x, y: k1.y + k2.y, r: k1.r + k2.r };
+  const cardIn = spring(t + .1, .6, 14);
+  X(card, 540 + sh.x, 830 + sh.y + 400 * (1 - cardIn), -3 + sh.r + 6 * (1 - cardIn), zoom * Math.max(.001, .85 + .15 * cardIn));
+  X(rays, 0, -60, t * 6);
+  // the top pancake flips: up, a full turn (fake 3D via scaleY), and lands on the beat
+  const fp = clamp((t - (HIT.flip - .6)) / .6), lift = Math.sin(Math.PI * fp) * 330;
+  X(flipper, 0, 210 - 4 * 46 - lift, fp * 14 * Math.sin(Math.PI * fp), 1, fp > 0 && fp < 1 ? Math.cos(fp * Math.PI * 2) : 1);
+  const squash = Math.exp(-14 * Math.max(0, t - HIT.flip)) * (t >= HIT.flip ? .12 : 0);
+  cakes.forEach((c, i) => X(c, 0, 210 - i * 46, 0, 1 + squash * .5, 1 - squash));
+  steam.forEach((p, i) => { let d = ''; for (let k = 0; k <= 10; k++) { const yy = -110 - k * 16 - (t * 30 % 16); d += (k ? 'L' : 'M') + (-70 + i * 70 + 14 * Math.sin(k * .8 + t * 4 + i)).toFixed(1) + ' ' + yy.toFixed(1); } p.setAttribute('d', d); });
+  X(badge, 60 + sh.x * .3, 90 + sh.y * .3 - 160 * (1 - spring(t - .1, .5, 16)), -2);
+  dots.forEach(d => { d.e.setAttribute('cx', d.x); d.e.setAttribute('cy', ((d.y - t * d.v) % 1920 + 1920) % 1920); d.e.setAttribute('r', d.r); });
+  // hero burst behind PERFECT!!
+  const bs = spring(t - HIT.perfect - F, .5, 18), cs = { x: sh.x * .35, y: sh.y * .35 };
+  burst.setAttribute('visibility', bs > .001 ? 'visible' : 'hidden'); X(burst, 540 + cs.x, 1540 + cs.y, -3 + 3 * Math.sin(t * 2.2), Math.max(.001, bs));
+  const sl = clamp(1 - (t - HIT.perfect) / .6); speed.setAttribute('opacity', t >= HIT.perfect ? sl : 0); X(speed, 540, 1540, 0, 1 + .25 * (1 - sl));
+  sparks.forEach(s => { const a = spring(t - s.t0, .45, 20); s.e.setAttribute('visibility', a > .001 ? 'visible' : 'hidden');
+    X(s.e, s.x, s.y, t * 40, Math.max(.001, a * (.8 + .25 * Math.sin(t * 7 + s.x)))); });
+  CAPS.forEach(c => drive(c, t, cs));
+};
+</script>
+</body>
+</html>

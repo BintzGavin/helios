@@ -1,0 +1,196 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render art-deco.html -o art-deco.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Art Deco</title>
+<link href="https://fonts.googleapis.com/css2?family=Limelight&family=Poiret+One&family=Josefin+Sans:wght@600&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#0d0b09;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Art deco: warm lacquer black, banded metal gold with a moving sheen, engraved keylines, everything unfolding
+// from the centre axis, counted marquee light, one jewel accent.
+const W = 1920, H = 1080, CX = 960;
+const ctx = document.getElementById('c').getContext('2d');
+const C = { black: '#0d0b09', lacquer: '#070605', g0: '#6f5220', g1: '#c9a24b', g2: '#f3d98b', gHi: '#fff4d2', ivory: '#f2e8d5', jewel: '#1d8a6b', jewelD: '#0b3d30', jewelL: '#7fe0bf' };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, u) => a + (b - a) * u;
+const io = (u) => u * u * (3 - 2 * u);                       // firm mechanical ease-in-out
+const outQ = (u) => 1 - Math.pow(1 - u, 3);
+const hash = (n) => { const x = Math.sin(n * 91.345 + 12.9) * 43758.5453; return x - Math.floor(x); };
+
+// banded metal: dark - base - light - HOT - light - base - dark; slide `sheen` for a light sweep
+function gold(x0, y0, x1, y1, sheen = 0.38) {
+  const g = ctx.createLinearGradient(x0, y0, x1, y1), s = clamp(sheen, 0.1, 0.9);
+  g.addColorStop(0, C.g0); g.addColorStop(clamp(s - 0.3), C.g1); g.addColorStop(clamp(s - 0.08), C.g2);
+  g.addColorStop(s, C.gHi); g.addColorStop(clamp(s + 0.1), C.g1); g.addColorStop(clamp(s + 0.32), C.g0); g.addColorStop(1, C.g1);
+  return g;
+}
+// polyline helpers: partial draw-on by arc length
+const plen = (p) => p.reduce((s, q, i) => (i ? s + Math.hypot(q[0] - p[i - 1][0], q[1] - p[i - 1][1]) : 0), 0);
+function part(p, f) {
+  if (f >= 1) return p; const out = [p[0]]; let left = plen(p) * f;
+  for (let i = 1; i < p.length && left > 0; i++) {
+    const a = p[i - 1], b = p[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (L <= left) { out.push(b); left -= L; } else { out.push([lerp(a[0], b[0], left / L), lerp(a[1], b[1], left / L)]); left = 0; }
+  }
+  return out;
+}
+// the engraved gold keyline: dark underline 1.6 px wider, gold gradient line, hairline highlight on top
+function gline(p, w, sheen, glow = 0) {
+  if (p.length < 2) return;
+  ctx.beginPath(); p.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1])));
+  ctx.lineJoin = 'miter'; ctx.lineCap = 'butt';
+  if (glow) { ctx.save(); ctx.shadowColor = `rgba(255,205,110,${0.6 * glow})`; ctx.shadowBlur = 14 * glow; ctx.strokeStyle = C.g1; ctx.lineWidth = w; ctx.stroke(); ctx.restore(); }
+  ctx.strokeStyle = 'rgba(70,50,18,0.9)'; ctx.lineWidth = w + 1.6; ctx.stroke();
+  ctx.strokeStyle = gold(0, 0, W, H, sheen); ctx.lineWidth = w; ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,246,214,0.55)'; ctx.lineWidth = Math.max(0.6, w * 0.28); ctx.stroke();
+}
+const mirror = (p) => p.map(([x, y]) => [2 * CX - x, y]);
+// stepped arch, right half from the keystone down to the floor; nested copies are exact inward offsets of a staircase
+const ARCH = [[960, 110], [1090, 110], [1090, 172], [1220, 172], [1220, 252], [1350, 252], [1350, 1010]];
+const inset = (p, d) => p.map(([x, y], i) => [i === 0 ? x : x - d, y + d]);
+// marquee bulbs along the outer arch (outside it), counted in 6 groups from the floor up to the keystone
+const BULBS = [];
+(function placeBulbs() {
+  const p = inset(ARCH, -30), L = plen(p);
+  for (let s = 22; s < L - 10; s += 46) {
+    const q = part(p, s / L), pt = q[q.length - 1], f = 1 - s / L;           // f: 0 at keystone, 1 at the floor
+    const group = Math.min(5, Math.floor((1 - f) * 6 * 0.9999));
+    BULBS.push({ x: pt[0], y: pt[1], g: 5 - group, i: BULBS.length, s: s / L }, { x: 2 * CX - pt[0], y: pt[1], g: 5 - group, i: BULBS.length + 0.5, s: s / L });
+  }
+})();
+const GROUP_T = [2.5, 3.0, 3.5, 4.0, 4.5, 5.0];             // one group per beat, floor to keystone; the audience can count
+function bulbValue(b, t) {
+  const t0 = GROUP_T[b.g]; if (t < t0) return 0;
+  const dt = t - t0; let v = dt < 0.18 ? 1 + 0.6 * (1 - dt / 0.18) : 1;   // ignition overshoot 1.6x settling in 0.18 s
+  if (dt < 0.04) v *= 0.3 + 0.7 * dt / 0.04;
+  if (t >= 5.6) { const ph = ((b.i * 0.5 - (t - 5.6) * 9) % 6 + 6) % 6; v = ph < 1.5 ? 1.15 : 0.72; }   // gentle chase once lit
+  return v;
+}
+function bulb(x, y, v) {
+  ctx.beginPath(); ctx.arc(x, y, 9, 0, 6.283); ctx.fillStyle = '#1c150c'; ctx.fill();
+  ctx.lineWidth = 2; ctx.strokeStyle = C.g0; ctx.stroke();
+  if (v <= 0) return;
+  const r = 9 * (3 + 1.6 * Math.max(0, v - 1)), a = 0.45 * Math.min(v, 1.6) / 1.6 + 0.12;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `rgba(255,214,130,${a})`); g.addColorStop(1, 'rgba(255,190,90,0)');
+  ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+  ctx.beginPath(); ctx.arc(x, y, 6.5, 0, 6.283); ctx.fillStyle = `rgba(255,248,226,${Math.min(1, v)})`; ctx.fill();
+}
+function sparkle(x, y, r, a) {                               // four-point star
+  ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = C.gHi; ctx.shadowColor = 'rgba(255,220,150,0.9)'; ctx.shadowBlur = 10;
+  ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r * 0.18, y - r * 0.18); ctx.lineTo(x + r, y); ctx.lineTo(x + r * 0.18, y + r * 0.18);
+  ctx.lineTo(x, y + r); ctx.lineTo(x - r * 0.18, y + r * 0.18); ctx.lineTo(x - r, y); ctx.lineTo(x - r * 0.18, y - r * 0.18); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+function stepBar(w, h, y) {                                 // title bar with stepped ends, centred on the axis
+  const x0 = CX - w / 2, x1 = CX + w / 2, s = Math.min(26, w / 6);
+  return [[x0 + s, y - h / 2], [x1 - s, y - h / 2], [x1 - s, y - h / 2 + s], [x1, y - h / 2 + s], [x1, y + h / 2 - s], [x1 - s, y + h / 2 - s], [x1 - s, y + h / 2],
+    [x0 + s, y + h / 2], [x0 + s, y + h / 2 - s], [x0, y + h / 2 - s], [x0, y - h / 2 + s], [x0 + s, y - h / 2 + s], [x0 + s, y - h / 2]];
+}
+function goldText(s, x, y, font, track, sheen, w) {         // engraved: dark rim, banded gold fill, hairline highlight
+  ctx.font = font; ctx.letterSpacing = `${track}px`; ctx.textAlign = 'center';
+  ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(60,42,14,0.95)'; ctx.lineWidth = 4; ctx.strokeText(s, x, y);
+  ctx.fillStyle = gold(x - w / 2, y - 120, x + w / 2, y + 20, sheen); ctx.fillText(s, x, y);
+  ctx.strokeStyle = 'rgba(255,246,214,0.35)'; ctx.lineWidth = 0.8; ctx.strokeText(s, x, y);
+  ctx.letterSpacing = '0px';
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('140px "Limelight"', 'HALCYON'), document.fonts.load('40px "Poiret One"', 'THE GRAND'), document.fonts.load('600 24px "Josefin Sans"', 'DANCING')]);
+  await document.fonts.ready;
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+  ctx.textBaseline = 'alphabetic';
+  // lacquer ground, lifted toward the centre so the gold never sits on dead black
+  const bg = ctx.createRadialGradient(CX, 560, 50, CX, 560, 1100);
+  bg.addColorStop(0, '#221a10'); bg.addColorStop(0.55, '#110d09'); bg.addColorStop(1, '#050403');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  const drift = 0.38 + 0.04 * Math.sin(t * 0.9);                 // resting sheen breathes slowly
+  const sweep = t < 5.0 ? drift : t < 5.8 ? lerp(-0.1, 1.1, io(prog(t, 5.0, 5.8))) : drift;   // the hero sweep
+
+  // 1. sunburst: wedges and tapered gold rays unfold from the title centre, clipped to the arch opening
+  const inner = inset(ARCH, 44), opening = [...mirror(inner).reverse(), ...inner];
+  ctx.save(); ctx.beginPath(); opening.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath(); ctx.clip();
+  const rays = 48, grow = io(prog(t, 0.5, 1.8)), r0 = 150, r1 = lerp(r0, 1000, grow);
+  for (let i = 0; i <= rays / 2; i++) {             // a half sunburst rising behind the title
+    const a = -Math.PI + i * (Math.PI * 2 / rays), b = a + Math.PI * 2 / rays;
+    if (i % 2 === 0 && i < rays / 2) { ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r0, 560 + Math.sin(a) * r0); ctx.lineTo(CX + Math.cos(a) * r1, 560 + Math.sin(a) * r1); ctx.lineTo(CX + Math.cos(b) * r1, 560 + Math.sin(b) * r1); ctx.lineTo(CX + Math.cos(b) * r0, 560 + Math.sin(b) * r0); ctx.fillStyle = 'rgba(201,162,75,0.07)'; ctx.fill(); }
+    const re = i % 2 ? lerp(r0, r1, 0.7) : r1, hw = i % 2 ? 1.2 : 2.2;
+    ctx.beginPath(); ctx.moveTo(CX + Math.cos(a) * r0, 560 + Math.sin(a) * r0);
+    ctx.lineTo(CX + Math.cos(a) * re - Math.sin(a) * hw, 560 + Math.sin(a) * re + Math.cos(a) * hw);
+    ctx.lineTo(CX + Math.cos(a) * re + Math.sin(a) * hw, 560 + Math.sin(a) * re - Math.cos(a) * hw); ctx.closePath();
+    ctx.globalAlpha = 0.55; ctx.fillStyle = gold(CX - 900, 0, CX + 900, H, sweep); ctx.fill(); ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+
+  // 2. hook: a gold point on the axis opens into a hairline, then the arch engraves itself from the keystone down
+  const pt = outQ(prog(t, 0, 0.18)), hl = io(prog(t, 0.08, 0.6));
+  if (t < 1.2) { ctx.save(); ctx.globalAlpha = 1 - prog(t, 0.9, 1.2); gline([[CX - 700 * hl, 560], [CX + 700 * hl, 560]], 1.6, 0.5, 1); ctx.restore(); }
+  if (t < 0.9) { ctx.save(); ctx.globalAlpha = pt * (1 - prog(t, 0.6, 0.9)); sparkle(CX, 560, 30 * pt, 1); ctx.restore(); }
+  const ad = io(prog(t, 0.3, 1.5));
+  [[0, 3.2], [22, 1.6], [44, 2.4]].forEach(([d, w]) => {
+    const half = part(inset(ARCH, d), ad); gline(half, w, sweep, d === 0 ? 0.4 : 0); gline(mirror(half), w, sweep, d === 0 ? 0.4 : 0);
+  });
+  // side rules (speed lines) run outward from the arch, three per side
+  const sr = io(prog(t, 1.2, 1.9));
+  for (let k = 0; k < 3; k++) { const y = 600 + k * 14, x = 1350 + 50; gline([[x, y], [x + 420 * sr, y]], 1.4, sweep); gline([[2 * CX - x, y], [2 * CX - x - 420 * sr, y]], 1.4, sweep); }
+
+  // 3. title bar opens symmetrically along the axis, the title rises inside it
+  const bw = lerp(0, 800, io(prog(t, 1.0, 1.6)));
+  if (bw > 4) {
+    const bar = stepBar(bw, 190, 560);
+    ctx.beginPath(); bar.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath();
+    ctx.fillStyle = 'rgba(7,6,5,0.94)'; ctx.fill();
+    gline([...bar], 2.4, sweep); gline(stepBar(Math.max(0, bw - 22), 168, 560), 1.2, sweep);
+    ctx.save(); ctx.beginPath(); ctx.rect(CX - bw / 2, 470, bw, 180); ctx.clip();
+    goldText('HALCYON', CX, 612 + (1 - io(prog(t, 1.5, 2.1))) * 170, '124px "Limelight", "Didot", serif', 8, sweep, 700);
+    ctx.restore();
+  }
+  // 4. subtitle reveals from the centre outward; chevrons engrave beneath it
+  const sw = io(prog(t, 2.0, 2.6));
+  ctx.save(); ctx.beginPath(); ctx.rect(CX - 520 * sw, 690, 1040 * sw, 60); ctx.clip();
+  ctx.font = '42px "Poiret One", "Futura", sans-serif'; ctx.letterSpacing = '9px'; ctx.textAlign = 'center'; ctx.fillStyle = C.ivory;
+  ctx.fillText('THE GRAND BALLROOM', CX + 4, 735); ctx.letterSpacing = '0px'; ctx.restore();
+  const cv = io(prog(t, 2.3, 3.0));
+  for (let k = 0; k < 3; k++) {
+    const pts = []; const n = 8, w = 36;
+    for (let i = -n; i <= n; i++) pts.push([CX + i * w / 2, 790 + k * 12 + (i % 2 ? 0 : 14)]);
+    const mid = Math.floor(pts.length / 2), rh = part(pts.slice(mid), cv), lh = part(pts.slice(0, mid + 1).reverse(), cv);
+    gline(rh, 1.4, sweep); gline(lh, 1.4, sweep);
+  }
+  ctx.save(); ctx.globalAlpha = io(prog(t, 2.8, 3.3));
+  ctx.font = '600 22px "Josefin Sans", sans-serif'; ctx.letterSpacing = '6px'; ctx.textAlign = 'center'; ctx.fillStyle = '#cbbd9f';
+  ctx.fillText('DANCING UNTIL DAWN  ·  EST. MCMXXVI', CX + 3, 900); ctx.letterSpacing = '0px'; ctx.restore();
+
+  // 5. marquee: bulbs counted one group per beat from the floor to the keystone
+  for (const b of BULBS) if (ad >= b.s) bulb(b.x, b.y, bulbValue(b, t));   // sockets arrive with the engraving
+
+  // 6. the one jewel: an emerald lozenge at the keystone ignites with the last group (hero), glint on the sweep
+  const jw = outQ(prog(t, 5.0, 5.25));
+  if (jw > 0) {
+    const jx = CX, jy = 168, rx = 34 * jw, ry = 46 * jw;
+    const dia = [[jx, jy - ry], [jx + rx, jy], [jx, jy + ry], [jx - rx, jy]];
+    ctx.save(); ctx.shadowColor = 'rgba(80,230,180,0.55)'; ctx.shadowBlur = 26 * jw;
+    ctx.beginPath(); dia.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath();
+    const jg = ctx.createLinearGradient(jx - rx, jy - ry, jx + rx, jy + ry); jg.addColorStop(0, C.jewelL); jg.addColorStop(0.45, C.jewel); jg.addColorStop(1, C.jewelD);
+    ctx.fillStyle = jg; ctx.fill(); ctx.restore();
+    gline([...dia, dia[0], dia[1]], 2.4, sweep);
+    gline([[jx, jy - ry], [jx, jy + ry]], 0.9, sweep); gline([[jx - rx, jy], [jx + rx, jy]], 0.9, sweep);
+    sparkle(jx + 18, jy - 26, 26 * Math.sin(Math.PI * prog(t, 5.1, 5.6)), 1);
+  }
+  // 7. end hold: sparkles twinkle in fixed seeded places (micro-motion), symmetric about the axis
+  for (let i = 0; i < 7; i++) {
+    const x = 420 + hash(i) * 420, y = 120 + hash(i + 9) * 420, ph = Math.sin((t - 5.6) * 2.6 + i * 1.9);
+    if (t > 5.6 && ph > 0.6) { const a = (ph - 0.6) / 0.4; sparkle(x, y, 12 * a, a); sparkle(2 * CX - x, y, 12 * a, a); }
+  }
+};
+</script>
+</body>
+</html>

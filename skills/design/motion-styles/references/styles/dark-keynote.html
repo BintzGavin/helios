@@ -1,0 +1,137 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render dark-keynote.html -o dark-keynote.mp4 --duration 8 --mode canvas --preset medium -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#08090b}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, BEAT = .5, TURN = 3.0;                 // 120 BPM; the turn lands on beat 6
+const ACCENT = '#b7f34a', PROBLEM = '#ff4d4f', TXT = ['#eceef2', '#9aa0aa', '#5d636d'], SURF = ['#121418', '#181b20', '#1f2329'];
+const INTER = 'Inter, system-ui, sans-serif', TIGHT = '"Inter Tight", Inter, sans-serif', MONO = '"JetBrains Mono", monospace';
+const ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, t0, d) => clamp((t - t0) / d);
+const outC = k => 1 - Math.pow(1 - clamp(k), 3);
+const inC = k => Math.pow(clamp(k), 3);
+const back = (k, s = 1.3) => (k = clamp(k), 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2));   // fast-out, one small overshoot
+const hash = (a, b = 0) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+const frameOf = t => Math.floor(t * 30 + .5);
+let STAGE = null;
+
+const TYPES = [['Mail', 'Re: re: final_v7'], ['Calendar', 'Standup moved again'], ['Files', 'Q3_deck (1).key'], ['Chat', '@here quick question']];
+const N = 40, CARDS = [...Array(N)].map((_, i) => ({
+  type: i % 4, t0: .02 + 2.25 * Math.sqrt(i / N),                    // accumulation accelerates
+  x: 170 + hash(i, 1) * 1300, y: 150 + hash(i, 2) * 640, rot: (hash(i, 3) - .5) * .2, badge: 1 + Math.floor(hash(i, 4) * 9),
+  col: i % 4, row: Math.floor(i / 4) }));
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`500 40px ${INTER}`, 'Aa'), document.fonts.load(`600 16px ${INTER}`, 'Aa'),
+    document.fonts.load(`600 300px ${TIGHT}`, '0123456789,'), document.fonts.load(`500 18px ${MONO}`, 'ITEMS')]);
+  await document.fonts.ready;
+  STAGE = document.createElement('canvas'); STAGE.width = W; STAGE.height = H; const s = STAGE.getContext('2d');   // static stage
+  s.fillStyle = '#08090b'; s.fillRect(0, 0, W, H);
+  let g = s.createRadialGradient(960, 120, 0, 960, 120, 1000); g.addColorStop(0, 'rgba(40,46,60,.55)'); g.addColorStop(1, 'rgba(40,46,60,0)'); s.fillStyle = g; s.fillRect(0, 0, W, H);
+  g = s.createRadialGradient(1500, 800, 0, 1500, 800, 700); g.addColorStop(0, 'rgba(70,90,160,.07)'); g.addColorStop(1, 'rgba(70,90,160,0)'); s.fillStyle = g; s.fillRect(0, 0, W, H);
+  for (let x = 0, i = 0; x <= W; x += 48, i++) { s.fillStyle = `rgba(255,255,255,${i % 4 ? .03 : .06})`; s.fillRect(x, 0, 1, H); }
+  for (let y = 12, i = 0; y <= H; y += 48, i++) { s.fillStyle = `rgba(255,255,255,${i % 4 ? .03 : .06})`; s.fillRect(0, y, W, 1); }
+  g = s.createRadialGradient(960, 540, 500, 960, 540, 1150); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.55)'); s.fillStyle = g; s.fillRect(0, 0, W, H);
+})();
+
+const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); };
+function surface(x, y, w, h, r, step = 1) {   // raised dark surface: shadow, fill, 1 px border, 1 px top highlight
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10; ctx.fillStyle = SURF[step]; rr(x, y, w, h, r); ctx.fill(); ctx.restore();
+  ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.lineWidth = 1; rr(x + .5, y + .5, w - 1, h - 1, r); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.fillRect(x + r, y + 1, w - 2 * r, 1);
+}
+function glyph(type, x, y, s) {   // tiny monochrome category glyphs, drawn in code
+  ctx.strokeStyle = TXT[1]; ctx.lineWidth = 2; ctx.beginPath();
+  if (type === 0) { ctx.rect(x - s, y - s * .7, 2 * s, 1.4 * s); ctx.moveTo(x - s, y - s * .7); ctx.lineTo(x, y + s * .1); ctx.lineTo(x + s, y - s * .7); }
+  else if (type === 1) { ctx.rect(x - s, y - s * .8, 2 * s, 1.7 * s); ctx.moveTo(x - s, y - s * .3); ctx.lineTo(x + s, y - s * .3); }
+  else if (type === 2) { ctx.moveTo(x - s * .8, y - s); ctx.lineTo(x + s * .3, y - s); ctx.lineTo(x + s * .8, y - s * .5); ctx.lineTo(x + s * .8, y + s); ctx.lineTo(x - s * .8, y + s); ctx.closePath(); }
+  else { ctx.roundRect(x - s, y - s * .8, 2 * s, 1.4 * s, s * .5); }
+  ctx.stroke();
+}
+
+function card(c, t) {
+  const e = back(prog(t, c.t0, .28)); if (t < c.t0) return;
+  const k = c.row * .02 + c.col * .008, fly = back(prog(t, TURN + k, .45)), path = Math.sin(Math.PI * clamp((t - TURN - k) / .45)) * 60;
+  const sx = 230 + c.col * 370, sy = 250 + c.row * 50;                       // snap-grid slot: one column per type
+  const w = lerp(300, 350, fly), h = lerp(76, 40, fly), x = lerp(c.x, sx, fly) - path * (c.col < 2 ? 1 : -1), y = lerp(c.y - 30 * (1 - e), sy, fly);
+  ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(c.rot * (1 - fly)); ctx.scale(lerp(.92, 1, e), lerp(.92, 1, e)); ctx.globalAlpha = clamp(e * 3);
+  surface(-w / 2, -h / 2, w, h, lerp(14, 10, fly), 1);
+  glyph(c.type, -w / 2 + lerp(34, 24, fly), 0, lerp(10, 7, fly));
+  ctx.textAlign = 'left'; ctx.fillStyle = TXT[0]; ctx.font = `600 ${lerp(16, 15, fly)}px ${INTER}`;
+  ctx.fillText(TYPES[c.type][0], -w / 2 + lerp(62, 46, fly), lerp(-6, 5, fly));
+  ctx.globalAlpha *= clamp(1 - fly * 2.5); ctx.fillStyle = TXT[1]; ctx.font = `400 14px ${INTER}`; ctx.fillText(TYPES[c.type][1], -w / 2 + 62, 16);
+  ctx.globalAlpha = clamp(e * 3) * fly; ctx.fillStyle = TXT[2]; ctx.font = `500 12px ${MONO}`; ctx.textAlign = 'right'; ctx.fillText(`#${String(c.row * 4 + c.col + 101)}`, w / 2 - 16, 5);
+  const bp = t < TURN ? 1 : 1 - inC((t - TURN) / .12);                         // the problem colour dies at the turn
+  if (bp > 0) { ctx.globalAlpha = clamp(e * 3); ctx.fillStyle = PROBLEM; ctx.beginPath(); ctx.arc(w / 2 - 6, -h / 2 + 6, 13 * bp * lerp(.6, 1, e), 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = `600 ${14 * bp}px ${INTER}`; ctx.textAlign = 'center'; ctx.fillText(c.badge, w / 2 - 6, -h / 2 + 11); }
+  ctx.restore();
+}
+
+function cursor(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(0, 30); ctx.lineTo(8, 23); ctx.lineTo(14, 36); ctx.lineTo(19, 34); ctx.lineTo(13, 21); ctx.lineTo(23, 21); ctx.closePath();
+  ctx.fillStyle = '#f4f5f7'; ctx.shadowColor = 'rgba(0,0,0,.6)'; ctx.shadowBlur = 10; ctx.fill(); ctx.shadowBlur = 0; ctx.strokeStyle = '#08090b'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
+
+function scramble(t, t0, str, step = .125) {   // digits lock left to right, one per sixteenth note, out of hashed glyph noise
+  return [...str].map((ch, k) => { const tl = t0 + k * step; if (!/\d/.test(ch) || t >= tl) return { ch, lock: t - tl };
+    return { ch: String(Math.floor(hash(frameOf(t), k * 7 + 1) * 10)), lock: -1 }; });
+}
+
+function toast(t, t0, t1, text) {   // captions are a UI component: dark pill, 1 px border, accent speaking dot
+  if (t < t0 || t > t1 + .16) return;
+  const a = Math.min(outC((t - t0) / .16), 1 - prog(t, t1, .16)), y = 970 + 12 * (1 - a);
+  ctx.font = `500 40px ${INTER}`; const tw = ctx.measureText(text).width, w = tw + 120, x = 960 - w / 2;
+  ctx.save(); ctx.globalAlpha = a; ctx.shadowColor = 'rgba(0,0,0,.5)'; ctx.shadowBlur = 30; ctx.fillStyle = 'rgba(22,24,29,.88)'; rr(x, y - 40, w, 80, 40); ctx.fill(); ctx.restore();
+  ctx.globalAlpha = a; ctx.strokeStyle = 'rgba(255,255,255,.1)'; ctx.lineWidth = 1; rr(x + .5, y - 39.5, w - 1, 79, 40); ctx.stroke();
+  ctx.fillStyle = ACCENT; ctx.beginPath(); ctx.arc(x + 44, y, 6 + 1.5 * Math.sin(t * 12), 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = TXT[0]; ctx.textAlign = 'left'; ctx.fillText(text, x + 74, y + 14); ctx.globalAlpha = 1; window.heliosDrawnText?.add(text);
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  ctx.drawImage(STAGE, 0, 0);
+  // --- act 1 + 2: accumulation under a slight Dutch angle, then the snap; the grid squashes away into the number ---
+  const tilt = (t < TURN ? 1 : 1 - back(prog(t, TURN, .5))) * .012 + (t < TURN ? Math.sin(t * 23) * .0015 * prog(t, 1.6, .8) : 0);
+  const sq = inC(prog(t, 4.3, .3));
+  if (sq < 1) { ctx.save(); ctx.translate(960, 540); ctx.rotate(tilt); ctx.scale(lerp(1.03, 1, prog(t, 0, TURN)), 1 - sq); ctx.translate(-960, -540);
+    if (t > TURN + .2) { ctx.globalAlpha = prog(t, TURN + .2, .3); ctx.font = `500 14px ${MONO}`; ctx.letterSpacing = '3px'; ctx.textAlign = 'left'; ctx.fillStyle = TXT[2];
+      TYPES.forEach(([n], i) => ctx.fillText(n.toUpperCase(), 232 + i * 370, 222)); ctx.letterSpacing = '0px'; ctx.globalAlpha = 1; }
+    CARDS.forEach(c => card(c, t)); ctx.restore(); }
+  if (sq > 0 && t < 4.75) { ctx.fillStyle = ACCENT; const w = lerp(1440, 6, prog(t, 4.45, .25)); ctx.globalAlpha = 1 - prog(t, 4.62, .1); ctx.fillRect(960 - w / 2, 539, w, 2); ctx.globalAlpha = 1; }
+  // unread counter in the problem colour, alive only until the turn
+  if (t > .3 && t < TURN + .15) { const n = Math.round(12 + 300 * Math.pow(prog(t, .3, 2.6), 1.6)), a = t < TURN ? 1 : 1 - prog(t, TURN, .15);
+    ctx.globalAlpha = a; ctx.font = `600 22px ${INTER}`; ctx.textAlign = 'right'; ctx.fillStyle = PROBLEM; ctx.fillText(`${n} unread`, 1830, 80); ctx.globalAlpha = 1; }
+  // --- the one decisive action: accent button + cursor (anticipation, 2-frame contact) ---
+  if (t > 2.2 && t < TURN + .4) { const pop = back(prog(t, 2.2, .25)), press = frameOf(t) - frameOf(2.95), down = press >= 0 && press < 2;
+    const out = 1 - prog(t, TURN + .2, .2), bx = 960, by = 880, sxy = down ? [1.05, .9] : [1, 1];
+    ctx.save(); ctx.translate(bx, by); ctx.scale(pop * sxy[0] * out, pop * sxy[1] * out); ctx.shadowColor = 'rgba(183,243,74,.45)'; ctx.shadowBlur = 40;
+    ctx.fillStyle = ACCENT; rr(-130, -34, 260, 68, 34); ctx.fill(); ctx.shadowBlur = 0; ctx.fillStyle = '#0b0d08'; ctx.font = `600 26px ${INTER}`; ctx.textAlign = 'center'; ctx.fillText('Sort inbox', 0, 9); ctx.restore();
+    if (press >= 0) { const r = prog(t, 2.95, .45); ctx.strokeStyle = ACCENT; ctx.globalAlpha = 1 - r; ctx.lineWidth = 2; rr(bx - 130 - 40 * r, by - 34 - 40 * r, 260 + 80 * r, 68 + 80 * r, 34 + 40 * r); ctx.stroke(); ctx.globalAlpha = 1; }
+    const m = outC(prog(t, 2.3, .55)), wind = Math.sin(Math.PI * prog(t, 2.62, .3)) * 14;     // glide, small wind-up, press
+    cursor(lerp(1560, bx + 40, m) + wind, lerp(1000, by - 6, m) - wind * .5 + Math.sin(Math.PI * m) * -120, down ? .86 : 1); }
+  // --- hero: the number locks out of glyph noise, in the accent ---
+  if (t > 4.6) { const up = back(prog(t, 6.0, .5)), s = lerp(1, .55, up), y = lerp(560, 420, up);
+    ctx.save(); ctx.translate(960, y); ctx.scale(s, s); ctx.font = `600 300px ${TIGHT}`; ctx.textAlign = 'left';
+    const cells = scramble(t, 4.7, '1,284'), tw = [...'1,284'].reduce((a, ch) => a + ctx.measureText(ch).width - 13, 13); let x = -tw / 2;
+    const hand = prog(t, 6.1, .3);                                                        // the accent hands over to the product mark
+    ctx.shadowColor = `rgba(183,243,74,${.35 * (1 - hand)})`; ctx.shadowBlur = 60;
+    for (const { ch, lock } of cells) { const bob = lock >= 0 ? (1 - back(lock / .18, 2)) * 26 : 0; ctx.fillStyle = lock < 0 ? TXT[2] : hand > .5 ? TXT[0] : ACCENT;
+      ctx.fillText(ch, x, 100 + bob); x += ctx.measureText(ch).width - 13; }
+    ctx.restore(); ctx.letterSpacing = '0px';
+    const la = prog(t, 5.5, .3); ctx.globalAlpha = la * (1 - prog(t, 6.0, .2)); ctx.font = `500 22px ${MONO}`; ctx.letterSpacing = '6px'; ctx.textAlign = 'center'; ctx.fillStyle = TXT[1];
+    ctx.fillText('ITEMS SORTED IN 0.8 S', 963, 740 + 10 * (1 - outC(la))); ctx.letterSpacing = '0px'; ctx.globalAlpha = 1;
+    window.heliosDrawnText?.add('1,284'); }
+  // --- lockup + end hold ---
+  if (t > 6.1) { const a = back(prog(t, 6.1, .4)); ctx.save(); ctx.translate(960, 640); ctx.scale(a, a); ctx.globalAlpha = clamp(a);
+    ctx.font = `600 64px ${INTER}`; ctx.textAlign = 'center'; ctx.fillStyle = TXT[0]; ctx.letterSpacing = '-1.5px'; ctx.fillText('Fieldwork', 22, 22);
+    ctx.fillStyle = ACCENT; ctx.beginPath(); ctx.arc(-150, 0, 11 * (1 + .12 * Math.sin(t * 4)), 0, Math.PI * 2); ctx.fill(); ctx.restore(); ctx.letterSpacing = '0px'; }
+  toast(t, .25, 2.4, 'Monday, 9:02. Everything is urgent.');
+  toast(t, 2.5, 4.2, 'One click. Everything has a place.');
+  toast(t, 6.5, 8.2, 'Calm by default.');
+};
+</script></body></html>

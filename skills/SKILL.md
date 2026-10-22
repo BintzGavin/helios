@@ -32,6 +32,7 @@ npx skills add BintzGavin/helios/skills/workflows/visualize-data
 # Design / motion
 npx skills add BintzGavin/helios/skills/design/animated-video-philosophy
 npx skills add BintzGavin/helios/skills/design/cinematic-product-promo-plan
+npx skills add BintzGavin/helios/skills/design/motion-styles
 
 # Guided video creation
 npx skills add BintzGavin/helios/skills/guided/motion-design-rules
@@ -41,6 +42,9 @@ npx skills add BintzGavin/helios/skills/guided/product-demo
 npx skills add BintzGavin/helios/skills/guided/testimonial-video
 npx skills add BintzGavin/helios/skills/guided/launch-announcement
 npx skills add BintzGavin/helios/skills/guided/social-clip
+npx skills add BintzGavin/helios/skills/guided/cartoon-short
+npx skills add BintzGavin/helios/skills/guided/music-video
+npx skills add BintzGavin/helios/skills/guided/video-recipes
 
 # Framework examples
 npx skills add BintzGavin/helios/skills/examples/react
@@ -80,6 +84,7 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 
 - **skills/design/animated-video-philosophy** - Working philosophy for animated video: story-first motion, pacing, shots, timing, composition, medium-specific grammar, technical commitments, and anti-patterns. Use when directing or critiquing motion and programmatic video.
 - **skills/design/cinematic-product-promo-plan** - Template plan for a ~45s feeling-first cinematic product promo: brief through ship, hero-element journey, look/motion/audio, deliverables matrix, accessibility. Adapt to any product category.
+- **skills/design/motion-styles** - Opt-in library of established visual styles, each a style card with colour rules, motion grammar and a checkable signature list, plus a tested `renderAt(t)` demo. Load only when the user names a specific style or asks for style options; otherwise design an original look.
 
 ### Guided Video Creation Skills
 
@@ -90,6 +95,9 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 - **skills/guided/testimonial-video** - Social proof / testimonial video. Quote typography, customer branding, trust signals.
 - **skills/guided/launch-announcement** - Product launch / release announcement. Countdown motifs, dramatic reveal.
 - **skills/guided/social-clip** - Short-form social clip (Reels/TikTok/Shorts). Vertical 9:16, punchy, loop-friendly.
+- **skills/guided/cartoon-short** - Hand-drawn cartoon short: a character rig you design, acted emotion changes, boiling ink-and-paint linework, storyboarding by reads. Includes a tested starter page.
+- **skills/guided/music-video** - Lyric and karaoke music video: word timings by forced alignment, treatment and section storyboard, a timeline derived from lyrics and beats, karaoke recipes. Includes a tested karaoke page.
+- **skills/guided/video-recipes** - Opt-in genre recipes with tested demos (scale dive, process explainer, era timeline, mechanism/proof, kinetic type, UI morph loop, pixel sprite), plus the video brief template and a gotcha list. Load only when the request is one of these genres.
 
 ### Framework Integration Skills
 

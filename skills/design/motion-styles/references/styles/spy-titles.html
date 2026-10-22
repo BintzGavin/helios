@@ -1,0 +1,248 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render spy-titles.html -o spy-titles.mp4 --duration 9 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Spy Titles</title>
+<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+<style>html,body{margin:0;background:#1b1714;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// 60s cut-paper title sequence: four inks, scissor-cut edges cached in local space, cut gaps + paper shadows,
+// credits as the set, silhouettes on twos, camera on ones, stop-time freeze on a stab.
+const W = 1920, H = 1080;
+const ctx = document.getElementById('c').getContext('2d');
+const C = { ink: '#1b1714', cream: '#efe4c9', red: '#d23a22', mus: '#e2a52a', redD: '#b3311d', creamD: '#ddd0b2' };
+const FONT_URL = 'https://cdn.jsdelivr.net/npm/@fontsource/league-gothic@5.0.12/files/league-gothic-latin-400-normal.woff';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, u) => a + (b - a) * u;
+const outC = (u) => 1 - Math.pow(1 - u, 3);
+const twos = (t) => Math.floor(t * 12 + 1e-4) / 12;              // puppets and letters step at 12 fps
+const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const vnoise = (x) => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u); };
+
+// ---- scissor cut: resample every ~step px, push along the normal by low-frequency noise, rare notch. Done ONCE per piece.
+function rough(pts, seed, amp = 1.6, step = 9) {
+  const out = []; let s = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i], b = pts[(i + 1) % pts.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1e-6;
+    const nx = -dy / L, ny = dx / L, k = Math.max(1, Math.round(L / step));
+    for (let j = 0; j < k; j++) {
+      const ss = s + (j / k) * L, w = j === 0 ? 0.25 : 1;                // corners stay sharp
+      let o = ((vnoise(ss / 21 + seed * 17.3) * 2 - 1) + 0.35 * (vnoise(ss / 5 + seed * 5.1) * 2 - 1)) * amp * w;
+      if (hash(Math.floor(ss / 27) + seed * 91.7) > 0.965 && j > 0) o -= amp * 1.6;
+      out.push([a[0] + dx * j / k + nx * o, a[1] + dy * j / k + ny * o]);
+    }
+    s += L;
+  }
+  return out;
+}
+let gap = 2.4;
+function piece(polys, col, ground, shadow = true) {      // cut gap in the ground colour, then the paper with a small shadow
+  const sc = Math.hypot(ctx.getTransform().a, ctx.getTransform().b);
+  ctx.beginPath(); for (const p of polys) { ctx.moveTo(p[0][0], p[0][1]); for (const q of p) ctx.lineTo(q[0], q[1]); ctx.closePath(); }
+  ctx.lineJoin = 'round'; ctx.lineWidth = (gap * 2) / sc; ctx.strokeStyle = ground; ctx.stroke();
+  ctx.save();
+  if (shadow) { ctx.shadowColor = 'rgba(20,12,6,0.3)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 2.5; ctx.shadowOffsetY = 3.5; }
+  ctx.fillStyle = col; ctx.fill('evenodd'); ctx.restore();
+}
+
+// ---- credits: glyph outlines from the font, re-cut per letter (edge noise, ±0.8° tilt, ±1.5 px baseline)
+let FONT, CAP;
+function glyphPolys(ch, size) {
+  const polys = []; let cur = null, lx = 0, ly = 0;
+  for (const c of FONT.getPath(ch, 0, 0, size).commands) {
+    if (c.type === 'M') { cur = [[c.x, c.y]]; polys.push(cur); }
+    else if (c.type === 'L') cur.push([c.x, c.y]);
+    else if (c.type === 'Q' || c.type === 'C') for (let i = 1; i <= 6; i++) {
+      const u = i / 6, v = 1 - u;
+      cur.push(c.type === 'Q' ? [v * v * lx + 2 * v * u * c.x1 + u * u * c.x, v * v * ly + 2 * v * u * c.y1 + u * u * c.y]
+        : [v * v * v * lx + 3 * v * v * u * c.x1 + 3 * v * u * u * c.x2 + u * u * u * c.x, v * v * v * ly + 3 * v * v * u * c.y1 + 3 * v * u * u * c.y2 + u * u * u * c.y]);
+    }
+    if (c.type !== 'Z') { lx = c.x; ly = c.y; }
+  }
+  return polys.filter((p) => p.length > 2);
+}
+function makeLine(text, cap, x, base, track, seed) {
+  const size = cap / CAP, out = [];
+  for (const [i, ch] of [...text].entries()) {
+    const adv = FONT.charToGlyph(ch).advanceWidth * size / FONT.unitsPerEm;
+    if (ch !== ' ') out.push({ ch, x, y: base + (hash(seed + i) - 0.5) * 3, rot: (hash(seed + i + 50) - 0.5) * 1.6 * Math.PI / 180, w: adv,
+      polys: glyphPolys(ch, size).map((p) => rough(p, seed + i, Math.max(0.8, cap / 160), 9)) });
+    x += adv + track;
+  }
+  return out;
+}
+function drawLetter(L, col, ground, dx = 0, dy = 0) {
+  ctx.save(); ctx.translate(L.x + dx, L.y + dy); ctx.rotate(L.rot); piece(L.polys, col, ground); ctx.restore();
+}
+
+// ---- silhouette rig: every bone roughened once in its own local space, so moving limbs keep the same cut edge
+const limb = (L, w0, w1) => [[-w0 / 2, 0], [w0 / 2, 0], [w1 / 2, L], [-w1 / 2, L]];
+const ellipse = (rx, ry, cx = 0, cy = 0, n = 16) => Array.from({ length: n }, (_, i) => [cx + Math.cos(i / n * 6.283) * rx, cy + Math.sin(i / n * 6.283) * ry]);
+const RIG = {};
+function buildRig() {
+  const r = (p, s) => rough(p, s, 0.9, 6);
+  Object.assign(RIG, {
+    uleg: r(limb(66, 24, 16), 1), lleg: r(limb(64, 16, 10), 2), foot: r([[-7, -6], [26, -3], [29, 4], [-7, 5]], 3),
+    uarm: r(limb(50, 15, 11), 4), larm: r(limb(46, 11, 7), 5), hand: r([[-5, 0], [5, 0], [1, 17]], 6),
+    coat: r([[-19, -96], [19, -96], [27, 24], [-25, 30]], 7), head: r(ellipse(16, 18, 5, -122), 8),
+    nose: r([[18, -128], [27, -118], [17, -114]], 9), brim: r([[-24, -137], [34, -138], [36, -132], [-22, -131]], 10),
+    crown: r([[-12, -137], [20, -137], [16, -158], [-8, -158]], 11),
+  });
+}
+const P = { // poses: hip/knee for front (F) and back (B) legs, shoulder/elbow for arms, torso lean, body bob
+  stand: { hF: -0.06, kF: 0.05, hB: 0.08, kB: 0.05, sF: 0.12, eF: -0.25, sB: -0.05, eB: -0.15, lean: 0.03, bob: 0 },
+  leap: { hF: -1.25, kF: 0.25, hB: 0.95, kB: 1.25, sF: -2.5, eF: -0.25, sB: 1.0, eB: -0.6, lean: 0.42, bob: 0 },
+  crouch: { hF: -0.9, kF: 1.5, hB: -0.2, kB: 1.4, sF: -0.6, eF: -1.2, sB: 0.7, eB: -0.8, lean: 0.55, bob: 26 },
+};
+function run(t) {                                   // 8-drawing run cycle, one drawing per 1/12 s
+  const p = (Math.floor(t * 12 + 1e-4) % 8) / 8, s = Math.sin(p * 6.283), s2 = Math.sin(p * 6.283 + Math.PI);
+  return { hF: -0.95 * s, kF: 0.25 + 1.2 * Math.max(0, Math.sin(p * 6.283 + 1.7)), hB: -0.95 * s2, kB: 0.25 + 1.2 * Math.max(0, Math.sin(p * 6.283 + 1.7 + Math.PI)),
+    sF: 1.0 * s, eF: -1.5, sB: 1.0 * s2, eB: -1.5, lean: 0.34, bob: -9 * Math.abs(Math.cos(p * 6.283)) };
+}
+const LAYER = document.createElement('canvas'); LAYER.width = 900; LAYER.height = 900;
+const lx = LAYER.getContext('2d'), GAPL = document.createElement('canvas'); GAPL.width = GAPL.height = 900;
+const gx = GAPL.getContext('2d');
+function figure(g, pose, onHand, ink = true) {                // pelvis at origin, facing +x; all pieces merge into one silhouette
+  const fill = (poly) => { if (!ink) return; g.beginPath(); g.moveTo(poly[0][0], poly[0][1]); for (const q of poly) g.lineTo(q[0], q[1]); g.closePath(); g.fill(); };
+  const leg = (h, k) => { g.save(); g.rotate(h); fill(RIG.uleg); g.translate(0, 64); g.rotate(k); fill(RIG.lleg); g.translate(0, 62); g.rotate(-h - k); fill(RIG.foot); g.restore(); };
+  const arm = (s, e, hand) => { g.save(); g.translate(0, -90); g.rotate(s); fill(RIG.uarm); g.translate(0, 48); g.rotate(e); fill(RIG.larm); g.translate(0, 44); fill(RIG.hand); if (hand) hand(g); g.restore(); };
+  g.save(); g.translate(0, pose.bob);
+  leg(pose.hB, pose.kB); leg(pose.hF, pose.kF);
+  g.rotate(pose.lean);
+  arm(pose.sB, pose.eB); for (const k of ['coat', 'head', 'nose', 'brim', 'crown']) fill(RIG[k]);
+  arm(pose.sF, pose.eF, onHand);
+  g.restore();
+}
+function key(g) {                                      // the object of the chase: mustard on a black backing
+  const shape = () => { g.beginPath(); g.arc(0, 12, 9, 0, 6.283); g.rect(-2.5, 19, 5, 30); g.rect(2, 38, 8, 4); g.rect(2, 44, 6, 4); };
+  g.save(); g.lineJoin = 'round'; shape(); g.lineWidth = 6; g.strokeStyle = C.ink; g.stroke(); g.fillStyle = C.mus; g.fill('nonzero');
+  g.beginPath(); g.arc(0, 12, 3.5, 0, 6.283); g.fillStyle = C.ink; g.fill(); g.restore();
+}
+// draws the merged silhouette with its cut-gap outline and shadow, then the scarf (red accent) and the key on top
+function hero(x, feet, s, pose, ground, tq, withKey = true) {
+  const y = feet - 128 * s;                          // pelvis sits one leg length above the feet line
+  lx.setTransform(1, 0, 0, 1, 0, 0); lx.clearRect(0, 0, 900, 900);
+  lx.setTransform(2, 0, 0, 2, 450, 560); lx.fillStyle = C.ink; figure(lx, pose);
+  gx.setTransform(1, 0, 0, 1, 0, 0); gx.globalCompositeOperation = 'source-over'; gx.clearRect(0, 0, 900, 900);
+  gx.drawImage(LAYER, 0, 0); gx.globalCompositeOperation = 'source-in'; gx.fillStyle = ground; gx.fillRect(0, 0, 900, 900);
+  ctx.save(); ctx.translate(x, y); ctx.scale(s / 2, s / 2); ctx.translate(-450, -560);
+  for (let a = 0; a < 8; a++) ctx.drawImage(GAPL, Math.cos(a * 0.785) * gap * 2 / s, Math.sin(a * 0.785) * gap * 2 / s);
+  ctx.shadowColor = 'rgba(20,12,6,0.3)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 2.5; ctx.shadowOffsetY = 3.5;
+  ctx.drawImage(LAYER, 0, 0); ctx.restore();
+  // scarf: a multi-segment ribbon with a travelling sine, streaming back from the neck
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.translate(0, pose.bob); ctx.rotate(pose.lean); ctx.translate(-2, -100);
+  const top = [], bot = [];
+  for (let i = 0; i <= 7; i++) {
+    const px = -i * 13, py = Math.sin(i * 0.9 - tq * 19) * i * 1.3 + i * 2.2, w = lerp(6, 2, i / 7);
+    top.push([px, py - w]); bot.unshift([px, py + w]);
+  }
+  ctx.beginPath(); [...top, ...bot].forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath();
+  ctx.lineJoin = 'round'; ctx.lineWidth = 3 / s; ctx.strokeStyle = C.ink; ctx.stroke(); ctx.fillStyle = C.red; ctx.fill(); ctx.restore();
+  if (withKey) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); figure(ctx, pose, () => key(ctx), false); ctx.restore(); }   // same bone chain, key only
+}
+
+// ---- paper finish: one multiplied texture (mottling + fibres) and a sparse void speckle, both seeded, built in ready
+let seedv = 777; const rnd = () => ((seedv = (seedv * 1664525 + 1013904223) >>> 0) / 4294967296);
+const TEX = document.createElement('canvas'); TEX.width = W; TEX.height = H;
+const SPK = document.createElement('canvas'); SPK.width = W; SPK.height = H;
+let SET = {}, SLOT = null;
+const ready = (async () => {
+  FONT = opentype.parse(await (await fetch(FONT_URL)).arrayBuffer());
+  CAP = FONT.charToGlyph('H').getBoundingBox().y2 / FONT.unitsPerEm;   // measured cap height
+  buildRig();
+  DISC = rough(ellipse(330, 330, 1590, 345, 90), 5, 2.2, 10);
+  SET = {
+    halcyon: makeLine('HALCYON', 430, 70, 860, 26, 10), presents: makeLine('PICTURES PRESENTS', 64, 640, 975, 14, 40),
+    music: [...'MUSIC'].map((ch, i) => makeLine(ch, 170, 150 + i * 150, 1000 - i * 72, 0, 70 + i)[0]),
+    brass: makeLine('THE HALCYON BRASS', 40, 330, 1046, 9, 90),
+    the: makeLine('THE', 170, 236, 470, 14, 110), quiet: makeLine('QUIET', 170, 566, 470, 30, 120),
+    courier: makeLine('COURIER', 330, 220, 860, 22, 130), credit: makeLine('A HALCYON PICTURE  ·  IN FOUR INKS', 34, 226, 950, 8, 150),
+  };
+  SLOT = SET.quiet.splice(2, 1)[0];                  // the I stays empty until the key drops into it
+  const t = TEX.getContext('2d'), im = t.createImageData(W, H), d = im.data, low = Array.from({ length: 62 * 36 }, rnd);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const fx = x / 32, fy = y / 32, ix = fx | 0, iy = fy | 0, u = fx - ix, v = fy - iy;
+    const l = lerp(lerp(low[iy * 62 + ix], low[iy * 62 + ix + 1], u), lerp(low[(iy + 1) * 62 + ix], low[(iy + 1) * 62 + ix + 1], u), v);
+    const val = 255 - l * 16 - rnd() * 8, k = (y * W + x) * 4;
+    d[k] = val; d[k + 1] = val - 2; d[k + 2] = val - 6; d[k + 3] = 255;
+  }
+  t.putImageData(im, 0, 0); t.strokeStyle = 'rgba(100,84,60,0.07)';
+  for (let i = 0; i < 2400; i++) { const x = rnd() * W, y = rnd() * H, a = rnd() * 6.3, l = 6 + rnd() * 20; t.beginPath(); t.moveTo(x, y); t.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); t.stroke(); }
+  const s = SPK.getContext('2d'); s.fillStyle = '#000'; s.fillRect(0, 0, W, H);
+  for (let i = 0; i < 5000; i++) { s.fillStyle = `rgba(120,108,88,${0.25 + rnd() * 0.45})`; s.beginPath(); s.arc(rnd() * W, rnd() * H, 0.7 + rnd() * 1.4, 0, 7); s.fill(); }
+})();
+
+// ---- scenes. Stabs (hard cuts) at 3.5 and 6.5; stop-time freeze 5.5-6.0.
+function sceneA(t) {            // red ground: the credit line is the skyline, the courier runs its rooftops
+  const ground = C.red; ctx.fillStyle = ground; ctx.fillRect(0, 0, W, H);
+  const tq = twos(t), hx = -150 + (tq - 1.0) * 780;
+  const cz = outC(prog(t, 1.3, 2.0));                // wide on the full credit line first, then truck in and track
+  const zoom = lerp(1, 1.45, cz);
+  const fx = Math.min(lerp(960, Math.max(960, -150 + (t - 1.0) * 780 + 260), cz), W - 960 / zoom);
+  const fy = lerp(540, 470, cz);
+  ctx.setTransform(zoom, 0, 0, zoom, W / 2 - zoom * fx, H / 2 - zoom * fy);
+  ctx.fillStyle = C.redD; for (let i = 0; i < 5; i++) ctx.fillRect(160 + i * 420, 330, 9, 540);        // poles: darker ground, never black
+  ctx.fillRect(0, 352, W, 4);
+  SET.halcyon.forEach((L, i) => {                    // letters land one per 1/12 s, stop dead with a paper slap
+    const land = 0.04 + i * 0.08, u = prog(tq, land - 0.17, land);
+    if (u > 0) drawLetter(L, C.ink, ground, 0, -(1 - outC(u)) * 700);
+  });
+  ctx.fillStyle = C.ink; ctx.fillRect(-200, 868, W + 400, 300);                                        // rail bed
+  SET.presents.forEach((L) => drawLetter(L, C.cream, C.ink, (1 - outC(prog(t, 0.4, 0.8))) * 1400, 0));
+  if (t >= 1.0) hero(hx, 432, 1.0, run(t), ground, tq);
+}
+function sceneB(t) {            // cream ground: the credit is a staircase; leap across the red disc, freeze on the stab
+  const ground = C.cream; ctx.fillStyle = ground; ctx.fillRect(0, 0, W, H);
+  let u = t - 3.5; u = u < 2.0 ? u : u < 2.5 ? 2.0 : u - 0.5;                   // stop-time: the whole picture holds
+  const z = 1 + 0.05 * u / 2.5;
+  ctx.setTransform(z, 0, 0, z, W / 2 * (1 - z), H / 2 * (1 - z));
+  ctx.save(); ctx.translate(960, 540); ctx.rotate(-Math.PI / 6); ctx.fillStyle = C.creamD;
+  for (let i = -3; i <= 3; i++) ctx.fillRect(-1400, i * 260 - 40, 2800, 70); ctx.restore();
+  piece([DISC], C.red, ground);
+  SET.music.forEach((L, i) => drawLetter(L, C.ink, ground));
+  SET.brass.forEach((L) => drawLetter(L, C.ink, ground, 0, 0));
+  const uq = twos(u), tops = SET.music.map((L) => [L.x + L.w / 2 - 20, L.y - 170]);
+  let x, y, pose;
+  if (uq < 0.3) { x = lerp(-120, tops[0][0], uq / 0.3); y = tops[0][1]; pose = run(u); }
+  else if (uq < 1.42) {                              // four hops up the letters, one per 0.28 s
+    const k = Math.min(3, Math.floor((uq - 0.3) / 0.28)), f = (uq - 0.3 - k * 0.28) / 0.28;
+    x = lerp(tops[k][0], tops[k + 1][0], f); y = lerp(tops[k][1], tops[k + 1][1], f) - Math.sin(f * Math.PI) * 70;
+    pose = f < 0.2 || f > 0.85 ? P.crouch : P.leap;
+  } else {                                           // the leap across the disc
+    const f = (uq - 1.42) / 1.08; x = lerp(tops[4][0], 2300, f); y = lerp(tops[4][1], tops[4][1] - 40, f) - 4 * 60 * f * (1 - f);
+    pose = f < 0.08 ? P.crouch : P.leap;
+  }
+  hero(x, y, 1.2, pose, ground, uq);
+}
+let DISC = null;
+function sceneC(t) {            // mustard ground: the title assembles along a 30° diagonal; the key becomes the I
+  const ground = C.mus; ctx.fillStyle = ground; ctx.fillRect(0, 0, W, H);
+  const tq = twos(t), dir = [Math.cos(Math.PI / 6), -Math.sin(Math.PI / 6)];
+  const fly = (L, land, col) => { const u = outC(prog(tq, land - 0.25, land)); if (u > 0) drawLetter(L, col, ground, -(1 - u) * 1500 * dir[0], -(1 - u) * 1500 * dir[1]); };
+  SET.the.forEach((L, i) => fly(L, 6.67 + i * 0.083, C.ink));
+  SET.quiet.forEach((L, i) => fly(L, 6.83 + i * 0.083, C.cream));
+  SET.courier.forEach((L, i) => fly(L, 7.0 + i * 0.083, C.red));
+  SET.credit.forEach((L) => drawLetter(L, C.ink, ground, (1 - outC(prog(t, 7.6, 7.9))) * -1400, 0));
+  const ku = outC(prog(tq, 7.75, 8.0));             // the object of the chase drops into the I slot on the 8.0 stab
+  if (ku > 0) { ctx.save(); ctx.translate(SLOT.x + SLOT.w / 2, 470 - 170 - 3 * 3.5 - (1 - ku) * 560); ctx.scale(3.5, 3.5); key(ctx); ctx.restore(); }
+  const R = SET.courier[6], hy = R.y - 330 - (1 - outC(prog(tq, 7.9, 8.17))) * 700;
+  if (tq >= 7.9) hero(R.x + R.w / 2 + 6, hy, 0.95, tq < 8.25 ? P.crouch : P.stand, ground, tq, false);
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.shadowColor = 'transparent';
+  if (t < 3.5) sceneA(t); else if (t < 6.5) sceneB(t); else sceneC(t);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(TEX, 0, 0);
+  ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.5; ctx.drawImage(SPK, 0, 0);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+};
+</script>
+</body>
+</html>

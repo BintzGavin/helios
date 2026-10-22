@@ -1,0 +1,116 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render aurora-glass.html -o aurora-glass.mp4 --duration 8 -->
+<!-- default dom mode: the frosted cards are DOM elements with backdrop-filter over a WebGL2 light field -->
+<html><head><meta charset="utf-8"><title>Aurora glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#05060F;font-family:Inter,system-ui,sans-serif;color:rgba(255,255,255,.94)}
+  #gl{position:absolute;inset:0;width:1920px;height:1080px}
+  .card{position:absolute;border-radius:30px;overflow:hidden;opacity:0;
+    background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+    backdrop-filter:blur(38px) saturate(150%);-webkit-backdrop-filter:blur(38px) saturate(150%);
+    border:1px solid rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.34),0 40px 90px rgba(2,3,12,.45)}
+  .sheen{position:absolute;inset:-40% -60%;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.16) 50%,transparent 58%);transform:translateX(-120%)}
+  .row{display:flex;align-items:center;gap:18px}
+  .muted{color:rgba(255,255,255,.6)}
+  #main{left:300px;top:240px;width:860px;height:480px;padding:48px 56px;box-sizing:border-box}
+  #orb{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0,#C7B8FF 18%,#7B5CFF 52%,#2B2E9E 100%)}
+  h1{font-weight:600;font-size:60px;letter-spacing:-1.5px;margin:58px 0 18px}
+  p{font-size:26px;line-height:1.5;margin:0;max-width:680px}
+  .pill{font-size:22px;font-weight:500;padding:14px 28px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+  #wind{left:1200px;top:150px;width:520px;height:200px;padding:40px 44px;box-sizing:border-box}
+  #track{margin-left:auto;width:96px;height:56px;border-radius:28px;background:rgba(255,255,255,.16);position:relative}
+  #knob{position:absolute;left:6px;top:6px;width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  #warm{left:1060px;top:570px;width:560px;height:250px;padding:44px 48px;box-sizing:border-box}
+  #bar{margin-top:40px;height:12px;border-radius:6px;background:rgba(255,255,255,.14);position:relative}
+  #fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#7B5CFF,#4FD8F0)}
+  #thumb{position:absolute;top:-14px;width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+</style></head>
+<body>
+<canvas id="gl" width="1920" height="1080"></canvas>
+<div class="card" id="main"><div class="sheen"></div>
+  <div class="row"><div id="orb"></div><div style="font-size:28px;font-weight:600">Solace</div><div class="muted" style="margin-left:auto;font-size:22px">now</div></div>
+  <h1>Your evening is clear.</h1>
+  <p class="muted">Dinner at seven, lights low at nine-thirty, and nothing on your calendar until morning.</p>
+  <div class="row" style="margin-top:40px"><div class="pill">Keep it</div><div class="pill muted">Adjust</div></div>
+</div>
+<div class="card" id="wind"><div class="sheen"></div>
+  <div class="row"><div><div style="font-size:30px;font-weight:600">Wind-down</div><div class="muted" style="font-size:21px;margin-top:8px">Quiet notifications at 9:30</div></div>
+  <div id="track"><div id="knob"></div></div></div>
+</div>
+<div class="card" id="warm"><div class="sheen"></div>
+  <div class="row"><div style="font-size:30px;font-weight:600">Warmth</div><div id="pct" class="muted" style="margin-left:auto;font-size:26px;font-variant-numeric:tabular-nums">30%</div></div>
+  <div id="bar"><div id="fill"></div><div id="thumb"></div></div>
+  <div class="row muted" style="justify-content:space-between;font-size:19px;margin-top:30px"><span>Daylight</span><span>Candle</span></div>
+</div>
+<script>
+// ---------------------------------------------------------------- WebGL2 light field: Gaussian blobs, normalised colour mixing
+const cv = document.getElementById('gl'), gl = cv.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false });
+const FS = `#version 300 es
+precision highp float;
+uniform vec2 uB[6]; uniform vec3 uC[6]; uniform float uR[6]; uniform float uGain, uSeed; out vec4 o;
+float hash(vec2 p){ vec3 q = fract(vec3(p.xyx) * .1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+void main(){
+  vec2 p = vec2(gl_FragCoord.x, 1080. - gl_FragCoord.y);
+  vec3 acc = vec3(0.); float ws = 0.;
+  for (int i = 0; i < 6; i++){ vec2 d = (p - uB[i]) / uR[i]; float g = exp(-dot(d, d)); acc += uC[i] * g; ws += g; }
+  vec3 hue = acc / max(ws, 1e-4);                        // normalised: overlaps blend hue, never sum to mud or white
+  float cov = pow(1. - exp(-ws * 1.2), 1.5);              // how much light reaches this pixel (deep valleys between pools)
+  vec2 q = p / vec2(1920., 1080.) - .5; float vig = 1. - .55 * dot(q, q) * 2.2;
+  vec3 col = mix(vec3(.016, .02, .055), hue, cov * .95) * uGain * vig;
+  col += (hash(p + uSeed) - .5) * .035;                   // ~3.5 % noise: kills banding in the long gradients
+  o = vec4(col, 1.);
+}`;
+const VS = `#version 300 es
+void main(){ vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2)); gl_Position = vec4(p * 2. - 1., 0., 1.); }`;
+const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindVertexArray(gl.createVertexArray());
+const U = n => gl.getUniformLocation(prog, n), uB = U('uB'), uC = U('uC'), uR = U('uR'), uGain = U('uGain'), uSeed = U('uSeed');
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255);
+// adjacent hues only: violet, blue, cyan, magenta, indigo. Each blob drifts on a closed loop with a 20–40 s period
+const BLOBS = [
+  { c: '#7B3FF2', x: 560, y: 330, ax: 240, ay: 150, P: 34, ph: 0.0, r: 470 },
+  { c: '#2F5BFF', x: 1300, y: 660, ax: 280, ay: 170, P: 28, ph: 1.7, r: 480 },
+  { c: '#1FC8E8', x: 1560, y: 280, ax: 200, ay: 180, P: 24, ph: 3.1, r: 340 },
+  { c: '#C23FE0', x: 860, y: 900, ax: 320, ay: 110, P: 38, ph: 4.4, r: 380 },
+  { c: '#3B2FB8', x: 220, y: 860, ax: 180, ay: 140, P: 30, ph: 2.2, r: 420 },
+  { c: '#5C6CFF', x: 1060, y: 140, ax: 260, ay: 100, P: 22, ph: 5.3, r: 300 },
+];
+gl.uniform3fv(uC, BLOBS.flatMap(b => hex(b.c)).map(v => v * 1.08)); gl.uniform1fv(uR, BLOBS.map(b => b.r));
+
+// ---------------------------------------------------------------- timing helpers
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const sine = u => .5 - .5 * Math.cos(Math.PI * clamp(u));        // the only ease in this style: slow sine in-out
+const span = (t, a, d) => clamp((t - a) / d);
+const $ = id => document.getElementById(id);
+const CARDS = [['main', .3], ['wind', .75], ['warm', 1.15]].map(([id, t0], i) => ({ el: $(id), sheen: $(id).querySelector('.sheen'), t0, ph: i * 2.1 }));
+const HERO = 5.0;
+const ready = (async () => { await Promise.all([document.fonts.load('600 60px Inter', 'Your evening'), document.fonts.load('400 26px Inter', 'Dinner')]); await document.fonts.ready; })();
+
+window.renderAt = async (t) => {
+  await ready;
+  // light field
+  const swell = Math.exp(-(((t - HERO - .35) / .9) ** 2));
+  gl.uniform2fv(uB, BLOBS.flatMap(b => { const a = 2 * Math.PI * t / b.P + b.ph; return [b.x + b.ax * Math.sin(a), b.y + b.ay * Math.sin(2 * a + .6)]; }));   // figure-eight loops
+  gl.uniform1f(uGain, (.3 + .7 * sine(span(t, 0, 1.4))) * (1 + .25 * swell));   // hook: light already rising on frame 0 gl.uniform1f(uSeed, Math.floor(t * 60) * 17.31 % 997);
+  gl.viewport(0, 0, 1920, 1080); gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  // cards: rise 8 px while fading in, then float ±2 px on a slow sine; one specular sheen crosses them at the hero beat
+  for (const c of CARDS) {
+    const u = sine(span(t, c.t0, 1.1)), fl = 2 * Math.sin(2 * Math.PI * (t - c.t0) / 6.5 + c.ph) * u;
+    c.el.style.opacity = u.toFixed(4); c.el.style.transform = `translateY(${(8 * (1 - u) + fl).toFixed(3)}px)`;
+    c.sheen.style.transform = `translateX(${(-120 + 240 * sine(span(t, HERO + .1 + c.ph * .06, 1.6))).toFixed(2)}%)`;
+  }
+  // hero: the wind-down toggle slides on, the orb brightens
+  const k = sine(span(t, HERO, .6));
+  $('knob').style.transform = `translateX(${(40 * k).toFixed(2)}px)`;
+  $('track').style.background = `linear-gradient(90deg, rgba(123,92,255,${(.95 * k).toFixed(3)}), rgba(79,216,240,${(.9 * k).toFixed(3)})), rgba(255,255,255,.16)`;
+  $('orb').style.boxShadow = `0 0 ${(18 + 30 * swell + 6 * Math.sin(t * 1.6)).toFixed(1)}px rgba(160,140,255,${(.45 + .4 * swell).toFixed(3)})`;
+  // the warmth slider eases 30 % -> 72 %
+  const w = 30 + 42 * sine(span(t, 2.4, 2.2));
+  $('fill').style.width = `${w.toFixed(2)}%`; $('thumb').style.left = `${w.toFixed(2)}%`; $('pct').textContent = `${Math.round(w)}%`;
+};
+</script>
+</body></html>

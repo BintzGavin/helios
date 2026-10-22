@@ -1,0 +1,191 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render swiss-grid.html -o swiss-grid.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Swiss Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#EAE9E5;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Swiss grid: 12 columns, 96 px margins, 24 px gutters and baseline, one face, one signal colour.
+// 120 BPM: beat 0.5 s, 1/8 = 0.25 s, 1/16 = 0.125 s. Every snap starts one note value early and lands on the beat.
+const W = 1920, H = 1080;
+const ctx = document.getElementById('c').getContext('2d');
+const C = { page: '#EAE9E5', paper: '#FFFFFF', ink: '#111111', grey: '#CFCDC7', guide: '#D9D7D2', hair: '#BDBBB5', sig: '#E30613' };
+const FAM = '"Archivo", "Helvetica Neue", Arial, sans-serif';
+const BEAT = 0.5, E8 = 0.25, E16 = 0.125;
+
+// ---- the only two curves: precise ease and linear
+function bezier(x1, y1, x2, y2) {
+  const f = (u, a, b) => 3 * (1 - u) * (1 - u) * u * a + 3 * (1 - u) * u * u * b + u * u * u;
+  return (x) => {
+    if (x <= 0) return 0; if (x >= 1) return 1;
+    let lo = 0, hi = 1, u = x;
+    for (let i = 0; i < 28; i++) { const v = f(u, x1, x2); if (v < x) lo = u; else hi = u; u = (lo + hi) / 2; }
+    return f(u, y1, y2);
+  };
+}
+const E = bezier(0.7, 0, 0.2, 1);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lin = (t, a, b) => clamp((t - a) / (b - a));
+const snap = (t, tArrive, d = E8) => E(lin(t, tArrive - d, tArrive));   // lands exactly on tArrive
+const lerp = (a, b, u) => a + (b - a) * u;
+const steps = (t, a, b, n) => { const p = lin(t, a, b) * n, i = Math.floor(p); return i >= n ? 1 : (i + E(p - i)) / n; };
+
+// ---- frame grid
+const MX = 96, COL = 122, GUT = 24, BL = 24;
+const colX = (i) => MX + i * (COL + GUT);            // left edge of column i (0..11); colX(12) - GUT = right margin
+// artifact (right page): white paper on columns 7-12, its own 6 x 6 module grid
+const PX = colX(6), PY = 96, PW = colX(12) - GUT - PX, PH = 888, MW = PW / 6, MH = PH / 6;
+const mx = (c) => PX + c * MW, my = (r) => PY + r * MH;
+
+function font(w, s) { ctx.font = `${w} ${s}px ${FAM}`; ctx.letterSpacing = s >= 90 ? `${(-s * 0.03).toFixed(1)}px` : '0px'; }
+// word rises out of a clip rect from below its baseline (p), leaves upward (q)
+function clipWord(s, x, y, size, p, q = 0) {
+  if (p <= 0 || q >= 1) return 0;
+  const w = ctx.measureText(s).width;
+  ctx.save(); ctx.beginPath(); ctx.rect(x - 4, y - size * 1.0, w + 8, size * 1.28); ctx.clip();
+  ctx.fillText(s, x, y + (1 - p) * size * 1.05 - q * size * 1.3);
+  ctx.restore(); return w;
+}
+
+// ---- bars on the artifact grid: half a module tall, long/short rhythm on a diagonal.
+// [col, row, len, colour, dodge] - dodge = modules it steps aside when the exception lands
+const BARS = [
+  [0, 0, 5, 'ink', [0, 0]], [1, 1, 2, 'ink', [0, 0]], [3, 1, 3, 'grey', [0, 0]], [2, 2, 4, 'ink', [-1, 0]],
+  [0, 3, 3, 'grey', [0, 0]], [4, 3, 2, 'ink', [-1, 0]], [0, 2, 1, 'ink', [0, 0]],
+].map((b) => ({ c: b[0], r: b[1], len: b[2], col: b[3], dodge: b[4], d: Math.hypot(b[0], b[1]) }));
+BARS.slice().sort((a, b) => a.d - b.d).forEach((b, k) => { b.arrive = 1.5 + Math.floor(k / 2) * E16; });   // ripple: 2 per 1/16
+const CUT = BARS[1];                                  // the bar the knife deletes
+const T_KNIFE = 3.5, T_EXC = 4.75, T_LAND = 5.75;
+// exception path: from module (5,3) on grid to an off-grid spot that bleeds off the paper, pausing one 1/8 mid-flight
+const EX0 = { x: mx(5), y: my(3), s: MW }, EX1 = { x: mx(4) + 67, y: my(3) + 41, s: MW * 1.95 };
+function exState(t) {
+  const u = lin(t, T_EXC, 5.25) * 0.42 + lin(t, 5.375, T_LAND) * 0.58;   // linear, with a held glance at 5.25-5.375
+  return { x: lerp(EX0.x, EX1.x, u), y: lerp(EX0.y, EX1.y, u), s: lerp(EX0.s, EX1.s, u), u };
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`800 400px ${FAM}`, '03'), document.fonts.load(`500 19px ${FAM}`, 'a'), document.fonts.load(`700 76px ${FAM}`, 'a')]);
+  await document.fonts.ready;
+  font(800, 100); HEAD = Math.floor(100 * (PW - 48) / ctx.measureText('halden').width);   // headline fills the paper width
+})();
+let HEAD = 240;
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left';
+  ctx.fillStyle = C.page; ctx.fillRect(0, 0, W, H);
+
+  // 1. hook: an ink line strikes across (linear), column guides grow from it ordered by distance from the centre
+  const strike = lin(t, 0, 0.25);
+  ctx.fillStyle = C.ink; ctx.fillRect(0, 94, W * strike, 3);
+  const guides = [];
+  for (let i = 0; i <= 12; i++) { guides.push(colX(i) - (i ? GUT : 0)); if (i > 0 && i < 12) guides.push(colX(i)); }
+  guides.forEach((x) => {
+    const rank = Math.round(Math.abs(x - W / 2) / 146);
+    const g = lin(t, 0.0625 + rank * 0.0625, 0.4375 + rank * 0.0625);
+    ctx.fillStyle = C.guide; ctx.fillRect(Math.round(x), 97, 1, (984 - 97) * g);
+  });
+
+  // 2. paper wipes in from the top, lands on beat 2
+  const pw = snap(t, 1.0, E8);
+  ctx.fillStyle = C.paper; ctx.fillRect(PX, PY, PW, PH * pw);
+  ctx.save(); ctx.beginPath(); ctx.rect(PX, PY, PW, PH * pw); ctx.clip();
+  ctx.fillStyle = '#EFEEEB';
+  for (let c = 1; c < 6; c++) ctx.fillRect(Math.round(mx(c)), PY, 1, PH);
+  for (let r = 1; r < 6; r++) ctx.fillRect(PX, Math.round(my(r)), PW, 1);
+  ctx.restore();
+
+  // 3. bars: ripple in by distance, a knife cut deletes one, the rest re-flow nearest first
+  const ex = exState(t);
+  for (const b of BARS) {
+    const grow = snap(t, b.arrive, E16);              // grows along its length
+    if (grow <= 0) continue;
+    let x = mx(b.c), y = my(b.r), w = b.len * MW * grow, h = MH / 2;
+    if (b === CUT) {
+      const col = snap(t, T_KNIFE + E16 + E8, E8);    // collapses to its midline after the knife passes
+      if (col >= 1) continue;
+      y += h / 2 * col; h *= 1 - col;
+    }
+    // re-flow after the cut: bars right of the gap on its row slide into it, nearest first
+    if (b.r === CUT.r && b.c > CUT.c) x -= MW * CUT.len * snap(t, 4.0 + (b.c - CUT.c) * E16, E8);
+    // re-flow around the exception: dodging bars step aside, ordered by distance from where it landed
+    if (b.dodge[0] || b.dodge[1]) {
+      const k = snap(t, 6.0 + Math.round(Math.hypot(b.c - 4.5, b.r - 3.3)) * E16, E8);
+      x += b.dodge[0] * MW * k; y += b.dodge[1] * MH * k;
+    }
+    ctx.fillStyle = C[b.col]; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w) + 1, Math.round(h) + 1);
+  }
+  // the knife: 2 px line across the cut bar in a 1/16, linear
+  const kn = lin(t, T_KNIFE, T_KNIFE + E16);
+  if (kn > 0 && t < T_KNIFE + 0.5) {
+    const ky = my(CUT.r) + MH / 4;
+    ctx.fillStyle = C.ink; ctx.fillRect(PX - 40, ky - 1, (PW + 80) * kn, 2);
+  }
+
+  // 4. the exception: the only red thing, the only linear, unsnapped move
+  const ein = snap(t, 4.5, E8);
+  if (ein > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+    ctx.fillStyle = C.sig;
+    ctx.fillRect(ex.x, ex.y, ex.s, ex.s * ein);
+    ctx.restore();
+    // coordinate readout, bottom-left technical note: "on grid" until it moves, then non-integer. Ink, not red:
+    // the square is the only red thing.
+    font(500, 19);
+    const off = ex.u > 0.001;
+    const cc = ((ex.x - PX) / MW).toFixed(2), rr = ((ex.y - PY) / MH).toFixed(2);
+    ctx.fillStyle = C.ink;
+    clipWord(`signal  col ${cc}  row ${rr}  · ${off ? 'off grid' : 'on grid'}`, MX, 984, 19, ein);
+  }
+
+  // 5. headline on the artifact, flush left, tight tracking at large size
+  font(800, HEAD); ctx.fillStyle = C.ink;
+  let hx = mx(0) + 24;
+  ['hal', 'den'].forEach((s, i) => { hx += clipWord(s, hx, my(6) - 36, HEAD, snap(t, 6.5 + i * E8, E16)); });
+  font(500, 19);
+  clipWord('open studio · six rooms · one signal', mx(0) + 24, my(4) + 24, 19, snap(t, 6.75, E16));
+  clipWord('26.10 — 09.11', mx(3) + 24, my(4) + 24, 19, snap(t, 6.875, E16));
+
+  // 6. left page: programme. Giant numeral climbs in 4 eased steps, optically flush left
+  font(800, 600);
+  const m = ctx.measureText('03');
+  const climb = steps(t, 0, 2.0, 4);          // one module at a time, first step lands on beat 1
+  ctx.save(); ctx.beginPath(); ctx.rect(MX - 20, 120, 900, 560); ctx.clip();
+  ctx.fillStyle = C.ink; ctx.fillText('03', MX + m.actualBoundingBoxLeft, 648 + (1 - climb) * 540);
+  ctx.restore();
+
+  // statements: small grey lead-in + bold line, words clip-revealed on beats, previous line leaves upward
+  const LINES = [
+    { lead: 'rule 1', words: ['a', 'grid.'], t: 1.0, out: 2.5 },
+    { lead: 'rule 2', words: ['a', 'rhythm.'], t: 2.5, out: 4.0 },
+    { lead: 'rule 3', words: ['one', 'exception.'], t: 4.0, out: 99 },
+  ];
+  for (const L of LINES) {
+    const q = snap(t, L.out, E8);
+    font(500, 19); ctx.fillStyle = '#8A8882';
+    clipWord(L.lead, MX, 720, 19, snap(t, L.t, E16), q);
+    font(700, 76); ctx.fillStyle = C.ink;
+    let x = MX;
+    L.words.forEach((w, i) => { x += clipWord(w, x, 816, 76, snap(t, L.t + i * E8, E16), q) + 20; });
+  }
+
+  // 7. caption row with a 1 px rule above, technical notes, linear bar counter (end-hold micro-motion)
+  const cr = snap(t, 1.5, E8);
+  ctx.fillStyle = C.ink; ctx.fillRect(MX, 911, (colX(6) - GUT - MX) * cr, 1);
+  font(500, 19); ctx.fillStyle = C.ink;
+  clipWord('12 columns · 96 margin', MX, 936, 19, snap(t, 1.625, E16));
+  clipWord('24 gutter · 24 baseline', colX(2), 936, 19, snap(t, 1.75, E16));
+  const bar = Math.floor(t / 2) + 1, beat = Math.floor((t % 2) / BEAT) + 1;
+  clipWord(`bar ${bar} · beat ${beat}`, colX(4), 936, 19, snap(t, 1.875, E16));
+  ctx.fillStyle = C.hair; ctx.fillRect(MX, 958, (colX(6) - GUT - MX) * cr, 1);
+  ctx.fillStyle = C.ink; ctx.fillRect(MX + (colX(6) - GUT - MX) * lin(t, 0, 8) * cr, 954, 2, 9);   // linear playhead
+};
+</script>
+</body>
+</html>

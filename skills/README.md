@@ -83,6 +83,7 @@ npx skills add BintzGavin/helios/skills/studio
 
 - [**skills/design/animated-video-philosophy**](./design/animated-video-philosophy) - Working philosophy for animated video: story-first motion, shots and timing, composition, medium-specific grammar, technical commitments, and anti-patterns.
 - [**skills/design/cinematic-product-promo-plan**](./design/cinematic-product-promo-plan) - Template production plan for ~45s feeling-first product promos (any category): brief through storyboard, visual/motion/audio specs, tooling, reframed cuts, accessibility, ship milestones.
+- [**skills/design/motion-styles**](./design/motion-styles) - Opt-in library of 24 named visual styles for code-drawn video: synthwave/VHS, ASCII/CRT, pixel art, HUD, dark keynote, risograph, silkscreen, halftone dossier, woodcut, ukiyo-e, Swiss grid, Bauhaus, spy titles, art deco, blueprint, flat vector, shape morph, one-line, cel boil, aurora glass, watercolor/ink, sticker explainer, isometric, variety captions. Each has a style card (palette rules, type, motion grammar, signature checklist, core technique, pitfalls) and a tested `renderAt(t)` demo page. Shared references cover finishing passes and time tricks, including in-page motion blur. Agents load it only when you name a style or ask for options, and vary each style with a random seed, so it doesn't pull every video toward the same 24 looks.
 
 ### Guided Video Creation
 
@@ -95,6 +96,12 @@ End-to-end guided workflows for creating specific video types. Each skill extrac
 - [**skills/guided/testimonial-video**](./guided/testimonial-video) - Social proof / testimonial video. Quote typography, customer branding, trust signals.
 - [**skills/guided/launch-announcement**](./guided/launch-announcement) - Product launch / release announcement. Countdown motifs, dramatic reveal.
 - [**skills/guided/social-clip**](./guided/social-clip) - Short-form social clip (Reels/TikTok/Shorts). Vertical 9:16, punchy, loop-friendly.
+
+These guided skills use the `renderAt(t)` page contract from **make-video** and need no brand extraction or API keys. Each draws a random seed before making creative choices (using an **apply-randomness** skill if one is installed), so repeated requests don't converge on the same film:
+
+- [**skills/guided/cartoon-short**](./guided/cartoon-short) - Hand-drawn cartoon short. A character rig you design, acted emotion changes, drawn turnarounds, boiling ink-and-paint linework, storyboarding by reads, and a review checklist. Includes a tested starter page.
+- [**skills/guided/music-video**](./guided/music-video) - Lyric and karaoke music video. Word and syllable timings (from a cue file or forced alignment on a vocal stem), a treatment and section storyboard, a timeline derived from lyrics and beats, and karaoke recipes. Includes a tested karaoke page.
+- [**skills/guided/video-recipes**](./guided/video-recipes) - Opt-in recipes for distinct genres, each with a tested demo: scale dive, process explainer, era timeline, mechanism/proof, kinetic typography, UI morph loop, pixel sprite. Also the video brief template, quality gates and a gotcha list.
 
 ### Framework Examples
 
@@ -124,6 +131,10 @@ End-to-end guided workflows for creating specific video types. Each skill extrac
 - [**skills/examples/signals**](./examples/signals) - Reactive signals patterns
 - [**skills/examples/tailwind**](./examples/tailwind) - Tailwind CSS styling
 - [**skills/examples/podcast-visualizer**](./examples/podcast-visualizer) - Audio visualization
+
+## Credits
+
+Some skills adapt techniques from other open-source projects. See [THIRD_PARTY.md](THIRD_PARTY.md).
 
 ## License
 

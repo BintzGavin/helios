@@ -1,0 +1,161 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render hud-fui.html -o hud-fui.mp4 --duration 8 --mode canvas --preset medium -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#020a0b}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, FPS = 30, LOCK = 5.0, HX = 960, HY = 540, R = 300;
+const CY = '#00e5ff', HOT = '#d8fbff', ALERT = '#ff6a00', MONO = '"Share Tech Mono", monospace', SANS = 'Rajdhani, sans-serif';
+const out = document.getElementById('c').getContext('2d');
+const hudC = document.createElement('canvas'); hudC.width = W; hudC.height = H; const ctx = hudC.getContext('2d');
+let BG = null, SCAN = null;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const outC = k => 1 - Math.pow(1 - clamp(k), 3);
+const inOut = k => (k = clamp(k), k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const prog = (t, t0, d) => clamp((t - t0) / d);
+const frameOf = t => Math.floor(t * FPS + .5);
+const hash = (...a) => { let h = 2166136261; for (const v of a) { h ^= Math.imul(v | 0, 2654435761); h = Math.imul(h ^ (h >>> 15), 2246822507); h ^= h >>> 13; } return (h >>> 0) / 4294967296; };
+const DEG = Math.PI / 180;
+
+// power-on flicker: 4 frames, then steady. Levels kept between .3 and 1 (small elements, staggered) for flash safety.
+const flick = (t, t0) => { if (t < t0) return 0; const f = frameOf(t) - frameOf(t0); return f >= 4 ? 1 : [.55, .3, .9, .6][f]; };
+// digit roll: hashed digits for n frames, then the true value
+const roll = (t, t0, fin, id, n = 4) => { if (t < t0) return ''; const f = frameOf(t) - frameOf(t0); if (f >= n) return fin;
+  return [...fin].map((c, i) => /\d/.test(c) ? String(Math.floor(hash(id, i, f + 3) * 10)) : c).join(''); };
+const typed = (t, t0, s, cps = 60) => t < t0 ? '' : s.slice(0, Math.floor((t - t0) * cps + 1e-6));
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`600 20px ${SANS}`, 'HALCYON'), document.fonts.load(`700 90px ${SANS}`, '0123'), document.fonts.load(`16px ${MONO}`, 'OK 01')]);
+  await document.fonts.ready;
+  BG = document.createElement('canvas'); BG.width = W; BG.height = H; const b = BG.getContext('2d');   // stage: lift, hex grid, vignette
+  const g = b.createRadialGradient(HX, HY, 0, HX, HY, 1100); g.addColorStop(0, '#06272b'); g.addColorStop(.55, '#031417'); g.addColorStop(1, '#010506');
+  b.fillStyle = g; b.fillRect(0, 0, W, H); b.strokeStyle = 'rgba(0,229,255,.05)'; b.lineWidth = 1;
+  const s = 26; for (let row = 0; row * s * 1.5 < H + s; row++) for (let col = 0; col * s * 1.732 < W + s; col++) {
+    const x = col * s * 1.732 + (row % 2) * s * .866, y = row * s * 1.5; b.beginPath();
+    for (let k = 0; k < 6; k++) { const a = (60 * k + 30) * DEG; b[k ? 'lineTo' : 'moveTo'](x + s * Math.cos(a) * .95, y + s * Math.sin(a) * .95); } b.closePath(); b.stroke(); }
+  const v = b.createRadialGradient(HX, HY, 400, HX, HY, 1150); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.75)'); b.fillStyle = v; b.fillRect(0, 0, W, H);
+  SCAN = document.createElement('canvas'); SCAN.width = W; SCAN.height = H; const sc = SCAN.getContext('2d');
+  sc.fillStyle = 'rgba(0,0,0,.16)'; for (let y = 0; y < H; y += 3) sc.fillRect(0, y, W, 1);       // scanlines every 3 px
+})();
+
+const st = (c, lw = 1.5, a = 1) => { ctx.strokeStyle = c; ctx.lineWidth = lw; ctx.globalAlpha = a; };
+function T(s, x, y, o = {}) { ctx.font = `${o.w ?? 500} ${o.s ?? 16}px ${o.f ?? MONO}`; ctx.letterSpacing = (o.ls ?? 0) + 'px';
+  ctx.textAlign = o.al ?? 'left'; ctx.fillStyle = o.c ?? CY; ctx.globalAlpha = o.a ?? 1; ctx.fillText(s, x, y); window.heliosDrawnText?.add(s); }
+function L(x0, y0, x1, y1, p = 1) { if (p <= 0) return; p = Math.min(1, p); ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(lerp(x0, x1, p), lerp(y0, y1, p)); ctx.stroke(); }
+function ARC(r, a0, a1, p = 1) { if (p <= 0) return; ctx.beginPath(); ctx.arc(HX, HY, r, a0, a0 + (a1 - a0) * Math.min(1, p)); ctx.stroke(); }
+function plate(x, y, w, h, a, title) {   // dark plate under every text block: fill, hairline, corner ticks, header rule
+  if (a <= 0) return;
+  ctx.globalAlpha = a * .78; ctx.fillStyle = '#020c0e'; ctx.fillRect(x, y, w, h);
+  st(CY, 1, a * .28); ctx.strokeRect(x + .5, y + .5, w - 1, h - 1); st(CY, 2, a);
+  for (const [cx, cy, dx, dy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) { L(cx, cy, cx + 14 * dx, cy); L(cx, cy, cx, cy + 14 * dy); }
+  if (title) { T(title, x + 16, y + 28, { s: 15, w: 700, f: SANS, ls: 4, a: a * .9 }); st(CY, 1, a * .5); L(x + 16, y + 40, x + w - 16, y + 40); }
+}
+function brackets(x, y, hs, arm, c, a, rot = 0) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); st(c, 3, a); ctx.lineCap = 'square';
+  for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { ctx.beginPath(); ctx.moveTo(sx * hs, sy * (hs - arm)); ctx.lineTo(sx * hs, sy * hs); ctx.lineTo(sx * (hs - arm), sy * hs); ctx.stroke(); }
+  ctx.restore();
+}
+
+const BLIPS = [[40, .62], [148, .46], [232, .78], [312, .36]];             // bearing (deg), range; [0] is the target
+const blipXY = ([b, r]) => [HX + Math.sin(b * DEG) * R * r, HY - Math.cos(b * DEG) * R * r];
+function scope(t) {
+  const a1 = flick(t, .3), sweepT = 1.3;
+  st(CY, 2, a1); ARC(R + 70, -Math.PI / 2, Math.PI * 1.5, prog(t, .3, .6));                   // outer ring draws on
+  const rot = t * 6 * DEG; st(CY, 1.5, flick(t, .55) * .8);                                     // ticks, slowly rotating
+  for (let i = 0; i < 72 * prog(t, .55, .5); i++) { const a = rot + i * 5 * DEG, l = i % 6 ? 8 : 18;
+    L(HX + Math.cos(a) * (R + 52), HY + Math.sin(a) * (R + 52), HX + Math.cos(a) * (R + 52 - l), HY + Math.sin(a) * (R + 52 - l)); }
+  st(CY, 6, flick(t, .7) * .55); for (let k = 0; k < 4; k++) ARC(R + 30, -rot * 2 + k * Math.PI / 2, -rot * 2 + k * Math.PI / 2 + .5, prog(t, .7, .4));
+  st(CY, 1, flick(t, .8) * .5); ARC(R, 0, Math.PI * 2, prog(t, .8, .5)); ARC(R * .66, 0, Math.PI * 2, prog(t, .9, .5)); ARC(R * .33, 0, Math.PI * 2, prog(t, 1, .5));
+  st(CY, 1, flick(t, 1) * .35); L(HX - R, HY, HX + R, HY, prog(t, 1, .4)); L(HX, HY - R, HX, HY + R, prog(t, 1, .4));
+  if (t >= .7) for (let k = 0; k < 12; k++) T(String(k * 30).padStart(3, '0'), HX + Math.sin(k * 30 * DEG) * (R + 100), HY - Math.cos(k * 30 * DEG) * (R + 100) + 6, { s: 15, al: 'center', a: flick(t, .7 + k * .03) * .6 });
+  if (t < sweepT) return;
+  const th = -Math.PI / 2 + 52 * DEG + (t - sweepT) * Math.PI;                                    // conic sweep, 2 s per turn
+  const cg = ctx.createConicGradient(th - .9, HX, HY);
+  cg.addColorStop(0, 'rgba(0,229,255,0)'); cg.addColorStop(.143, 'rgba(0,229,255,.28)'); cg.addColorStop(.1435, 'rgba(0,229,255,0)');
+  ctx.globalAlpha = flick(t, sweepT); ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(HX, HY, R, 0, Math.PI * 2); ctx.fill();
+  st(HOT, 2, ctx.globalAlpha); L(HX, HY, HX + Math.cos(th) * R, HY + Math.sin(th) * R);
+  BLIPS.forEach((bp, i) => { const [x, y] = blipXY(bp), ba = -Math.PI / 2 + bp[0] * DEG;
+    const since = (((th - ba) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), lit = (t - sweepT) * Math.PI >= since ? Math.exp(-since / 1.4) : 0;   // fades after the sweep passes
+    const c = i === 0 && t >= LOCK ? ALERT : HOT; ctx.globalAlpha = Math.max(lit, i === 0 && t > 3.4 ? .6 : 0); ctx.fillStyle = c;
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); });
+}
+
+function target(t) {   // search box hops between candidates, then the lock brackets fly in 1.4 -> 1.0
+  const hops = [[3.3, 2], [3.85, 1], [4.4, 3], [4.9, 0]];
+  if (t >= 3.3 && t < LOCK) { let k = 0; while (k < hops.length - 1 && t >= hops[k + 1][0]) k++;
+    const from = blipXY(BLIPS[hops[Math.max(0, k - 1)][1]]), to = blipXY(BLIPS[hops[k][1]]), e = outC((t - hops[k][0]) / .2);
+    const x = lerp(from[0], to[0], k ? e : 1), y = lerp(from[1], to[1], k ? e : 1);
+    ctx.setLineDash([6, 6]); st(CY, 1.5, .8); ctx.strokeRect(x - 34, y - 34, 68, 68); ctx.setLineDash([]);
+    T(e < 1 ? roll(t, hops[k][0], 'CND-0' + (k + 1), 50 + k, 4) : `CND-0${k + 1}  NO MATCH`, x + 42, y - 24, { s: 14, a: .85 }); }
+  if (t < LOCK) return;
+  const [x, y] = blipXY(BLIPS[0]), e = outC((t - LOCK) / .25), f = frameOf(t) - frameOf(LOCK);
+  const c = f < 3 ? HOT : ALERT;                                                                 // 3 white-hot frames, then alert
+  brackets(x, y, 44 * lerp(1.4, 1, e), 16, c, lerp(.4, 1, e), lerp(25, 0, e) * DEG);
+  st(c, 1.5, .9); L(x - 70, y, x - 54, y); L(x + 54, y, x + 70, y); L(x, y - 70, x, y - 54); L(x, y + 54, x, y + 70);
+  ctx.globalAlpha = .9; ctx.fillStyle = ALERT; ctx.beginPath(); ctx.arc(x, y, 3 + 2 * Math.sin(t * 8), 0, Math.PI * 2); ctx.fill();
+  if (f >= 3) { ctx.globalAlpha = .8; ctx.fillStyle = '#020c0e'; ctx.fillRect(x + 68, y - 80, 214, 76); st(ALERT, 2, 1); L(x + 68, y - 80, x + 68, y - 4);   // label plate
+    T('TGT-31', x + 80, y - 58, { s: 16, c: ALERT }); T(`LOCK ${roll(t, LOCK + .1, '100', 77, 5)}%`, x + 80, y - 36, { s: 16, c: ALERT });
+    T(roll(t, LOCK + .2, "N47°12' E008°31'", 61, 6), x + 80, y - 14, { s: 16, c: ALERT, a: flick(t, LOCK + .2) }); }
+  const pr = (t - LOCK) / .6; if (pr < 1) { st(ALERT, 2, (1 - pr) * .8); ctx.beginPath(); ctx.arc(x, y, 30 + 90 * outC(pr), 0, Math.PI * 2); ctx.stroke(); }   // one lock pulse
+}
+
+const BOOT = ['OPTIC CORE  v4.2.1', 'CRYO ARRAY  77K', 'GYRO ALIGN  0.0003', 'UPLINK  9.6G', 'SEARCH MODE ENGAGED'];
+function panels(t) {
+  const aL = flick(t, .9), aR = flick(t, 1.15);
+  plate(90, 120, 340, 290, aL, 'SYS BOOT');
+  BOOT.forEach((s, i) => { const t0 = 1.0 + i * .32, line = typed(t, t0, '> ' + s, 70);
+    T(line, 110, 190 + i * 32, { s: 16, a: aL * (i === 4 ? 1 : .75), c: i === 4 ? HOT : CY });
+    if (i < 4 && t > t0 + .45) T('[OK]', 410, 190 + i * 32, { s: 16, al: 'right', a: aL * .9 }); });
+  const cur = BOOT.findIndex((s, i) => t < 1.0 + i * .32 + (s.length + 2) / 70);
+  if (Math.floor(t * 2.4) % 2 === 0 && t > 1) { const i = cur < 0 ? 4 : cur, ln = typed(t, 1.0 + i * .32, '> ' + BOOT[i], 70);
+    ctx.font = `16px ${MONO}`; ctx.letterSpacing = '0px'; ctx.globalAlpha = aL; ctx.fillStyle = CY; ctx.fillRect(110 + ctx.measureText(ln).width + 3, 176 + i * 32, 9, 17); }
+  plate(90, 450, 340, 250, flick(t, 1.3), 'RANGE');
+  const locked = t >= LOCK + .1, rng = t < 2.2 ? '' : roll(t, locked ? LOCK + .1 : 2.2, locked ? '1647.3' : (2900 - 180 * Math.floor(t * 3 - 6)).toFixed(1), locked ? 9 : 8, 5);
+  T(rng, 110, 580, { s: 92, w: 700, f: SANS, c: locked ? ALERT : HOT, a: flick(t, 2.2) });
+  const aR2 = flick(t, 1.3); T('KM', 410, 580, { s: 22, w: 700, f: SANS, al: 'right', a: .8 * aR2 });
+  [['AZM', '121.48'], ['ELV', '031.23'], ['VEL', '7.615']].forEach(([k, v], i) => { T(k, 110, 630 + i * 26, { s: 15, a: .5 * aR2 });
+    T(roll(t, 2.4 + i * .25, v, 20 + i, 3 + i), 300, 630 + i * 26, { s: 15, al: 'right', c: HOT }); st(CY, 3, .8); L(320, 625 + i * 26, 410, 625 + i * 26, prog(t, 2.4 + i * .25, .3) * (.4 + .6 * hash(i, 4))); });
+  plate(1490, 120, 340, 300, aR, 'SIGNAL');
+  for (let gph = 0; gph < 2; gph++) { const y0 = 230 + gph * 110, n = 60, p = prog(t, 1.6 + gph * .3, .9);
+    st(CY, 1.5, aR * .9); ctx.beginPath();
+    for (let i = 0; i <= n * p; i++) { const v = Math.sin(i * .35 + gph * 2 + Math.floor(t * 10) * .12) * 12 + (hash(i, gph, Math.floor(t * 10 + i) % 7) - .5) * 14;
+      ctx[i ? 'lineTo' : 'moveTo'](1510 + i * 5, y0 + v); } ctx.stroke();
+    T(roll(t, 2 + gph * .3, gph ? '78.2 %' : '-75.0 dBm', 30 + gph, 5), 1810, y0 - 30, { s: 17, al: 'right', c: HOT }); }
+  plate(1490, 460, 340, 240, flick(t, 1.4), 'CANDIDATES');
+  [['CND-01', 3.85], ['CND-02', 4.4], ['CND-03', 4.9]].forEach(([n, t0], i) => { if (t < t0) return; const hit = i === 2 && t >= LOCK;
+    T(n, 1510, 530 + i * 56, { s: 16, c: hit ? ALERT : HOT, a: flick(t, t0) }); T(hit ? 'MATCH 99.7%' : 'NO MATCH', 1810, 530 + i * 56, { s: 16, al: 'right', c: hit ? ALERT : CY, a: flick(t, t0) * (hit ? 1 : .6) });
+    st(hit ? ALERT : CY, 2, .7); L(1510, 544 + i * 56, 1810, 544 + i * 56, prog(t, t0, .3) * (hit ? 1 : .3 + .3 * i)); });
+}
+
+function chrome(t) {
+  st(CY, 2, flick(t, .12));                                                                   // frame corners first
+  for (const [x, y, dx, dy] of [[40, 40, 1, 1], [W - 40, 40, -1, 1], [40, H - 40, 1, -1], [W - 40, H - 40, -1, -1]]) { L(x, y, x + 40 * dx, y, prog(t, .12, .2)); L(x, y, x, y + 40 * dy, prog(t, .12, .2)); }
+  const a = flick(t, .2); T('HALCYON-7', 120, 82, { s: 30, w: 700, f: SANS, ls: 3, a, c: HOT }); T('ORBITAL SURVEY // SECTOR 9', 300, 80, { s: 14, ls: 2, a: a * .6 });
+  st(CY, 2, a); ctx.strokeRect(92, 60, 18, 18);
+  const lk = t >= LOCK, lab = lk ? 'TARGET LOCKED' : 'SCANNING', pa = flick(t, lk ? LOCK : .4);
+  ctx.globalAlpha = pa * .85; ctx.fillStyle = '#020c0e'; ctx.beginPath(); ctx.moveTo(800, 50); ctx.lineTo(1120, 50); ctx.lineTo(1100, 92); ctx.lineTo(820, 92); ctx.closePath(); ctx.fill();
+  st(lk ? ALERT : CY, 2, pa); ctx.stroke();
+  T(lk ? lab : lab + '.'.repeat(Math.floor(t * 3) % 4), 960, 80, { s: 22, w: 700, f: SANS, ls: 6, al: 'center', c: lk ? ALERT : CY, a: pa });
+  const sec = (51 + frameOf(t) / FPS).toFixed(2);
+  T(`UTC 03:14:${sec}`, 1830, 82, { s: 20, al: 'right', c: HOT, a }); if (Math.floor(t * 2) % 2 === 0) { ctx.globalAlpha = a; ctx.fillStyle = HOT; ctx.beginPath(); ctx.arc(1600, 75, 6, 0, Math.PI * 2); ctx.fill(); }
+  const hd = lerp(96, 121.5, inOut((t - 2) / 3)), ra = flick(t, 1.5);                          // heading ruler
+  st(CY, 1, ra * .6); L(640, 1000, 1280, 1000, prog(t, 1.5, .4));
+  for (let d = Math.ceil((hd - 32) / 5) * 5; d <= hd + 32; d += 5) { const x = 960 + (d - hd) * 10, fade = 1 - Math.abs(d - hd) / 34;
+    st(CY, 1, ra * fade); L(x, 1000, x, d % 15 ? 1008 : 1018); if (d % 15 === 0) T(String(d).padStart(3, '0'), x, 1038, { s: 13, al: 'center', a: ra * fade * .7 }); }
+  st(HOT, 2, ra); L(960, 986, 960, 1000); T(`HDG ${hd.toFixed(1)}°`, 1300, 1005, { s: 15, c: HOT, a: ra });
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.clearRect(0, 0, W, H); ctx.lineCap = 'butt';
+  scope(t); target(t); panels(t); chrome(t);
+  out.setTransform(1, 0, 0, 1, 0, 0); out.globalCompositeOperation = 'source-over'; out.globalAlpha = 1; out.filter = 'none';
+  out.drawImage(BG, 0, 0);
+  out.globalCompositeOperation = 'lighter'; out.filter = 'blur(7px)'; out.globalAlpha = .7; out.drawImage(hudC, 0, 0);   // additive glow
+  out.filter = 'none'; out.globalCompositeOperation = 'source-over'; out.globalAlpha = 1; out.drawImage(hudC, 0, 0);
+  out.drawImage(SCAN, 0, 0);
+};
+</script></body></html>

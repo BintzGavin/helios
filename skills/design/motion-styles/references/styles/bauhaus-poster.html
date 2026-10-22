@@ -1,0 +1,187 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render bauhaus-poster.html -o bauhaus-poster.mp4 --duration 8 --fps 30 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bauhaus Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@600;800&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#F1E9DA;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Bauhaus kinetic poster: 120 px module grid, four inks on warm paper, one action per beat at 120 BPM.
+// Each ink is drawn as its own knockout plate, then the plates are "printed" (multiplied) with misregistration.
+const W = 1920, H = 1080, M = 120, X0 = 120, Y0 = 60, FPS = 30;
+const out = document.getElementById('c').getContext('2d');
+const PAPER = '#F1E9DA', INK = { R: '#E03C31', Y: '#F2B705', B: '#1E4FA3', K: '#141414' };
+const FAM = '"League Spartan", "Futura", "Century Gothic", sans-serif';
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const io2 = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);   // power2.inOut, never overshoots
+const in2 = (u) => u * u;                                                     // drops land dead
+const gate = (t) => Math.round(t * FPS) / FPS;      // frame-quantised time for hard cuts and counters
+const gx = (c) => X0 + c * M, gy = (r) => Y0 + r * M;
+const DEG = Math.PI / 180;
+
+// seeded RNG for textures
+let seed = 20240917;
+const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+const mk = (alpha = true) => { const c = document.createElement('canvas'); c.width = W; c.height = H; return [c, c.getContext('2d', { alpha })]; };
+const PLATES = Object.fromEntries(Object.keys(INK).map((k) => [k, mk()]));
+const [toothC, toothX] = mk(), [paperC, paperX] = mk(false);
+
+// ---- one draw call per shape, routed to every plate: own ink on its plate, paper-white knockout on the others.
+// Black overprints (no knockout on colour plates), as a printer would trap it.
+let cur = null;  // plate being drawn
+function paint(ink, path) {
+  const [, x] = PLATES[cur];
+  if (ink !== cur && ink === 'K') return;
+  x.fillStyle = ink === cur ? INK[ink] : '#FFFFFF';
+  x.beginPath(); path(x); x.fill();
+  if (ink === cur) { x.lineWidth = 1; x.strokeStyle = INK[ink]; x.stroke(); }   // 0.5 px trap hides AA seams between pieces
+}
+function text(ink, s, px, py, size, track = 0, w = 800) {
+  const [, x] = PLATES[cur]; if (ink !== cur) return;
+  x.font = `${w} ${size}px ${FAM}`; x.letterSpacing = `${track}px`; x.fillStyle = INK[ink]; x.fillText(s, px, py); x.letterSpacing = '0px';
+}
+const sector = (px, py, r, a0) => (x) => { x.moveTo(px, py); x.arc(px, py, r, a0, a0 + Math.PI / 2); x.closePath(); };
+
+// ---- composition data. Quarter-circle field: 6 x 6 tiles at columns 7-12, rows 0-5; 2 x 2 blocks make whole circles.
+const FIELD = [];
+const FCOL = ['R', 'R', 'K', 'R', 'Y', 'R', 'K', 'R', 'B', 'R', 'R', 'K'];
+for (let r = 0; r < 6; r++) for (let c = 0; c < 6; c++) {
+  const k = [2, 3, 1, 0][(c % 2) + 2 * (r % 2)];            // pivot corner so each 2x2 block forms a full circle
+  FIELD.push({ c, r, k, ink: FCOL[(Math.floor(c / 2) + 3 * Math.floor(r / 2) + r) % FCOL.length] });
+}
+const FX = gx(7), FY = gy(0), FCX = FX + 3 * M, FCY = FY + 3 * M;
+// 12-detent escapement: eased progress quantised into 7.5 deg teeth; each tooth moves in its last 65 %, then holds
+function escapement(t, t0, t1) {
+  const x = io2(prog(t, t0, t1)) * 12, k = Math.min(12, Math.floor(x + 1e-9)), f = x - k;
+  return 7.5 * (k + io2(clamp((f - 0.35) / 0.65))) * DEG;
+}
+let TYPE = null;
+
+function drawScene(t) {
+  // red disc drops from above and lands dead on beat 1
+  const d = in2(prog(t, 0.2, 0.5));
+  if (t >= 0.2) paint('R', (x) => x.arc(gx(2), gy(2) - (1 - d) * 5 * M, 2 * M, 0, Math.PI * 2));
+  // yellow triangle rises off its base on beat 3
+  const ty = io2(prog(t, 1.25, 1.5));
+  if (ty > 0.002) paint('Y', (x) => { x.moveTo(gx(0), gy(8)); x.lineTo(gx(4), gy(8)); x.lineTo(gx(2), gy(8) - 4 * M * ty); x.closePath(); });
+  // blue semicircle slides down one module on beat 4 (clipped by the top grid line)
+  const sl = io2(prog(t, 1.75, 2.0));
+  if (t >= 1.75) {
+    const [, x] = PLATES[cur]; x.save(); x.beginPath(); x.rect(0, gy(0), W, 8 * M); x.clip();
+    paint('B', (x) => { const cy = gy(1) + (sl - 1) * M; x.moveTo(gx(6) + M, cy); x.arc(gx(6), cy, M, 0, Math.PI, true); x.closePath(); });
+    x.restore();
+  }
+  // blue square grows from its corner on beat 9
+  const sq = io2(prog(t, 4.25, 4.5));
+  if (sq > 0.002) paint('B', (x) => x.rect(gx(5), gy(8) - 2 * M * sq, 2 * M * sq, 2 * M * sq));
+  // a yellow quarter disc pivots 90 deg about its corner into place on beat 7, second plate of the triangle column
+  const yq = io2(prog(t, 3.25, 3.5));
+  if (t >= 3.25) paint('Y', sector(gx(5), gy(6), 2 * M, -Math.PI / 2 + (1 - yq) * -Math.PI / 2));
+  // black bar: drops the full height on beat 2
+  const b = in2(prog(t, 0.75, 1.0));
+  if (b > 0) paint('K', (x) => x.rect(gx(13), gy(0), M, 8 * M * b));
+
+  // quarter-circle field: rows sweep in about their pivot corner (beats 5-7), the whole field ratchets 90 deg
+  // about its centre (5.0-6.0, the hero), then a cascade turns each tile 90 deg about its own centre (6.0-7.0)
+  const ang = escapement(t, 5.0, 6.0);
+  for (const f of FIELD) {
+    const tin = 2.25 + Math.floor(f.r / 2) * 0.5;
+    if (t < tin) continue;
+    const sweep = (1 - io2(prog(t, tin, tin + 0.25))) * -Math.PI / 2;            // corner pivot
+    const casc = io2(prog(t, 6.0 + (f.c + f.r) * 0.075, 6.25 + (f.c + f.r) * 0.075)) * Math.PI / 2;   // own-centre pivot
+    paint(f.ink, (x) => {
+      const cx = FX + (f.c + 0.5) * M, cy = FY + (f.r + 0.5) * M;
+      const rot = (px, py, ox, oy, a) => [ox + (px - ox) * Math.cos(a) - (py - oy) * Math.sin(a), oy + (px - ox) * Math.sin(a) + (py - oy) * Math.cos(a)];
+      const k = f.k;
+      let [qx, qy] = [cx + (k === 0 || k === 3 ? -M / 2 : M / 2), cy + (k < 2 ? -M / 2 : M / 2)];   // pivot corner
+      [qx, qy] = rot(qx, qy, cx, cy, casc);           // own-centre pivot
+      [qx, qy] = rot(qx, qy, FCX, FCY, ang);          // frame-group pivot
+      const a0 = k * Math.PI / 2 + casc + ang + sweep; // corner pivot = only the start angle changes
+      x.moveTo(qx, qy); x.arc(qx, qy, M, a0, a0 + Math.PI / 2); x.closePath();
+    });
+  }
+
+  // title: cap height = 1 module, set vertically up column 4, ink extent exactly 8 modules; rises on beat 8
+  const tu = io2(prog(t, 3.75, 4.0));
+  if (tu > 0) {
+    const [, x] = PLATES[cur];
+    x.save(); x.beginPath(); x.rect(gx(4), gy(0), M, 8 * M); x.clip();
+    x.translate(gx(5), gy(8) + (1 - tu) * 8 * M); x.rotate(-Math.PI / 2);
+    text('K', 'KONSTRUKT', -TYPE.bbL, -8, TYPE.size, TYPE.track);
+    x.restore();
+  }
+  // small caps: header, footer, beat counter (steps on every beat, gated to whole frames)
+  const beat = Math.min(16, Math.floor(gate(t) / 0.5) + 1);
+  text('K', `SCHLAG ${String(beat).padStart(2, '0')} / 16`, gx(0), 38, 15, 3.5, 600);
+  text('K', 'KINETISCHES PLAKAT · Nº 04 · 120 BPM · M = 120 PX', gx(7), 38, 15, 3.5, 600);
+  if (gate(t) >= 7.0) {
+    text('K', 'KREIS · DREIECK · QUADRAT', gx(7) + 4, gy(7) - 20, 28, 7, 600);
+    text('K', 'FORM FOLGT DEM TAKT', gx(7) + 4, gy(8) - 34, 15, 3.5, 600);
+  }
+  text('K', 'BOGEN 04 — KONSTRUKTION IN SECHZEHN SCHLÄGEN', gx(0), H - 22, 15, 3.5, 600);
+}
+
+// misregistration per plate (px); drifts slowly, struck into register by the press at 6.0 and 7.0
+function registration(t) {
+  const jolt = Math.max(1 - prog(t, 6.0, 6.3), 0) * (t >= 6.0 ? 1 : 0);
+  const lock = t >= 7.0 ? 0.35 : 1;
+  const a = (1.6 + 1.2 * Math.sin(t * 1.3)) * lock * (t >= 6.0 && t < 6.3 ? 1 - jolt : 1);
+  return { R: [-0.7 * a, 0.5 * a], Y: [1.1 * a, -0.4 * a], B: [0.4 * a, 1.0 * a], K: [0, 0] };
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`800 170px ${FAM}`, 'KONSTRUKT'), document.fonts.load(`600 15px ${FAM}`, 'SCHLAG')]);
+  await document.fonts.ready;
+  // type metrics: cap height = one module; tracking so the word's ink spans exactly 8 modules
+  const [, m] = PLATES.K; m.font = `800 100px ${FAM}`;
+  const size = M / (m.measureText('H').actualBoundingBoxAscent / 100);
+  m.font = `800 ${size}px ${FAM}`;
+  const word = 'KONSTRUKT', mm = [...word].map((ch) => m.measureText(ch));
+  const bbL = mm[0].actualBoundingBoxLeft, ink0 = mm.slice(0, -1).reduce((s, q) => s + q.width, 0) + mm[mm.length - 1].actualBoundingBoxRight + bbL;
+  TYPE = { size, bbL, track: (8 * M - ink0) / (word.length - 1) };
+  // paper: warm ground with low-frequency mottling and fibres
+  paperX.fillStyle = PAPER; paperX.fillRect(0, 0, W, H);
+  for (let i = 0; i < 1400; i++) { paperX.fillStyle = `rgba(150,118,70,${0.004 + rnd() * 0.008})`; paperX.beginPath(); paperX.arc(rnd() * W, rnd() * H, 20 + rnd() * 90, 0, 7); paperX.fill(); }
+  paperX.strokeStyle = 'rgba(120,96,60,0.05)'; paperX.lineWidth = 1;
+  for (let i = 0; i < 1800; i++) { const x = rnd() * W, y = rnd() * H, a = rnd() * 6.3, l = 6 + rnd() * 18; paperX.beginPath(); paperX.moveTo(x, y); paperX.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); paperX.stroke(); }
+  // tooth: tiny voids punched out of every ink plate (where the ink didn't take)
+  for (let i = 0; i < 9000; i++) { toothX.fillStyle = `rgba(0,0,0,${0.2 + rnd() * 0.5})`; const s = 1 + rnd() * rnd() * 2.2; toothX.fillRect(rnd() * W, rnd() * H, s, s); }
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  out.setTransform(1, 0, 0, 1, 0, 0); out.globalAlpha = 1; out.globalCompositeOperation = 'source-over';
+  out.drawImage(paperC, 0, 0);
+  // construction grid: lines land from the centre outward on 16ths as a 3 px pen stroke, then relax to a hairline
+  for (let i = 0; i <= 14; i++) for (const vert of [true, false]) {
+    if (!vert && i > 8) continue;
+    const dist = vert ? Math.abs(i - 7) : Math.abs(i - 4);
+    const t0 = dist * 0.0625 * 0.85, p = io2(prog(t, t0, t0 + 0.2)), relax = prog(t, t0 + 0.2, t0 + 0.45);
+    if (p <= 0) continue;
+    out.fillStyle = `rgba(60,48,30,${0.75 - 0.6 * relax})`;
+    const w = 3 - 2 * relax;
+    if (vert) { const L = 8 * M * p; out.fillRect(gx(i) - w / 2, gy(4) - L / 2, w, L); }
+    else { const L = 14 * M * p; out.fillRect(gx(7) - L / 2, gy(i) - w / 2, L, w); }
+  }
+  // draw every plate, punch the tooth, then print each plate onto the paper with its misregistration
+  const reg = registration(t);
+  for (const k of Object.keys(INK)) {
+    cur = k; const [c, x] = PLATES[k];
+    x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+    x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H);
+    drawScene(t);
+    x.globalCompositeOperation = 'destination-out'; x.drawImage(toothC, 0, 0); x.globalCompositeOperation = 'source-over';
+    out.globalCompositeOperation = 'multiply';
+    out.drawImage(c, reg[k][0], reg[k][1]);
+  }
+  out.globalCompositeOperation = 'source-over';
+};
+</script>
+</body>
+</html>
