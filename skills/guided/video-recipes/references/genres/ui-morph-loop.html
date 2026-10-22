@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- UI morph loop: one shape, never cut. 1080×1080, 16 s = 32 beats at 120 BPM, seamless.
+     Render: npx -y @helios-project/cli@latest render ui-morph-loop.html -o ui-morph-loop.mp4 --duration 16 --width 1080 --height 1080 --mode canvas
+     Export [0, 16): frame 480 would equal frame 0, so a looping player shows no stutter. -->
+<title>UI Morph Loop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&family=JetBrains+Mono:wght@500&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#E8E5DF}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1080"></canvas>
+<script>
+const W = 1080, H = 1080, B = 0.5, T = 32 * B;                    // 120 BPM: one beat = 0.5 s
+const ctx = document.getElementById('c').getContext('2d');
+const C = { bg: '#E8E5DF', ink: '#17171C', paper: '#FBFAF7', grey: '#C9C5BC', mute: '#8A867E', accent: '#FF5A36', green: '#22A45D' };
+const SANS = (w, px) => `${w} ${px}px Inter, "Helvetica Neue", Arial, sans-serif`;
+const MONO = (px) => `500 ${px}px "JetBrains Mono", ui-monospace, Menlo, monospace`;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const out3 = (x) => 1 - (1 - clamp(x)) ** 3;
+const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+
+// ---- the state table, keyed by beat: retiming the whole film is editing these numbers -----------
+const S = [
+  { b: 0,  id: 'button', w: 340, h: 100, r: 50, fill: C.ink },
+  { b: 2,  id: 'loader', w: 140, h: 140, r: 70, fill: C.ink },
+  { b: 4,  id: 'check',  w: 140, h: 140, r: 70, fill: C.green },
+  { b: 6,  id: 'pill',   w: 480, h: 104, r: 52, fill: C.paper },
+  { b: 8,  id: 'player', w: 540, h: 230, r: 44, fill: C.ink },
+  { b: 11, id: 'slider', w: 540, h: 84,  r: 42, fill: C.paper },
+  { b: 14, id: 'toggle', w: 220, h: 124, r: 62, fill: '#B3AEA4' },
+  { b: 16, id: 'tabs',   w: 600, h: 104, r: 52, fill: C.paper },
+  { b: 19, id: 'chart',  w: 520, h: 360, r: 40, fill: C.ink },
+  { b: 23, id: 'search', w: 600, h: 104, r: 52, fill: C.paper },
+  { b: 27, id: 'toast',  w: 440, h: 104, r: 28, fill: C.ink },
+  { b: 29, id: 'button', w: 340, h: 100, r: 50, fill: C.ink },  // back to the start: last frame == first frame
+];
+const EXTRA = [                                                     // changes inside a state (hover, toggle on)
+  { b: 1, w: 356, h: 104 }, { b: 15, fill: C.green }, { b: 30, w: 356, h: 104 }, { b: 31, w: 340, h: 100 },
+];
+// cursor waypoints: [beat, x, y, stop]; stop = arrives at rest (clicks, press, release)
+const WP = [[0, 230, 170], [1.4, 80, 22, 1], [2, 70, 16, 1], [3, 150, 130], [5.4, 14, 12, 1], [6, 8, 8, 1], [7.5, 140, 24, 1], [8, 132, 20, 1],
+  [9, 200, -30, 1], [10.5, 226, 62, 1], [11, 226, 62, 1], [11.5, -170, 0, 1], [13, 330, 4, 1], [13.25, 330, 4, 1], [14, 60, 8, 1], [15, -40, 10, 1],
+  [16, 40, 10, 1], [17, 6, 12, 1], [18, 194, 12, 1], [19, 194, 12, 1], [20.5, -60, 90], [22.5, 120, 60], [23, 205, -135, 1], [24.5, 330, 150],
+  [26.5, 254, 4, 1], [27, 250, 0, 1], [28.5, 162, 4, 1], [29, 158, 0, 1], [30, 60, 22, 1], [31, 140, 100]];
+const CLICKS = [2, 6, 8, 9, 11, 14, 15, 16, 17, 18, 19, 23, 27, 29];
+const PRESS = [11.5, 13.25];                                        // the drag: held from 11.5 to 13.25
+
+// ---- closed-form springs, summed per target ----------------------------------------------------
+function spring(tau, w0 = 15, z = 0.62) {                           // step response 0→1 (overshoots when z < 1)
+  if (tau <= 0) return 0;
+  if (z >= 1) return 1 - Math.exp(-w0 * tau) * (1 + w0 * tau);
+  const wd = w0 * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w0 * tau) * (Math.cos(wd * tau) + (z * w0 / wd) * Math.sin(wd * tau));
+}
+// keys: [[time, value]...], keys[0] at t=0 and last value == first. One spring per change, plus the
+// previous loop's springs (t + T), so the value and its velocity are continuous across the loop point.
+function track(keys, t, w0, z) {
+  let v = keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const d = keys[i][1] - keys[i - 1][1];
+    if (d) v += d * (spring(t - keys[i][0], w0, z) + spring(t + T - keys[i][0], w0, z));
+  }
+  return v;
+}
+const TR = {};
+function buildTracks() {
+  const ev = [...S, ...EXTRA].sort((a, b) => a.b - b.b || (a.id ? -1 : 1));
+  const cur = {}, keys = { w: [], h: [], r: [], R: [], G: [], B: [], z: [] };
+  for (const e of ev) {
+    if (e.id) Object.assign(cur, { w: e.w, h: e.h, r: e.r, fill: e.fill, z: clamp(540 / Math.max(e.w, e.h), 0.85, 3) });
+    else for (const k of ['w', 'h', 'fill']) if (e[k] !== undefined) cur[k] = e[k];
+    const [R, G, Bl] = hex(cur.fill), vals = { w: cur.w, h: cur.h, r: cur.r, R, G, B: Bl, z: cur.z };
+    for (const k in keys) keys[k].push([e.b * B, vals[k]]);
+  }
+  Object.assign(TR, keys);                                          // camera zoom keeps each state near 50 % of the frame
+}
+const stateAt = (t) => { let i = 0; while (i + 1 < S.length && S[i + 1].b * B <= t) i++; return i; };
+
+// ---- the cursor: periodic cubic Hermite through the waypoints (C1 across the loop) --------------
+function cursor(t) {
+  const n = WP.length, bt = t / B;
+  let i = n - 1; for (let k = 0; k < n; k++) if (WP[k][0] <= bt) i = k;
+  const at = (k) => { const m = ((k % n) + n) % n, wrap = Math.floor(k / n) * 32; return [WP[m][0] + wrap, WP[m][1], WP[m][2], WP[m][3]]; };
+  const tan = (k) => { const p = at(k); if (p[3]) return [0, 0]; const a = at(k - 1), c = at(k + 1); return [(c[1] - a[1]) / (c[0] - a[0]), (c[2] - a[2]) / (c[0] - a[0])]; };
+  const p0 = at(i), p1 = at(i + 1), m0 = tan(i), m1 = tan(i + 1), h = p1[0] - p0[0], u = (bt - p0[0]) / h;
+  const h00 = 2 * u ** 3 - 3 * u ** 2 + 1, h10 = u ** 3 - 2 * u ** 2 + u, h01 = -2 * u ** 3 + 3 * u ** 2, h11 = u ** 3 - u ** 2;
+  return { x: h00 * p0[1] + h10 * h * m0[0] + h01 * p1[1] + h11 * h * m1[0], y: h00 * p0[2] + h10 * h * m0[1] + h01 * p1[2] + h11 * h * m1[1] };
+}
+const pulse = (tau) => spring(tau, 40, 1) - spring(tau - 0.09, 22, 1);   // press: down fast, up softer
+const held = (t) => t >= PRESS[0] * B && t < PRESS[1] * B;
+const pressAmt = (t) => held(t) ? 1 : CLICKS.reduce((a, c) => a + pulse(t - c * B + 0.04) + pulse(t + T - c * B + 0.04), 0);
+
+// the drag: the knob follows the cursor while held (rubber band past the end), springs home on release
+const rubber = (x) => x > 230 ? 230 + (x - 230) * 0.35 : Math.max(-230, x);
+function knobX(t) {
+  const tp = PRESS[0] * B, tr = PRESS[1] * B;
+  if (t < tp) return -170;
+  if (t < tr) return rubber(cursor(t).x);
+  const k0 = rubber(cursor(tr).x);
+  return 230 + (k0 - 230) * (1 - spring(t - tr, 17, 0.42));
+}
+
+// ---- content: each state draws inside the shell's mask; text gets its own mask and timing --------
+function label(txt, x, y, font, col, p, align = 'left') {
+  if (p <= 0) return;
+  ctx.save(); ctx.font = font; ctx.textAlign = align; ctx.textBaseline = 'middle';
+  const m = ctx.measureText(txt), hh = 44, ww = m.width + 8, x0 = align === 'center' ? x - ww / 2 : x - 4;
+  ctx.beginPath(); ctx.rect(x0, y - hh / 2, ww, hh); ctx.clip();
+  ctx.fillStyle = col; ctx.fillText(txt, x, y + (1 - out3(p)) * hh * 0.8); ctx.restore();
+  window.heliosDrawnText?.add(txt);
+}
+const circle = (x, y, r, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); };
+const rr = (x, y, w, h, r, col) => { ctx.fillStyle = col; ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill(); };
+const DRAW = {
+  button(t, p, w) { label('Get started', -18, 0, SANS(700, 34), C.paper, p, 'center'); label('→', 104, 0, SANS(700, 34), C.accent, p, 'center'); },
+  loader(t) { const a = (t / B) * Math.PI * 2; ctx.strokeStyle = C.paper; ctx.lineWidth = 11; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(0, 0, 36, a, a + 1.2 + 2.4 * (0.5 - 0.5 * Math.cos(a))); ctx.stroke(); },
+  check(t, p, w, h, s) { const q = out3(seg(t, s + 0.1, s + 0.4)); ctx.strokeStyle = C.paper; ctx.lineWidth = 13; ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.setLineDash([120 * q, 200]); ctx.beginPath(); ctx.moveTo(-30, 2); ctx.lineTo(-8, 24); ctx.lineTo(32, -20); ctx.stroke(); ctx.setLineDash([]); },
+  pill(t, p, w, h, s) { circle(-186, 0, 32, C.accent); label('MK', -186, 1, SANS(700, 22), C.paper, p, 'center');
+    label('New message', -136, -14, SANS(700, 26), C.ink, p); label('Mika: running late?', -136, 18, SANS(500, 21), C.mute, seg(t, s + 0.2, s + 0.5));
+    const pop = spring(t - s - B, 22, 0.4); if (pop > 0) { circle(-160, -24, 15 * pop, C.ink); label('2', -160, -24, SANS(700, 17), C.paper, pop, 'center'); } },
+  player(t, p, w, h, s) { rr(-250, -90, 140, 140, 20, C.accent); rr(-226, -66, 92, 92, 46, '#FF8A6E'); circle(-180, -20, 14, C.ink);
+    label('Low Tide', -88, -52, SANS(700, 30), C.paper, p); label('Paper Boats', -88, -14, SANS(500, 21), C.mute, seg(t, s + 0.2, s + 0.5));
+    const playing = t >= 9 * B, beats = Math.max(0, Math.floor((t - 9 * B) / B)), stepE = out3(seg((t - 9 * B) % B, 0, 0.2));
+    const prog = playing ? 0.12 + 0.11 * (beats + stepE) : 0.12;
+    rr(-250, 70, 430, 8, 4, '#3A3A42'); rr(-250, 70, 430 * prog, 8, 4, C.paper); circle(-250 + 430 * prog, 74, 9, C.paper);
+    circle(200, -30, 32, C.paper); ctx.fillStyle = C.ink;
+    if (playing) { ctx.fillRect(189, -43, 8, 26); ctx.fillRect(203, -43, 8, 26); } else { ctx.beginPath(); ctx.moveTo(192, -45); ctx.lineTo(216, -30); ctx.lineTo(192, -15); ctx.fill(); }
+    ctx.fillStyle = C.paper; ctx.fillRect(214, 66, 8, 16); ctx.beginPath(); ctx.moveTo(222, 66); ctx.lineTo(234, 58); ctx.lineTo(234, 90); ctx.lineTo(222, 82); ctx.fill(); },
+  slider(t, p) { const k = knobX(t); rr(-230, -4, 460, 8, 4, C.grey); rr(-230, -4, k + 230, 8, 4, C.accent);
+    ctx.shadowColor = 'rgba(0,0,0,0.25)'; ctx.shadowBlur = 10; ctx.shadowOffsetY = 3; circle(k, 0, 26, '#FFFFFF'); ctx.shadowColor = 'transparent'; },
+  toggle(t) { const x = -48 + 96 * spring(t - 15 * B, 16, 0.55); ctx.shadowColor = 'rgba(0,0,0,0.2)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+    circle(x, 0, 48, '#FFFFFF'); ctx.shadowColor = 'transparent'; },
+  tabs(t, p) {                                                      // two-spring edges: the leading edge is stiffer, so the pill stretches
+    const pos = [-190, 0, 190], keysAt = [16, 17, 18].map((b) => b * B);
+    const edge = (side) => { let v = pos[0] + side * 88; for (let i = 1; i < 3; i++) { const d = pos[i] - pos[i - 1]; const lead = side > 0;
+      v += d * spring(t - keysAt[i], lead ? 24 : 11, lead ? 0.75 : 0.95); } return v; };
+    const L = edge(-1), R = edge(1); rr(L, -38, R - L, 76, 38, C.ink);
+    ['Day', 'Week', 'Stats'].forEach((s, i) => { const on = clamp(1 - Math.abs((L + R) / 2 - pos[i]) / 120);
+      const c = hex(C.ink).map((v, j) => Math.round(v + (hex(C.paper)[j] - v) * on)); label(s, pos[i], 0, SANS(700, 28), `rgb(${c})`, seg(t, 16 * B + 0.12 + i * 0.06, 16 * B + 0.42 + i * 0.06), 'center'); }); },
+  chart(t, p, w, h, s) { label('Rainfall, mm', -220, -136, SANS(700, 24), C.paper, p); circle(205, -135, 26, '#2C2C34');
+    ctx.strokeStyle = C.paper; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(201, -139, 9, 0, 7); ctx.moveTo(208, -132); ctx.lineTo(216, -124); ctx.stroke();
+    const vals = [12, 30, 22, 48, 36, 64, 18];
+    vals.forEach((v, i) => { const g = spring(t - (19.5 + 0.5 * i) * B, 16, 0.5), bh = v * 3.2 * g, x = -210 + i * 64;
+      rr(x, 140 - bh, 40, Math.max(0, bh), 8, i === 5 ? C.accent : '#4A4A55'); label('MTWTFSS'[i], x + 20, 162, SANS(500, 18), C.mute, g, 'center'); }); },
+  search(t, p, w, h, s) { ctx.strokeStyle = C.ink; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(-252, -4, 14, 0, 7); ctx.moveTo(-242, 6); ctx.lineTo(-230, 18); ctx.stroke();
+    const q = 'rainy day', n = clamp(Math.floor((t - 23.5 * B) / 0.125) + 1, 0, q.length), typed = q.slice(0, n);
+    if (n === 0) label('Search', -206, 0, SANS(500, 30), C.mute, p); else { ctx.font = SANS(500, 30); ctx.fillStyle = C.ink; ctx.textBaseline = 'middle'; ctx.fillText(typed, -206, 0); window.heliosDrawnText?.add(typed); }
+    ctx.font = SANS(500, 30); const cx = -206 + ctx.measureText(n ? typed : '').width + 3;
+    if (Math.floor(t / B) % 2 === 0 || n < q.length) ctx.fillStyle = C.accent, ctx.fillRect(cx, -18, 3, 36);
+    circle(250, 0, 32, C.ink); label('→', 250, 0, SANS(700, 28), C.paper, p, 'center'); },
+  toast(t, p, w, h, s) { circle(-170, 0, 22, C.green); ctx.strokeStyle = C.paper; ctx.lineWidth = 5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(-180, 0); ctx.lineTo(-173, 8); ctx.lineTo(-160, -8); ctx.stroke();
+    label('Saved', -130, -14, SANS(700, 26), C.paper, p); label('to Rainy day', -130, 17, SANS(500, 20), C.mute, seg(t, s + 0.2, s + 0.5));
+    label('OK', 160, 0, SANS(700, 26), C.accent, p, 'center'); rr(-220, 46, 440 * (1 - seg(t, s + 0.3, 29 * B)), 6, 0, C.accent); },
+};
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(SANS(700, 30)), document.fonts.load(SANS(500, 30)), document.fonts.load(MONO(16))]);
+  await document.fonts.ready; buildTracks();
+})();
+
+window.renderAt = async (time) => {
+  await ready;
+  const t = ((time % T) + T) % T;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.shadowColor = 'transparent';
+  ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+
+  const z = track(TR.z, t, 7, 1), dip = 1 - 0.035 * pressAmt(t);
+  const over = Math.max(0, rubber(knobX(t)) - 230) * (stateAt(t) === 5 ? 1.8 : 0);
+  const w = track(TR.w, t, 15, 0.62) + over, h = track(TR.h, t, 15, 0.62), r = Math.min(track(TR.r, t, 15, 0.7), h / 2);
+  const fill = `rgb(${['R', 'G', 'B'].map((k) => clamp(Math.round(track(TR[k], t, 14, 1)), 0, 255))})`;
+
+  // world dot grid: moves with the camera so the zoom reads as a camera, not as the shape growing
+  ctx.fillStyle = 'rgba(23,23,28,0.10)';
+  const step = 48 * z; for (let x = W / 2 % step; x < W; x += step) for (let y = H / 2 % step; y < H; y += step) ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+
+  ctx.setTransform(z * dip, 0, 0, z * dip, W / 2, H / 2);
+  const ox = over / 2;                                              // the stretch grows to the right, toward the drag
+  ctx.shadowColor = 'rgba(23,23,28,0.22)'; ctx.shadowBlur = 50 * z; ctx.shadowOffsetY = 22 * z;
+  rr(-w / 2 + ox, -h / 2, w, h, r, fill); ctx.shadowColor = 'transparent';
+
+  // content of the outgoing state leaves first (0–120 ms), the incoming one arrives after (120–320 ms)
+  ctx.save(); ctx.beginPath(); ctx.roundRect(-w / 2 + ox, -h / 2, w, h, r); ctx.clip();
+  const i = stateAt(t);
+  for (const k of [i - 1, i]) {
+    if (k < 0) continue;
+    const s = S[k].b * B, next = k + 1 < S.length ? S[k + 1].b * B : T;
+    const pin = k === 0 ? 1 : seg(t, s + 0.12, s + 0.32), pout = 1 - seg(t, next, next + 0.12);
+    const a = Math.min(pin, pout); if (a <= 0) continue;
+    ctx.save(); ctx.globalAlpha = a; if (a < 1) ctx.filter = `blur(${((1 - a) * 6 * z).toFixed(2)}px)`;
+    DRAW[S[k].id](t, pin, w, h, s); ctx.restore();
+  }
+  ctx.restore();
+
+  // the cursor, in screen space: same size at every zoom; a ripple on each click
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const cp = cursor(t), sx = W / 2 + cp.x * z, sy = H / 2 + cp.y * z;
+  for (const c of [...CLICKS, PRESS[0]]) { const a = t - c * B + 0.04; if (a > 0 && a < 0.4) { ctx.strokeStyle = C.accent; ctx.globalAlpha = 1 - a / 0.4; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(sx, sy, 10 + 70 * out3(a / 0.4), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; } }
+  const k = 1 - 0.14 * clamp(pressAmt(t));
+  ctx.save(); ctx.translate(sx, sy); ctx.scale(k, k); ctx.beginPath();
+  ctx.moveTo(0, 0); ctx.lineTo(0, 34); ctx.lineTo(9, 26); ctx.lineTo(16, 40); ctx.lineTo(22, 37); ctx.lineTo(15, 23); ctx.lineTo(27, 23); ctx.closePath();
+  ctx.fillStyle = C.ink; ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.stroke(); ctx.fill(); ctx.restore();
+
+  // HUD: what changes on every beat is countable
+  ctx.font = MONO(16); ctx.fillStyle = C.mute; ctx.textBaseline = 'alphabetic';
+  ctx.fillText('ONE SHAPE · 120 BPM', 56, 72); ctx.textAlign = 'right';
+  ctx.fillText(`${String(i % 11 + 1).padStart(2, '0')} / ${S[i].id}`, W - 56, 72); ctx.textAlign = 'left';
+  const beat = Math.floor(t / B);
+  for (let b = 0; b < 32; b++) { const x = 56 + b * ((W - 112) / 31); ctx.fillStyle = b === beat ? C.accent : C.grey;   // no 'past' colouring: it would jump at the loop point
+    ctx.fillRect(x - 2, H - 76 - (b % 4 ? 0 : 6), 4, b % 4 ? 10 : 16); }
+};
+</script>
+</body>
+</html>

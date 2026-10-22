@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Pixel sprite loop: a mage charges and casts at a rune stone, as a pure function of phase.
+     160×90 logical pixels × 12 = 1920×1080. Two 6 s cycles (seeded differently), 12 s seamless loop.
+     Render: npx -y @helios-project/cli@latest render pixel-sprite.html -o pixel-sprite.mp4 --duration 12 --mode canvas -->
+<title>Pixel Sprite</title>
+<style>html,body{margin:0;overflow:hidden;background:#0d0b1a}canvas{display:block;image-rendering:pixelated}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const LW = 160, LH = 90, S = 12, M = 2, BW = LW + 2 * M, BH = LH + 2 * M;   // M = margin so shake never shows an edge
+const CYC = 6, T = 12, FPS_FEEL = 10;
+const ctx = document.getElementById('c').getContext('2d');
+const low = document.createElement('canvas'); low.width = BW; low.height = BH;
+const lctx = low.getContext('2d');
+const img = lctx.createImageData(BW, BH);
+
+// fixed palette: everything below is drawn as indices into this list (24 colours)
+const PAL = ['#0d0b1a', '#1a1530', '#2a2350', '#3d3470', '#141026', '#22203a', '#34304f', '#4d4868',
+  '#6f6a8a', '#3b2a6b', '#5a44a0', '#2f4f9a', '#4a78c8', '#f2c79e', '#c58d6e', '#e8e6f0',
+  '#e8b84a', '#5b3a29', '#8a5a3a', '#e8673a', '#b8fff4', '#5ef0e0', '#1fb5c8', '#1a6c9e'].map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
+const MAGIC = [23, 22, 21, 20], FIRE = [19, 16, 15], LIGHT = { 0: 1, 1: 2, 2: 3, 3: 10, 4: 3, 5: 6, 6: 7, 7: 8, 8: 15 }; // LIGHT: one step brighter
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const inOut = (x) => { x = clamp(x); return x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2; };
+const out2 = (x) => 1 - (1 - clamp(x)) ** 2;
+const rand = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const q = (v, steps) => Math.round(v * steps) / steps;                       // quantize a 0..1 pose parameter
+
+// procedural sprite as string art: one char = one palette index ('.' = transparent)
+const KEY = { k: 0, h: 9, H: 10, g: 16, s: 13, S: 14, e: 0, b: 15, r: 11, R: 12, w: 17 };
+const MAGE = [
+  '......k.......', '.....khk......', '.....kHhk.....', '....khHhk.....', '....khHhhk....', '...khhHhhhk...',
+  '.kkgggggggggk.', '...ksssssk....', '...ksssesk....', '...kSsssSk....', '...kbbbbbbk...', '..krbbbbbbrk..',
+  '..krRbbbbRrk..', '.krrRrbbrRrrk.', '.krrRrrrrRrrk.', '.krrgggggrrrk.', '.krrRrrrrRrrk.', 'krrrRrrrrRrrrk',
+  'krrrRrrrrRrrrk', 'kkrrrrrrrrrrkk', '..kwwk..kwwk..', '..kkkk..kkkk..'];
+const HEM_B = ['.krrRrrrrRrrrk', '.kkrrrrrrrrrkk'];                         // second cloak frame for rows 18–19
+
+// 3×5 pixel font for the state label
+const GLYPH = { I: '111010010010111', D: '110101101101110', L: '100100100100111', E: '111100110100111', C: '011100100100011',
+  H: '101101111101101', A: '010101111101101', R: '110101110101101', G: '011100101101011', S: '011100010001110',
+  T: '111010010010010', O: '010101101101010', V: '101101101101010' };
+
+// ---- the state machine is a pure function of phase ---------------------------------------------
+const STATES = [['IDLE', 0], ['CHARGE', 0.30], ['CAST', 0.62], ['RECOVER', 0.70]];
+function machine(t) {
+  const c = Math.floor(t / CYC), ph = (t - c * CYC) / CYC;
+  let i = 0; while (i + 1 < STATES.length && ph >= STATES[i + 1][1]) i++;
+  const a = STATES[i][1] * CYC, b = (i + 1 < STATES.length ? STATES[i + 1][1] : 1) * CYC, lt = ph * CYC;
+  return { c, lt, name: STATES[i][0], u: (lt - a) / (b - a) };
+}
+const CHARGE0 = 0.30 * CYC, CAST0 = 0.62 * CYC, TRAVEL = 0.36, HIT = CAST0 + TRAVEL, RECOV0 = 0.70 * CYC;
+const TARGET = [129, 51];
+
+// pose parameters: eased, then quantized to the grid and to the stepped clock
+function pose(m) {
+  const raise = m.name === 'CHARGE' ? q(inOut(m.u / 0.4), 3) : m.name === 'IDLE' ? 0 : m.name === 'CAST' ? 1 : q(1 - inOut(m.u / 0.6), 3);
+  const aim = m.name === 'CAST' ? 1 : m.name === 'RECOVER' ? q(1 - inOut(m.u / 0.5), 3) : 0;
+  const glow = m.name === 'IDLE' ? 0.15 : m.name === 'CHARGE' ? 0.25 + 0.75 * m.u : m.name === 'CAST' ? 1 : 1 - out2(m.u / 0.5) * 0.85;
+  const bob = m.name === 'IDLE' ? Math.floor(m.lt * 2) % 2 : m.name === 'CHARGE' ? 1 : 0;
+  const lean = aim > 0.5 ? 1 : 0;
+  const ang = q((-0.15 * raise * (1 - aim) + 1.2 * aim) / (Math.PI / 16), 1) * (Math.PI / 16);   // staff angle snaps to 11.25°
+  const hx = Math.round(13 + aim), hy = Math.round(13 - 5 * raise * (1 - aim) - 2 * aim);
+  return { raise, aim, glow, bob, lean, ang, hx, hy, flutter: Math.floor(m.lt * (m.name === 'CHARGE' ? 8 : 3)) % 2 };
+}
+
+let buf, spr;                                    // background indices, sprite layer (-1 = transparent)
+const put = (x, y, i) => { x = Math.round(x); y = Math.round(y); if (x >= -M && y >= -M && x < LW + M && y < LH + M) buf[(y + M) * BW + x + M] = i; };
+const get = (x, y) => buf[(Math.round(y) + M) * BW + Math.round(x) + M];
+const sput = (x, y, i) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < 40 && y < 40) spr[y * 40 + x] = i; };
+const light = (x, y) => { const v = get(x, y); if (v !== undefined && LIGHT[v] !== undefined) put(x, y, LIGHT[v]); };
+function line(x0, y0, x1, y1, f) {                                           // Bresenham: integer pixels only
+  x0 = Math.round(x0); y0 = Math.round(y0); x1 = Math.round(x1); y1 = Math.round(y1);
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let e = dx + dy;
+  for (;;) { f(x0, y0); if (x0 === x1 && y0 === y1) break; const e2 = 2 * e; if (e2 >= dy) { e += dy; x0 += sx; } if (e2 <= dx) { e += dx; y0 += sy; } }
+}
+function text(str, x, y, i) {
+  for (const ch of str) { const g = GLYPH[ch]; if (g) for (let k = 0; k < 15; k++) if (g[k] === '1') put(x + k % 3, y + Math.floor(k / 3), i); x += 4; }
+  window.heliosDrawnText?.add(str);
+}
+
+function background(t, tq, glowAt, glow) {
+  for (let y = -M; y < LH + M; y++) for (let x = -M; x < LW + M; x++) {
+    let i = y < 20 ? 0 : y < 38 ? 1 : 2;
+    if ((y === 20 || y === 38) && (x + y) % 2) i -= 1;                          // one stippled row per band edge
+    put(x, y, i);
+  }
+  for (let k = 0; k < 28; k++) { const sx = Math.floor(rand(k) * LW), sy = Math.floor(rand(k + 50) * 36);
+    put(sx, sy, [7, 8, 15][(Math.floor(t * 2) + k) % 3]); }                    // twinkle steps through indices, 2 per second
+  for (let y = -7; y <= 7; y++) for (let x = -7; x <= 7; x++) if (x * x + y * y <= 49) put(74 + x, 14 + y, (x - 2) ** 2 + (y + 1) ** 2 < 6 || (x + 3) ** 2 + (y - 3) ** 2 < 3 ? 8 : 15);
+  for (let x = -M; x < LW + M; x++) { const h = Math.round(54 + 3 * Math.sin(x * 0.07) + 2 * Math.sin(x * 0.17 + 1)); for (let y = h; y < 70; y++) put(x, y, 3); }
+  for (const [px, ph] of [[8, 16], [58, 22], [70, 14], [96, 19], [148, 24]]) for (let r = 0; r < ph; r++) {
+    const half = Math.floor((r % 6) / 2 + r / 4); for (let x = -half; x <= half; x++) put(px + x, 69 - ph + r, 4);
+  }
+  for (let x = -M; x < LW + M; x++) { put(x, 70, 6); if (rand(x * 3.1) > 0.7) put(x, 69, 6); for (let y = 71; y < LH + M; y++) put(x, y, rand(x * 7 + y * 13) > 0.93 ? 6 : 5); }
+  const r = Math.round(3 + 7 * glow);                                        // light pool from the magic source
+  for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const d = x * x + y * y; if (d <= r * r && (d <= r * r * 0.4 || (x + y) % 2 === 0)) light(glowAt[0] + x, glowAt[1] + y); }
+}
+
+function stone(lit, tq) {
+  const x0 = 124, y0 = 52;
+  for (let y = 0; y < 18; y++) for (let x = 0; x < 11; x++) {
+    const edge = x === 0 || x === 10 || y === 0 || y === 17;
+    put(x0 + x, y0 + y, edge ? 0 : x < 3 ? 8 : 7);
+  }
+  const rune = [[5, 4], [5, 5], [5, 6], [5, 7], [5, 8], [5, 9], [5, 10], [4, 5], [3, 6], [6, 8], [7, 9], [4, 12], [5, 12], [6, 12]];
+  for (const [x, y] of rune) put(x0 + x, y0 + y, lit > 0.5 ? 20 : lit > 0.15 ? 21 : 5);
+  if (lit > 0.05) {                                                          // brazier flame, re-rolled at the stepped clock
+    const fr = Math.floor(tq * FPS_FEEL), hgt = Math.round(3 + 7 * lit);
+    for (let k = 0; k < hgt; k++) { const w = Math.max(0, Math.round((hgt - k) / 2.5)) , wob = Math.round((rand(fr * 7 + k) - 0.5) * 2);
+      for (let x = -w; x <= w; x++) put(x0 + 5 + x + wob, y0 - 1 - k, FIRE[clamp(Math.floor(k / hgt * 3 + (Math.abs(x) === w ? -1 : 0)), 0, 2)]); }
+  }
+}
+
+function mage(p, ox, oy) {
+  spr.fill(-1);
+  MAGE.forEach((row, y) => [...((y >= 18 && y < 20 && p.flutter) ? HEM_B[y - 18] : row)].forEach((ch, x) => {
+    if (ch === '.') return; sput(x + 2 + p.lean, y + 12 + p.bob * (y < 17 ? 1 : 0), ch === 'e' && p.glow > 0.85 ? 20 : KEY[ch]);
+  }));
+  const d = [Math.sin(p.ang), -Math.cos(p.ang)], hx = p.hx + 2, hy = p.hy + 12 + p.bob;
+  const tip = [hx + d[0] * 15, hy + d[1] * 15];
+  line(hx - d[0] * 7, hy - d[1] * 7, tip[0], tip[1], (x, y) => sput(x, y, 17));   // staff
+  line(10 + p.lean, 23 + p.bob, hx, hy, (x, y) => sput(x, y, 11)); sput(hx, hy, 13); // arm, hand
+  const tx = Math.round(tip[0]), ty = Math.round(tip[1]) - 1;
+  for (const [x, y, i] of [[0, -1, 21], [-1, 0, 21], [0, 0, 20], [1, 0, 21], [0, 1, 22]]) sput(tx + x, ty + y, i);
+  // 1 px rim light: any sprite pixel whose neighbour toward the source is empty takes the magic colour
+  const src = [tx, ty], base = spr.slice();
+  if (p.glow > 0.3) for (let y = 0; y < 40; y++) for (let x = 0; x < 40; x++) {
+    const v = base[y * 40 + x]; if (v < 0 || v >= 20) continue;
+    const dx = src[0] - x, dy = src[1] - y, n = Math.hypot(dx, dy); if (n < 2 || n > 34) continue;
+    const nx = Math.round(dx / n), ny = Math.round(dy / n), nb = base[(y + ny) * 40 + x + nx];
+    if (nb === -1 || nb === undefined) spr[y * 40 + x] = p.glow > 0.8 ? 20 : 21;
+  }
+  for (let i = 0; i < spr.length; i++) if (spr[i] >= 0) put(ox + i % 40, oy + Math.floor(i / 40), spr[i]);
+  return [ox + tx, oy + ty];
+}
+
+const ready = Promise.resolve().then(() => { buf = new Uint8Array(BW * BH); spr = new Int16Array(40 * 40); });
+
+window.renderAt = async (time) => {
+  await ready;
+  const t = ((time % T) + T) % T, tq = Math.floor(t * FPS_FEEL + 1e-6) / FPS_FEEL;   // 10 fps feel for everything that acts
+  const m = machine(tq), p = pose(m), lt = m.lt, seed = m.c * 101;
+  const OX = 18, OY = 70 - 34;                                               // sprite layer origin (feet on the ground row)
+  const tipGuess = [OX + Math.round(p.hx + 2 + Math.sin(p.ang) * 15), OY + Math.round(p.hy + 12 + p.bob - Math.cos(p.ang) * 15) - 1];
+  const lit = lt >= HIT ? Math.max(0, 1 - (lt - HIT) / (CYC - HIT)) ** 0.7 : 0;
+  background(t, tq, tipGuess, p.glow);
+  stone(lit, tq);
+  const tip = mage(p, OX, OY);
+
+  if (m.name === 'CHARGE') for (let i = 0; i < 18; i++) {                    // motes spiral into the crystal: seed + age
+    const age = lt - (CHARGE0 + i * 0.09), life = 0.7; if (age < 0 || age >= life) continue;
+    const u = age / life, r = (14 + 8 * rand(seed + i)) * (1 - u), a = rand(seed + i + 40) * 6.283 + u * 3;
+    put(tip[0] + Math.cos(a) * r, tip[1] + Math.sin(a) * r * 0.8, MAGIC[Math.min(3, Math.floor(u * 4))]);
+  }
+  if (lt >= CAST0 && lt < HIT) {                                             // the bolt: head plus a stepped trail
+    const u = (lt - CAST0) / TRAVEL;
+    for (let k = 5; k >= 0; k--) { const v = Math.max(0, u - k * 0.05), x = tip[0] + (TARGET[0] - tip[0]) * v, y = tip[1] + (TARGET[1] - tip[1]) * v + Math.sin(v * 9) * 1.5;
+      put(x, y, MAGIC[3 - Math.min(3, Math.floor(k / 1.5))]); if (k === 0) { put(x + 1, y, 20); put(x - 1, y, 21); put(x, y - 1, 21); put(x, y + 1, 21); } }
+  }
+  const age = lt - HIT;
+  if (age >= 0 && age < 0.3) { const r = 2 + Math.floor(age * 30);            // impact ring, 3 stepped frames
+    for (let k = 0; k < 24; k++) put(TARGET[0] + Math.cos(k / 24 * 6.283) * r, TARGET[1] + Math.sin(k / 24 * 6.283) * r * 0.7, age < 0.1 ? 20 : 21); }
+  if (age >= 0 && age < 0.9) for (let i = 0; i < 22; i++) {                 // impact sparks: closed-form ballistics
+    const life = 0.45 + 0.45 * rand(seed + i + 7); if (age >= life) continue;
+    const vx = (rand(seed + i) - 0.65) * 70, vy = -15 - rand(seed + i + 3) * 55;
+    const x = TARGET[0] + vx * age, y = Math.min(69, TARGET[1] + vy * age + 60 * age * age);
+    put(x, y, [20, 21, 16, 19][Math.min(3, Math.floor(age / life * 4))]);
+  }
+  for (let k = 0; k < 6; k++) {                                              // fireflies: 6 s periods, so the loop closes
+    const x = 50 + rand(k + 9) * 70 + 4 * Math.sin(2 * Math.PI * t / 6 + k), y = 50 + rand(k + 19) * 14 + 2 * Math.sin(2 * Math.PI * t / 3 + k * 2);
+    if ((Math.floor(t * 2) + k) % 4) put(x, y, 16);
+  }
+
+  // HUD: state name + charge meter
+  text(m.name, 4, 4, 15);
+  const meter = m.name === 'CHARGE' ? Math.round(m.u * 28) : 0;
+  for (let x = 0; x < 30; x++) { put(4 + x, 11, 0); put(4 + x, 13, 0); put(4 + x, 12, x >= 1 && x <= meter ? 21 : 2); }
+  put(4, 12, 0); put(33, 12, 0);
+
+  // 1–2 px screen shake on impact, stepped like everything else
+  const SHAKE = [[2, -1], [-1, 1], [1, 1], [-1, 0]], sk = age >= 0 && age < 0.4 ? SHAKE[Math.floor(age * FPS_FEEL)] : [0, 0];
+
+  for (let i = 0; i < BW * BH; i++) { const c = PAL[buf[i]]; img.data[i * 4] = c[0]; img.data[i * 4 + 1] = c[1]; img.data[i * 4 + 2] = c[2]; img.data[i * 4 + 3] = 255; }
+  lctx.putImageData(img, 0, 0);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(low, M + sk[0], M + sk[1], LW, LH, 0, 0, LW * S, LH * S);       // integer scale, no smoothing
+};
+</script>
+</body>
+</html>
