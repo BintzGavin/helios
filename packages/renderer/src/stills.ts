@@ -1,6 +1,7 @@
 import { BrowserPool } from './core/BrowserPool.js';
 import { BrowserConfig } from './types.js';
 import { DEFAULT_MIN_TEXT_OPACITY, FRAME_TEXT_SCRIPT } from './utils/frame-text.js';
+import { PAGE_ASSETS_SCRIPT, mergePageAssets, type PageAssets } from './utils/page-assets.js';
 
 export interface CaptureFramesOptions {
   /** Viewport size. Defaults to 1920x1080. */
@@ -47,6 +48,11 @@ export interface ContactSheetOptions extends CaptureFramesOptions {
   cellWidth?: number;
 }
 
+export interface OnionSkinOptions extends CaptureFramesOptions {
+  /** Width of the blended image. Defaults to 960, or the frame width if smaller. */
+  imageWidth?: number;
+}
+
 /**
  * Renders the frames at the given times (seconds) as PNGs, straight from the page: the same
  * seek and capture path as a DOM-mode render, without encoding a video. For looking at a
@@ -89,18 +95,57 @@ export async function captureContactSheet(url: string, times: number[], options:
       figcaption { font: 600 14px/1 system-ui, sans-serif; color: #d8d8e0; padding: 6px 2px 0; }
     </style></head><body><div class="grid">${cells}</div></body></html>`;
 
-    // A fresh page: the render page carries the virtual clock and seek hooks.
-    const sheetPage = await pool.workers[0].context.newPage();
-    await sheetPage.setViewportSize({ width: columns * cellWidth + (columns + 1) * gap, height: 100 });
-    await sheetPage.setContent(html);
-    // A string, not a function: transpilers can inject helpers that do not exist in the page.
-    await sheetPage.evaluate('Promise.all(Array.from(document.images, (img) => img.decode()))');
-    const grid = await sheetPage.$('.grid');
-    return await grid!.screenshot({ type: 'png' });
+    return await screenshotHtml(pool, html, columns * cellWidth + (columns + 1) * gap, '.grid');
   } finally {
     await pool.close();
     await pool.cleanupStrategies();
   }
+}
+
+/**
+ * Renders the frames at the given times and blends them into one labelled PNG, later frames
+ * stronger: frame k of n weighs k / (1 + 2 + … + n). A moving element leaves a trail whose
+ * spacing shows its path and easing, and the brightest copy is where it ends.
+ */
+export async function captureOnionSkin(url: string, times: number[], options: OnionSkinOptions = {}): Promise<Buffer> {
+  const pool = createPool(options);
+  try {
+    const frameWidth = options.crop?.width ?? options.width ?? 1920;
+    const imageWidth = Math.round(options.imageWidth ?? Math.min(960, frameWidth));
+    const frames = await captureWithPool(pool, url, times, { ...options, scale: imageWidth / frameWidth });
+    // Stacking layer k (from 1) at opacity 2 / (k + 1) over the layers below gives layer k
+    // weight k / (k(k + 1) / 2) of the stack so far, which keeps all weights linear in k.
+    const layers = frames.map((png, i) =>
+      `<img src="data:image/png;base64,${png.toString('base64')}" style="opacity: ${i === 0 ? 1 : 2 / (i + 2)}">`).join('');
+    const label = times.length === 1
+      ? formatTime(times[0])
+      : `${formatTime(times[0])} to ${formatTime(times[times.length - 1])}: ${times.length} frames, later ones stronger`;
+    const gap = 8;
+    const html = `<!doctype html><html><head><style>
+      html, body { margin: 0; background: #16161a; }
+      .onion { padding: ${gap}px; width: max-content; }
+      .stack { position: relative; width: ${imageWidth}px; background: #000; }
+      .stack img { display: block; width: ${imageWidth}px; height: auto; }
+      .stack img + img { position: absolute; left: 0; top: 0; }
+      .label { font: 600 14px/1 system-ui, sans-serif; color: #d8d8e0; padding: 6px 2px 0; }
+    </style></head><body><div class="onion"><div class="stack">${layers}</div><div class="label">${label}</div></div></body></html>`;
+    return await screenshotHtml(pool, html, imageWidth + 2 * gap, '.onion');
+  } finally {
+    await pool.close();
+    await pool.cleanupStrategies();
+  }
+}
+
+/** Screenshots one element of an HTML page laid out at the given width. */
+async function screenshotHtml(pool: BrowserPool, html: string, width: number, selector: string): Promise<Buffer> {
+  // A fresh page: the render page carries the virtual clock and seek hooks.
+  const page = await pool.workers[0].context.newPage();
+  await page.setViewportSize({ width, height: 100 });
+  await page.setContent(html);
+  // A string, not a function: transpilers can inject helpers that do not exist in the page.
+  await page.evaluate('Promise.all(Array.from(document.images, (img) => img.decode()))');
+  const element = await page.$(selector);
+  return await element!.screenshot({ type: 'png' });
 }
 
 /**
@@ -136,6 +181,30 @@ export async function readFrameText(url: string, times: number[], options: ReadF
     }
     if (pool.capturedErrors.length > 0) throw pool.capturedErrors[0];
     return frames;
+  } finally {
+    await pool.close();
+    await pool.cleanupStrategies();
+  }
+}
+
+/**
+ * Seeks the page to each time (seconds) and lists the images, fonts and requests that failed
+ * to load by then: broken `<img>` elements, `@font-face` files that did not load, and
+ * requests answered with HTTP 400 or above. A render shows these as empty boxes or fallback
+ * fonts without failing, so this is how to catch them before rendering.
+ */
+export async function readPageAssets(url: string, times: number[], options: CaptureFramesOptions = {}): Promise<PageAssets> {
+  const pool = createPool(options);
+  try {
+    await pool.init(url);
+    const { page, timeDriver } = pool.workers[0];
+    const readings: PageAssets[] = [await page.evaluate<PageAssets>(PAGE_ASSETS_SCRIPT)];
+    for (const t of times) {
+      await timeDriver.setTime(page, t);
+      readings.push(await page.evaluate<PageAssets>(PAGE_ASSETS_SCRIPT));
+    }
+    if (pool.capturedErrors.length > 0) throw pool.capturedErrors[0];
+    return mergePageAssets(readings);
   } finally {
     await pool.close();
     await pool.cleanupStrategies();

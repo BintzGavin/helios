@@ -649,6 +649,19 @@ describe('helios MCP server: frames and verify', () => {
     expect(result.content[0].text).toBe('Contact sheet of a.html: 4 frames at 0s, 0.5s, 1s, 1.5s; each frame is labelled with its time.');
   });
 
+  it('get_frames passes --onion and says the frames are blended', async () => {
+    write('a.html');
+    const fake = fakeRunner((c) => {
+      fs.writeFileSync(c.args[c.args.indexOf('-o') + 1], Buffer.from([1]));
+      c.out('Wrote onion.png (3 frames: 1s, 1.1s, 1.2s)\n');
+      c.exit(0);
+    });
+    await connect(fake.runner);
+    const result = await call('get_frames', { path: 'a.html', at: [1, 1.1, 1.2], onion: true });
+    expect(fake.calls[0].args.slice(4)).toEqual(['--at', '1,1.1,1.2', '--cell-width', '640', '--onion']);
+    expect(result.content[0].text).toBe('Onion skin of a.html: 3 frames at 1, 1.1, 1.2 s, blended into one picture with later frames stronger; the brightest copy is the last frame.');
+  });
+
   it('get_frames turns a CLI failure into a tool error and cleans up', async () => {
     write('a.html');
     let sheetDir = '';
@@ -1048,6 +1061,27 @@ describe('helios MCP server: verify_video with timed text', () => {
     expect(result.isError).toBeFalsy();
     expect(result.structuredContent).toEqual({ ok: false, message, purity: { ok: false, message, samples: 6, differing: [1, 2] } });
     expect(result.content[0].text).toBe(message);
+  });
+
+  it('reports assets that do not load as a result', async () => {
+    write('a.html');
+    const message = 'The page is missing assets: images that did not load: img/logo.png. Check each path relative to the page, and that the file exists and is in the project.';
+    const report = {
+      ok: false,
+      purity: { ok: true, samples: 6, differing: [], noisy: [], message: PURE },
+      assets: { ok: false, brokenImages: ['img/logo.png'], failedFonts: [], failedRequests: [{ url: 'img/logo.png', status: 404 }], message },
+    };
+    const fake = fakeRunner((c) => { c.out(JSON.stringify(report)); c.exit(1); });
+    await connect(fake.runner);
+    const result = await call('verify_video', { path: 'a.html' });
+    expect(result.isError).toBeFalsy();
+    expect(result.structuredContent).toEqual({
+      ok: false,
+      message: `${PURE} ${message}`,
+      purity: { ok: true, message: PURE, samples: 6, differing: [] },
+      assets: { ok: false, message, brokenImages: ['img/logo.png'], failedFonts: [], failedRequests: [{ url: 'img/logo.png', status: 404 }] },
+    });
+    expect(result.content[0].text).toBe(`${PURE}\n${message}`);
   });
 
   it('only takes .srt, .vtt or .json cues inside the root', async () => {

@@ -613,7 +613,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
       description:
         'Renders chosen frames of a video page into one labelled contact-sheet PNG that you can look at. ' +
         'Use it to check your own work at specific moments (at: times in seconds) or across the video (every: seconds between frames). ' +
-        'It encodes no video, so it is much faster than render_video.',
+        'It encodes no video, so it is much faster than render_video. ' +
+        "With onion, the frames are blended into one picture instead, later frames stronger: use a few close times to see a motion's path, spacing and easing.",
       inputSchema: {
         path: pagePath,
         at: z.array(z.number().min(0)).min(1).max(24).optional().describe('Times to show, in seconds (1-24 of them)'),
@@ -623,7 +624,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         height: height.optional(),
         crop: z.string().regex(/^\s*\d+(\.\d+)?\s*(,\s*\d+(\.\d+)?\s*){3}$/, 'crop is "x,y,w,h" in pixels').optional()
           .describe('Cut each frame to this region: "x,y,w,h" in pixels'),
-        cellWidth: z.number().int().positive().max(1920).default(640).describe('Width of each frame on the sheet, in pixels (default 640)'),
+        cellWidth: z.number().int().positive().max(1920).default(640).describe('Width of each frame on the sheet, or of the onion picture, in pixels (default 640)'),
+        onion: z.boolean().default(false).describe('Blend the frames into one picture, later frames stronger, instead of a grid'),
       },
       annotations: { title: 'Get frames', readOnlyHint: true, openWorldHint: false },
     },
@@ -639,7 +641,8 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
           if (args.every !== undefined) cli.push('--every', String(args.every));
           if (args.duration !== undefined) cli.push('--duration', String(args.duration));
         }
-        cli.push('--cell-width', String(args.cellWidth));        const settings = await getSettings(root);
+        cli.push('--cell-width', String(args.cellWidth));
+        if (args.onion) cli.push('--onion');        const settings = await getSettings(root);
         const width = args.width ?? settings.width;
         if (width !== undefined) cli.push('--width', String(width));        const height = args.height ?? settings.height;
         if (height !== undefined) cli.push('--height', String(height));
@@ -653,7 +656,11 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
         if (!png) return toolError(`helios sheet finished but wrote no image for ${page.rel}`);
 
         let text: string;
-        if (args.at) {
+        if (args.onion) {
+          const wrote = /\((\d+) frames: ([^)]*)\)/.exec(stripAnsi(result.stdout));
+          text = `Onion skin of ${page.rel}: ${args.at ? `${args.at.length} frames at ${args.at.join(', ')} s` : wrote ? `${wrote[1]} frames at ${wrote[2]}` : 'the selected frames'}, ` +
+            'blended into one picture with later frames stronger; the brightest copy is the last frame.';
+        } else if (args.at) {
           text = `Contact sheet of ${page.rel} at ${args.at.join(', ')} s; each frame is labelled with its time.`;
         } else {
           const wrote = /\((\d+) frames: ([^)]*)\)/.exec(stripAnsi(result.stdout));
@@ -678,10 +685,11 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
     {
       title: 'Verify video',
       description:
-        'Checks that every frame of a video page depends only on its time, by rendering sample frames in order and in reverse and comparing them. ' +
+        'Checks that every frame of a video page depends only on its time, by rendering sample frames in order and in reverse and comparing them, ' +
+        'and that its images, fonts and files load at those frames. ' +
         'With cues (an .srt, .vtt or .json file of lyrics, captions or words with start and end times), it also checks that each piece of timed text is on screen during its time. ' +
         'Run it on a new or changed page before render_video. ' +
-        'A failure names the times whose frames depend on what came before (the page uses counters, timers or per-frame randomness instead of values computed from t), ' +
+        'A failure names the times whose frames depend on what came before (the page uses counters, timers or per-frame randomness instead of values computed from t), the assets that did not load, ' +
         'or the cues that were not on screen and what the frame showed instead.',
       inputSchema: {
         path: pagePath,
@@ -698,6 +706,13 @@ export function createHeliosMcpServer(options: HeliosMcpOptions): HeliosMcp {
           message: z.string(),
           samples: z.number().optional(),
           differing: z.array(z.number()).describe('Times, in seconds, whose frames depend on render order'),
+        }).optional(),
+        assets: z.object({
+          ok: z.boolean(),
+          message: z.string(),
+          brokenImages: z.array(z.string()).describe('Images that finished loading without a picture, relative to the page'),
+          failedFonts: z.array(z.string()).describe('@font-face families whose file did not load; their text uses a fallback font'),
+          failedRequests: z.array(z.object({ url: z.string(), status: z.number() })).describe('Requests answered with HTTP 400 or above'),
         }).optional(),
         cues: z.object({
           ok: z.boolean(),

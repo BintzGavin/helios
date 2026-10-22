@@ -2,8 +2,8 @@ import { Command } from 'commander';
 import path from 'path';
 import fs from 'fs';
 import util from 'util';
-import { captureFrames, captureContactSheet, probeComposition, readFrameText } from '@helios-project/renderer';
-import type { CompositionInfo, ReadFrameTextOptions } from '@helios-project/renderer';
+import { captureFrames, captureContactSheet, captureOnionSkin, probeComposition, readFrameText, readPageAssets } from '@helios-project/renderer';
+import type { CompositionInfo, PageAssets, ReadFrameTextOptions } from '@helios-project/renderer';
 import { compareFrames } from '../utils/compare-frames.js';
 import { checkCues, cueSampleTimes, readCueFile } from '../utils/cues.js';
 import type { Cue, CueCheck } from '../utils/cues.js';
@@ -76,7 +76,7 @@ export function registerFrameCommands(program: Command) {
   addPageOptions(
     program
       .command('verify <input>')
-      .description('Check that every frame depends only on its time, as rendering in chunks or out of order needs, and that timed text is on screen at its time')
+      .description('Check that every frame depends only on its time, as rendering in chunks or out of order needs, that its images, fonts and files load, and that timed text is on screen at its time')
       .option('--duration <seconds>', "Duration to sample (default: the composition's)")
       .option('--samples <number>', 'Frames to compare', '6')
       .option('--cues <file>', 'Timed text that must be on screen at its time (lyrics, captions): an .srt, .vtt or .json file')
@@ -97,8 +97,9 @@ export function registerFrameCommands(program: Command) {
         }
         const { width, height } = await pageSize(url, options, info);
         const purity = await checkPurity(url, duration, samples, { width, height, crop: parseCrop(options.crop), browserConfig: browserConfig(options) });
+        const assets = await checkAssets(url, sampleTimes(duration, samples), { width, height, browserConfig: browserConfig(options) });
         const cueCheck = cues ? await checkCuesOnScreen(url, cues, { width, height, browserConfig: browserConfig(options) }) : undefined;
-        return { ok: purity.ok && (cueCheck?.ok ?? true), purity, ...(cueCheck ? { cues: cueCheck } : {}) };
+        return { ok: purity.ok && assets.ok && (cueCheck?.ok ?? true), purity, assets, ...(cueCheck ? { cues: cueCheck } : {}) };
       });
 
       restoreConsole?.();
@@ -108,6 +109,8 @@ export function registerFrameCommands(program: Command) {
         if (result.purity.ok) console.log(result.purity.message);
         // Same wording as before timed text existed: tools read "Verify failed: Frames at …".
         else console.error('Verify failed:', result.purity.message);
+        if (result.assets.ok) console.log(result.assets.message);
+        else console.error(result.assets.message);
         if (result.cues?.ok) console.log(result.cues.message);
         else if (result.cues) console.error(result.cues.message);
       }
@@ -122,15 +125,16 @@ export function registerFrameCommands(program: Command) {
   addPageOptions(
     program
       .command('sheet <input>')
-      .description('Render a labelled contact sheet of frames (one PNG), without encoding a video')
+      .description('Render a labelled contact sheet of frames (one PNG), without encoding a video; --onion blends them into one picture instead')
       .option('--at <seconds>', 'Times to show, comma-separated')
       .option('--every <seconds>', 'One frame every N seconds across the duration')
       .option('--strip <start:end>', 'Every frame from start to end, in seconds')
       .option('--duration <seconds>', "Duration for --every and the default sheet (default: the composition's)")
       .option('--fps <number>', `Frame rate for --strip (default: the composition's, else ${DEFAULT_FPS})`)
       .option('--cols <number>', 'Frames per row (default: up to 4)')
-      .option('--cell-width <px>', 'Width of each frame on the sheet (default: 480)')
-      .option('-o, --output <path>', 'Output PNG', 'sheet.png')
+      .option('--cell-width <px>', 'Width of each frame on the sheet (default: 480), or of the --onion picture (default: 960)')
+      .option('--onion', "Blend the frames into one picture, later frames stronger, to see a motion's path and easing")
+      .option('-o, --output <path>', 'Output PNG (default: sheet.png, or onion.png with --onion)')
   ).action(async (input, options) => {
     try {
       await withCompositionUrl(input, options.serve !== false, async (url) => {
@@ -169,15 +173,13 @@ export function registerFrameCommands(program: Command) {
           throw new Error(`That selects ${times.length} frames; a sheet holds up to ${MAX_SHEET_FRAMES}. Narrow --strip, or use a larger --every.`);
         }
 
-        const sheet = await captureContactSheet(url, times, {
-          width,
-          height,
-          crop: parseCrop(options.crop),
-          columns: parsePositive(options.cols, '--cols', true),
-          cellWidth: parsePositive(options.cellWidth, '--cell-width', true),
-          browserConfig: browserConfig(options),
-        });
-        const target = path.resolve(process.cwd(), options.output);
+        const cellWidth = parsePositive(options.cellWidth, '--cell-width', true);
+        const capture = { width, height, crop: parseCrop(options.crop), browserConfig: browserConfig(options) };
+        if (options.onion && options.cols !== undefined) throw new Error('--cols lays out a sheet; --onion makes one picture. Use one of them.');
+        const sheet = options.onion
+          ? await captureOnionSkin(url, times, { ...capture, imageWidth: cellWidth })
+          : await captureContactSheet(url, times, { ...capture, columns: parsePositive(options.cols, '--cols', true), cellWidth });
+        const target = path.resolve(process.cwd(), options.output ?? (options.onion ? 'onion.png' : 'sheet.png'));
         fs.writeFileSync(target, sheet);
         console.log(`Wrote ${path.relative(process.cwd(), target)} (${times.length} frames: ${times.slice(0, 6).join('s, ')}s${times.length > 6 ? ', …' : ''})`);
       });
@@ -207,7 +209,7 @@ async function checkPurity(
   samples: number,
   capture: { width: number; height: number; crop?: { x: number; y: number; width: number; height: number }; browserConfig: ReturnType<typeof browserConfig> },
 ): Promise<PurityCheck> {
-  const times = Array.from({ length: samples }, (_, i) => round((i * duration) / samples));
+  const times = sampleTimes(duration, samples);
   const forward = await captureFrames(url, times, capture);
   const reversed = await captureFrames(url, [...times].reverse(), capture);
   const frameWidth = capture.crop?.width ?? capture.width;
@@ -240,6 +242,49 @@ async function checkPurity(
       `(Frames at ${list(noisy)} differ by a few pixels of rendering noise, such as antialiasing; that is ignored.)`
     : `${times.length} sampled frames are identical rendered in order and in reverse: each frame depends only on t.`;
   return { ok: true, samples: times.length, differing, noisy, message };
+}
+
+/** Evenly spaced times from 0, the frames verify compares. */
+function sampleTimes(duration: number, samples: number): number[] {
+  return Array.from({ length: samples }, (_, i) => round((i * duration) / samples));
+}
+
+interface AssetCheck extends PageAssets {
+  ok: boolean;
+  message: string;
+}
+
+/** A URL as the page wrote it: relative to the page when it is beside or below it. */
+function relativeTo(pageUrl: string, url: string): string {
+  const base = pageUrl.slice(0, pageUrl.lastIndexOf('/') + 1);
+  return url.startsWith(base) ? decodeURIComponent(url.slice(base.length)) : url;
+}
+
+/**
+ * Seeks to the sampled times and lists the images, fonts and files that failed to load. A
+ * render does not fail on these: it shows empty boxes and fallback fonts.
+ */
+async function checkAssets(url: string, times: number[], options: { width: number; height: number; browserConfig: ReturnType<typeof browserConfig> }): Promise<AssetCheck> {
+  const found = await readPageAssets(url, times, options);
+  const brokenImages = found.brokenImages.map((src) => relativeTo(url, src));
+  const failedRequests = found.failedRequests.map((r) => ({ url: relativeTo(url, r.url), status: r.status }));
+  const failedFonts = found.failedFonts;
+  if (!brokenImages.length && !failedFonts.length && !failedRequests.length) {
+    return { ok: true, brokenImages, failedFonts, failedRequests, message: `Images, fonts and files load at the ${times.length} sampled frames.` };
+  }
+  const parts: string[] = [];
+  if (brokenImages.length) parts.push(`images that did not load: ${brokenImages.join(', ')}`);
+  if (failedFonts.length) parts.push(`fonts that did not load, so their text uses a fallback font: ${failedFonts.join(', ')}`);
+  // A broken image's request is already named above.
+  const others = failedRequests.filter((r) => !brokenImages.includes(r.url));
+  if (others.length) parts.push(`files the server could not send: ${others.map((r) => `${r.url} (HTTP ${r.status})`).join(', ')}`);
+  return {
+    ok: false,
+    brokenImages,
+    failedFonts,
+    failedRequests,
+    message: `The page is missing assets: ${parts.join('; ')}. Check each path relative to the page, and that the file exists and is in the project.`,
+  };
 }
 
 /**

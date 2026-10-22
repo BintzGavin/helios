@@ -4,7 +4,7 @@
  * exactly the requested time, crops must cut the requested region, and a sheet must lay
  * the frames out in a labelled grid.
  */
-import { captureFrames, captureContactSheet } from '../src/index';
+import { captureFrames, captureContactSheet, captureOnionSkin } from '../src/index';
 import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import { spawnSync } from 'child_process';
 import path from 'path';
@@ -18,13 +18,19 @@ function pngSize(png: Buffer): { width: number; height: number } {
   return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
 }
 
-/** First lit pixel on row y of a PNG, via ffmpeg's decoder. */
-function firstLitX(png: Buffer, y: number): number {
+/** One row of a PNG as 8-bit gray, via ffmpeg's decoder. */
+function grayRow(png: Buffer, y: number): Buffer {
   const { width, height } = pngSize(png);
   const result = spawnSync(ffmpegInstaller.path, ['-v', 'error', '-f', 'png_pipe', '-i', '-', '-f', 'rawvideo', '-pix_fmt', 'gray', '-'], { input: png, maxBuffer: 16 * 1024 * 1024 });
   const raw: Buffer = result.stdout;
   if (raw.length < width * height) throw new Error('could not decode PNG');
-  for (let x = 0; x < width; x++) if (raw[y * width + x] > 128) return x;
+  return raw.subarray(y * width, (y + 1) * width);
+}
+
+/** First lit pixel on row y of a PNG. */
+function firstLitX(png: Buffer, y: number): number {
+  const row = grayRow(png, y);
+  for (let x = 0; x < row.length; x++) if (row[x] > 128) return x;
   return -1;
 }
 
@@ -58,6 +64,23 @@ async function main() {
   // 3 columns of 160px plus gaps, 2 rows of 90px images plus labels and gaps.
   check(sheetSize.width >= 3 * 160 && sheetSize.width < 3 * 160 + 80, `sheet is 3 cells wide (${sheetSize.width}px)`);
   check(sheetSize.height >= 2 * 90 && sheetSize.height < 2 * 90 + 160, `sheet has 2 rows (${sheetSize.height}px)`);
+
+  // Three frames with the box at x = 0, 50 and 100 weigh 1/6, 2/6 and 3/6: one dim, one
+  // brighter and one brightest copy, each where its frame put it.
+  const onion = await captureOnionSkin(page, [0, 0.5, 1], { width: 320, height: 180, imageWidth: 320 });
+  const onionSize = pngSize(onion);
+  check(onionSize.width >= 320 && onionSize.width < 320 + 40 && onionSize.height > 180 && onionSize.height < 180 + 60,
+    `onion skin is one frame plus a label (${onionSize.width}x${onionSize.height})`);
+  // The image sits 8px in from the top-left corner of the PNG.
+  const row = grayRow(onion, 8 + 90);
+  const level = (x: number) => row[8 + x + 10];
+  const [first, middle, last] = [level(0), level(50), level(100)];
+  const near = (value: number, expected: number) => Math.abs(value - expected) <= 0.05 * 255;
+  check(first < middle && middle < last, `later frames are stronger (${first}, ${middle}, ${last})`);
+  // The box is the fixture's white minus the black background; weights are 1/6, 2/6, 3/6.
+  const white = grayRow(stills[0], 90)[10];
+  check(near(first, white / 6) && near(middle, white / 3) && near(last, white / 2),
+    `frames weigh 1:2:3 (${first}, ${middle}, ${last} of ${white})`);
 
   if (failures.length > 0) {
     console.error(`\n❌ ${failures.length} still/sheet check(s) failed.`);

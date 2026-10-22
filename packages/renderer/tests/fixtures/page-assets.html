@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head><style>
+  @font-face { font-family: 'Missing Sans'; src: url('missing-font.woff2') format('woff2'); }
+  html, body { margin: 0; background: #000; color: #fff; }
+  h1 { font-family: 'Missing Sans', sans-serif; }
+</style></head>
+<body>
+<h1>Title</h1>
+<img id="ok" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="">
+<img id="broken" src="missing-logo.png" alt="">
+<div id="later"></div>
+<script>
+// Adds a second missing image only after one second, to check that seeking finds it.
+window.renderAt = (t) => {
+  const later = document.getElementById('later');
+  if (t >= 1 && !later.firstChild) {
+    const img = document.createElement('img');
+    img.src = 'missing-late.png';
+    later.appendChild(img);
+    return new Promise((resolve) => { img.onload = img.onerror = resolve; });
+  }
+};
+</script>
+</body>
+</html>

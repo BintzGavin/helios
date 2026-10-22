@@ -228,6 +228,7 @@ export interface VerifyReport {
   ok: boolean;
   message: string;
   purity?: { ok: boolean; message: string; samples?: number; differing: number[] };
+  assets?: { ok: boolean; message: string; brokenImages: string[]; failedFonts: string[]; failedRequests: Array<{ url: string; status: number }> };
   cues?: {
     ok: boolean;
     message: string;
@@ -279,16 +280,37 @@ export function summarizeVerify(data: Json): VerifyReport {
     };
   }
 
-  const ok = typeof data.ok === 'boolean' ? data.ok : (purity?.ok ?? true) && (cues?.ok ?? true);
-  const message = [purity?.message, cues?.message].filter(Boolean).join(' ') || (ok ? 'Verified.' : 'Verify failed.');
+  let assets: VerifyReport['assets'];
+  if (isObject(data.assets)) {
+    const failedRequests = (Array.isArray(data.assets.failedRequests) ? data.assets.failedRequests : [])
+      .filter(isObject)
+      .slice(0, MAX_MISSING)
+      .map((r) => ({ url: typeof r.url === 'string' ? r.url : '', status: num(r.status) ?? 0 }));
+    const brokenImages = strings(data.assets.brokenImages).slice(0, MAX_MISSING);
+    const failedFonts = strings(data.assets.failedFonts).slice(0, MAX_MISSING);
+    const ok = typeof data.assets.ok === 'boolean' ? data.assets.ok : !brokenImages.length && !failedFonts.length && !failedRequests.length;
+    assets = {
+      ok,
+      message: typeof data.assets.message === 'string' && data.assets.message
+        ? data.assets.message
+        : ok ? 'Images, fonts and files load.' : 'Some images, fonts or files do not load.',
+      brokenImages,
+      failedFonts,
+      failedRequests,
+    };
+  }
+
+  const ok = typeof data.ok === 'boolean' ? data.ok : (purity?.ok ?? true) && (assets?.ok ?? true) && (cues?.ok ?? true);
+  const message = [purity?.message, assets?.message, cues?.message].filter(Boolean).join(' ') || (ok ? 'Verified.' : 'Verify failed.');
   const report: VerifyReport = { ok, message };
   if (purity) report.purity = purity;
+  if (assets) report.assets = assets;
   if (cues) report.cues = cues;
   return report;
 }
 
 export function verifyText(report: VerifyReport): string {
-  const lines = [report.purity?.message, report.cues?.message].filter((line): line is string => Boolean(line));
+  const lines = [report.purity?.message, report.assets?.message, report.cues?.message].filter((line): line is string => Boolean(line));
   if (!lines.length) lines.push(report.message);
   if (report.cues && !report.cues.ok) {
     const seen = report.cues.missing.filter((cue) => cue.seen !== undefined).slice(0, TEXT_MISSING);

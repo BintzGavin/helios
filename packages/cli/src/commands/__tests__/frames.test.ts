@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { captureFrames, captureContactSheet, probeComposition, readFrameText } from '@helios-project/renderer';
+import { captureFrames, captureContactSheet, captureOnionSkin, probeComposition, readFrameText, readPageAssets } from '@helios-project/renderer';
 import { registerFrameCommands } from '../frames.js';
 import { spawnSync } from 'child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
@@ -19,8 +19,10 @@ function boxPng(x: number, tweak?: (pixels: Buffer) => void): Buffer {
 vi.mock('@helios-project/renderer', () => ({
   captureFrames: vi.fn(),
   captureContactSheet: vi.fn(),
+  captureOnionSkin: vi.fn(),
   probeComposition: vi.fn(),
   readFrameText: vi.fn(),
+  readPageAssets: vi.fn(),
 }));
 
 describe('still and sheet commands', () => {
@@ -44,6 +46,8 @@ describe('still and sheet commands', () => {
     vi.mocked(probeComposition).mockResolvedValue({ driver: 'helios', durationInSeconds: 12, fps: 30, width: 1080, height: 1920 });
     vi.mocked(captureFrames).mockImplementation(async (_url, times) => times.map(() => Buffer.from('png')));
     vi.mocked(captureContactSheet).mockResolvedValue(Buffer.from('sheet'));
+    vi.mocked(captureOnionSkin).mockResolvedValue(Buffer.from('onion'));
+    vi.mocked(readPageAssets).mockResolvedValue({ brokenImages: [], failedFonts: [], failedRequests: [] });
   });
 
   afterEach(() => { vi.restoreAllMocks(); });
@@ -196,6 +200,7 @@ describe('still and sheet commands', () => {
         expect(JSON.parse(stdout.join(''))).toEqual({
           ok: true,
           purity: { ok: true, samples: 2, differing: [], noisy: [], message: '2 sampled frames are identical rendered in order and in reverse: each frame depends only on t.' },
+          assets: { ok: true, brokenImages: [], failedFonts: [], failedRequests: [], message: 'Images, fonts and files load at the 2 sampled frames.' },
           cues: { ok: true, total: 1, shown: 1, missing: [], message: '1/1 cues on screen at their time.' },
         });
       });
@@ -228,9 +233,39 @@ describe('still and sheet commands', () => {
         const stderr = vi.spyOn(process.stderr, 'write').mockImplementation((() => true) as any);
         await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--json']);
         const result = JSON.parse(stdout.join(''));
-        expect(Object.keys(result)).toEqual(['ok', 'purity']);
+        expect(Object.keys(result)).toEqual(['ok', 'purity', 'assets']);
         expect(stderr.mock.calls.flat().join('')).toContain('Initializing pool');
         expect(vi.mocked(console.log)).not.toHaveBeenCalled();
+      });
+
+      it('fails on images, fonts and files that do not load, named relative to the page', async () => {
+        vi.mocked(readPageAssets).mockImplementation(async (url) => {
+          const dir = url.slice(0, url.lastIndexOf('/') + 1);
+          return {
+            brokenImages: [`${dir}img/logo.png`],
+            failedFonts: ['Brand Sans'],
+            failedRequests: [{ url: `${dir}img/logo.png`, status: 404 }, { url: `${dir}fonts/brand.woff2`, status: 404 }],
+          };
+        });
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--samples', '2', '--json']);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+        expect(readPageAssets).toHaveBeenCalledWith(expect.any(String), [0, 2], expect.objectContaining({ width: 1080, height: 1920 }));
+        const result = JSON.parse(stdout.join(''));
+        expect(result.ok).toBe(false);
+        expect(result.purity.ok).toBe(true);
+        expect(result.assets).toEqual({
+          ok: false,
+          brokenImages: ['img/logo.png'],
+          failedFonts: ['Brand Sans'],
+          failedRequests: [{ url: 'img/logo.png', status: 404 }, { url: 'fonts/brand.woff2', status: 404 }],
+          message: 'The page is missing assets: images that did not load: img/logo.png; fonts that did not load, so their text uses a fallback font: Brand Sans; ' +
+            'files the server could not send: fonts/brand.woff2 (HTTP 404). Check each path relative to the page, and that the file exists and is in the project.',
+        });
+
+        exitSpy.mockClear();
+        await program.parseAsync(['node', 'test', 'verify', 'page.html', '--duration', '4', '--samples', '2']);
+        expect(exitSpy).toHaveBeenCalledWith(1);
+        expect(errors()).toContain('The page is missing assets: images that did not load: img/logo.png');
       });
 
       it('reports a missing cue file or a page error on stderr, with no JSON', async () => {
@@ -281,6 +316,20 @@ describe('still and sheet commands', () => {
       expect(exitSpy).toHaveBeenCalledWith(1);
       expect(errors()).toContain('--duration');
       expect(captureContactSheet).not.toHaveBeenCalled();
+    });
+
+    it('--onion blends the selected frames into onion.png, with --cell-width as its width', async () => {
+      await program.parseAsync(['node', 'test', 'sheet', 'page.html', '--strip', '2:2.5', '--fps', '10', '--onion', '--cell-width', '640', '--crop', '0,0,540,960']);
+      expect(captureOnionSkin).toHaveBeenCalledWith(expect.any(String), [2, 2.1, 2.2, 2.3, 2.4, 2.5], expect.objectContaining({ imageWidth: 640, crop: { x: 0, y: 0, width: 540, height: 960 } }));
+      expect(captureContactSheet).not.toHaveBeenCalled();
+      expect(written()).toEqual(['onion.png']);
+    });
+
+    it('--onion with --cols is an error', async () => {
+      await program.parseAsync(['node', 'test', 'sheet', 'page.html', '--at', '0,1', '--onion', '--cols', '2']);
+      expect(exitSpy).toHaveBeenCalledWith(1);
+      expect(errors()).toContain('--onion');
+      expect(captureOnionSkin).not.toHaveBeenCalled();
     });
 
     it('refuses more frames than fit on a sheet', async () => {
