@@ -1,0 +1,217 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render blueprint.html -o blueprint.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>Blueprint</title>
+<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=B612:wght@400;700&family=Allura&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#0d1116;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Blueprint: one cyanotype sheet (procedural, built in ready), white line work drawn on by arc length with a glowing
+// nib, in drafting order. Line width on screen = sheet width x zoom^0.65. One red stamp, used exactly once.
+const W = 1920, H = 1080, SW = 2400, SH = 1350;               // sheet units; zoom 1 = sheet fills the frame width
+const ctx = document.getElementById('c').getContext('2d');
+const LINE = '#e7f0f9', HAND = '"Architects Daughter", "Comic Sans MS", cursive', TECH = '"B612", "Consolas", monospace';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, u) => a + (b - a) * u;
+const io = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const circ = (cx, cy, r, n = 48) => Array.from({ length: n + 1 }, (_, i) => [cx + Math.cos(i / n * 6.283) * r, cy + Math.sin(i / n * 6.283) * r]);
+const WT = { out: 3.2, det: 2.0, thin: 1.25, hair: 0.9 };    // four weights, sheet units
+const DASH = { centre: [34, 7, 6, 7], hidden: [10, 6], phantom: [30, 6, 5, 6, 5, 6] };
+
+// ---- the drawing, in drafting order: centre lines -> outlines -> hatching -> dimensions -> balloons -> labels
+const A = [1000, 1030], B = [770, 720], Cp = [1150, 480];     // pivots: base, elbow, shade
+const ITEMS = [], TEXTS = [];
+const add = (pts, w, t0, dur, dash = null) => ITEMS.push({ pts, w, t0, dur, dash });
+const say = (s, x, y, size, t0, dur, font = HAND, rot = 0, align = 'left') => TEXTS.push({ s, x, y, size, t0, dur, font, rot, align });
+const norm = (v) => { const l = Math.hypot(v[0], v[1]); return [v[0] / l, v[1] / l]; };
+const off = (p, q, d) => { const n = norm([q[1] - p[1], p[0] - q[0]]); return [[p[0] + n[0] * d, p[1] + n[1] * d], [q[0] + n[0] * d, q[1] + n[1] * d]]; };
+const ext = (p, q, a, b) => { const v = norm([q[0] - p[0], q[1] - p[1]]); return [[p[0] - v[0] * a, p[1] - v[1] * a], [q[0] + v[0] * b, q[1] + v[1] * b]]; };
+// 1. centre lines (the hook: the lamp's axis crosses the empty sheet first)
+add([[1000, 1200], [1000, 380]], WT.det, 0.0, 0.45, DASH.centre);   // hook
+add(ext(A, B, 40, 40), WT.hair, 0.3, 0.4, DASH.centre); add(ext(B, Cp, 40, 40), WT.hair, 0.45, 0.4, DASH.centre);
+const SAX = norm([1, 1.25]);                                    // shade axis
+add([[Cp[0] - SAX[0] * 30, Cp[1] - SAX[1] * 30], [Cp[0] + SAX[0] * 330, Cp[1] + SAX[1] * 330]], WT.hair, 0.6, 0.4, DASH.centre);
+for (const [x, y] of [A, B, Cp]) { add([[x - 34, y], [x + 34, y]], WT.hair, 0.75, 0.15); add([[x, y - 34], [x, y + 34]], WT.hair, 0.8, 0.15); }
+// 2. outlines
+add([[800, 1140], [800, 1100], [830, 1078], [1170, 1078], [1200, 1100], [1200, 1140], [800, 1140]], WT.out, 0.95, 0.5);
+add([[970, 1078], [970, 1048], [1030, 1048], [1030, 1078]], WT.out, 1.2, 0.2);
+for (const d of [-13, 13]) { add(off(A, B, d), WT.out, 1.35, 0.35); add(off(B, Cp, d), WT.out, 1.55, 0.35); }
+for (const [x, y] of [A, B, Cp]) add(circ(x, y, 18), WT.det, 1.75, 0.2);
+const ax = (s, n) => [Cp[0] + SAX[0] * s - SAX[1] * n, Cp[1] + SAX[1] * s + SAX[0] * n];
+add([ax(22, -32), ax(22, 32), ax(250, 140), ax(250, -140), ax(22, -32)], WT.out, 1.85, 0.5);   // shade
+add([ax(250, -140), ax(270, -120), ax(270, 120), ax(250, 140)], WT.det, 2.2, 0.2);
+add(circ(...ax(232, 0), 46), WT.det, 2.3, 0.25);                                                  // bulb
+const spring = []; for (let i = 0; i <= 24; i++) { const u = i / 24, p = [lerp(A[0], B[0], 0.18 + 0.6 * u), lerp(A[1], B[1], 0.18 + 0.6 * u)], n = norm([B[1] - A[1], A[0] - B[0]]); const d = 30 + (i % 2 ? 9 : -9); spring.push([p[0] + n[0] * d, p[1] + n[1] * d]); }
+add(spring, WT.det, 2.35, 0.35);
+add([[640, 1140], [1360, 1140]], WT.out, 2.4, 0.3);                                              // ground line
+// 3. hatching: base in section at 45°, spacing 12
+for (let c = 754, k = 0; c < 1194; c += 12, k++) {             // lines y = yb - (x - c), clipped to the section rect
+  const x0 = 806, x1 = 1194, yb = 1136, h = 52, sx = Math.max(x0, c), ex = Math.min(x1, c + h);
+  if (sx < ex) add([[sx, yb - (sx - c)], [ex, yb - (ex - c)]], WT.hair, 2.55 + k * 0.018, 0.08);
+}
+// 4. dimensions: extension lines, arrowed dimension line, value
+function dim(p, q, d, label, t0) {
+  const [a, b] = off(p, q, d), v = norm([q[0] - p[0], q[1] - p[1]]), n = norm([q[1] - p[1], p[0] - q[0]]);
+  add([p, [a[0] + n[0] * 10, a[1] + n[1] * 10]], WT.hair, t0, 0.15); add([q, [b[0] + n[0] * 10, b[1] + n[1] * 10]], WT.hair, t0, 0.15);
+  add([a, b], WT.thin, t0 + 0.1, 0.3);
+  const head = (o, s) => add([[o[0] + v[0] * 18 * s + n[0] * 5, o[1] + v[1] * 18 * s + n[1] * 5], o, [o[0] + v[0] * 18 * s - n[0] * 5, o[1] + v[1] * 18 * s - n[1] * 5]], WT.thin, t0 + 0.35, 0.08);
+  head(a, 1); head(b, -1);
+  const m = [(a[0] + b[0]) / 2 + n[0] * 14, (a[1] + b[1]) / 2 + n[1] * 14];
+  say(label, m[0], m[1], 26, t0 + 0.4, 0.2, TECH, Math.atan2(v[1], v[0]) + (v[0] < -1e-6 ? Math.PI : 0), 'center');
+}
+dim([800, 1140], [1200, 1140], -60, '400', 3.0);
+dim([660, 1140], [660, 432], 0, '708', 3.15);
+dim(A, B, -60, '388', 3.3);
+// 5. balloons with leaders, 6. hand-lettered labels
+function balloon(n, cx, cy, to, t0) {
+  const v = norm([to[0] - cx, to[1] - cy]);
+  add([[cx + v[0] * 24, cy + v[1] * 24], to], WT.thin, t0, 0.2); add(circ(to[0], to[1], 3, 8), WT.det, t0 + 0.18, 0.05);
+  add(circ(cx, cy, 24), WT.det, t0 + 0.1, 0.2); say(String(n), cx, cy + 10, 28, t0 + 0.25, 0.1, TECH, 0, 'center');
+}
+balloon(1, 1420, 610, ax(150, 80), 3.75); balloon(2, 1010, 500, [960, 600], 3.85); balloon(3, 560, 860, spring[8], 3.95); balloon(4, 1290, 1020, [1180, 1110], 4.05);
+say('SHADE — SPUN BRASS', 1456, 619, 28, 4.1, 0.35); say('ARMS — ASH, OILED', 800, 440, 30, 4.2, 0.35);
+say('SPRING ×2', 400, 916, 30, 4.3, 0.25); say('BASE — CAST IRON', 1320, 1028, 30, 4.4, 0.35);
+// sheet furniture: border, header, notes column, title block (mostly drawn off camera during the close-up)
+add([[40, 40], [2360, 40], [2360, 1310], [40, 1310], [40, 40]], WT.out, 0.2, 1.2); add([[56, 56], [2344, 56], [2344, 1294], [56, 1294], [56, 56]], WT.hair, 0.4, 1.2);
+say('HALCYON Nº 3 — ARTICULATED TABLE LAMP', 110, 150, 64, 0.6, 1.0); add([[110, 172], [1380, 172]], WT.det, 1.4, 0.4);
+say('FIG. 1  ·  SIDE ELEVATION, BASE IN SECTION', 112, 220, 28, 1.6, 0.6, TECH);
+add([[1740, 980], [2310, 980], [2310, 1270], [1740, 1270], [1740, 980]], WT.out, 1.0, 0.6);
+for (const y of [1050, 1120, 1190]) add([[1740, y], [2310, y]], WT.thin, 1.3, 0.3);
+add([[2020, 1050], [2020, 1190]], WT.thin, 1.5, 0.2);
+[['DRAWN', 1756, 1042], ['SCALE 1:4', 1756, 1112], ['SHEET 1 / 1', 2036, 1112], ['DATE 22.10', 1756, 1182], ['REV. A', 2036, 1182], ['STATUS', 1756, 1252]].forEach(([s, x, y], i) => say(s, x, y, 20, 1.6 + i * 0.08, 0.2, TECH));
+say('GENERAL NOTES', 1760, 330, 34, 4.55, 0.4); add([[1760, 346], [2050, 346]], WT.det, 4.8, 0.2);
+const NOTES = ['1. ONE LAMP, TWO ARMS, NO SCREWS SHOWING.', '2. ALL DIMENSIONS IN MILLIMETRES.', '3. SPRINGS BALANCE THE SHADE AT ANY ANGLE.'];
+NOTES.forEach((s, i) => say(s, 1760, 400 + i * 48, 24, 4.9 + i * 0.25, 0.4));
+say('E. Marlowe', 1880, 1042, 40, 6.0, 0.9, '"Allura", cursive');
+
+// ---- procedural cyanotype sheet, built once: fbm between two blues, coating streaks, folds, stains, bleached edges
+const SHEET = document.createElement('canvas'); SHEET.width = SW; SHEET.height = SH;
+const STAMP = document.createElement('canvas'); STAMP.width = 520; STAMP.height = 220;
+let sd = 4242; const rnd = () => ((sd = (sd * 1664525 + 1013904223) >>> 0) / 4294967296);
+function buildSheet() {
+  const g = SHEET.getContext('2d', { willReadFrequently: true }), im = g.createImageData(SW, SH), d = im.data;
+  const oct = [64, 160, 420].map((cell) => { const nx = Math.ceil(SW / cell) + 2, ny = Math.ceil(SH / cell) + 2; return { cell, nx, v: Float32Array.from({ length: nx * ny }, rnd) }; });
+  const lo = [0x18, 0x33, 0x6b], hi = [0x2a, 0x58, 0xa6];
+  for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+    let n = 0, amp = 0.5, tot = 0;
+    for (const o of oct) {
+      const fx = x / o.cell, fy = y / o.cell, ix = fx | 0, iy = fy | 0, u = fx - ix, v = fy - iy, s = u * u * (3 - 2 * u), r = v * v * (3 - 2 * v);
+      const a = o.v[iy * o.nx + ix], b = o.v[iy * o.nx + ix + 1], c = o.v[(iy + 1) * o.nx + ix], e = o.v[(iy + 1) * o.nx + ix + 1];
+      n += lerp(lerp(a, b, s), lerp(c, e, s), r) * amp; tot += amp; amp *= 1.6;
+    }
+    n /= tot;
+    const edge = Math.min(x, y, SW - x, SH - y), bleach = Math.max(0, 1 - edge / 70) * 0.35, streak = 0.05 * Math.sin(y * 0.021 + n * 6);
+    const k = clamp(0.45 + (n - 0.5) * 0.95 + streak * 0.6 + bleach + (rnd() - 0.5) * 0.07), i4 = (y * SW + x) * 4;
+    d[i4] = lerp(lo[0], hi[0], k); d[i4 + 1] = lerp(lo[1], hi[1], k); d[i4 + 2] = lerp(lo[2], hi[2], k); d[i4 + 3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+  // fold creases: whitened band, bright edge, dark edge
+  for (const [x0, y0, x1, y1] of [[SW / 2, 0, SW / 2, SH], [0, SH / 2, SW, SH / 2]]) {
+    const vx = x1 !== x0;
+    g.fillStyle = 'rgba(200,220,255,0.06)'; vx ? g.fillRect(0, y0 - 6, SW, 12) : g.fillRect(x0 - 6, 0, 12, SH);
+    g.fillStyle = 'rgba(230,240,255,0.18)'; vx ? g.fillRect(0, y0, SW, 1.5) : g.fillRect(x0, 0, 1.5, SH);
+    g.fillStyle = 'rgba(5,15,40,0.25)'; vx ? g.fillRect(0, y0 - 2, SW, 2) : g.fillRect(x0 - 2, 0, 2, SH);
+  }
+  // water stains: deeper blue bloom with a pale tide line
+  for (const [x, y, r] of [[420, 1080, 110], [2140, 230, 70]]) {
+    for (let j = 0; j < 4; j++) {                           // a few offset blooms make an irregular stain
+      const cx = x + (rnd() - 0.5) * r * 0.6, cy = y + (rnd() - 0.5) * r * 0.6, rr = r * (0.6 + rnd() * 0.4);
+      const gr = g.createRadialGradient(cx, cy, 0, cx, cy, rr); gr.addColorStop(0, 'rgba(8,24,70,0.12)'); gr.addColorStop(0.85, 'rgba(8,24,70,0.1)'); gr.addColorStop(1, 'rgba(8,24,70,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, rr, 0, 6.283); g.fill();
+      g.strokeStyle = 'rgba(190,215,250,0.06)'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, rr * 0.9, rnd() * 6, rnd() * 6 + 3.5); g.stroke();
+    }
+  }
+  for (let i = 0; i < 1800; i++) { g.fillStyle = `rgba(225,238,255,${0.05 + rnd() * 0.15})`; g.fillRect(rnd() * SW, rnd() * SH, 1 + rnd() * 2, 1 + rnd() * 2); }
+  // the stamp, pre-inked with voids (red, used once)
+  const s = STAMP.getContext('2d');
+  s.strokeStyle = s.fillStyle = '#d7262e'; s.lineWidth = 7; s.strokeRect(12, 12, 496, 196); s.lineWidth = 2.5; s.strokeRect(26, 26, 468, 168);
+  s.font = `700 86px ${TECH}`; s.textAlign = 'center'; s.fillText('APPROVED', 260, 132); s.font = `400 24px ${TECH}`; s.fillText('FOR PRODUCTION · REV. A', 260, 174);
+  s.globalCompositeOperation = 'destination-out';
+  for (let i = 0; i < 2600; i++) { s.globalAlpha = 0.3 + rnd() * 0.7; s.fillRect(rnd() * 520, rnd() * 220, 1 + rnd() * 3, 1 + rnd() * 2); }
+}
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`64px ${HAND}`, 'HALCYON'), document.fonts.load(`700 86px ${TECH}`, 'APPROVED'), document.fonts.load(`400 20px ${TECH}`, 'SCALE'), document.fonts.load('40px "Allura"', 'Marlowe')]);
+  await document.fonts.ready;
+  buildSheet();
+})();
+
+// camera: close on the lamp while it is drafted, pull out to the whole sheet, small bump on the stamp
+function camera(t) {
+  const u = io(prog(t, 4.7, 5.3)), z = lerp(1.55, 0.96, u) + 0.02 * prog(t, 5.3, 8), bump = t > 5.4 && t < 5.55 ? Math.sin(prog(t, 5.4, 5.55) * Math.PI) * 4 : 0;
+  return { z, fx: lerp(1010, SW / 2, u), fy: lerp(800, SH / 2, u) + bump / (0.8 * z) };
+}
+function nib(x, y, s) {                                    // the glowing pen head
+  const r = 16 / s, g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, 'rgba(255,255,255,0.95)'); g.addColorStop(0.3, 'rgba(200,230,255,0.5)'); g.addColorStop(1, 'rgba(160,210,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash([]); ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+  ctx.fillStyle = '#0d1116'; ctx.fillRect(0, 0, W, H);
+  const cam = camera(t), S = 0.8 * cam.z, lw = Math.pow(cam.z, 0.65) / cam.z;   // sheet-unit width that gives w x zoom^0.65 on screen
+  ctx.setTransform(S, 0, 0, S, W / 2 - S * cam.fx, H / 2 - S * cam.fy);
+  ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10; ctx.drawImage(SHEET, 0, 0); ctx.restore();
+
+  ctx.strokeStyle = LINE; ctx.fillStyle = LINE; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(220,235,255,0.45)'; ctx.shadowBlur = 2;                // slight ink bleed
+  const heads = [];
+  for (const it of ITEMS) {
+    const f = prog(t, it.t0, it.t0 + it.dur); if (f <= 0) continue;
+    let L = 0; const seg = [it.pts[0]];
+    const total = it.pts.reduce((s, q, i) => (i ? s + Math.hypot(q[0] - it.pts[i - 1][0], q[1] - it.pts[i - 1][1]) : 0), 0), want = total * f;
+    for (let i = 1; i < it.pts.length; i++) {
+      const a = it.pts[i - 1], b = it.pts[i], l = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (L + l <= want) { seg.push(b); L += l; } else { const k = (want - L) / l; seg.push([lerp(a[0], b[0], k), lerp(a[1], b[1], k)]); break; }
+    }
+    ctx.setLineDash(it.dash || []); ctx.lineWidth = it.w * lw;
+    ctx.beginPath(); seg.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.stroke();
+    if (f < 1) heads.push(seg[seg.length - 1]);
+  }
+  ctx.setLineDash([]);
+  for (const T of TEXTS) {                                    // lettered on left to right behind the nib
+    const f = prog(t, T.t0, T.t0 + T.dur); if (f <= 0) continue;
+    ctx.save(); ctx.translate(T.x, T.y); ctx.rotate(T.rot); ctx.font = `${T.size}px ${T.font}`; ctx.textAlign = 'left';
+    const w = ctx.measureText(T.s).width, x0 = T.align === 'center' ? -w / 2 : 0;
+    ctx.beginPath(); ctx.rect(x0 - 4, -T.size * 1.2, (w + 8) * f, T.size * 1.6); ctx.clip();
+    ctx.fillText(T.s, x0, 0); ctx.restore();
+    if (f < 1) { const c = Math.cos(T.rot), s = Math.sin(T.rot), px = (T.align === 'center' ? -w / 2 : 0) + w * f; heads.push([T.x + px * c + 8 * s, T.y + px * s - 8 * c]); }
+  }
+  ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+  for (const [x, y] of heads) nib(x, y, S);
+  // light from the shade: phantom lines marching slowly (end-hold micro-motion)
+  const bf = prog(t, 6.6, 7.2);
+  if (bf > 0) {
+    ctx.setLineDash(DASH.phantom); ctx.lineDashOffset = -t * 30; ctx.lineWidth = WT.hair * lw; ctx.globalAlpha = 0.7 * bf;
+    for (const s of [-1, 1]) { const p = ax(270, 120 * s), q = [p[0] + SAX[0] * 260 + s * 60, Math.min(1138, p[1] + SAX[1] * 260)]; ctx.beginPath(); ctx.moveTo(...p); ctx.lineTo(...q); ctx.stroke(); }
+    ctx.setLineDash([]); ctx.lineDashOffset = 0; ctx.globalAlpha = 1;
+  }
+  // the one red thing: APPROVED lands on the title block's status field
+  if (t >= 5.4) {
+    const k = prog(t, 5.4, 5.48), sc = lerp(1.25, 1, k);
+    ctx.save(); ctx.translate(2060, 1180); ctx.rotate(-0.12); ctx.scale(sc * 0.78, sc * 0.78); ctx.globalAlpha = 0.9 * k;
+    ctx.drawImage(STAMP, -260, -110); ctx.restore();
+  }
+  // caption as a drawing NOTE in empty sky (screen overlay), only during the close-up
+  const nf = prog(t, 3.9, 4.25), nout = prog(t, 4.6, 4.75);
+  if (nf > 0 && nout < 1) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1 - nout;
+    const bx = 96, by = 96, bw = 760, bh = 108;
+    ctx.fillStyle = 'rgba(230,240,252,0.12)'; ctx.fillRect(bx, by, bw * io(nf), bh);
+    ctx.strokeStyle = LINE; ctx.lineWidth = 1.6; ctx.strokeRect(bx, by, bw * io(nf), bh); ctx.lineWidth = 0.8; ctx.strokeRect(bx + 6, by + 6, Math.max(0, bw * io(nf) - 12), bh - 12);
+    ctx.beginPath(); ctx.moveTo(bx + 120, by + 6); ctx.lineTo(bx + 120, by + bh - 6); ctx.stroke();
+    ctx.fillStyle = LINE; ctx.font = `20px ${TECH}`; ctx.fillText('NOTE', bx + 30, by + 50); ctx.fillText('1', bx + 52, by + 80);
+    const tf = prog(t, 4.0, 4.35); ctx.save(); ctx.beginPath(); ctx.rect(bx + 130, by, (bw - 140) * tf, bh); ctx.clip();
+    ctx.font = `32px ${HAND}`; ctx.fillText('One lamp, two arms,', bx + 146, by + 48); ctx.fillText('no screws showing.', bx + 146, by + 86); ctx.restore();
+    ctx.globalAlpha = 1;
+  }
+};
+</script>
+</body>
+</html>
