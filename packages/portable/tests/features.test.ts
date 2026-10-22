@@ -43,7 +43,8 @@ it('matches three fresh preparations and thirty shuffled frame schedules across 
       const index = (order * 17 + fresh * 7) % plan.frameCount;
       const native = await renderFrame(plan, index, new Map(), { prepared });
       const wasm = await renderFrame(plan, index, new Map(), { prepared, rasterizer: 'wasm' });
-      expect(wasm.pixels).toEqual(native.pixels);
+      // Buffer.equals: a deep toEqual on one 320x180 frame takes about a second, ninety of them time out.
+      expect(wasm.pixels.equals(native.pixels), `frame ${index}: Wasm pixels differ from native`).toBe(true);
       const hash = digest(native.pixels); if (hashes.has(index)) expect(hash).toBe(hashes.get(index)); else hashes.set(index, hash);
     }
   }
