@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Kinetic type: an 18 s square loop where the words of a locked three-phrase line build a doorway.
+     Frame 0 is the finished doorway: the loop seam sits inside the held composition (PHASE below).
+     Render: npx -y @helios-project/cli@latest render kinetic-type.html -o kinetic-type.mp4 --duration 18 --width 1080 --height 1080 --mode canvas
+     Check:  npx -y @helios-project/cli@latest verify kinetic-type.html --duration 18 --width 1080 --height 1080 --cues kinetic-type.cues.json -->
+<title>Kinetic Type</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=DM+Serif+Display&family=JetBrains+Mono:wght@500&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#EDE6D8}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1080"></canvas>
+<script>
+const W = 1080, H = 1080, T = 18;
+// Story time s runs 0→18 (reveal, three phrases, held doorway, panel reset). Video time v shows s = (v + PHASE) mod T,
+// so the seam lands on the held composition and frame 0 is a finished poster. Cue file times are video times: v = s − 13 (+18).
+const PHASE = 13;
+const ctx = document.getElementById('c').getContext('2d');
+const C = { paper: '#EDE6D8', ink: '#1C1B19', red: '#D9472B', stone: '#8F877A' };
+const F = {
+  disp: '"DM Serif Display", Georgia, serif',                    // display voice: the words that become structure
+  gro: '800 X "Archivo", "Helvetica Neue", Arial, sans-serif',    // grotesque voice: verbs and connectives
+  mono: '500 X "JetBrains Mono", ui-monospace, Menlo, monospace', // mono crumbs: labels, figure numbers, dimensions
+};
+const font = (voice, px) => voice === 'disp' ? `${px}px ${F.disp}` : F[voice].replace('X', `${px}px`);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const out3 = (x) => 1 - (1 - clamp(x)) ** 3;
+const inOut = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2; };
+const in2 = (x) => clamp(x) ** 2;
+const lerp = (a, b, p) => a + (b - a) * p;
+
+// LOCKED COPY: exact text, exact order. Every timing below hangs off these cues.
+const WORDS = {
+  SMALL:    { voice: 'disp', color: C.ink, in: 0.80, hold: 2.90 },
+  WORDS:    { voice: 'disp', color: C.ink, in: 1.10, hold: 3.00 },
+  HOLD:     { voice: 'gro',  color: C.red, in: 4.00, hold: 5.70 },
+  UP:       { voice: 'gro',  color: C.red, in: 4.22, hold: 5.70 },
+  THE:      { voice: 'gro',  color: C.ink, in: 7.30, hold: 9.60 },
+  WHOLE:    { voice: 'gro',  color: C.ink, in: 7.48, hold: 9.60 },
+  'SENTENCE.': { voice: 'disp', color: C.ink, in: 7.85, hold: 9.60 },
+};
+const STILL = [6.35, 6.95];          // absolute stillness: nothing on screen moves (story time; video 11.35–11.95)
+const M = {};                        // ink boxes at 100 px, measured once the fonts are in
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load(font('disp', 100)), document.fonts.load(font('gro', 100)), document.fonts.load(font('mono', 20))]);
+  await document.fonts.ready;
+  for (const [w, d] of Object.entries(WORDS)) {
+    ctx.font = font(d.voice, 100);
+    const m = ctx.measureText(w);    // real glyph ink, not the em box: structure rests on ink edges
+    M[w] = { L: m.actualBoundingBoxLeft, R: m.actualBoundingBoxRight, A: m.actualBoundingBoxAscent, D: m.actualBoundingBoxDescent };
+    M[w].w = M[w].L + M[w].R; M[w].h = M[w].A + M[w].D;
+  }
+})();
+
+// Draw a word by the centre of its ink box. rise < 1 = masked entrance from below its own baseline.
+function word(w, cx, cy, px, rot = 0, rise = 1, alpha = 1) {
+  const m = M[w], d = WORDS[w], k = px / 100;
+  if (alpha <= 0 || rise <= 0) return;
+  ctx.save();
+  ctx.translate(cx, cy); ctx.rotate(rot); ctx.scale(k, k);
+  ctx.translate(m.L - m.w / 2, m.A - m.h / 2);
+  if (rise < 1) { ctx.beginPath(); ctx.rect(-m.L - 8, -m.A - 8, m.w + 16, m.h + 16); ctx.clip(); ctx.translate(0, (1 - rise) * (m.h + 16)); }
+  ctx.globalAlpha = alpha; ctx.fillStyle = d.color; ctx.font = font(d.voice, 100); ctx.fillText(w, 0, 0);
+  ctx.restore();
+  window.heliosDrawnText?.add(w);
+}
+// HOLD over UP, letter by letter, so each glyph can travel from its reading spot to its place in the plank.
+function plankLetters(px0, cy0, lineGap, px1, y1, x0, x1, p) {
+  ctx.save(); ctx.font = font('gro', 100); ctx.fillStyle = C.red;
+  const lines = [['HOLD', cy0 - lineGap / 2], ['UP', cy0 + lineGap / 2]], all = 'HOLDUP';
+  const cw = [...all].map((ch) => ctx.measureText(ch).width);
+  let n = 0;
+  for (const [w, cy] of lines) {
+    const k0 = px0 / 100, startX = 540 - M[w].w * k0 / 2 + M[w].L * k0;
+    for (let i = 0; i < w.length; i++, n++) {
+      const sx = startX + ctx.measureText(w.slice(0, i)).width * k0, sy = cy + (M[w].A - M[w].h / 2) * k0;
+      const gapX = (x1 - x0 - cw.reduce((a, b) => a + b) * px1 / 100) / (all.length - 1 + 1.6);
+      const ex = x0 + cw.slice(0, n).reduce((a, b) => a + b, 0) * px1 / 100 + gapX * (n + (n >= 4 ? 1.6 : 0));
+      const ey = y1 + (M.HOLD.A - M.HOLD.h / 2) * px1 / 100;
+      const q = inOut(clamp(p * 1.25 - n * 0.05));        // letters leave one after another
+      const k = lerp(k0, px1 / 100, q);
+      ctx.save(); ctx.translate(lerp(sx, ex, q), lerp(sy, ey, q)); ctx.scale(k, k); ctx.fillText(all[n], 0, 0); ctx.restore();
+    }
+  }
+  ctx.restore();
+}
+function crumb(text, x, y, alpha = 1, align = 'left', col = C.stone) {
+  if (alpha <= 0) return;
+  ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = col; ctx.font = font('mono', 17); ctx.textAlign = align; ctx.fillText(text, x, y); ctx.restore();
+}
+
+// ---- the doorway, in world units --------------------------------------------------------------
+const GROUND = 840, XL = 318, XR = 762, PILLAR = 360;
+const pillarPx = (w) => PILLAR / M[w].w * 100;            // font size that makes the word exactly PILLAR long
+const plankPx = 70, plankH = () => M.HOLD.h * plankPx / 100;
+const thick = (w) => M[w].h * pillarPx(w) / 100;
+
+// ---- camera: exactly three named operations, still between them -------------------------------
+// PUSH  0.6–2.8   lean into the first phrase while it is read
+// CRANE 6.95–7.75 rise to where the weight waits; 9.6–10.4 ride it down
+// PULL  10.7–12.0 step back so the whole structure and its labels fit
+function camera(t) {
+  const push = inOut(seg(t, 0.6, 2.8)), up = inOut(seg(t, 6.95, 7.75)), down = inOut(seg(t, 9.62, 10.4)), pull = inOut(seg(t, 10.7, 12.0));
+  const z = lerp(lerp(1, 1.1, push), 0.92, pull);
+  const cy = lerp(lerp(lerp(560, 350, up), 560, down), 530, pull);
+  return { z, cx: 540, cy };
+}
+
+window.renderAt = async (time) => {
+  await ready;
+  const t = (((time + PHASE) % T) + T) % T;   // story time
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = 'none';
+  ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, H);
+
+  const cam = camera(t);
+  ctx.setTransform(cam.z, 0, 0, cam.z, W / 2 - cam.cx * cam.z, H / 2 - cam.cy * cam.z);
+
+  // ground hairline and baseline ticks (crumb layer, never moves on its own)
+  const g = out3(seg(t, 0.55, 1.4));
+  ctx.fillStyle = C.stone; ctx.fillRect(540 - 380 * g, GROUND, 760 * g, 2);
+  for (let i = 0; i <= 19; i++) ctx.fillRect(540 - 380 + i * 40, GROUND + 6, 1, i % 5 ? 6 : 12);
+
+  // phrase B physics: HOLD UP slides under the columns and lifts them by the plank's height
+  const pH = plankH();
+  const lift = out3(seg(t, 5.7, 5.95)) * (pH + 18) - in2(seg(t, 6.05, 6.2)) * 18;
+  const land = seg(t, 10.08, 10.32), squash = Math.sin(Math.PI * land) * (1 - land) * 0.05;
+
+  // phrase A: SMALL / WORDS read, then stand up as columns
+  for (const [w, cx, row, i] of [['SMALL', XL, 470, 0], ['WORDS', XR, 625, 1]]) {
+    const d = WORDS[w], rise = out3(seg(t, d.in, d.in + 0.45));
+    const p = inOut(seg(t, d.hold, d.hold + 0.85));             // travel never starts before the hold ends
+    const px = lerp(150, pillarPx(w), p), sq = 1 - squash;
+    const footY = GROUND - lift, len = PILLAR * sq;
+    const x = lerp(540, cx, p), y = lerp(row, footY - len / 2, p);
+    ctx.save(); ctx.translate(x, y); ctx.scale(1 + squash * 0.4 * p, lerp(1, sq, p)); word(w, 0, 0, px, -Math.PI / 2 * p, rise); ctx.restore();
+  }
+
+  // phrase B: HOLD UP read between the columns, then becomes the plank they stand on
+  const pb = inOut(seg(t, 5.72, 6.2));
+  const plankY = GROUND - pH / 2;
+  if (pb <= 0) {
+    word('HOLD', 540, 530, 86, 0, out3(seg(t, WORDS.HOLD.in, WORDS.HOLD.in + 0.4)));
+    word('UP', 540, 634, 86, 0, out3(seg(t, WORDS.UP.in, WORDS.UP.in + 0.4)));
+  } else {
+    plankLetters(86, 582, 104, plankPx, plankY, XL - 60, XR + 60, pb);
+    window.heliosDrawnText?.add('HOLD UP');
+  }
+
+  // phrase C: THE WHOLE / SENTENCE. wait high, then SENTENCE. drops as the lintel
+  const topY = GROUND - pH - PILLAR * (1 - squash);
+  const lintPx = (XR - XL + thick('WORDS') / 2 + thick('SMALL') / 2 + 90) / M['SENTENCE.'].w * 100;
+  const fall = in2(seg(t, 9.62, 10.08));
+  const sP = lerp(140, lintPx, inOut(seg(t, 9.6, 9.95)));
+  const sY = lerp(232, topY - M['SENTENCE.'].h * lintPx / 100 / 2, fall);
+  word('SENTENCE.', 540, sY, sP, 0, out3(seg(t, WORDS['SENTENCE.'].in, WORDS['SENTENCE.'].in + 0.45)));
+  const cap = inOut(seg(t, 9.7, 10.6));
+  const capY = lerp(110, topY - M['SENTENCE.'].h * lintPx / 100 - 34, cap), capPx = lerp(80, 40, cap);
+  const gap = lerp(24, 12, cap), wT = M.THE.w * capPx / 100, wW = M.WHOLE.w * capPx / 100, x0 = 540 - (wT + gap + wW) / 2;
+  word('THE', x0 + wT / 2, capY, capPx, 0, out3(seg(t, WORDS.THE.in, WORDS.THE.in + 0.4)));
+  word('WHOLE', x0 + wT + gap + wW / 2, capY, capPx, 0, out3(seg(t, WORDS.WHOLE.in, WORDS.WHOLE.in + 0.4)));
+
+  // contact dust on landing: short mono ticks thrown sideways from each column top
+  const dust = seg(t, 10.08, 10.5);
+  if (dust > 0 && dust < 1) {
+    ctx.fillStyle = C.stone; ctx.globalAlpha = 1 - dust;
+    for (const sx of [XL, XR]) for (let i = 0; i < 4; i++) {
+      const dir = i < 2 ? -1 : 1, r = 20 + 70 * out3(dust) * (1 + (i % 2) * 0.6);
+      ctx.fillRect(sx + dir * r, topY - 6 - (i % 2) * 14 * dust, 10, 2);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // held final composition: warm light rises inside the doorway
+  const glow = inOut(seg(t, 12.2, 16.6));
+  if (glow > 0) {
+    const ix0 = XL + thick('SMALL') / 2 + 6, ix1 = XR - thick('WORDS') / 2 - 6, iy1 = GROUND - pH - 2, iy0 = topY + 4;
+    ctx.globalAlpha = 0.8 * glow; ctx.fillStyle = C.red;
+    ctx.fillRect(ix0, iy1 - (iy1 - iy0) * glow, ix1 - ix0, (iy1 - iy0) * glow); ctx.globalAlpha = 1;
+  }
+
+  // mono crumbs: figure numbers per phrase, then dimension lines once the camera has pulled back
+  const fig = t < 3.9 ? 'fig. 01 — two columns' : t < 7.2 ? 'fig. 02 — a plank' : t < 10.7 ? 'fig. 03 — a lintel' : 'fig. 04 — a doorway';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  crumb(fig, 64, 84, seg(t, 0.6, 1.0));
+  crumb('read slowly', W - 64, 84, seg(t, 0.6, 1.0), 'right');
+  ctx.setTransform(cam.z, 0, 0, cam.z, W / 2 - cam.cx * cam.z, H / 2 - cam.cy * cam.z);
+  const dim = (k, x0, y0, x1, y1, label, lx, ly, align) => {
+    const p = out3(seg(t, 11.3 + k * 0.25, 11.8 + k * 0.25)); if (p <= 0) return;
+    ctx.fillStyle = C.stone; ctx.globalAlpha = p;
+    if (x0 === x1) { ctx.fillRect(x0, y0, 1.5, (y1 - y0) * p); ctx.fillRect(x0 - 6, y0, 13, 1.5); if (p === 1) ctx.fillRect(x0 - 6, y1, 13, 1.5); }
+    else { ctx.fillRect(x0, y0, (x1 - x0) * p, 1.5); ctx.fillRect(x0, y0 - 6, 1.5, 13); if (p === 1) ctx.fillRect(x1, y0 - 6, 1.5, 13); }
+    ctx.globalAlpha = 1; crumb(label, lx, ly, p, align);
+  };
+  const lw = M['SENTENCE.'].w * lintPx / 100;
+  dim(0, XL - 110, topY, XL - 110, GROUND - pH, 'column', XL - 122, (topY + GROUND - pH) / 2, 'right');
+  dim(0, XL - 110, topY, XL - 110, GROUND - pH, '5 letters', XL - 122, (topY + GROUND - pH) / 2 + 24, 'right');
+  dim(1, 540 - lw / 2, topY - M['SENTENCE.'].h * lintPx / 100 - 90, 540 + lw / 2, 0, 'lintel · 8 letters', 540, topY - M['SENTENCE.'].h * lintPx / 100 - 104, 'center');
+  dim(2, XL - 60, GROUND + 46, XR + 60, 0, 'plank · 6 letters', 540, GROUND + 78, 'center');
+
+  // loop reset under occlusion: an ink panel passes over the cut point (frame T == frame 0)
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const cover = t > 17 ? in2(seg(t, 17.2, 17.65)) : 1 - out3(seg(t, 0.1, 0.55));
+  if (cover > 0) {
+    const top = t > 17 ? H * (1 - cover) : 0, h = t > 17 ? H * cover : H * cover;
+    ctx.fillStyle = C.ink; ctx.fillRect(0, top, W, h);
+    if (cover > 0.98) crumb('fig. 00', W / 2, H / 2 + 6, 1, 'center', C.stone);
+  }
+};
+</script>
+</body>
+</html>
