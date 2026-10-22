@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- Karaoke starter: word- and syllable-timed lyrics on a canvas, read from lyrics.json.
+     Render: npx -y @helios-project/cli@latest render karaoke.html -o karaoke.mp4 --duration 11 --audio song.wav
+     Check:  npx -y @helios-project/cli@latest verify karaoke.html --duration 11 --cues lyrics.example.json -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&display=block">
+<style>html,body{margin:0;overflow:hidden;background:#101018}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080;
+const ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const easeOut = (x) => 1 - (1 - clamp(x)) ** 3;
+
+const C = { ground: '#101018', sung: '#f4efe6', unsung: 'rgba(244,239,230,0.32)', now: '#ffb020' };
+const FONT = '800 92px Archivo, "Helvetica Neue", Arial, sans-serif';
+const ANTICIPATE = 0.4;            // a line may appear (dim) this early; the highlight never runs ahead of the voice
+const BPM = 100;                   // with a real song, read beats from track.beats.json instead (helios analyze)
+
+let L;                             // { lines: [{ text, start, end, first, last }], words: [{ w, start, end, syl? }] }
+const ready = (async () => {
+  L = await (await fetch('lyrics.example.json')).json();
+  await document.fonts.load(FONT, L.lines.map((l) => l.text).join(' '));
+  await document.fonts.ready;
+})();
+
+// Look lyrics up by content, never by hard-coded time: lyric('carried it').words[0].start
+function lyric(phrase, nth = 0) {
+  let n = 0;
+  for (const line of L.lines) {
+    const i = line.text.indexOf(phrase);
+    if (i < 0) continue;
+    if (n++ < nth) continue;
+    const before = line.text.slice(0, i).split(' ').filter(Boolean).length;
+    const count = phrase.split(' ').filter(Boolean).length;
+    return { line, words: L.words.slice(line.first + before, line.first + before + count) };
+  }
+  throw new Error(`lyric "${phrase}" not found`);   // fail loudly: a missing phrase is a bug
+}
+
+// 0→1 through a word, moving piecewise across its syllables when it has them.
+function wordProgress(w, t) {
+  if (t <= w.start) return 0;
+  if (t >= w.end) return 1;
+  if (w.syl && w.syl.length > 1) {
+    const n = w.syl.length;
+    for (let i = 0; i < n; i++) {
+      const [a, b] = w.syl[i];
+      if (t < a) return i / n;
+      if (t < b) return (i + (t - a) / Math.max(1e-3, b - a)) / n;
+    }
+    return 1;
+  }
+  return (t - w.start) / Math.max(1e-3, w.end - w.start);
+}
+const pulse = (t, t0, d) => (t < t0 || t > t0 + d * 6) ? 0 : Math.exp(-(t - t0) / d);
+
+// One lyric line, lit glyph by glyph. Positions come from measuring the prefix up to and including
+// each glyph, minus that glyph's own advance, so sung and unsung pieces keep their kerning.
+function drawLine(line, t, cx, cy, alpha) {
+  ctx.font = FONT; ctx.textBaseline = 'alphabetic';
+  const width = ctx.measureText(line.text).width, x0 = cx - width / 2;
+  let ci = 0;                                          // character index into line.text
+  for (let wi = line.first; wi <= line.last; wi++) {
+    const w = L.words[wi], p = wordProgress(w, t), n = w.w.length;
+    const pop = 1 + 0.06 * pulse(t, w.start, 0.07);   // a small kick as each word starts
+    const held = w.end - w.start > 0.9 ? 0.05 * seg(t, w.start, w.end) : 0;   // held notes lift a little
+    const wordX = x0 + ctx.measureText(line.text.slice(0, ci)).width;
+    const wordW = ctx.measureText(w.w).width;
+    ctx.save(); ctx.globalAlpha = alpha;
+    ctx.translate(wordX + wordW / 2, cy - held * 80); ctx.scale(pop, pop); ctx.translate(-(wordX + wordW / 2), 0);
+    for (let k = 0; k < n; k++) {
+      const ch = line.text[ci + k];
+      const x = x0 + ctx.measureText(line.text.slice(0, ci + k + 1)).width - ctx.measureText(ch).width;
+      const lit = clamp(p * n - k);                    // 0 unsung, 1 sung, between = the glyph being sung
+      ctx.fillStyle = C.unsung; ctx.fillText(ch, x, 0);
+      if (lit > 0) {
+        const gw = ctx.measureText(ch).width;
+        ctx.save(); ctx.beginPath(); ctx.rect(x - 2, -120, (gw + 4) * lit, 200); ctx.clip();
+        ctx.fillStyle = lit < 1 && t < w.end ? C.now : C.sung;   // the done colour snaps; never blend accent to white
+        ctx.fillText(ch, x, 0); ctx.restore();
+      }
+    }
+    ctx.restore();
+    if (alpha > 0.05) window.heliosDrawnText?.add(w.w);       // canvas text must be declared for verify --cues
+    ci += n + 1;                                               // the word plus its following space
+  }
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+
+  // Background: a slow field that breathes on the beat. Replace with your scene; keep the lyric band clear.
+  const beat = t * BPM / 60, kick = Math.exp(-6 * (beat - Math.floor(beat)));
+  const g = ctx.createRadialGradient(W / 2, H * 0.42, 50, W / 2, H * 0.42, 900 + 40 * kick);
+  g.addColorStop(0, '#2a2040'); g.addColorStop(1, C.ground);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+  // The scene can react to the words too: the "light" grows while that word is sung.
+  const light = lyric('light').words[0];
+  const r = 30 + 160 * easeOut(seg(t, light.start, light.end)) + 6 * kick;
+  ctx.fillStyle = '#ffb020'; ctx.globalAlpha = 0.9; ctx.beginPath(); ctx.arc(W / 2, H * 0.36, r, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Lyric lines on two alternating rows: a line appears dim ANTICIPATE early, stays at least until it is
+  // fully sung, and leaves when the line after next needs its row.
+  L.lines.forEach((line, i) => {
+    const reuse = L.lines[i + 2];
+    const out = Math.max(line.end + 0.2, Math.min(reuse ? reuse.start - ANTICIPATE - 0.3 : Infinity, line.end + 1.2));
+    if (t < line.start - ANTICIPATE || t > out + 0.25) return;
+    const alpha = Math.min(seg(t, line.start - ANTICIPATE, line.start - ANTICIPATE + 0.25), 1 - seg(t, out, out + 0.25));
+    const y = (i % 2 ? H * 0.86 : H * 0.74) + 24 * (1 - easeOut(seg(t, line.start - ANTICIPATE, line.start)));
+    drawLine(line, t, W / 2, y, alpha);
+  });
+};
+</script>
+</body>
+</html>
