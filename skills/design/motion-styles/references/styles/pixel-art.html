@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render pixel-art.html -o pixel-art.mp4 --duration 8 --fps 30 --mode canvas --preset medium -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#0b0a14}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// Indexed 320x180 framebuffer of palette SLOTS -> per-stage LUT -> fixed 32-colour master palette -> x6 nearest-neighbour.
+const LW = 320, LH = 180, GY = 138;                          // logical size, ground line
+const out = document.getElementById('c').getContext('2d');
+const low = document.createElement('canvas'); low.width = LW; low.height = LH;
+const lctx = low.getContext('2d', { willReadFrequently: true });
+const img = lctx.createImageData(LW, LH), U32 = new Uint32Array(img.data.buffer);
+const buf = new Uint8Array(LW * LH), lit = new Uint8Array(LW * LH);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+const bayer = (x, y) => B4[(y & 3) * 4 + (x & 3)];
+const step = (t, fps) => Math.floor(t * fps + 1e-6) / fps;
+
+const MASTER = ['#0b0a14', '#1b1a2e', '#2a2c4f', '#3d4775', '#566aa6', '#7fa3d9', '#b5d8f2', '#f4f1e6',
+  '#2b1d2a', '#4d2d45', '#7a3e5c', '#b8576a', '#e8826a', '#f5b56b', '#fbe39a', '#173126',
+  '#23502f', '#3a7a3c', '#6aa84f', '#a6d06a', '#3b2a22', '#5e3f2c', '#8a5f3c', '#c08f5a',
+  '#4a4f5e', '#757c8c', '#a9b0bd', '#1f6f8b', '#2fa4c4', '#7ee3e8', '#e04a3f', '#f0d0b0']
+  .map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
+const PACK = MASTER.map(([r, g, b]) => (255 << 24) | (b << 16) | (g << 8) | r);
+// semantic slots: name -> daytime master index. P = protected (no stage LUT touches it)
+const SLOT_DEF = [['INK', 0], ['SKY0', 4], ['SKY1', 5], ['SKY2', 6], ['SKY3', 6], ['SUN', 14], ['STAR', 5], ['MOON', 5],
+  ['MTN0', 3], ['MTN1', 4], ['HILL0', 16], ['HILL1', 15], ['GR0', 19], ['GR1', 18], ['GR2', 17], ['DIRT0', 21], ['DIRT1', 20], ['DIRT2', 22],
+  ['W0', 27], ['W1', 28], ['W2', 29], ['ST0', 24], ['ST1', 25], ['ST2', 26], ['HAIR', 21], ['SKIN', 31], ['CL0', 4], ['CL1', 3], ['BOOT', 20],
+  ['SCARF', 30, 'P'], ['LAMP', 14, 'P'], ['CR0', 27, 'P'], ['CR1', 28, 'P'], ['CR2', 29, 'P'], ['CRD', 4, 'P'], ['FLY0', 19], ['FLY1', 19], ['FLY2', 19],
+  ['T0', 14, 'P'], ['T1', 13, 'P'], ['T2', 12, 'P'], ['WHITE', 7, 'P'], ['BOX0', 1, 'P'], ['BOX1', 2, 'P']];
+const S = {}; SLOT_DEF.forEach(([n], i) => S[n] = i);
+// five palette stages: day, golden, sunset, dusk, night. Sky, sun, stars and moon are hand-picked; the rest is tinted + re-quantised.
+const STAGES = [
+  { at: 0, tint: [1, 1, 1], sky: [4, 5, 6, 6], sun: 14, star: 5, moon: 5 },
+  { at: 1.8, tint: [1.02, .84, .66], sky: [4, 5, 13, 14], sun: 14, star: 5, moon: 5 },
+  { at: 2.5, tint: [.9, .62, .6], sky: [3, 10, 11, 12], sun: 13, star: 10, moon: 10 },
+  { at: 3.1, tint: [.6, .48, .7], sky: [2, 3, 9, 10], sun: 12, star: 4, moon: 3 },
+  { at: 3.7, tint: [.44, .5, .8], sky: [1, 1, 2, 3], sun: 2, star: 7, moon: 14 }];
+const nearest = c => { let b = 0, bd = 1e9; MASTER.forEach((m, i) => { const d = (c[0] - m[0]) ** 2 * .3 + (c[1] - m[1]) ** 2 * .59 + (c[2] - m[2]) ** 2 * .11; if (d < bd) { bd = d; b = i; } }); return b; };
+let LUTS, LIT_W, LIT_C, FAR, TITLE, GLYPH = {}, MTN = [], HILL = [];
+
+const SPR = {   // string art + legend. Torso is shared; legs swap per pose.
+  torso: ['....kkkk....', '...khhhhk...', '..khhhhhhk..', '..khhhsssk..', '..khhsksk...', '...khsssk...', '...krrrrk...',
+          '..krrcccck..', '..kcccccck..', '..kcccccck..', '..kcdddcck..', '..kccccck...'],
+  stand: ['...kbkkbk...', '...kbkkbk...', '...kbkkbk...', '...kbkkbk...', '..kbbkkbbk..', '..kkkkkkkk..'],
+  stride: ['...kbkkbk...', '..kbk..kbk..', '..kbk..kbk..', '.kbk....kbk.', '.kbbk..kbbk.', '.kkkk..kkkk.'],
+  lamp: ['.kkk.', 'kLlLk', 'kllLk', 'kLLLk', '.kkk.'] };
+const LEG = { k: 'INK', h: 'HAIR', s: 'SKIN', r: 'SCARF', c: 'CL0', d: 'CL1', b: 'BOOT', l: 'LAMP', L: 'T1' };
+
+const ready = (async () => {
+  await document.fonts.load('16px "Press Start 2P"', 'MOSSLIGHT'); await document.fonts.ready;
+  LUTS = STAGES.map(st => SLOT_DEF.map(([n, d, p]) => {
+    if (p) return d;
+    if (n.startsWith('SKY')) return st.sky[+n[3]];
+    if (n === 'SUN' || n === 'STAR' || n === 'MOON') return st[n.toLowerCase()];
+    return nearest(MASTER[d].map((v, k) => v * st.tint[k]));
+  }));
+  const far = n => /^(SKY|STAR|MOON|SUN|MTN|T\d|WHITE|BOX)/.test(n);                     // air and distance are never lit
+  const relight = (L, mul, add, skip = far) => L.map((i, s) => skip(SLOT_DEF[s][0]) ? i : nearest(MASTER[i].map((v, k) => v * mul + add[k])));
+  FAR = Uint8Array.from(SLOT_DEF, ([n]) => /^(SKY|STAR|MOON|SUN|MTN)/.test(n));
+  LIT_W = LUTS.map(L => relight(L, 1.35, [80, 45, 0], n => far(n) || n.startsWith('HILL')));   // a lantern only reaches the near ground                                    // lantern: warm step up
+  LIT_C = LUTS.map(L => relight(L, 1.2, [0, 50, 70]));                                     // crystal: cool step up
+  const mask = (txt, font, w, h, base) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.font = font; x.fillStyle = '#fff'; x.fillText(txt, 0, base);
+    const d = x.getImageData(0, 0, w, h).data, m = new Uint8Array(w * h); for (let i = 0; i < w * h; i++) m[i] = d[i * 4 + 3] > 110; return { m, w, h }; };
+  TITLE = mask('MOSSLIGHT', '16px "Press Start 2P"', 150, 18, 16);
+  for (const ch of new Set('A LIGHT FOR THE LONG ROAD.')) GLYPH[ch] = mask(ch, '8px "Press Start 2P"', 8, 9, 8);
+  for (let x = 0; x < 700; x++) {                                                          // parallax ridges (seeded)
+    MTN.push(Math.round(78 + 16 * Math.sin(x * .021 + 1) + 9 * Math.sin(x * .057) + 4 * Math.sin(x * .13)));
+    HILL.push(Math.round(112 + 6 * Math.sin(x * .03 + 2) + 3 * Math.sin(x * .09))); }
+})();
+
+const px = (x, y, s) => { if (x >= 0 && y >= 0 && x < LW && y < LH) buf[y * LW + x] = s; };
+const rect = (x, y, w, h, s) => { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) px(x + i, y + j, s); };
+const sprite = (rows, x, y) => rows.forEach((r, j) => [...r].forEach((ch, i) => { if (ch !== '.') px(x + i, y + j, S[LEG[ch]]); }));
+
+function world(t, cx) {
+  for (let y = 0; y < GY; y++) { const v = clamp(y / 120) * 3, b = Math.floor(v);           // dithered sky bands
+    for (let x = 0; x < LW; x++) buf[y * LW + x] = S['SKY' + Math.min(3, b + (bayer(x, y) < v - b ? 1 : 0))]; }
+  for (let i = 0; i < 46; i++) px(Math.floor(hash(i) * LW), Math.floor(hash(i + 50) * 80), S.STAR);   // stars: invisible by day (LUT)
+  const sunY = Math.round(34 + 80 * clamp(t / 3.4)), sx = 236;
+  for (let j = -11; j <= 11; j++) for (let i = -11; i <= 11; i++) if (i * i + j * j <= 121) px(sx + i, sunY + j, S.SUN);
+  for (let j = -7; j <= 7; j++) for (let i = -7; i <= 7; i++) if (i * i + j * j <= 49 && (i + 3) ** 2 + (j - 2) ** 2 > 30) px(70 + i, 26 + j, S.MOON);
+  const m = Math.floor(cx * .25), h = Math.floor(cx * .5);
+  for (let x = 0; x < LW; x++) {
+    const my = MTN[x + m]; for (let y = my; y < GY; y++) px(x, y, y === my || (y < my + 3 && MTN[x + m - 1] > my) ? S.MTN1 : S.MTN0);
+    const hy = HILL[x + h], tr = (x + h) % 23, th = 14 + Math.floor(hash(Math.floor((x + h) / 23)) * 10);   // pines on the hills
+    for (let y = hy; y < GY; y++) px(x, y, S.HILL0);
+    if (tr < 9) for (let y = hy - th + Math.floor(Math.abs(tr - 4) * th / 5); y < hy; y++) px(x, y, S.HILL1);
+  }
+  for (let x = 0; x < LW; x++) { const wx = x + cx, pond = wx > 334 && wx < 420;
+    for (let y = GY; y < LH; y++) {
+      if (pond && y < GY + 12) { px(x, y, S['W' + ((Math.floor((wx + (y - GY) * 3) / 6) + y) % 3)]); continue; }   // cycling stripes
+      const d = y - GY; px(x, y, d === 0 ? S.GR0 : d < 3 ? S.GR1 : d < 5 ? (bayer(x, y) < .5 ? S.GR2 : S.DIRT0) : (hash(wx * 7 + y * 13) > .93 ? S.DIRT2 : bayer(wx, y) < (d - 5) / 40 ? S.DIRT1 : S.DIRT0));
+    } }
+  const shx = 300 - cx;                                                                     // shrine: stone blocks + crystal
+  rect(shx - 10, GY - 5, 21, 5, S.ST0); rect(shx - 9, GY - 5, 19, 1, S.ST1);
+  for (let y = GY - 33; y < GY - 5; y++) for (let x = shx - 6; x <= shx + 6; x++) px(x, y, (y - GY) % 7 === 0 || x === shx - 6 ? S.ST0 : x < shx ? S.ST2 : S.ST1);
+  rect(shx - 8, GY - 37, 17, 4, S.ST0); rect(shx - 7, GY - 37, 15, 1, S.ST2);
+  const on = t >= 5.0, cyc = Math.floor(t * 8) % 3;
+  for (let j = 0; j < 11; j++) { const w = j < 5 ? j : 10 - j; for (let i = -w; i <= w; i++) px(shx + i, GY - 48 + j, on ? S['CR' + ((i + j + cyc + 30) % 3)] : (i < 0 ? S.CRD : S.ST0)); }
+}
+
+function hero(t, cx) {   // poses quantised to 10 fps; position on integer pixels
+  const tp = step(t, 10), stopT = 4.7, wx = 22 + 47 * Math.min(tp, stopT), x = Math.round(wx - cx), f = Math.floor(tp * 10) % 4;
+  const walking = tp < stopT, raise = tp >= 4.85, bob = walking && f % 2 ? 1 : 0, breathe = !walking && Math.floor(t * 2) % 2 ? 1 : 0;
+  const y = GY - 18 + bob + breathe;
+  sprite(SPR.torso, x, y); sprite(walking && f % 2 === 0 ? SPR.stride : SPR.stand, x, GY - 6);
+  px(x + 1, y + 7, S.SCARF); px(x, y + 8 - (f % 2), S.SCARF);         // scarf tail: the silhouette mark
+  const hx = raise ? x + 8 : x + 8 + (walking ? [0, 1, 0, -1][f] : 0), hy = raise ? y - 6 : y + 11;
+  px(x + 8, y + 8, S.INK); px(hx, raise ? y + 1 : y + 9, S.SKIN); px(hx, raise ? y - 1 : y + 10, S.SKIN);
+  sprite(SPR.lamp, hx - 2, hy); return [hx, hy + 2, x];
+}
+
+function lightPool(cx0, cy0, r, mode) {   // index lighting: inner disc + Bayer-dithered rim
+  for (let y = Math.max(0, cy0 - r); y < Math.min(LH, cy0 + r); y++) for (let x = Math.max(0, cx0 - r); x < Math.min(LW, cx0 + r); x++) {
+    const d = Math.hypot(x - cx0, y - cy0) / r, i = y * LW + x;
+    if (mode === 2 && FAR[buf[i]]) { if (bayer(x, y) < (1 - d) * .55) lit[i] = 3; continue; }     // air: sparse dithered halo
+    if (d < .6 || (d < 1 && bayer(x, y) < (1 - d) / .4)) lit[i] = mode; }
+}
+
+function ui(t) {
+  const ty = Math.round(-20 + 44 * (1 - Math.pow(1 - clamp((step(t, 15) - .15) / .5), 3)));          // title: integer drop, Bayer dissolve
+  const dis = clamp((t - 2.9) / .6);
+  if (t > .15 && dis < 1) for (let j = -1; j <= TITLE.h; j++) for (let i = -1; i <= TITLE.w; i++) {
+    const X = 85 + i, Y = ty + j, on = (a, b) => a >= 0 && b >= 0 && a < TITLE.w && b < TITLE.h && TITLE.m[b * TITLE.w + a];
+    if (bayer(X, Y) < dis) continue;
+    if (on(i, j)) px(X, Y, j < 6 ? S.T0 : j < 11 ? S.T1 : S.T2);
+    else if (on(i - 1, j - 1)) px(X, Y, S.INK);                         // drop shadow
+    else for (const [a, b] of [[-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [1, 1], [-1, 1], [1, -1]]) if (on(i + a, j + b)) { px(X, Y, S.INK); break; }
+  }
+  if (t < 6.1) return;
+  const open = clamp((t - 6.1) / .25), bh = Math.max(2, Math.round(30 * open)), by = 160 - (bh >> 1);   // dialog box opens
+  rect(14, by, 292, bh, S.INK); rect(15, by + 1, 290, bh - 2, S.WHITE);
+  for (let y = by + 2; y < by + bh - 2; y++) for (let x = 16; x < 304; x++) px(x, y, bayer(x, y) < (y - by) / bh * .8 ? S.BOX1 : S.BOX0);
+  if (open < 1) return;
+  const line = 'A LIGHT FOR THE LONG ROAD.', n = Math.floor((t - 6.4) * 24);
+  [...line.slice(0, clamp(n, 0, line.length))].forEach((ch, i) => { const g = GLYPH[ch];
+    for (let j = 0; j < g.h; j++) for (let k = 0; k < 8; k++) if (g.m[j * 8 + k]) { px(28 + i * 9 + k + 1, 153 + j + 1, S.INK); px(28 + i * 9 + k, 153 + j, S.WHITE); } });
+  if (n > line.length && Math.floor(t * 2) % 2) for (let j = 0; j < 3; j++) rect(291 + j, 166 + j, 5 - 2 * j, 1, S.WHITE);   // blinking ▼
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  lit.fill(0);
+  const cx = Math.round(clamp(22 + 47 * Math.min(step(t, 10), 4.7) - 112, 0, 160));
+  world(t, cx);
+  const fl = Math.floor(t * 6) % 3;
+  if (t > 3.7) for (let i = 0; i < 9; i++) { const tq = step(t, 10);                      // fireflies: blink by palette cycling
+    px(Math.round(40 + i * 31 + 6 * Math.sin(tq * .9 + i)), Math.round(100 + 14 * Math.sin(tq * 1.3 + i * 2)), S['FLY' + (i % 3)]); }
+  const [lx, ly, hx] = hero(t, cx);
+  const stage = STAGES.reduce((k, s, i) => (t >= s.at ? i : k), 0);
+  if (stage >= 2) lightPool(lx, Math.max(ly, GY - 10), stage >= 4 ? 20 : 13, 1);
+  if (t >= 5.0) lightPool(300 - cx, GY - 43, Math.round(12 + 30 * clamp((step(t, 10) - 5) / .4)), 2);
+  ui(t);
+  const L = LUTS[stage].slice();
+  for (let k = 0; k < 3; k++) { L[S['W' + k]] = LUTS[stage][S['W' + ((k + fl) % 3)]]; L[S['FLY' + k]] = stage === 4 && k === fl ? 14 : 16; }   // palette cycling
+  for (let i = 0; i < buf.length; i++) { const s = buf[i]; U32[i] = PACK[lit[i] === 1 ? LIT_W[stage][s] : lit[i] === 2 ? LIT_C[stage][s] : lit[i] === 3 ? 27 : L[s]]; }
+  lctx.putImageData(img, 0, 0);
+  const k = t < 4.9 ? 6 : t < 5.05 ? 7 : t < 6.0 ? 8 : t < 6.1 ? 7 : 6;                    // integer zoom steps only
+  const vw = LW * 6 / k, vh = LH * 6 / k, sx = Math.floor(clamp((hx + 300 - cx) / 2 - vw / 2, 0, LW - vw)), sy = Math.floor(clamp(GY - 40 - vh / 2, 0, LH - vh));
+  out.setTransform(1, 0, 0, 1, 0, 0); out.imageSmoothingEnabled = false; out.fillStyle = '#0b0a14'; out.fillRect(0, 0, 1920, 1080);
+  out.setTransform(k, 0, 0, k, -sx * k, -sy * k); out.drawImage(low, 0, 0);
+};
+</script></body></html>

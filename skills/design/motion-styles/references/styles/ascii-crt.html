@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render ascii-crt.html -o ascii-crt.mp4 --duration 8 --preset medium -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#050403;width:1920px;height:1080px}canvas{position:absolute;left:0;top:0}</style>
+</head><body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, PIC_H = 950;              // picture area; the LOG strip lives below it
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const smooth = k => (k = clamp(k), k * k * (3 - 2 * k));
+const inOut = k => (k = clamp(k), k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+const hash = (i, j = 0) => { const x = Math.sin(i * 12.9898 + j * 78.233) * 43758.5453; return x - Math.floor(x); };
+const LIT = 5.0;                                     // the one moment the second colour switches on
+
+// Scene canvas: R = amber phosphor energy, G = the one second colour. The CRT pass colours them.
+const scene = document.createElement('canvas'); scene.width = W; scene.height = H;
+const g = scene.getContext('2d', { willReadFrequently: true });
+const GS = 80, GW = 32, GH = 64, BASE = 51, PAD = 4, COLS = 16;   // VT323 cell = 0.4em x 0.8em
+let A = null, RAMP = null;
+
+const ready = (async () => {
+  await document.fonts.load(`${GS}px VT323`, 'A'); await document.fonts.ready;
+  const chars = []; for (let c = 32; c < 127; c++) chars.push(String.fromCharCode(c));
+  const aw = COLS * (GW + PAD * 2), ah = Math.ceil(chars.length / COLS) * (GH + PAD * 2);
+  const white = document.createElement('canvas'); white.width = aw; white.height = ah;
+  const x = white.getContext('2d', { willReadFrequently: true });
+  x.fillStyle = x.strokeStyle = '#fff'; x.font = `${GS}px VT323`; x.lineWidth = 2; x.lineJoin = 'round';
+  const pos = {}, cov = {};
+  chars.forEach((ch, i) => { const px = (i % COLS) * (GW + PAD * 2) + PAD, py = Math.floor(i / COLS) * (GH + PAD * 2) + PAD;
+    pos[ch] = [px, py]; x.save(); x.beginPath(); x.rect(px, py, GW, GH); x.clip();
+    x.fillText(ch, px, py + BASE); x.strokeText(ch, px, py + BASE); x.restore(); });      // stroke = a little beam spread
+  const d = x.getImageData(0, 0, aw, ah).data;                                            // measure ink per glyph
+  for (const ch of chars) { const [px, py] = pos[ch]; let s = 0;
+    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) s += d[((py + j) * aw + px + i) * 4 + 3];
+    cov[ch] = s / 255 / (GW * GH); }
+  const tint = col => { const c = document.createElement('canvas'); c.width = aw; c.height = ah; const t = c.getContext('2d');
+    t.drawImage(white, 0, 0); t.globalCompositeOperation = 'source-in'; t.fillStyle = col; t.fillRect(0, 0, aw, ah); return c; };
+  A = { amber: tint('#ff0000'), ice: tint('#00ff00'), black: tint('#000000'), pos, cov };
+  // density ramp: glyph coverage x (dim, normal, bold), sorted, near-duplicates dropped
+  const set = [...'.,:;-~=+*cox%#&@MW'], mx = Math.max(...set.map(c => cov[c])), lv = [{ ch: ' ', a: 0, v: 0 }];
+  for (const c of set) for (const a of [.42, .7, 1]) lv.push({ ch: c, a, v: cov[c] / mx * a });
+  lv.sort((p, q) => p.v - q.v); RAMP = [lv[0]];
+  for (const l of lv.slice(1)) { const last = RAMP[RAMP.length - 1]; if (l.v - last.v > .02) RAMP.push(l); else if (l.a > last.a) RAMP[RAMP.length - 1] = l; }
+})();
+
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16 - .5);
+const pick = (L, i, j) => { const n = RAMP.length - 1;
+  return RAMP[clamp(Math.round(L * n + (BAYER[(j & 3) * 4 + (i & 3)] * .5 + (hash(i, j) - .5) * .5) * .9), 0, n)]; };
+function glyph(ch, x, y, cw, a = 1, atlas = A.amber) {     // a > 1 = bold (drawn twice)
+  const p = A.pos[ch]; if (!p || ch === ' ' || a <= .004) return;
+  g.globalAlpha = Math.min(1, a); g.drawImage(atlas, p[0], p[1], GW, GH, x, y, cw, cw * 2);
+  if (a > 1) { g.globalAlpha = Math.min(1, a - 1); g.drawImage(atlas, p[0], p[1], GW, GH, x, y, cw, cw * 2); }
+}
+const text = (s, col, row, cw, a = 1, ox = 0, oy = 0, atlas) => { for (let i = 0; i < s.length; i++) glyph(s[i], ox + (col + i) * cw, oy + row * cw * 2, cw, a, atlas); };
+
+// ---- the picture, as a brightness field in world px (amber, ice) — sampled per cell ----
+const HZ = 600, TX = 1500, LY = 212;                                                       // horizon, tower x, lamp y
+const landTop = x => x < 1000 ? 1e9 : 640 - 130 * smooth((x - 1000) / 330) + 8 * Math.sin(x * .031) + 5 * Math.sin(x * .083);
+function field(x, y, ts, lit) {
+  let a = 0, e = 0;
+  const lt = landTop(x), base = landTop(TX), dx = x - TX, hw = lerp(30, 46, clamp((y - 250) / (base - 250)));
+  if (Math.abs(dx) < hw && y > 250 && y < base) a = (dx < -6 ? .85 : dx < 14 ? .55 : .3) * ((y - 250) % 95 < 34 ? .4 : 1);   // tower
+  else if (Math.abs(dx) < 54 && y > 234 && y <= 250) a = .9;                                // gallery
+  else if (Math.abs(dx) < 28 && y > 190 && y <= 234) { a = lit ? 0 : .2; e = lit ? 1.5 : 0; }   // lantern
+  else if (y > 156 && y <= 190 && Math.abs(dx) < (y - 156) * .95) a = .7;                  // roof
+  else if (y >= lt) a = y - lt < 20 ? .95 : .12 + .08 * (Math.sin(x * .05 + y * .09) * Math.sin(y * .04) > .2);   // headland
+  else if (y > HZ) {                                                                       // sea: swell dashes, broken moon path
+    const v = (y - HZ) / (PIC_H - HZ), dash = Math.sin(x * .016 / (.2 + v) + Math.floor(y / 20) * 2.1 - ts * 2.4) > .55;
+    const path = Math.exp(-Math.pow((x - 420) / (40 + 160 * v), 2));
+    a = .03 + (dash ? .18 + .3 * v : 0) + (dash || v < .08 ? .75 * path : .15 * path);
+  } else {                                                                                 // sky + moon
+    a = .025 * smooth((y - 300) / (HZ - 300));
+    const r = Math.hypot(x - 420, y - 240); if (r < 92) a = .5 + .45 * smooth((x - 340) / 150) - .25 * (Math.sin(x * .07 + 1) * Math.sin(y * .09) > .55);
+    else if (r < 110) a = .06;
+  }
+  if (lit) {                                                                               // the beam: ice channel only
+    const k = clamp((ts - LIT) / .25), th = Math.PI - .1 + .12 * Math.sin((ts - LIT) * 1.4);
+    const ddx = x - TX, ddy = y - LY, dist = Math.hypot(ddx, ddy);
+    let da = Math.abs(Math.atan2(ddy, ddx) - th); da = Math.min(da, 2 * Math.PI - da);
+    if (y < lt && dist > 30) e += k * .62 * Math.exp(-Math.pow(da / (.05 + 26 / (dist + 60)), 2)) * Math.exp(-dist / 1300);
+    e += k * 1.2 * Math.exp(-dist / 26);                                                    // halo round the lamp
+    if (y > HZ && y < lt) e += k * .45 * Math.exp(-Math.pow((x - 760) / (80 + 300 * (y - HZ) / 350), 2)) * (Math.sin(x * .016 / (.2 + (y - HZ) / 350) + Math.floor(y / 20) * 2.1 - ts * 2.4) > .55);
+  }
+  return [a, e];
+}
+
+function picture(t) {
+  const ts = Math.floor(t * 12 + 1e-6) / 12, lit = t >= LIT, CW0 = 10;                  // world grid: 10 px cells
+  const p = inOut((t - 3.2) / 1.8), z = lerp(1, 2.1, p) * (1 + .012 * clamp(t - LIT));    // font size = camera
+  const F = [lerp(960, TX - 60, p), lerp(475, LY + 90, p)], S = [960, lerp(475, 440, p)], cw = CW0 * z;
+  const i0 = Math.floor((F[0] - S[0] / z) / CW0), i1 = Math.ceil((F[0] + (W - S[0]) / z) / CW0);
+  const j0 = Math.max(0, Math.floor((F[1] - S[1] / z) / (CW0 * 2))), j1 = Math.ceil((F[1] + (PIC_H - S[1]) / z) / (CW0 * 2));
+  g.save(); g.beginPath(); g.rect(0, 0, W, PIC_H); g.clip();
+  for (let j = j0; j <= j1; j++) {
+    const rowT = 1.75 + j / 47 * .8; if (t < rowT) continue;                               // raster reveal, top to bottom
+    const flash = 1 + .9 * Math.exp(-(t - rowT) / .12);
+    for (let i = i0; i <= i1; i++) {
+      let a = 0, e = 0;
+      for (const [u, v] of [[.25, .25], [.75, .25], [.25, .75], [.75, .75]]) { const f = field((i + u) * CW0, (j + v) * CW0 * 2, ts, lit); a += f[0] / 4; e += f[1] / 4; }
+      if (j * 20 < HZ - 60 && hash(i, j) > .993) { glyph(hash(j, i) > .7 ? '*' : '.', S[0] + (i * CW0 - F[0]) * z, S[1] + (j * CW0 * 2 - F[1]) * z, cw, .5 + .5 * hash(j, i)); continue; }   // stars
+      const L = Math.pow(Math.max(a, e), 1.2); if (L < .05) continue;
+      const lv = pick(Math.min(1, L), i, j);
+      glyph(lv.ch, S[0] + (i * CW0 - F[0]) * z, S[1] + (j * CW0 * 2 - F[1]) * z, cw, lv.a * flash * (L > 1 ? 1.4 : 1), e > a * .8 ? A.ice : A.amber);
+    }
+  }
+  g.restore();
+}
+
+const BOOT = [[.42, 'NORTHWIND RELAY  STATION 7', .012], [.68, 'MEMORY 640K ............ OK', .012], [.92, 'COAST LINK ............. OK', .012], [1.12, '> render headland.map', 0]];
+function boot(t) {
+  const fade = t < 1.62 ? 1 : Math.exp(-(t - 1.62) / .1); if (fade < .01) return;          // clear screen with ~0.1 s afterglow
+  BOOT.forEach(([t0, s, rate], r) => {
+    let n = 0; if (rate) n = Math.floor((t - t0) / rate);
+    else { let tt = t0; for (; n < s.length; n++) { tt += .022 + .045 * hash(n, 7) + (s[n] === ' ' ? .06 : 0); if (tt > t) break; } }  // human: uneven
+    if (t >= t0) text(s.slice(0, clamp(n, 0, s.length)), 4, 3 + r, 24, fade);
+  });
+}
+
+const LOG = [[.5, 'SYSTEM WAKE  03:12'], [1.75, 'RENDERING HEADLAND  192 x 48'], [3.3, 'LAMP ONE  STANDBY'], [LIT, 'LAMP ONE IS LIT.']];
+function logStrip(t) {   // subtitles as terminal output: separator, inverse tag, prompt, words typed in
+  const cw = 22, oy = PIC_H + 16;
+  text('-'.repeat(84), 0, 0, cw, .3, 30, PIC_H - 10);
+  g.globalAlpha = .85; g.fillStyle = '#ff0000'; g.fillRect(30 + cw, oy + 4, cw * 5, cw * 1.8);
+  g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
+  [...' LOG '].forEach((c, i) => { const p = A.pos[c]; if (c !== ' ') g.drawImage(A.black, p[0], p[1], GW, GH, 30 + cw * (1 + i), oy, cw, cw * 2); });
+  g.globalCompositeOperation = 'lighter';
+  const cur = LOG.filter(l => t >= l[0]).at(-1); let col = 7;
+  text('>', col, 0, cw, .7, 30, oy); col += 2;
+  if (cur) { const words = cur[1].split(' '), shown = words.slice(0, Math.floor((t - cur[0]) / .11) + 1).join(' ');
+    text(shown, col, 0, cw, cur[0] === LIT ? 1.15 : .9, 30, oy, cur[0] === LIT ? A.ice : A.amber); col += shown.length;
+    window.heliosDrawnText?.add(shown); }
+  if ((t % 1.06) < .53) { g.globalAlpha = .9; g.fillStyle = '#ff0000'; g.fillRect(30 + (col + .3) * cw, oy + 6, cw * .85, cw * 1.6); }
+}
+
+// ---- monochrome CRT pass (raw WebGL): phosphor ramp, glow, 3 px scanlines, curvature, power-on ----
+const gl = document.getElementById('out').getContext('webgl', { preserveDrawingBuffer: true, antialias: false });
+const sh = (ty, src) => { const s = gl.createShader(ty); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, 'attribute vec2 p; varying vec2 uv; void main(){ uv = p*.5+.5; gl_Position = vec4(p,0,1); }'));
+gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `precision highp float; varying vec2 uv; uniform sampler2D tex; uniform float frame, power;
+  float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233)))*43758.5453); }
+  float sdBox(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, q.y), 0.) - r; }
+  vec3 phos(float a){ return mix(vec3(.55,.15,.02), vec3(1.,.64,.16), smoothstep(0., .6, a)) * a + vec3(1.,.9,.7) * smoothstep(.7, 1.3, a) * .5; }
+  void main(){
+    vec2 d = (uv - .5) * 2.; d.x *= 1. + .045 * d.y * d.y; d.y *= 1. + .06 * d.x * d.x; d /= 1.02;          // barrel
+    float sx = smoothstep(0., .35, power), sy = max(.004, smoothstep(.35, 1., power)), boost = pow(1. - sy, 3.) * 1.4;
+    vec2 q = vec2(d.x / max(sx, .001), d.y / sy) * .5 + .5; q.y = 1. - q.y;
+    vec2 s = 1. / vec2(1920., 1080.);
+    vec3 c0 = texture2D(tex, q).rgb * .6 + (texture2D(tex, q + vec2(s.x, 0.)).rgb + texture2D(tex, q - vec2(s.x, 0.)).rgb) * .2;
+    vec3 bl = vec3(0.);                                                                   // two-ring glow
+    for (int k = 0; k < 12; k++) { float an = float(k) * .5236; vec2 o = vec2(cos(an), sin(an));
+      bl += texture2D(tex, q + o * s * 5.).rgb * .05 + texture2D(tex, q + o * s * 14.).rgb * .035; }
+    vec3 c = phos(c0.r) + vec3(.72,.88,1.) * c0.g + vec3(1.,.92,.88) * smoothstep(.8, 1.4, c0.g) * .4;
+    c += vec3(1.,.55,.12) * bl.r * .55 + vec3(.55,.8,1.) * bl.g * .7;
+    float L = clamp(max(c0.r, c0.g), 0., 1.);
+    c *= 1. - .3 * (.5 - .5 * cos(6.2832 * gl_FragCoord.y / 3.)) * (1. - .55 * L);         // scanlines, 3 px
+    float inside = 1. - smoothstep(-.004, .004, sdBox(d, vec2(1.), .09));
+    float vig = 1. - .3 * (.35 * dot(d, d) + .9 * d.x * d.x * d.y * d.y);
+    c += vec3(.024,.017,.011) * vig;                                                       // unlit glass is not black
+    c += (h(gl_FragCoord.xy + frame * 17.) - .5) * .012;
+    c *= vig * (1. + (h(vec2(frame * .73)) - .5) * .012);
+    c += vec3(1.,.93,.85) * smoothstep(.9, 0., length(d - vec2(-.55, .6))) * .02;          // faint glass reflection
+    c = mix(vec3(.016,.013,.011) + vec3(.9,.5,.1) * bl.r * .15 * smoothstep(.1, 0., sdBox(d, vec2(1.), .09)), c, inside);
+    c = c * (1. + boost) + boost * vec3(1.,.82,.55) * smoothstep(.012, 0., abs(uv.y - .5)) * step(abs(uv.x - .5), max(sx, .004) * .5);
+    gl_FragColor = vec4(clamp(c, 0., 1.), 1.); }`));
+gl.bindAttribLocation(prog, 0, 'p'); gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v);
+const uFrame = gl.getUniformLocation(prog, 'frame'), uPower = gl.getUniformLocation(prog, 'power');
+
+window.renderAt = async (t) => {
+  await ready;
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'lighter';
+  boot(t); picture(t); if (t > .45) logStrip(t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
+  gl.uniform1f(uFrame, Math.round(t * 30)); gl.uniform1f(uPower, clamp(t / .45));
+  gl.viewport(0, 0, W, H); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+};
+</script></body></html>
