@@ -9,6 +9,9 @@ INPUTS      What to ask the user for, each with a default if they skip it:
             name, one-line promise, the 3–12 states/objects/facts to show, accent colour,
             song and its licence, any footage, photos or screenshots. Ask once, in one message, then proceed.
 
+SEED        A random string (apply-randomness, or `tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256`),
+            and a short map: verified pattern → the creative choice it decided. Draw it before CONCEPT.
+
 CONCEPT     One sentence.
             One CENTRAL VISUAL RULE: "the baseline is a trajectory", "one shape, never cut",
             "one pencil line promoted three times", "every scene is born from the last".
@@ -20,7 +23,7 @@ LOCKED COPY Exact on-screen text, in exact order. No extra slogans.
 LOOK        Size, fps, duration. Palette as hex with roles (ground / type / accent / secondary).
             1–3 typefaces with weights and tracking. Safe margins.
             Camera rule (locked; or only push, pull, roll; or velocity-matched).
-            Texture (grain, paper) or none. A style from the motion-styles skill, if one fits.
+            Texture (grain, paper) or none. A named style from the motion-styles library only if the user asked for it.
 
 MOTION      One easing personality (a named curve, or a spring with frequency and damping).
             Stagger. Transition grammar (morph, flood, iris, mask line, match cut).
@@ -46,6 +49,7 @@ GATES       Before code: the storyboard or beat map.
 
 ## The highest-leverage directives
 
+0. **Diverge before you converge.** Draw a seed and write three genuinely different directions before picking one. Don't open a style library or a demo to find the idea; they pull every video toward the same few looks.
 1. **One central visual rule and one hero object.** A single idea the viewer can feel ("an orange dot links every scene", "the button is the only saturated thing") does more than any effect.
 2. **Every scene is made from the previous one.** Shapes morph, floods contract, objects carry across. A cut or crossfade between unrelated scenes is a slideshow.
 3. **Locked copy and a facts file.** Never invent a number, a feature, a review or a result. Label anything illustrative as illustrative.

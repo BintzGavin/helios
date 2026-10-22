@@ -1,6 +1,6 @@
 ---
 name: guided-video-recipes
-description: "Recipes for distinct code-made video genres, each with structure, look, technique, gotchas and a tested Helios renderAt(t) demo: scale dives (powers of ten), step-by-step process explainers, era timelines in a drawn medium, mechanism and proof explainers, kinetic typography, one-shape UI morph loops, and pixel-art sprite scenes. Also the video brief template, quality gates and a gotcha list for springs, morphs, loops, text and motion blur. Use when the request matches one of these genres, or before any code video longer than ~10 s to write the brief."
+description: "Opt-in recipes for specific code-video genres, each with structure, technique, gotchas and a tested Helios renderAt(t) demo: scale dives (powers of ten), step-by-step process explainers, era timelines, mechanism and proof explainers, kinetic typography, one-shape UI morph loops and pixel-art sprite scenes, plus a video brief template and a gotcha list. Load it only when the user asks for one of these genres by description or name, or asks for genre options or a brief template. Don't load it for general video requests."
 ---
 
 # Video recipes
@@ -28,25 +28,26 @@ Other genres already have Helios skills:
 - Promo, explainer, product demo, testimonial, launch and social clip: the other [guided skills](../).
 - Animated charts: [visualize-data](../../workflows/visualize-data/SKILL.md).
 
-A recipe says *what happens*; a style says *what it looks like*. Pair a recipe with a look from the [motion-styles](../../design/motion-styles/SKILL.md) library: a scale dive in `blueprint`, an era timeline in `watercolor-ink` or `one-line`, a mechanism in `swiss-grid`.
+A recipe says *what happens*; it doesn't say what it looks like. Design the look from the user's subject and the seed. The "best styles" named in each recipe point to the opt-in [motion-styles](../../design/motion-styles/SKILL.md) library: use one only if the user asks for it or accepts your one-line offer.
 
 ## Workflow
 
-1. **Brief.** Fill in the [brief template](references/brief.md): inputs (asked once, with defaults), concept with one central visual rule and one hero object, locked copy, look, motion, a banned list, structure, build rules, gates. If the user gave one line, write the brief yourself and make the calls.
-2. **Structure.** A storyboard or a beat map with timestamps, using the recipe's beat proportions. With music, run `helios analyze` first and put structure on its downbeats.
-3. **Copy the demo** for the recipe and adapt it. Keep its technique; replace its content and look.
-4. **Stills gate.** Before the full render, render the recipe's named stills and a strip over the hardest 2–4 seconds. Each still should work as a poster.
+1. **Seed.** Draw a random seed before deciding anything creative. If an **apply-randomness** skill is available, use it; otherwise run `LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256; echo`. Find a few verifiable patterns in it (digit runs, repeats, letter clusters) and let them choose between three concept directions you write, and between options for the central visual rule, the hero object and the look. Keep the seed and a one-line pattern → choice map in the brief.
+2. **Brief.** Fill in the [brief template](references/brief.md): inputs (asked once, with defaults), concept with one central visual rule and one hero object, locked copy, look, motion, a banned list, structure, build rules, gates. If the user gave one line, write the brief yourself and make the calls.
+3. **Structure.** A storyboard or a beat map with timestamps, using the recipe's beat proportions. With music, run `helios analyze` first and put structure on its downbeats.
+4. **Read the demo for its technique,** not its composition. The demo shows how the hard part is built (the log zoom, the volume function, the summed springs). Your subject, look, structure and ending come from the brief.
+5. **Stills gate.** Before the full render, render the recipe's named stills and a strip over the hardest 2–4 seconds. Each still should work as a poster.
    ```bash
    npx -y @helios-project/cli@latest still video.html --at 0.4,6.2,13.8,19.5
    npx -y @helios-project/cli@latest sheet video.html --strip 12.8:14.6 --fps 30
    npx -y @helios-project/cli@latest verify video.html --duration 20
    ```
-5. **Render and check.**
+6. **Render and check.**
    ```bash
    npx -y @helios-project/cli@latest render video.html -o video.mp4 --duration 20 --preset medium
    npx -y @helios-project/cli@latest check video.mp4
    ```
-6. **Self-score and revise** on the seven axes in [brief.md](references/brief.md#self-score-and-revise). Fix the lowest first. If you can, have a fresh reviewer (a second agent) look at a contact sheet every 0.2–0.5 s and return ranked, timestamped problems.
+7. **Self-score and revise** on the seven axes in [brief.md](references/brief.md#self-score-and-revise). Fix the lowest first. If you can, have a fresh reviewer (a second agent) look at a contact sheet every 0.2–0.5 s and return ranked, timestamped problems.
 
 ## Rules that apply to every recipe
 

@@ -1,19 +1,31 @@
 ---
 name: guided-cartoon-short
-description: "Hand-drawn cartoon shorts drawn in code: a character you design, acted emotions, drawn turnarounds, and boiling ink-and-paint linework, as one Helios renderAt(t) page. Covers storyboarding by reads, the character rig, the emotion timeline, closed-form acting helpers (jump, take, spring), transitions and the review loop. Use for animated shorts, mascot-style explainers, story-driven cartoons and character loops."
+description: "Cartoon shorts drawn in code: a character you design, acted emotions, drawn turnarounds and boiling linework, as one Helios renderAt(t) page. Covers storyboarding by reads, the character rig, the emotion timeline, closed-form acting helpers (jump, take, spring), transitions and the review loop. Use for animated shorts, mascot-style explainers, story-driven cartoons and character loops."
 ---
 
 # Cartoon short
 
-A short cartoon where a character wants something, something happens, and they react. It looks hand-painted: flat colour, ink lines that boil, paper grain. Everything is drawn in Canvas 2D inside one `window.renderAt(t)` page, so the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract applies: every frame is a pure function of `t`.
+A short cartoon where a character wants something, something happens, and they react. Everything is drawn in Canvas 2D inside one `window.renderAt(t)` page, so the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract applies: every frame is a pure function of `t`.
 
-Start from [starter.html](starter.html). It's a complete, tested 6-second shot: an original character goes bored → surprised → happy and jumps, with boil, paper, grain and iris transitions. Copy it, then replace the character, the emotions and the shots.
+The skill has two halves. The **method** (storyboarding by reads, the rig, acted emotion changes, boil that stays deterministic, the review loop) applies to every cartoon. The **look** it documents (flat colour, boiling ink, paper grain) is one default, not a requirement: chalk on a blackboard, cut paper, marker on lined paper, a single-colour brush line or flat poster shapes all work with the same method.
+
+[starter.html](starter.html) is a tested 6-second shot that shows the techniques working together: boil seeding, the paint recipe, `emotions()`, `jump()`, iris transitions. Read it for how each technique is built. Don't reuse its character, meadow, palette or gag; those come from the seed and the user's idea.
+
+## 0. Seed the idea
+
+Before you design anything, draw a random seed so this cartoon doesn't come out like the last one. If an **apply-randomness** skill is available, use it. Otherwise:
+
+```bash
+LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256; echo
+```
+
+Find a few verifiable patterns in the string (a digit run, a repeated fragment, a cluster of capitals, a symmetry) and let them choose between options you write down first: three character silhouettes, three worlds, three loglines, and two or three looks (the ink-and-paint default among them). Keep what the user asked for fixed; the seed only decides what they left open. Put the seed and a one-line pattern → choice map at the top of `STORYBOARD.md`.
 
 Code-drawn characters are a deliberate style: simple, iconic shapes with boiling ink. They don't replace a real illustration. If the brief needs a detailed or realistic character, say so and ask for artwork.
 
 ## The three goals
 
-- **Handmade.** Brush-like ink that boils, flat 2D, soft palette, paper underneath. No vector-perfect shapes, no 3D projection.
+- **Handmade.** Lines that boil, flat 2D, a small palette, a surface underneath (paper, board, card). No vector-perfect shapes, no 3D projection.
 - **Alive.** Something always moves. Faces act and never snap. The character is big enough to feel.
 - **One piece.** One short film with an arc, not a pile of clips. Plan it before you draw it, and link every shot to the next.
 
@@ -21,9 +33,9 @@ Underneath all three, the viewer has to follow it. Timing is what generated anim
 
 ## Design your own character
 
-Never reuse an existing mascot or a well-known character, even a "simplified" one. Design one for this video:
+Never reuse an existing mascot or a well-known character, even a "simplified" one, and don't reuse the starter's bean. Design one for this video, with the seed choosing between your silhouettes:
 
-- A silhouette that reads when filled solid black: one main shape (bean, sock, box, drop), a few parts (eyes, arms, legs).
+- A silhouette that reads when filled solid black: one main shape (a teapot, a moth, a stack of books, a pebble with legs), a few parts (eyes, arms, legs).
 - A size unit `u`. Every coordinate in the rig is a multiple of `u`, so the same function draws a wide shot and a close-up.
 - A two- or three-colour body: base, a lighter pool, a darker settle. No pure black or white anywhere; use a dark ink like `#2b2233` and a cream like `#fff5e2`.
 
@@ -74,7 +86,7 @@ Check the storyboard: an event in every shot, time for every read, a transition 
 
 **Render hand-drawn pieces at 24 fps** so each 12 fps drawing holds exactly 2 frames. At 30 fps they hold for 2 or 3 frames unevenly, which stutters. If you must render at 30, boil at 15.
 
-**Paint recipe** for each solid shape: wobbly fill slightly off the line, a light pool top-left, a darker settle along the bottom, then the ink outline last with a fainter dry second pass. Backgrounds get soft fills with no outline or a thin one. Light (a glow, a lamp) is additive (`globalCompositeOperation = 'lighter'` or `'screen'`), not paint. See [references/look.md](references/look.md).
+**Paint recipe** for the default ink-and-paint look: wobbly fill slightly off the line, a light pool top-left, a darker settle along the bottom, then the ink outline last with a fainter dry second pass. Backgrounds get soft fills with no outline or a thin one. Light (a glow, a lamp) is additive (`globalCompositeOperation = 'lighter'` or `'screen'`), not paint. See [references/look.md](references/look.md).
 
 **Shots** are `fn(t, lt, dur)`: video time, time since the shot started, shot length. Each paints the whole frame. Keep them in a list and pick the active one in `renderAt`, as the starter does.
 

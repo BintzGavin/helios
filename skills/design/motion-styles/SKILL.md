@@ -1,49 +1,38 @@
 ---
 name: motion-styles
-description: "A library of 24 named visual styles for code-drawn video, each a style card (palette rules, type, materials, motion grammar, a checkable signature list, native moves, the core rendering trick, pitfalls) plus a tested Helios renderAt(t) demo page: synthwave/VHS, ASCII/CRT, pixel art, HUD, dark keynote, risograph, silkscreen, halftone dossier, woodcut, ukiyo-e, Swiss grid, Bauhaus, 60s spy titles, art deco, blueprint, flat vector, shape morph, one-line drawing, cel boil, aurora glass, watercolor/ink, sticker explainer, isometric, variety captions. Also finishing passes (grain, print plates, CRT, film damage) and time tricks (stepped time, springs, in-page motion blur). Use when the user names a look, or a video needs a distinctive, medium-faithful style instead of a generic one."
+description: "Opt-in library of established visual styles for code-drawn Helios videos: style cards (colour rules, type, motion grammar, a checkable signature list, the core rendering trick) with tested renderAt(t) demo pages, plus finishing passes and time tricks. Load it only when the user names a specific established style or medium they want reproduced (a print process, a retro screen look, a design movement), or asks to see Helios's style options. Do not load it to choose a look for a video request that names no style: design an original look instead, and at most offer this library."
 ---
 
 # Motion styles
 
 A style is a set of invariants: what the image is made of, which colours are allowed and what they mean, how things move, how the camera behaves, and what never happens. Get those right and the video reads as that medium; get them wrong and it reads as "flat vector with a noise overlay".
 
-Each style here is a **card** (`references/styles/<slug>.md`) and a **demo** (`references/styles/<slug>.html`), a complete page under the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract that passes `helios verify`. Read the card, copy the demo, then replace its content.
+Each style is a **card** (`references/styles/<slug>.md`) and a **demo** (`references/styles/<slug>.html`), a complete page under the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract that passes `helios verify`.
 
-## Pick a style
+## When to use this library
 
-| Style | Feels like | Best for | Route |
-|---|---|---|---|
-| **Screens and retro** | | | |
-| [synthwave-vhs](references/styles/synthwave-vhs.md) | 80s chrome titles over a neon grid, on tape | launches, music, nostalgia | Canvas 2D + optional WebGL VHS |
-| [ascii-crt](references/styles/ascii-crt.md) | images made of glyphs on an amber phosphor tube | dev tools, terminals, hacker stories | Canvas 2D glyph atlas |
-| [pixel-art](references/styles/pixel-art.md) | 16-bit game scenes on a fixed palette | games, playful brands, loops | low-res buffer, integer scale |
-| [hud-fui](references/styles/hud-fui.md) | a sci-fi interface scanning and locking on | data, security, tech reveals | Canvas 2D, additive |
-| [dark-keynote](references/styles/dark-keynote.md) | product UI as the hero on a dark stage, one accent | SaaS and app launches | Canvas 2D UI kit |
-| **Print** | | | |
-| [risograph](references/styles/risograph.md) | two or three translucent inks, misregistered, halftoned | zines, culture, friendly explainers | ink plates + WebGL print |
-| [silkscreen](references/styles/silkscreen.md) | opaque stepped inks pulled on camera | posters, events, bold statements | Canvas 2D Path2D plates |
-| [halftone-dossier](references/styles/halftone-dossier.md) | a case file of dots, stamps and evidence | investigations, reveals, timelines | SVG / Canvas halftone |
-| [woodcut](references/styles/woodcut.md) | light carved out of black | folklore, history, gravitas | carve mask + print |
-| [ukiyo-e](references/styles/ukiyo-e.md) | woodblock colour blocks on a handscroll | journeys, landscapes, calm stories | cached block canvases |
-| **Graphic and type** | | | |
-| [swiss-grid](references/styles/swiss-grid.md) | a strict grid, one signal colour, no decoration | data, corporate, typographic films | Canvas 2D / DOM |
-| [bauhaus-poster](references/styles/bauhaus-poster.md) | primaries and geometry, one action per beat | music, design, brand systems | Canvas 2D on a module grid |
-| [spy-titles](references/styles/spy-titles.md) | 60s cut-paper title sequence | trailers, intros, credits | Canvas 2D cut-paper |
-| [art-deco](references/styles/art-deco.md) | gold keylines unfolding from a centre axis | premieres, luxury, galas | Canvas 2D gradients |
-| [blueprint](references/styles/blueprint.md) | white line drafting on a cyanotype sheet | engineering, how-it-works | Canvas 2D draw-on |
-| **Motion graphics** | | | |
-| [flat-vector](references/styles/flat-vector.md) | bouncy, friendly vector shapes in one continuous shot | apps, explainers, onboarding | SVG / Canvas + springs |
-| [shape-morph](references/styles/shape-morph.md) | one shape becoming the next on every beat | logos, loops, brand stories | Canvas 2D polygon morph |
-| [one-line](references/styles/one-line.md) | a single unbroken line drawing everything | elegant brands, stories, logos | Canvas 2D arc-length draw-on |
-| [cel-boil](references/styles/cel-boil.md) | hand-inked cels with boiling lines and smears | energetic titles, FX, reactions | Canvas 2D brush + exposure sheet |
-| [aurora-glass](references/styles/aurora-glass.md) | soft light fields behind frosted glass cards | AI and tech launches, calm UI | WebGL blobs or CSS |
-| **Hand, explainer and social** | | | |
-| [watercolor-ink](references/styles/watercolor-ink.md) | a journal page painting itself; ink-wash variant | travel, food, reflective stories | Canvas 2D brush engine |
-| [sticker-explainer](references/styles/sticker-explainer.md) | die-cut stickers slapped onto a big world, camera flights | explainers, maps, data stories | DOM / Canvas world camera |
-| [isometric](references/styles/isometric.md) | a pastel iso city growing tile by tile | platforms, ecosystems, systems | three.js ortho or Canvas iso |
-| [variety-captions](references/styles/variety-captions.md) | loud stacked caption stickers popping per character | social clips, reactions, 9:16 | DOM / SVG text stack |
+This library is a set of known answers, and known answers pull everything toward themselves. An agent that reads a menu of 24 looks before every video makes those 24 looks forever. So the library is **opt-in**:
 
-Not sure? Offer the user two or three that fit the topic and say what each would feel like. Characters with acting belong in the [cartoon-short](../../guided/cartoon-short/SKILL.md) skill; this library is about the look.
+| The request | What to do |
+|---|---|
+| Names a style or medium ("make it risograph", "like an old blueprint", "Swiss style") | Open that one card: `references/styles/<slug>.md`. If you're unsure of the slug, list `references/styles/`. Don't read the catalog. |
+| Asks for style options, or says "surprise me with a known look" | Read [references/catalog.md](references/catalog.md) and offer at most three styles chosen with a seed, plus one original direction. Build only what they pick. |
+| Names no style | Don't use this library. Design an original look from the brief and a random seed (the make-video skill describes how). You may offer once, in one line, that a known style from this library is available. Load it only if they say yes. |
+| Gives a brand or design system | Follow the brand. A card can lend a technique (a halftone, a grain, a draw-on) only if the user asks for that treatment. |
+
+Never copy a demo's composition. Demos show how a technique is built; the video should come from the user's subject.
+
+## Vary within the style
+
+Two risograph videos should not be the same video in different words. Before the treatment, draw a random seed and let it make the choices the card leaves open.
+
+If an **apply-randomness** skill is available, use it for this step. Otherwise:
+
+```bash
+LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256; echo
+```
+
+Look for a few verifiable patterns in the string (a digit run, a repeated fragment, a cluster of capitals, an odd/even split) and turn each into a concrete choice inside the card's "safe to change" axes: the subject's framing, the palette variant within the colour rules, the structure, which native move goes at the peak, the opening and the ending. Keep the seed and a one-line pattern → choice map in your notes. The card's invariants never change; the seed only moves what the card leaves free.
 
 ## What a card holds
 
@@ -60,10 +49,10 @@ Not sure? Offer the user two or three that fit the topic and say what each would
 
 ## Workflow
 
-1. **Pick the style** and read its card start to finish.
-2. **Mini-treatment.** Sketch three possible structures and pick one. Place one native move at the peak. Write down what you'll learn from the demo and what you won't take from it.
+1. **Read the card** the user asked for, start to finish.
+2. **Seed and mini-treatment.** Draw the seed (above). Sketch three possible structures from it and pick one. Place one native move at the peak. Write down what you'll learn from the demo and what you won't take from it.
 3. **Style frames before motion.** Build two or three key frames with the real drawing code and render them with `helios still`. Check them against the signature checklist. Fix the look before animating anything.
-4. **Build** from the demo: keep its technique, replace its content, palette (within the card's rules) and structure.
+4. **Build** with the demo's technique, not its composition: your subject, your structure, a palette chosen within the card's rules.
 5. **Review.** Stills at 6–10 key times, a sheet every 0.5 s, a strip over the fastest move, crops of fine texture and text, then `verify` and `check`. Tick the signature checklist.
 6. **Not the demo again.** Compare your video with the card's demo on six things: structure, opening, signature shot, camera path, rhythm, ending. At least four must differ.
 

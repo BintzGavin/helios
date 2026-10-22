@@ -84,7 +84,7 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 
 - **skills/design/animated-video-philosophy** - Working philosophy for animated video: story-first motion, pacing, shots, timing, composition, medium-specific grammar, technical commitments, and anti-patterns. Use when directing or critiquing motion and programmatic video.
 - **skills/design/cinematic-product-promo-plan** - Template plan for a ~45s feeling-first cinematic product promo: brief through ship, hero-element journey, look/motion/audio, deliverables matrix, accessibility. Adapt to any product category.
-- **skills/design/motion-styles** - Library of 24 named visual styles (synthwave, risograph, Swiss grid, blueprint, pixel art, aurora glass and more). Each is a style card with palette rules, motion grammar and a checkable signature list, plus a tested `renderAt(t)` demo. Also finishing passes and time tricks such as in-page motion blur.
+- **skills/design/motion-styles** - Opt-in library of established visual styles, each a style card with colour rules, motion grammar and a checkable signature list, plus a tested `renderAt(t)` demo. Load only when the user names a specific style or asks for style options; otherwise design an original look.
 
 ### Guided Video Creation Skills
 
@@ -97,7 +97,7 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 - **skills/guided/social-clip** - Short-form social clip (Reels/TikTok/Shorts). Vertical 9:16, punchy, loop-friendly.
 - **skills/guided/cartoon-short** - Hand-drawn cartoon short: a character rig you design, acted emotion changes, boiling ink-and-paint linework, storyboarding by reads. Includes a tested starter page.
 - **skills/guided/music-video** - Lyric and karaoke music video: word timings by forced alignment, treatment and section storyboard, a timeline derived from lyrics and beats, karaoke recipes. Includes a tested karaoke page.
-- **skills/guided/video-recipes** - Genre recipes with tested demos (scale dive, process explainer, era timeline, mechanism/proof, kinetic type, UI morph loop, pixel sprite), plus the video brief template and a gotcha list.
+- **skills/guided/video-recipes** - Opt-in genre recipes with tested demos (scale dive, process explainer, era timeline, mechanism/proof, kinetic type, UI morph loop, pixel sprite), plus the video brief template and a gotcha list. Load only when the request is one of these genres.
 
 ### Framework Integration Skills
 

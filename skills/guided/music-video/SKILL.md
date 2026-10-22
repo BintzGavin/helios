@@ -7,7 +7,7 @@ description: "Lyric and karaoke music videos drawn in code: get word- and syllab
 
 A music video where the words matter. The picture moves on the beat, the words light up on the voice, and every scene does something different with the lyric. It's one `window.renderAt(t)` page, so the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract applies; its [music reference](../../../plugins/helios/skills/make-video/references/music.md) covers `helios analyze`, the beat map and the sync rules. This skill adds what a lyric video needs on top of that.
 
-Start from [karaoke.html](karaoke.html) and [lyrics.example.json](lyrics.example.json): a tested page that reads word and syllable timings, lights each glyph as it's sung, looks lyrics up by content, and makes the scene react to a word.
+[karaoke.html](karaoke.html) and [lyrics.example.json](lyrics.example.json) are a tested reference for the mechanics: reading word and syllable timings, lighting each glyph as it's sung, looking lyrics up by content, and making the scene react to a word. Reuse the mechanics; design the look and scenes from the treatment.
 
 ## Ground rules
 
@@ -38,7 +38,9 @@ See [references/lyrics.md](references/lyrics.md) for each tier's commands, the c
 
 ## 2. Treatment
 
-Write `TREATMENT.md` before any code. One page:
+Write `TREATMENT.md` before any code. Start it with a random seed, so the concept comes from the song and the seed rather than from whatever music video you'd make by default. If an **apply-randomness** skill is available, use it; otherwise run `LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256; echo`. Write three different concepts and three motifs, then let verifiable patterns in the seed (a digit run, a repeat, a letter cluster) choose between them, and between the palette and the lyric treatment for each section. Keep the seed and a one-line pattern → choice map in the treatment. The song and lyrics are fixed; the seed only decides what's open.
+
+The treatment, on one page:
 
 - **Concept** in one paragraph, and **one motif** that recurs and changes role across the song.
 - **Palette** with one accent owned by one moment or one element. **Type voices:** two or three, each with a job (the sung line, the typed aside, the title).

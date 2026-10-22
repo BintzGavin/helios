@@ -7,6 +7,12 @@ description: "Make videos drawn with code: motion graphics, launch and explainer
 
 A Helios video is one HTML page with one function, `window.renderAt(t)`. It draws the frame at `t` seconds. The Helios renderer loads the page in headless Chrome, calls `renderAt(t)` once per frame, captures each frame and encodes the MP4. There is no bundler, no framework and no capture script to write.
 
+## Choose an original direction
+
+When the request leaves the look open, don't fall back on a stock look or copy another page's design. Draw a random seed (use an **apply-randomness** skill if one is installed, otherwise run `LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256; echo`). Write three genuinely different directions for this subject, then let verifiable patterns in the seed (a digit run, a repeated fragment, a cluster of capitals) pick one and settle its palette, type and motion. When the user gives a brand, a style or a reference, follow it instead.
+
+Helios also has opt-in libraries: named visual styles (`motion-styles`) and genre recipes (`video-recipes`). Use them only when the user names a style or genre from them or asks for options. Otherwise you may offer them once, in one line, but don't load them: a menu of ready-made looks pulls every video toward the same few.
+
 ## 1. Write the page
 
 Every frame must be a **pure function of `t`**. The renderer may ask for frames in any order, and it renders the same frame identically every time.
