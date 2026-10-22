@@ -116,6 +116,7 @@ export class CaptureLoop {
   }
 
   public async run(): Promise<void> {
+    if (this.totalFrames <= 0) return;
     this.setupDrainListeners();
     const fps = this.options.fps;
     const totalFrames = this.totalFrames;
@@ -170,68 +171,60 @@ export class CaptureLoop {
 
         let nextCapturePromise: any = null;
         if (isDomStrategy) {
-          if (totalFrames > 0) {
+          const timePromise = timeDriver.setTime(
+            page,
+            startFrame * compTimeStep,
+          );
+          if (timePromise) await timePromise;
+          nextCapturePromise = domBeginFrame!(0);
+
+          const rawResult = await nextCapturePromise;
+          if (1 < totalFrames) {
             const timePromise = timeDriver.setTime(
               page,
-              startFrame * compTimeStep,
+              (startFrame + 1) * compTimeStep,
             );
             if (timePromise) await timePromise;
-            nextCapturePromise = domBeginFrame!(0);
+            nextCapturePromise = domBeginFrame!(timeStep);
+          }
+          console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
+          if (onProgress) {
+            onProgress(0 / totalFrames);
           }
 
-          if (totalFrames > 0) {
-            const rawResult = await nextCapturePromise;
-            if (1 < totalFrames) {
-              const timePromise = timeDriver.setTime(
-                page,
-                (startFrame + 1) * compTimeStep,
-              );
-              if (timePromise) await timePromise;
-              nextCapturePromise = domBeginFrame!(timeStep);
-            }
-            console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
-            if (onProgress) {
-              onProgress(0 / totalFrames);
-            }
+          domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
 
-            domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
-
-            pendingBytes += domLastFrameBuffer!.length;
-            if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
-              await this.drainPromise;
-              pendingBytes = 0;
-            }
+          pendingBytes += domLastFrameBuffer!.length;
+          if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
+            await this.drainPromise;
+            pendingBytes = 0;
           }
         } else {
-          if (totalFrames > 0) {
+          const timePromise = timeDriver.setTime(
+            page,
+            startFrame * compTimeStep,
+          );
+          if (timePromise) await timePromise;
+          nextCapturePromise = strategy.capture(page, 0);
+
+          const rawResult = await nextCapturePromise;
+          if (1 < totalFrames) {
             const timePromise = timeDriver.setTime(
               page,
-              startFrame * compTimeStep,
+              (startFrame + 1) * compTimeStep,
             );
             if (timePromise) await timePromise;
-            nextCapturePromise = strategy.capture(page, 0);
+            nextCapturePromise = strategy.capture(page, timeStep);
+          }
+          console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
+          if (onProgress) {
+            onProgress(0 / totalFrames);
           }
 
-          if (totalFrames > 0) {
-            const rawResult = await nextCapturePromise;
-            if (1 < totalFrames) {
-              const timePromise = timeDriver.setTime(
-                page,
-                (startFrame + 1) * compTimeStep,
-              );
-              if (timePromise) await timePromise;
-              nextCapturePromise = strategy.capture(page, timeStep);
-            }
-            console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
-            if (onProgress) {
-              onProgress(0 / totalFrames);
-            }
-
-            pendingBytes += rawResult.length;
-            if (!stream.write(rawResult) && pendingBytes >= 16777216) {
-              await this.drainPromise;
-              pendingBytes = 0;
-            }
+          pendingBytes += rawResult.length;
+          if (!stream.write(rawResult) && pendingBytes >= 16777216) {
+            await this.drainPromise;
+            pendingBytes = 0;
           }
         }
 

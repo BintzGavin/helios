@@ -1,11 +1,11 @@
 ---
 id: PERF-1130
 slug: inline-capture-methods
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-22
 completed: ""
-result: ""
+result: "improved"
 ---
 # PERF-1130: Inline `domBeginFrame` evaluation in CaptureLoop.ts
 
