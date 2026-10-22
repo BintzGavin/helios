@@ -45,7 +45,19 @@ it('isolates group opacity and preserves clipping across shuffled retained frame
   await renderer.prepare();
   const first = renderer.render(0).pixels;
   const pixel = (data: Buffer, x: number, y: number) => [...data.subarray((y * 160 + x) * 4, (y * 160 + x) * 4 + 4)];
-  expect(pixel(first, 50, 40)).toEqual([127, 127, 255, 255]);
+  // Isolated, the overlap shows blue alone at half opacity, exactly as one half-opacity blue
+  // rect draws on this backend. Per-child alpha would mix in red, about [127, 63, 191].
+  // Half of 255 rounds to 127 or 128 depending on Skia's CPU pipeline, so compare to the
+  // backend's own rect rather than a constant.
+  const single = parsePlan({ version: 'portable-v1', width: 160, height: 90, fps: { num: 30, den: 1 }, frameCount: 1, background: '#ffffff', nodes: [
+    { id: 'blue', type: 'rect', x: 40, y: 20, width: 50, height: 50, fill: '#0000ff', opacity: 0.5 },
+  ] });
+  const reference = new SkiaRasterizer(single, await prepareScene(single, new Map()));
+  await reference.prepare();
+  const halfBlue = pixel(reference.render(0).pixels, 50, 40);
+  expect(halfBlue[0]).toBeGreaterThanOrEqual(127); expect(halfBlue[0]).toBeLessThanOrEqual(128);
+  expect(halfBlue.slice(1)).toEqual([halfBlue[0], 255, 255]);
+  expect(pixel(first, 50, 40)).toEqual(halfBlue);
   expect(pixel(first, 85, 40)).toEqual([255, 255, 255, 255]);
   for (const index of [30, 15, 0]) {
     const frame = renderer.render(index).pixels;
