@@ -507,5 +507,7 @@ $entry
 - **PERF-1125**: Created experiment plan to unroll intermediate `buf` variable bindings into direct `domLastFrameBuffer` references in the single-worker capture loop of `CaptureLoop.ts` to reduce AST scope complexity.
 - **PERF-1126**: Created experiment plan to hoist `totalFrames - 1` mathematical calculations into a block-scoped `loopEnd` constant out of the single-worker chunk loop bounds in `CaptureLoop.ts` to reduce branch evaluation overhead.
 - **PERF-1127**: Created experiment plan to optimize progress interval logic into a simple countdown counter in the single-worker chunk loops to avoid per-frame addition and boundary checks.
-- **PERF-1130**: Created experiment plan to hoist `totalFrames > 0` validation to an early-return at the top of `CaptureLoop.ts` `start()` function to remove redundant nested branching and shrink AST complexity.
+- **PERF-1130**: Hoisted `totalFrames > 0` validation to an early-return at the top of `CaptureLoop.ts` `run()` function.
+  - **Improvement:** Removed redundant nested branching inside the fast single-worker loop to shrink V8 AST complexity and simplify parsing.
+  - **Plan ID:** PERF-1130
 - **PERF-1123**: Created experiment plan to hoist the `16777216` (16MB) `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing overhead.
