@@ -78,7 +78,7 @@ The roughened polygon lives in the piece's **local** coordinates: glyph origin, 
 - A credit only ever seen cropped → open wide on the full line for ≥ 0.4 s before trucking in.
 - The object in the same ink as its ground vanishes → black keyline / backing.
 - `sCapHeight` missing or wrong in some font files → measure the "H" glyph's bounding box for the cap height.
-- Stepped camera → camera on ones, puppets on twos: `twos = t => Math.floor(t * 12 + 1e-6) / 12`.
+- Stepped camera → camera on ones, puppets on twos: `twos = t => Math.floor(t * 12 + 1e-4) / 12`.
 - Flat inks + full-frame grain bloat the encode → keep the speckle sparse (~5 k dots) and the texture static. Use `--preset medium` for the final file.
 - Text drawn as polygons is invisible to `verify --cues` → call `window.heliosDrawnText?.add(...)` if you check captions.
 

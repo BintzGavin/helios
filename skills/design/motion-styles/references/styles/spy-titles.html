@@ -20,7 +20,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const prog = (t, a, b) => clamp((t - a) / (b - a));
 const lerp = (a, b, u) => a + (b - a) * u;
 const outC = (u) => 1 - Math.pow(1 - u, 3);
-const twos = (t) => Math.floor(t * 12 + 1e-6) / 12;              // puppets and letters step at 12 fps
+const twos = (t) => Math.floor(t * 12 + 1e-4) / 12;              // puppets and letters step at 12 fps
 const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const vnoise = (x) => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u); };
 
@@ -100,7 +100,7 @@ const P = { // poses: hip/knee for front (F) and back (B) legs, shoulder/elbow f
   crouch: { hF: -0.9, kF: 1.5, hB: -0.2, kB: 1.4, sF: -0.6, eF: -1.2, sB: 0.7, eB: -0.8, lean: 0.55, bob: 26 },
 };
 function run(t) {                                   // 8-drawing run cycle, one drawing per 1/12 s
-  const p = (Math.floor(t * 12 + 1e-6) % 8) / 8, s = Math.sin(p * 6.283), s2 = Math.sin(p * 6.283 + Math.PI);
+  const p = (Math.floor(t * 12 + 1e-4) % 8) / 8, s = Math.sin(p * 6.283), s2 = Math.sin(p * 6.283 + Math.PI);
   return { hF: -0.95 * s, kF: 0.25 + 1.2 * Math.max(0, Math.sin(p * 6.283 + 1.7)), hB: -0.95 * s2, kB: 0.25 + 1.2 * Math.max(0, Math.sin(p * 6.283 + 1.7 + Math.PI)),
     sF: 1.0 * s, eF: -1.5, sB: 1.0 * s2, eB: -1.5, lean: 0.34, bob: -9 * Math.abs(Math.cos(p * 6.283)) };
 }

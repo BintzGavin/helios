@@ -53,7 +53,7 @@ Drawing slots instead of colours is what makes palette shifts, cycling and light
 
 ## Pitfalls
 - Drawing colours instead of slots → no palette tricks are possible later; decide slots first.
-- Smooth camera or sprite motion → shimmering half-pixels; `Math.round` every layer offset, quantise poses with `floor(t*fps + 1e-6)/fps`.
+- Smooth camera or sprite motion → shimmering half-pixels; `Math.round` every layer offset, quantise poses with `floor(t*fps + 1e-4)/fps`.
 - Non-integer scale (`drawImage(low, 0, 0, 1920, 1080)` from 274 px wide) → uneven pixel widths; zoom with an integer `setTransform` and crop.
 - A light LUT that brightens everything → the sky turns grey and hills turn into brown discs; exempt air and far layers, and let a small lantern light only the near ground.
 - Night LUT so dark the hero vanishes → keep an ink outline, give the hero a contrasting cloth, and carry a light.

@@ -6,7 +6,7 @@ The look has seven layers, all deterministic. [starter.html](../starter.html) im
 
 ```js
 const BOIL = 12;                       // drawings per second
-let BN = 0;                            // set at the top of renderAt: BN = Math.floor(t * BOIL + 1e-6)
+let BN = 0;                            // set at the top of renderAt: BN = Math.floor(t * BOIL + 1e-4)
 function rng(key) {                    // a fresh stream from (stable key, boil drawing)
   let h = 2166136261;
   for (const ch of key + '|' + BN) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);

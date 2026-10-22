@@ -53,7 +53,7 @@ const backOut = (x) => { x = clamp(x); const s = 1.9; return 1 + (s + 1) * (x - 
 const spring = (t, t0, k = 6, w = 18) => t < t0 ? 0 : Math.exp(-k * (t - t0)) * Math.sin(w * (t - t0));
 const ring = (t, events, k, w) => events.reduce((s, e) => s + spring(t, e, k, w), 0);   // one kick per event
 // Hold each drawing for two frames. Wrap a character's time in it for snappier, hand-timed motion; keep the camera on ones.
-const onTwos = (t) => Math.floor(t * 12 + 1e-6) / 12;
+const onTwos = (t) => Math.floor(t * 12 + 1e-4) / 12;
 // A point on a thrown arc from p0 to p1, peaking h px above the straight line; k = 0..1 along the flight.
 const arcPt = (p0, p1, h, k) => [lerp(p0[0], p1[0], k), lerp(p0[1], p1[1], k) - h * 4 * k * (1 - k)];
 // Camera shake that changes 24 times a second, from a hash, never from Math.random.

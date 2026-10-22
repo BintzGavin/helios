@@ -87,7 +87,7 @@ function field(x, y, ts, lit) {
 }
 
 function picture(t) {
-  const ts = Math.floor(t * 12 + 1e-6) / 12, lit = t >= LIT, CW0 = 10;                  // world grid: 10 px cells
+  const ts = Math.floor(t * 12 + 1e-4) / 12, lit = t >= LIT, CW0 = 10;                  // world grid: 10 px cells
   const p = inOut((t - 3.2) / 1.8), z = lerp(1, 2.1, p) * (1 + .012 * clamp(t - LIT));    // font size = camera
   const F = [lerp(960, TX - 60, p), lerp(475, LY + 90, p)], S = [960, lerp(475, 440, p)], cw = CW0 * z;
   const i0 = Math.floor((F[0] - S[0] / z) / CW0), i1 = Math.ceil((F[0] + (W - S[0]) / z) / CW0);

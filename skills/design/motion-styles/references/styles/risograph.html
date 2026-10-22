@@ -1,0 +1,189 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render risograph.html -o risograph.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Jost:wght@500;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#F4EEE2;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<script>
+// RISOGRAPH: draw every frame into ONE plate canvas where R/G/B = density of ink 1/2/3,
+// then a WebGL2 pass "prints" it: per-plate misregistration, halftone screen, grain, multiply over paper.
+const W = 1920, H = 1080;
+const INKS = [[0, 120, 191], [255, 72, 176], [255, 232, 0]];   // R = blue, G = fluorescent pink, B = yellow
+const PAPER = [244, 238, 226];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, a, d) => clamp((t - a) / d);
+const eio = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const eo = x => 1 - Math.pow(1 - clamp(x), 3);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const step12 = t => Math.floor(t * 12 + 1e-4) / 12;              // figure acts on twos
+
+// ---------- plate canvas (densities, not colours) ----------
+const plate = document.createElement('canvas'); plate.width = W; plate.height = H;
+const g = plate.getContext('2d', { alpha: false, willReadFrequently: true });
+const layerC = document.createElement('canvas'); layerC.width = W; layerC.height = H;
+const L = layerC.getContext('2d', { willReadFrequently: true });
+const d255 = v => Math.round(clamp(v) * 255);
+const ink = (b = 0, p = 0, y = 0) => `rgb(${d255(b)},${d255(p)},${d255(y)})`;   // density recipe
+const over = fn => { g.globalCompositeOperation = 'lighter'; fn(); g.globalCompositeOperation = 'source-over'; };
+// knockout halo: draw fn on a layer, stamp it as zero-ink (paper) in a ring, then draw it on top
+function halo(fn, r = 5) {
+  L.setTransform(1, 0, 0, 1, 0, 0); L.clearRect(0, 0, W, H); fn(L);
+  g.filter = 'brightness(0)';
+  for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; g.drawImage(layerC, Math.cos(a) * r, Math.sin(a) * r); }
+  g.filter = 'none'; g.drawImage(layerC, 0, 0);
+}
+
+// ---------- the print shader ----------
+const out = document.getElementById('out');
+const gl = out.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false, alpha: false });
+const FS = `#version 300 es
+precision highp float;
+uniform sampler2D uTex; uniform vec2 uOff[3]; uniform float uAng[3], uGate[3], uSweep[3];
+uniform vec3 uInk[3], uPaper; uniform float uSeed, uPeriod;
+out vec4 o;
+const vec2 R = vec2(1920., 1080.);
+float h21(vec2 p){ vec3 q = fract(vec3(p.xyx) * .1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+float vn(vec2 p, float s){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f);
+  return mix(mix(h21(i+s), h21(i+vec2(1,0)+s), f.x), mix(h21(i+vec2(0,1)+s), h21(i+vec2(1,1)+s), f.x), f.y); }
+mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, R.y - gl_FragCoord.y);
+  vec3 col = uPaper * (.975 + .03 * (vn(px * vec2(.9, .22), 3.) * .5 + vn(px * .04, 9.) * .5));
+  for (int i = 0; i < 3; i++) {
+    if (uGate[i] < .001) continue;
+    vec2 q = px - uOff[i];                                   // misregistration: this plate lands off by uOff
+    float d = texture(uTex, q / R)[i];
+    float edge = px.x - uSweep[i];                            // roller sweep: inked left of the front
+    float band = exp(-pow(edge / 24., 2.)) * step(d, 2.) * smoothstep(0., .3, d);
+    d *= 1. - smoothstep(-6., 6., edge);
+    if (d < .003 && band < .01) continue;
+    vec2 gq = rot(uAng[i]) * px / uPeriod;                    // screen fixed to the paper, own angle per plate
+    float spot = 1. - (cos(6.2832 * gq.x) + cos(6.2832 * gq.y) + 2.) * .25;
+    float fi = float(i);
+    float grain = mix(h21(floor(q * .9) + fi * 31.), h21(floor(q * .9) + fi * 31. + uSeed * 7.), .35);
+    float thr = spot + (grain - .5) * .16 + (vn(q * .3, fi * 5.) - .5) * .12;
+    float cov = smoothstep(thr - .07, thr + .07, d * 1.05);
+    cov = max(cov, smoothstep(.88, 1., d) * .96);            // >= ~90 % prints solid
+    cov *= 1. - step(.955, h21(floor(q * .55) + fi * 77.)) * .7 * smoothstep(.4, 1., d);   // pinholes
+    float k = .8 + .14 * vn(vec2(q.x * .025, q.y * .002), 11. + fi) + .08 * vn(q * .004, 5. + fi);  // feed streaks, blots
+    float c = clamp(cov * k + band * .4, 0., 1.) * uGate[i];
+    col *= mix(vec3(1.), uInk[i], c);                         // inks multiply
+  }
+  o = vec4(col, 1.);
+}`;
+const sh = (t, s) => { const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); if (!gl.getShaderParameter(x, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(x)); return x; };
+const pr = gl.createProgram();
+gl.attachShader(pr, sh(gl.VERTEX_SHADER, `#version 300 es\nin vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`));
+gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+const U = n => gl.getUniformLocation(pr, n);
+gl.uniform3fv(U('uInk'), INKS.flat().map(v => v / 255)); gl.uniform3fv(U('uPaper'), PAPER.map(v => v / 255));
+gl.uniform1fv(U('uAng'), [15, 75, 0].map(a => a * Math.PI / 180)); gl.uniform1f(U('uPeriod'), 8);
+gl.viewport(0, 0, W, H);
+
+// ---------- timing ----------
+const PLATE_IN = [0.05, 1.6, 3.0];                               // each ink arrives with a roller sweep
+const KICKS = [[0.05, 6], [1.6, 10], [3.0, 10], [5.0, 14], [6.4, 4]];
+function registration(t) {
+  const off = [[0, 0], [3, -2], [-3, 2.5]];                     // fixed for the whole shot
+  for (const [tk, amp] of KICKS) {
+    const x = t - tk; if (x < 0 || x > .5) continue;
+    const e = Math.exp(-x * 11) * Math.cos(x * 34);             // analytic kick: decays with a little ringing
+    for (let i = 0; i < 3; i++) { const a = hash(tk * 13 + i * 5) * 6.283; off[i][0] += Math.cos(a) * amp * e; off[i][1] += Math.sin(a) * amp * e; }
+  }
+  if (t > 4.0 && t < 5.0) {                                      // held breath: plates drift apart, snap at 5.0
+    const d = eio(span(t, 4.0, 0.95)), dv = [[-5, 4], [22, -12], [-20, 14]];
+    for (let i = 0; i < 3; i++) { off[i][0] += dv[i][0] * d; off[i][1] += dv[i][1] * d; }
+  }
+  return off;
+}
+
+// ---------- the picture, in densities [blue, pink, yellow] ----------
+function hill(y0, amp, f, ph) { g.beginPath(); g.moveTo(0, H); for (let x = 0; x <= W; x += 24) g.lineTo(x, y0 - amp * Math.sin(x * f + ph) - amp * .4 * Math.sin(x * f * 2.7 + ph * 2)); g.lineTo(W, H); g.closePath(); }
+function walker(c, x, y, t, s, phase) {
+  const tt = step12(t), w = Math.sin(tt * 9 + phase) * (phase < 0 ? 0 : 1);
+  c.save(); c.translate(x, y); c.scale(s, s); c.lineCap = 'round';
+  c.strokeStyle = c.fillStyle = ink(1, .85, 0);                  // blue + pink = deep violet
+  c.lineWidth = 15; c.beginPath(); c.moveTo(0, -70); c.lineTo(-18 * w, 0); c.moveTo(0, -70); c.lineTo(18 * w, 0); c.stroke();
+  c.beginPath(); c.roundRect(-17, -150, 34, 88, 16); c.fill();
+  c.lineWidth = 12; c.beginPath(); c.moveTo(4, -136); c.lineTo(38, -186 + 4 * Math.sin(tt * 6)); c.stroke();   // arm up to the kite string
+  c.strokeStyle = ink(0, 1, 0); c.lineWidth = 9; c.beginPath(); c.moveTo(-6, -146);                    // scarf: pink, a travelling sine
+  for (let k = 1; k <= 5; k++) c.lineTo(-6 - k * 13, -146 + k * 3 + 6 * Math.sin(tt * 10 - k * .9)); c.stroke();
+  c.fillStyle = ink(0, 0, .3); c.beginPath(); c.arc(0, -176, 22, 0, 7); c.fill();                         // face: light tint of the palest ink
+  c.fillStyle = ink(1, 0, 0); c.beginPath(); c.arc(-4, -186, 22, Math.PI * .95, Math.PI * 2.05); c.fill(); // cap, blue only
+  c.restore();
+}
+
+function drawPlate(t) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.filter = 'none'; g.globalAlpha = 1;
+  g.fillStyle = ink(); g.fillRect(0, 0, W, H);                   // zero ink = paper
+  // sky: stepped yellow tints (never a gradient), top band left as paper
+  [[150, .14], [290, .28], [430, .44], [560, .62]].forEach(([y, v], i) => { g.fillStyle = ink(0, 0, v); g.fillRect(0, y, W, 700 - y); });
+  // sun disc: solid pink, knocks the sky out; it rises
+  const sy = 640 - 160 * eo(span(t, 1.6, 2.2));
+  g.fillStyle = ink(0, 1, 0); g.beginPath(); g.arc(1240, sy, 240, 0, 7); g.fill();
+  // far hills: 45 % blue OVERPRINTED -> green dots on the sky, violet dots across the sun
+  over(() => { hill(660, 40, .004, 1.3); g.fillStyle = ink(.45, 0, 0); g.fill(); });
+  // field: solid yellow
+  g.fillStyle = ink(0, 0, 1); g.fillRect(0, 700, W, H - 700);
+  // near hill: solid blue overprinted on the field = dark green
+  over(() => { hill(860, 70, .0026, 4.2); g.fillStyle = ink(1, 0, 0); g.fill(); });
+  // path as a paper knockout
+  g.fillStyle = ink(); g.beginPath(); g.moveTo(1500, H); g.bezierCurveTo(1380, 960, 1600, 860, 1450, 760); g.lineTo(1470, 760); g.bezierCurveTo(1650, 870, 1440, 960, 1620, H); g.fill();
+  // kite + figure on the ridge, knocked out with a paper halo
+  const fx = 300 + 520 * eio(span(t, 0.6, 5.4)), fy = 880 - 70 * Math.sin(fx * .0026 + 4.2) - 28 * Math.sin(fx * .007 + 8.4);
+  const tt = step12(t), kx = fx + 360 + 30 * Math.sin(tt * 2.1), ky = 330 + 26 * Math.sin(tt * 1.7);
+  halo(c => {
+    c.strokeStyle = ink(1, 0, 0); c.lineWidth = 4; c.beginPath(); c.moveTo(fx + 49, fy - 242); c.quadraticCurveTo(kx - 160, ky + 160, kx, ky + 70); c.stroke();
+    c.fillStyle = ink(0, 0, 1); c.beginPath(); c.moveTo(kx, ky - 70); c.lineTo(kx + 52, ky); c.lineTo(kx, ky + 70); c.lineTo(kx - 52, ky); c.fill();
+    c.fillStyle = ink(1, 0, 1); c.beginPath(); c.moveTo(kx, ky - 70); c.lineTo(kx + 52, ky); c.lineTo(kx, ky); c.lineTo(kx - 52, ky); c.fill();   // blue over yellow = green half
+    for (let i = 0; i < 4; i++) { c.fillStyle = ink(1, 0, 0); c.beginPath(); c.arc(kx - 10 * i + 8 * Math.sin(tt * 5 + i), ky + 100 + 34 * i, 9, 0, 7); c.fill(); }
+    walker(c, fx, fy, t, 1.3, t > 6.0 ? -1 : 0);
+  }, 5);
+  // title: printed on the blue plate only; double-hit on pink after the snap
+  g.font = '800 196px "Bricolage Grotesque", "Arial Black", sans-serif'; g.textBaseline = 'alphabetic'; g.letterSpacing = '4px';
+  const wipe = 140 + 1300 * eo(span(t, 0.3, 0.5));
+  g.save(); g.beginPath(); g.rect(0, 0, wipe, H); g.clip();
+  g.fillStyle = ink(1, 0, 0); g.fillText('HALCYON', 120, 250);
+  if (t >= 5.0) over(() => { g.fillStyle = ink(0, 1, 0); g.fillText('HALCYON', 132, 262); });
+  g.restore(); g.letterSpacing = '0px';
+  g.font = '500 40px Jost, "Helvetica Neue", sans-serif'; g.fillStyle = ink(1, 0, 0);
+  if (t >= 0.6) g.fillText('a summer issue in three inks', 128, 320);
+  // subtitle strip: paper knockout, text on the blue plate
+  if (t >= 5.0) {
+    const s = 'ISSUE 04  ·  KITE SEASON'; g.font = '700 44px Jost, sans-serif'; const w = g.measureText(s).width + 64;
+    g.fillStyle = ink(); g.beginPath(); g.roundRect(960 - w / 2, 952, w, 74, 10); g.fill();
+    g.fillStyle = ink(1, 0, 0); g.textAlign = 'center'; g.fillText(s, 960, 1004); g.textAlign = 'left';
+  }
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('800 196px "Bricolage Grotesque"', 'HALCYON'), document.fonts.load('500 40px Jost', 'a summer issue'), document.fonts.load('700 44px Jost', 'ISSUE 04 KITE')]);
+  await document.fonts.ready;
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  drawPlate(t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, plate);
+  gl.uniform1i(U('uTex'), 0);
+  gl.uniform2fv(U('uOff'), registration(t).flat());
+  gl.uniform1fv(U('uGate'), PLATE_IN.map(a => t >= a ? 1 : 0));
+  gl.uniform1fv(U('uSweep'), PLATE_IN.map(a => t < a + 0.7 ? -60 + (W + 200) * eio(span(t, a, 0.55)) : 1e5));
+  gl.uniform1f(U('uSeed'), Math.floor(t * 12 + 1e-4));          // grain re-rolls once per "print" (12 fps)
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+};
+</script>
+</body>
+</html>

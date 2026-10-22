@@ -235,7 +235,7 @@ const ready = (async () => { await document.fonts.ready; paper = makePaper(); gr
 
 window.renderAt = async (t) => {
   await ready;
-  BN = Math.floor(t * BOIL + 1e-6); beatT = t;
+  BN = Math.floor(t * BOIL + 1e-4); beatT = t;
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
   ctx.drawImage(paper, 0, 0);
   let s = 0; while (s + 1 < SHOTS.length && t >= SHOTS[s + 1][0]) s++;

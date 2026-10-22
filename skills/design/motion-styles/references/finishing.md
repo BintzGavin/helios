@@ -42,7 +42,7 @@ function buildGrain(ctx, seed = 7, n = 4) {               // call inside ready, 
   });
 }
 function grain(ctx, t, amount = 0.07) {
-  const f = Math.floor(t * GRAIN_FPS + 1e-6);              // new grain 12×/s
+  const f = Math.floor(t * GRAIN_FPS + 1e-4);              // new grain 12×/s
   const ox = Math.floor(hash(f * 2 + 1) * TILE), oy = Math.floor(hash(f * 2 + 2) * TILE);
   ctx.save();
   ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = amount;
@@ -215,7 +215,7 @@ void main(){
 }`;
 ```
 
-Drive it from `t`: `const sheet = Math.floor(t * 12 + 1e-6)`, then offsets such as `[Math.sin(sheet * 0.9 + i * 2) * 1.5, Math.cos(sheet * 0.7 + i) * 1.5]` px. Misregistration of 1–4 px reads as print; past 6 px it reads as a glitch. Snapping all plates into register on a beat makes a strong hero moment. Pass inks as 0–1 RGB (`[0, 120, 191].map(v => v / 255)`).
+Drive it from `t`: `const sheet = Math.floor(t * 12 + 1e-4)`, then offsets such as `[Math.sin(sheet * 0.9 + i * 2) * 1.5, Math.cos(sheet * 0.7 + i) * 1.5]` px. Misregistration of 1–4 px reads as print; past 6 px it reads as a glitch. Snapping all plates into register on a beat makes a strong hero moment. Pass inks as 0–1 RGB (`[0, 120, 191].map(v => v / 255)`).
 
 ## 8. Halftone dots
 
@@ -280,7 +280,7 @@ Apply this over the finished frame at 24 fps (`--fps 24`). It combines gate weav
 
 ```js
 function filmDamage(ctx, src, t, k = 1, fps = 24) {
-  const f = Math.floor(t * fps + 1e-6);
+  const f = Math.floor(t * fps + 1e-4);
   const wx = (Math.sin(f * 0.31) * 0.6 + Math.sin(f * 0.113 + 1.3) * 0.8 + (hash(f) - 0.5) * 0.5) * 1.4 * k;
   const wy = (Math.sin(f * 0.23 + 0.7) * 0.7 + Math.sin(f * 0.071 + 2.1) * 0.9 + (hash(f + 99) - 0.5) * 0.6) * 1.6 * k;
   const flick = 1 + ((hash(f + 7) - 0.5) * 0.08 + Math.sin(f * 1.9) * 0.02) * k;   // keep under ±10 %

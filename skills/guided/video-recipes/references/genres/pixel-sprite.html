@@ -142,7 +142,7 @@ const ready = Promise.resolve().then(() => { buf = new Uint8Array(BW * BH); spr 
 
 window.renderAt = async (time) => {
   await ready;
-  const t = ((time % T) + T) % T, tq = Math.floor(t * FPS_FEEL + 1e-6) / FPS_FEEL;   // 10 fps feel for everything that acts
+  const t = ((time % T) + T) % T, tq = Math.floor(t * FPS_FEEL + 1e-4) / FPS_FEEL;   // 10 fps feel for everything that acts
   const m = machine(tq), p = pose(m), lt = m.lt, seed = m.c * 101;
   const OX = 18, OY = 70 - 34;                                               // sprite layer origin (feet on the ground row)
   const tipGuess = [OX + Math.round(p.hx + 2 + Math.sin(p.ang) * 15), OY + Math.round(p.hy + 12 + p.bob - Math.cos(p.ang) * 15) - 1];

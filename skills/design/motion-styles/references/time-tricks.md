@@ -17,7 +17,7 @@ const hash = (n) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return
 
 ```js
 const frameOf = (t) => Math.floor(t * FPS + 0.5);                // nearest frame: per-frame discrete state
-const stepped = (t, fps = 12) => Math.floor(t * fps + 1e-6) / fps; // time quantised in seconds
+const stepped = (t, fps = 12) => Math.floor(t * fps + 1e-4) / fps; // time quantised in seconds
 ```
 
 - Frame `n` is rendered at `t = n / FPS`, and `n / 30 * 12` can come out as `3.9999999`. Without the `1e-6`, a held drawing changes one frame late at random places.
@@ -31,7 +31,7 @@ Hand animation doesn't keep one step rate. It runs on ones for fast action, twos
 ```js
 const XSHEET = [[0, 24, 2], [24, 36, 1], [36, 72, 2], [72, 96, 3]];   // [fromFrame, toFrame, hold] at 24 fps
 function exposure(t, fps = 24) {
-  const f = Math.floor(t * fps + 1e-6);
+  const f = Math.floor(t * fps + 1e-4);
   let id = 0;
   for (const [a, b, n] of XSHEET) {
     if (f >= b) { id += Math.ceil((b - a) / n); continue; }
@@ -72,7 +72,7 @@ function roll(t, t0, final, id = 0, frames = 5) {           // slot-machine digi
   if (f >= frames) return final;
   return final.replace(/[0-9]/g, (c, i) => String(Math.floor(hash(id * 131 + i * 17 + f) * 10)));
 }
-const typed = (t, t0, str, cps = 30) => str.slice(0, Math.max(0, Math.floor((t - t0) * cps + 1e-6)));
+const typed = (t, t0, str, cps = 30) => str.slice(0, Math.max(0, Math.floor((t - t0) * cps + 1e-4)));
 const counter = (t, t0, t1, to) => Math.round(to * easeIO(seg(t, t0, t1))).toLocaleString('en-US');
 ```
 

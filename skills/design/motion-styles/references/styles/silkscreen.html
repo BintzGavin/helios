@@ -1,0 +1,200 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render silkscreen.html -o silkscreen.mp4 --duration 8 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800&family=Outfit:wght@600&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#2b211b;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// SILKSCREEN: opaque flat inks, one Path2D per pull, revealed by a ragged squeegee front.
+// Stepped bands instead of gradients, 1-3 px registration, a multiply ghost under each ink, no fades.
+const W = 1920, H = 1080;
+const ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, a, d) => clamp((t - a) / d);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+// two runs of the same screens: noon, then dusk (palette re-ink = time passing). Six inks each.
+const NOON = { sky1: '#D3E6EC', sky2: '#7FB3C8', far: '#D9C7A3', mid: '#2F6E8E', near: '#173247', acc: '#E8553D' };
+const DUSK = { sky1: '#F6CD98', sky2: '#EE9A73', far: '#9A7FA8', mid: '#3E7079', near: '#1E3B3F', acc: '#FBE6B4' };
+const PAPER = '#F1E6CF';
+const ART = [150, 100, 1620, 700];                                // art area; info band below it
+const BAND = [150, 800, 1620, 180];
+
+// ---------- shapes: one Path2D per screen, built once ----------
+const P = {};
+function buildPaths() {
+  const [ax, ay, aw, ah] = ART;
+  P.sky1 = new Path2D(); P.sky1.rect(ax, ay, aw, ah);
+  // stepped band sky: solid, then stripes that thin out (the gradient substitute)
+  P.sky2 = new Path2D(); P.sky2.rect(ax, ay, aw, 120);
+  let y = ay + 120;
+  for (let i = 0; i < 7; i++) { const h = 26 - i * 3.4, gap = 10 + i * 6; y += gap; P.sky2.rect(ax, y, aw, h); y += h; }
+  // sun: disc + two concentric rings (evenodd rings)
+  P.sun = new Path2D(); P.sun.arc(1380, 470, 96, 0, 7);
+  for (const r of [122, 150]) { P.sun.moveTo(1380 + r + 9, 470); P.sun.arc(1380, 470, r + 9, 0, 7); P.sun.moveTo(1380 + r, 470); P.sun.arc(1380, 470, r, 0, 7, true); }
+  // far ridge with jagged peaks
+  P.far = new Path2D(); P.far.moveTo(ax, 590);
+  const R = mulberry(4);
+  for (let x = ax; x < ax + aw - 30; x += 60) P.far.lineTo(x + 30, 520 + R() * 50), P.far.lineTo(x + 60, 575 + R() * 20);
+  P.far.lineTo(ax + aw, 610); P.far.lineTo(ax, 610); P.far.closePath();
+  // sea with paper glint bars knocked out (evenodd holes)
+  P.mid = new Path2D(); P.mid.rect(ax, 600, aw, 200);
+  P.glints = [];
+  for (let i = 0; i < 26; i++) P.glints.push([900 + R() * 820, 625 + R() * 150, 30 + R() * 90]);
+  // headland + lighthouse + band share the near ink
+  P.near = new Path2D();
+  P.near.moveTo(ax, 560); P.near.lineTo(330, 548); P.near.lineTo(480, 566); P.near.lineTo(590, 600);
+  P.near.lineTo(700, 690); P.near.lineTo(760, 740); P.near.lineTo(860, 800); P.near.lineTo(ax, 800); P.near.closePath();
+  P.near.moveTo(392, 556); P.near.lineTo(404, 360); P.near.lineTo(456, 360); P.near.lineTo(468, 556); P.near.closePath();   // tower
+  P.near.moveTo(398, 352); P.near.lineTo(462, 352); P.near.lineTo(452, 300); P.near.lineTo(408, 300); P.near.closePath();   // lantern room
+  P.near.moveTo(400, 300); P.near.lineTo(430, 270); P.near.lineTo(460, 300); P.near.closePath();                            // cap
+  P.near.rect(...BAND);
+  // accent on the tower: stripes + lamp (sits on top of the near ink)
+  P.acc = new Path2D();
+  for (const [y0, y1] of [[392, 420], [460, 490], [526, 552]]) { const k = (y) => 12 * (y - 360) / 196; P.acc.moveTo(404 - k(y0), y0); P.acc.lineTo(456 + k(y0), y0); P.acc.lineTo(456 + k(y1), y1); P.acc.lineTo(404 - k(y1), y1); P.acc.closePath(); }
+  P.acc.rect(414, 312, 32, 30);
+  // beam (printed later, dusk only)
+  P.beam = new Path2D(); P.beam.moveTo(446, 318); P.beam.lineTo(1770, 250); P.beam.lineTo(1770, 372); P.beam.lineTo(446, 336); P.beam.closePath();
+}
+
+// ---------- paper, mottle and pinhole textures (seeded, built once) ----------
+const TX = {};
+function tile(n, fn) { const c = document.createElement('canvas'); c.width = c.height = n; fn(c.getContext('2d'), n); return c; }
+function buildTextures() {
+  const R = mulberry(7);
+  TX.paper = tile(512, (g, n) => {
+    g.fillStyle = PAPER; g.fillRect(0, 0, n, n);
+    for (let i = 0; i < 1400; i++) { const x = R() * n, y = R() * n, a = R() * 3.14, l = 3 + R() * 9; g.strokeStyle = R() < .5 ? 'rgba(255,255,250,.35)' : 'rgba(120,95,60,.12)'; g.lineWidth = .7; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); g.stroke(); }
+  });
+  TX.mottle = tile(512, (g, n) => {                               // multiply: uneven ink + drag streaks along the pull
+    g.fillStyle = '#fff'; g.fillRect(0, 0, n, n);
+    for (let i = 0; i < 260; i++) { g.fillStyle = `rgba(90,80,70,${.015 + R() * .025})`; g.beginPath(); g.arc(R() * n, R() * n, 4 + R() * 22, 0, 7); g.fill(); }
+    for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(80,70,60,${.03 + R() * .05})`; g.fillRect(R() * n, 0, 1 + R() * 3, n); }
+  });
+  TX.speck = tile(512, (g, n) => {                                // paper-coloured pinholes: invisible on paper, visible on ink
+    g.fillStyle = PAPER;
+    for (let i = 0; i < 420; i++) { g.globalAlpha = .4 + R() * .5; g.beginPath(); g.arc(R() * n, R() * n, .5 + R() * 1.3, 0, 7); g.fill(); }
+  });
+}
+const texFill = (tex, op, a, ox = 0) => { const p = ctx.createPattern(tex, 'repeat'); p.setTransform(new DOMMatrix([1, 0, 0, 1, ox, ox * .6])); ctx.save(); ctx.globalCompositeOperation = op; ctx.globalAlpha = a; ctx.fillStyle = p; ctx.fillRect(120, 70, 1680, 940); ctx.restore(); };
+
+// ---------- printing ----------
+// ragged squeegee front moving down a box: everything above the front is printed
+function pullClip(box, p, seed, tail = 30) {
+  const [x, y, w, h] = box, front = y - tail + p * (h + tail * 2), path = new Path2D();
+  if (p >= 1) { path.rect(0, 0, W, H); return path; }
+  path.moveTo(x - 10, -10);
+  for (let s = -10; s <= w + 10; s += 6) { const n = hash(Math.floor(s / 6) * 7.13 + seed) * .65 + hash(Math.floor(s / 18) + seed * 3) * .35; path.lineTo(x + s, front - tail * n); }
+  path.lineTo(x + w + 10, -10); path.closePath(); return path;
+}
+const INV = new Map();
+function ink(path, color, reg, clip, rule = 'evenodd') {
+  ctx.save(); if (clip) ctx.clip(clip); ctx.translate(reg[0], reg[1]);
+  ctx.save(); ctx.translate(2.2, -1.6); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .4; ctx.fillStyle = color; ctx.fill(path, rule); ctx.restore();  // overprint ghost
+  ctx.fillStyle = color; ctx.fill(path, rule);
+  if (!INV.has(path)) { const inv = new Path2D(); inv.rect(-100, -100, W + 200, H + 200); inv.addPath(path); INV.set(path, inv); }
+  ctx.clip(path, rule);                                         // ink thickness: light rim top-left, dark rim bottom-right (fills only)
+  ctx.translate(1.6, 1.6); ctx.fillStyle = 'rgba(255,255,255,.2)'; ctx.fill(INV.get(path), 'evenodd');
+  ctx.translate(-3.2, -3.2); ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fill(INV.get(path), 'evenodd');
+  ctx.restore();
+}
+function text(str, x, y, font, color, reg, clip, track = 0, align = 'left') {
+  ctx.save(); if (clip) ctx.clip(clip);
+  ctx.font = font; ctx.letterSpacing = track + 'px'; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .4; ctx.fillStyle = color; ctx.fillText(str, x + reg[0] + 2.2, y + reg[1] - 1.6);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; ctx.fillText(str, x + reg[0], y + reg[1]);
+  ctx.restore();
+}
+function squeegee(cx, cy, half, color, ang = 0) {              // blade + ink bead + a sliver of handle
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+  const a = -half, b = half;
+  ctx.fillStyle = 'rgba(0,0,0,.22)'; ctx.fillRect(a + 10, -28, b - a, 44);                   // shadow
+  ctx.fillStyle = color; ctx.beginPath(); ctx.roundRect(a, 2, b - a, 22, 11); ctx.fill();     // bead
+  ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(a + 8, 7, b - a - 16, 3);
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(a + 6, 19, b - a - 12, 4);
+  ctx.fillStyle = '#26282b'; ctx.fillRect(a - 6, -8, b - a + 12, 12);                         // rubber blade
+  ctx.fillStyle = '#9b7148'; ctx.fillRect(a - 10, -34, b - a + 20, 26);                       // wooden handle
+  ctx.fillStyle = 'rgba(255,255,255,.12)'; ctx.fillRect(a - 10, -34, b - a + 20, 6);
+  ctx.restore();
+}
+
+// ---------- the print run ----------
+// [layer, start, dur] — linear pulls, accent half a beat after its layer
+const PULLS = [['sky1', 0.0, 0.45], ['sky2', 0.5, 0.4], ['sun', 0.95, 0.35], ['far', 1.35, 0.4], ['mid', 1.8, 0.45], ['near', 2.3, 0.5], ['acc', 2.9, 0.3]];
+const ORDER = { sky1: 'sky1', sky2: 'sky2', sun: 'acc', far: 'far', mid: 'mid', near: 'near', acc: 'acc' };
+const regOf = (i, run) => [(hash(i * 3 + run * 17) - .5) * 4, (hash(i * 7 + run * 23 + 50) - .5) * 4];   // 1-3 px, fixed per run
+const REINK = [5.0, 0.35];
+
+const IMG = new Path2D(); IMG.rect(...ART); IMG.rect(...BAND);
+function printRun(t, pal, run) {
+  ctx.save(); ctx.clip(IMG);                                     // inks stay inside the image area; the paper border stays bare
+  PULLS.forEach(([id, t0, d], i) => {
+    if (t < t0) return;
+    const p = span(t, t0, d), box = id === 'near' ? [150, 100, 1620, 880] : ART;
+    ink(P[id], pal[ORDER[id]], regOf(i, run), p < 1 ? pullClip(box, p, i * 11 + 3) : null);
+    if (id === 'mid') {                                          // glints: paper bars, stepping at 6 fps
+      const st = Math.floor(t * 6 + 1e-4);
+      ctx.save(); if (p < 1) ctx.clip(pullClip(box, p, i * 11 + 3)); ctx.fillStyle = PAPER;
+      P.glints.forEach(([x, y, w], k) => { if (hash(k * 5 + st * 3) > .35) ctx.fillRect(x + (hash(k + st) - .5) * 14, y, w, 5); });
+      ctx.restore();
+    }
+  });
+  // header printed into the sky, then the info band, item by item on the beat
+  const tclip = t < 3.75 ? pullClip([150, 100, 1620, 180], span(t, 3.3, 0.45), 77) : null;
+  const big = '800 128px "Big Shoulders Display", "Arial Narrow", sans-serif', lab = '600 26px Outfit, sans-serif';
+  if (t >= 3.3) text('NORTHWIND POINT', 960, 236, big, pal.near, regOf(9, run), tclip, 16, 'center');
+  const items = [[3.8, 'LIGHTHOUSE WALK', 200, 900, '800 92px "Big Shoulders Display", sans-serif', pal.sky1],
+    [4.05, '07', 1715, 900, '800 104px "Big Shoulders Display", sans-serif', pal.acc, 'right'],
+    [4.3, 'DISTANCE  6 KM', 204, 950, lab, pal.sky2], [4.45, 'TIME  2 H', 640, 950, lab, pal.sky2], [4.6, 'OPEN  DAWN TO DUSK', 980, 950, lab, pal.sky2]];
+  items.forEach(([t0, s, x, y, f, c, al], k) => {
+    if (t < t0) return;
+    const cl = new Path2D(); cl.rect(0, 0, al === 'right' ? W : x - 10 + 900 * span(t, t0, 0.14), H);   // fast linear stamp-in, never a fade
+    text(s, x, y, f, c, regOf(20 + k, run), cl, k < 2 ? 6 : 5, al || 'left');
+  });
+  ctx.fillStyle = pal.acc; if (t >= 4.3) ctx.fillRect(200, 916, Math.min(1515, 1515 * span(t, 4.3, 0.3) + 1), 4);   // rule
+  if (run === 1 && t >= 5.6) {                                   // dusk only: the beam, a fresh pull in the accent ink
+    ink(P.beam, pal.acc, [1.5, -1], span(t, 5.6, 0.3) < 1 ? pullClip(ART, span(t, 5.6, 0.3), 91) : null);
+    const wet = 1 - span(t, 5.9, 0.9);                           // fresh-ink sheen dries in under a second
+    if (wet > 0) { ctx.save(); ctx.globalAlpha = .18 * wet; ctx.fillStyle = '#fff'; ctx.fill(P.beam); ctx.restore(); }
+  }
+  ctx.restore();
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('800 128px "Big Shoulders Display"', 'NORTHWIND POINT LIGHTHOUSE WALK 07'), document.fonts.load('600 26px Outfit', 'DISTANCE 6 KM TIME 2 H OPEN DAWN TO DUSK')]);
+  await document.fonts.ready;
+  buildPaths(); buildTextures();
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  // workbench + sheet (slight push-in across the whole film, on ones)
+  ctx.fillStyle = '#2b211b'; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < 9; i++) { ctx.fillStyle = i % 2 ? '#30251e' : '#281e18'; ctx.fillRect(i * 240, 0, 236, H); }
+  const z = 1 + 0.025 * span(t, 0, 8);
+  ctx.setTransform(z, 0, 0, z, 960 * (1 - z), 540 * (1 - z));
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(132, 84, 1680, 940);
+  texFill(TX.paper, 'source-over', 1);
+  const [rt, rd] = REINK, rp = span(t, rt, rd);
+  printRun(t, NOON, 0);
+  if (t >= rt) {                                                 // diagonal re-ink: same screens, dusk inks behind the blade
+    const f = -400 + rp * 3800, clip = new Path2D(); clip.moveTo(-200, -200); clip.lineTo(f, -200); clip.lineTo(f - 1300, 1400); clip.lineTo(-200, 1400); clip.closePath();
+    ctx.save(); ctx.clip(clip); texFill(TX.paper, 'source-over', 1); printRun(t, DUSK, 1); ctx.restore();
+  }
+  texFill(TX.mottle, 'multiply', .5, 13); texFill(TX.speck, 'source-over', .75, 5);
+  // the blade rides on every live pull
+  for (const [id, t0, d] of PULLS) if (t >= t0 && t < t0 + d) { const box = id === 'near' ? [150, 100, 1620, 880] : ART; squeegee(960, box[1] - 30 + span(t, t0, d) * (box[3] + 60), 850, NOON[ORDER[id]]); }
+  if (t >= 3.3 && t < 3.75) squeegee(960, 70 + span(t, 3.3, 0.45) * 240, 850, NOON.near);
+  if (t >= 5.6 && t < 5.9) squeegee(960, 70 + span(t, 5.6, 0.3) * 300, 850, DUSK.acc);
+  if (rp > 0 && rp < 1) { const f = -400 + rp * 3800; squeegee(f - 601, 540, 1100, DUSK.sky2, Math.atan2(1600, -1300) - Math.PI); }
+};
+</script>
+</body>
+</html>

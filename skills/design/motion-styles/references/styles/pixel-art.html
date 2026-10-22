@@ -17,7 +17,7 @@ const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const B4 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
 const bayer = (x, y) => B4[(y & 3) * 4 + (x & 3)];
-const step = (t, fps) => Math.floor(t * fps + 1e-6) / fps;
+const step = (t, fps) => Math.floor(t * fps + 1e-4) / fps;
 
 const MASTER = ['#0b0a14', '#1b1a2e', '#2a2c4f', '#3d4775', '#566aa6', '#7fa3d9', '#b5d8f2', '#f4f1e6',
   '#2b1d2a', '#4d2d45', '#7a3e5c', '#b8576a', '#e8826a', '#f5b56b', '#fbe39a', '#173126',

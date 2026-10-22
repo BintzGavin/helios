@@ -30,10 +30,10 @@ The hook is the first charge (within 2 s). The hero moment is the impact frame. 
 
 ## Technique
 
-**Everything is a pure function of phase, on a stepped clock.** Replace any fixed-timestep simulation (`pos += vel` every tick) with closed-form functions of `t`. The stepped clock `tq = floor(t · 10 + 1e-6) / 10` gives the 8–12 fps feel to everything that *acts* (poses, particles, shake), even though the render runs at 30 fps.
+**Everything is a pure function of phase, on a stepped clock.** Replace any fixed-timestep simulation (`pos += vel` every tick) with closed-form functions of `t`. The stepped clock `tq = floor(t · 10 + 1e-4) / 10` gives the 8–12 fps feel to everything that *acts* (poses, particles, shake), even though the render runs at 30 fps.
 
 ```js
-const tq = Math.floor(t * FPS_FEEL + 1e-6) / FPS_FEEL;         // 10 fps feel
+const tq = Math.floor(t * FPS_FEEL + 1e-4) / FPS_FEEL;         // 10 fps feel
 function machine(t) {                                           // state = pure function of phase
   const c = Math.floor(t / CYC), lt = t - c * CYC, ph = lt / CYC;
   let i = 0; while (i + 1 < STATES.length && ph >= STATES[i + 1][1]) i++;

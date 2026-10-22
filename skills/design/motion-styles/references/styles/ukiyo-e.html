@@ -1,0 +1,220 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render ukiyo-e.html -o ukiyo-e.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Yuji+Syuku&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#eee2c6;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// UKIYO-E: each colour group is its own cached block (offscreen canvas) composited with a fixed small
+// registration offset; a key-line block on top; bokashi with a noisy edge; woodgrain, baren rub and specks
+// pressed into every block; figures stepped at 8 fps; a handscroll camera that slides right → left.
+const W = 1920, H = 1080, WW = 2880;                               // the scroll is wider than the frame
+const ctx = document.getElementById('c').getContext('2d');
+const PAL = { paper: '#eee2c6', prus: '#1d3a66', prusL: '#4d6f98', sky: '#8db0c6', sumi: '#231f1c', grey: '#8b8a80', beni: '#b8412f', ochre: '#cf9f4a', green: '#8aa152', greenD: '#50703c', pine: '#3e5a3a', wood: '#8a6a48', skin: '#ecd6b2', cream: '#f3e7c6' };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, a, d) => clamp((t - a) / d);
+const ss = x => x * x * (3 - 2 * x);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const vnoise = x => { const i = Math.floor(x), f = x - i; return hash(i) + (hash(i + 1) - hash(i)) * ss(f); };
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const mk = (w = WW, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const hex = s => [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16));
+function noise2(w, h, cell, seed) {                                  // smooth value noise field 0..1
+  const R = mulberry(seed), gw = Math.ceil(w / cell) + 2, g = Float32Array.from({ length: gw * (Math.ceil(h / cell) + 2) }, R), f = new Float32Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) { const fx = x / cell, fy = y / cell, ix = fx | 0, iy = fy | 0, sx = ss(fx - ix), sy = ss(fy - iy), o = iy * gw + ix;
+    f[y * w + x] = (g[o] + (g[o + 1] - g[o]) * sx) * (1 - sy) + (g[o + gw] + (g[o + gw + 1] - g[o + gw]) * sx) * sy; }
+  return f;
+}
+
+// ---------- textures (seeded, built once) ----------
+const TX = {};
+function buildTextures() {
+  const R = mulberry(5);
+  TX.paper = mk(); { const x = TX.paper.getContext('2d'), n = noise2(360, 135, 18, 11), s = mk(360, 135), sx = s.getContext('2d'), id = sx.createImageData(360, 135), [r, g, b] = hex(PAL.paper);
+    for (let i = 0; i < n.length; i++) { const v = (n[i] - .5) * 22; id.data.set([r + v, g + v * .95, b + v * .8, 255], i * 4); }
+    sx.putImageData(id, 0, 0); x.drawImage(s, 0, 0, WW, H); fibers(x, 5000, '#fbf6e9', .3, R); fibers(x, 1400, '#c7b893', .15, R); }
+  TX.fiber = mk(); fibers(TX.fiber.getContext('2d'), 3000, '#f4ead4', .09, R);    // paper fibres pressed through the ink
+  TX.grain = mk(1440, 540); { const x = TX.grain.getContext('2d'), n = noise2(1440, 540, 70, 41), id = x.createImageData(1440, 540);
+    for (let i = 0; i < n.length; i++) { const X = i % 1440, Y = i / 1440 | 0, u = Y * .07 + n[i] * 9 + Math.sin(X * .004) * 1.4, d = Math.abs(u - Math.floor(u) - .5) * 2;
+      id.data.set([24, 20, 30, (d > .8 ? Math.pow((d - .8) / .2, 1.6) * .85 : 0) * 255 + (.5 + .5 * Math.sin(u * .9)) * 70], i * 4); }
+    x.putImageData(id, 0, 0); }
+  TX.baren = mk(); { const x = TX.baren.getContext('2d'); x.filter = 'blur(7px)'; x.lineCap = 'round';
+    for (let i = 0; i < 300; i++) { const cx = R() * WW, cy = R() * H, r = 40 + R() * 170, a = R() * 6.28; x.strokeStyle = `rgba(0,0,0,${.05 + R() * .12})`; x.lineWidth = 14 + R() * 40; x.beginPath(); x.arc(cx, cy, r, a, a + 1 + R() * 3.5); x.stroke(); } }
+  TX.speck = mk(1440, 540); { const x = TX.speck.getContext('2d'), n = noise2(1440, 540, 40, 31), id = x.createImageData(1440, 540);
+    for (let i = 0; i < n.length; i++) if (R() < .02 + .3 * Math.pow(n[i], 3.5)) id.data[i * 4 + 3] = 90 + R() * 140; x.putImageData(id, 0, 0); }
+}
+function fibers(x, n, col, a, R) { x.strokeStyle = col; x.lineCap = 'round';
+  for (let i = 0; i < n; i++) { let px = R() * WW, py = R() * H, ang = R() * 6.28; x.globalAlpha = a * (.4 + R() * .6); x.lineWidth = .5 + R(); x.beginPath(); x.moveTo(px, py);
+    for (let s = 0; s < 5; s++) { ang += (R() - .5) * .9; px += Math.cos(ang) * 10; py += Math.sin(ang) * 10; x.lineTo(px, py); } x.stroke(); } x.globalAlpha = 1; }
+// make a block look printed: woodgrain inside the ink, then baren rub and goma-zuri specks lifted out
+function inkify(c, grain, baren, speck = .45) { const x = c.getContext('2d'); x.save();
+  if (grain) { x.globalCompositeOperation = 'source-atop'; x.globalAlpha = grain; x.drawImage(TX.grain, 0, 0, WW, H); }
+  x.globalCompositeOperation = 'destination-out';
+  if (baren) { x.globalAlpha = baren; x.drawImage(TX.baren, 0, 0); }
+  x.globalAlpha = speck; x.drawImage(TX.speck, 0, 0, WW, H); x.restore(); }
+// bokashi: per-pixel wiped gradient whose edge wanders per column (never fillRect strips)
+function bokashi(x, x0, x1, y0, y1, col, a0, a1, seed, rough = 26) {
+  const w = x1 - x0, top = Math.min(y0, y1) - rough * 1.5, h = Math.abs(y1 - y0) + rough * 3, c = mk(w, h), cx = c.getContext('2d'), id = cx.createImageData(w, h), [r, g, b] = hex(col);
+  for (let i = 0; i < w; i++) { const off = (vnoise((x0 + i) * .006 + seed) - .5) * 2 * rough + (vnoise((x0 + i) * .03 + seed * 5) - .5) * rough * .35;
+    for (let j = 0; j < h; j++) { const u = clamp((top + j - (y0 + off)) / (y1 - y0)); id.data.set([r, g, b, (a0 + (a1 - a0) * u) * 255], (j * w + i) * 4); } }
+  cx.putImageData(id, 0, 0); x.drawImage(c, x0, top);
+}
+function kasumi(x, cx, cy, w, h, col, a) {                           // a long rounded mist band, fading at both ends
+  const g = x.createLinearGradient(cx - w / 2, 0, cx + w / 2, 0), [r, gg, b] = hex(col);
+  [[0, 0], [.14, a], [.86, a], [1, 0]].forEach(([o, al]) => g.addColorStop(o, `rgba(${r},${gg},${b},${al})`));
+  x.fillStyle = g; x.beginPath(); x.roundRect(cx - w / 2, cy - h / 2, w, h, h / 2); x.fill();
+}
+function pad(x, cx, cy, w) { const n = Math.round(w / 22); x.beginPath(); x.moveTo(cx - w / 2, cy + 5);
+  for (let i = 0; i < n; i++) { const a = cx - w / 2 + i * w / n, b = a + w / n, lift = 12 - 6 * Math.abs(i - (n - 1) / 2) / n; x.quadraticCurveTo((a + b) / 2, cy - lift - 8, b, cy - (i === n - 1 ? -5 : lift * .4)); }
+  x.closePath(); }
+const path = (x, pts) => { x.beginPath(); pts.forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); };
+
+// ---------- the scroll: colour blocks + key block, cached once in world coordinates ----------
+const MOUNT = []; for (let X = 80; X <= 1260; X += 10) MOUNT.push([X, 640 - 300 * Math.exp(-(((X - 520) / 210) ** 2)) - 200 * Math.exp(-(((X - 900) / 170) ** 2)) + 6 * Math.sin(X * .05)]);
+const HILL = [[1960, 1040], [2080, 750], [2300, 650], [2600, 600], [2880, 575], [2880, 1040]];
+const PINES = [[2420, 640, -.18], [2700, 600, .1], [2820, 590, -.05]];
+const B = {};
+function buildBlocks() {
+  B.blue = mk(); { const x = B.blue.getContext('2d');
+    bokashi(x, 0, WW, 44, 340, PAL.prus, .92, 0, 3);                 // sky: deep at the top, wiped away by hand
+    x.fillStyle = PAL.sky; x.fillRect(0, 640, WW, 400);
+    bokashi(x, 0, WW, 640, 780, PAL.prus, .88, 0, 9, 14);             // sea: dark at the horizon
+    path(x, [...MOUNT, [1260, 640], [80, 640]]); x.fillStyle = PAL.prusL; x.fill();
+    x.save(); x.clip(); bokashi(x, 80, 1260, 330, 520, PAL.prus, .8, 0, 6, 30); x.restore();
+    inkify(B.blue, .1, .5); }
+  B.green = mk(); { const x = B.green.getContext('2d');
+    path(x, HILL); x.fillStyle = PAL.green; x.fill();
+    x.save(); x.clip(); bokashi(x, 1880, WW, 600, 760, PAL.greenD, .9, 0, 12, 22); x.restore();
+    for (const [px, py, lean] of PINES) for (let k = 0; k < 4; k++) { const cx = px + lean * 260 * (k / 3) + (k % 2 ? 40 : -30), cy = py - 90 - k * 62, w = 150 - k * 22;
+      x.fillStyle = PAL.pine; pad(x, cx, cy, w); x.fill(); }   // flat needle pads with a scalloped top
+    inkify(B.green, .1, .45); }
+  B.ochre = mk(); { const x = B.ochre.getContext('2d'); x.fillStyle = PAL.ochre;
+    path(x, [[1960, 1040], [2240, 820], [2600, 760], [2880, 740], [2880, 790], [2620, 812], [2300, 880], [2080, 1040]]); x.fill();   // the path along the shore
+    x.fillStyle = PAL.wood; for (const [px, py, lean] of PINES) { path(x, [[px - 9, py], [px + 9, py], [px + lean * 260 + 4, py - 280], [px + lean * 260 - 4, py - 280]]); x.fill(); }
+    inkify(B.ochre, .12, .4); }
+  B.red = mk(); { const x = B.red.getContext('2d'); x.fillStyle = PAL.beni; x.beginPath(); x.arc(1120, 300, 82, 0, 7); x.fill(); inkify(B.red, .08, .3); }
+  B.key = mk(); { const x = B.key.getContext('2d'); x.strokeStyle = PAL.sumi; x.lineCap = x.lineJoin = 'round';
+    x.lineWidth = 2.8; path(x, MOUNT); x.stroke(); path(x, HILL.slice(0, 5)); x.stroke();
+    x.lineWidth = 2; x.strokeStyle = PAL.grey; x.beginPath(); x.moveTo(0, 640); x.lineTo(WW, 640); x.stroke();     // distant things: grey line
+    x.strokeStyle = PAL.sumi; x.lineWidth = 2.4;
+    for (const [px, py, lean] of PINES) { path(x, [[px - 9, py], [px + lean * 260 - 4, py - 280]]); x.stroke(); path(x, [[px + 9, py], [px + lean * 260 + 4, py - 280]]); x.stroke();
+      for (let k = 0; k < 4; k++) { const cx = px + lean * 260 * (k / 3) + (k % 2 ? 40 : -30), cy = py - 90 - k * 62, w = 150 - k * 22; pad(x, cx, cy, w); x.stroke();
+        for (let n = -3; n <= 3; n++) { x.beginPath(); x.moveTo(cx + n * w / 9, cy - 4); x.lineTo(cx + n * w / 7.5, cy - 15); x.stroke(); } } }   // needle fans
+    for (const y of [36, 1044]) { x.lineWidth = 5; x.beginPath(); x.moveTo(0, y); x.lineTo(WW, y); x.stroke(); x.lineWidth = 1.5; x.beginPath(); x.moveTo(0, y + (y < 500 ? 9 : -9)); x.lineTo(WW, y + (y < 500 ? 9 : -9)); x.stroke(); }
+    inkify(B.key, 0, 0, .3); }
+  B.mist = mk(); { const x = B.mist.getContext('2d'); kasumi(x, 640, 600, 1180, 46, PAL.paper, .92); kasumi(x, 380, 668, 700, 30, PAL.paper, .8); kasumi(x, 2250, 655, 640, 34, PAL.paper, .85); kasumi(x, 600, 215, 760, 30, PAL.paper, .55); }
+}
+// registration: each block lands slightly off the key line, in its own direction; at the start it slides 5–6 px home
+// draw order = colour blocks, then the key line on top; reveal order = key first (t0 = 0), then each colour
+const BLOCKS = [['blue', [2, -1.5], [6, -5], .25], ['green', [-1.8, 2], [-5, 5], .5], ['ochre', [-2, -1], [-6, -3], .7], ['red', [1.5, 2], [5, 4], .9], ['key', [0, 0], [0, 0], 0.0]];
+function sweepClip(p, seed) {                                      // diagonal baren sweep with a noisy edge
+  const c = new Path2D(); c.moveTo(-50, -50);
+  for (let y = -50; y <= H + 50; y += 18) c.lineTo((p * 1.35 - .3 * y / H) / .75 * W + (vnoise(y * .02 + seed) - .5) * 120, y);
+  c.lineTo(-50, H + 50); c.closePath(); return c;
+}
+
+// ---------- per-frame: figures at 8 fps, waves at 12 fps ----------
+function waves(cam, t) {                                            // banded swells: scalloped key line, darker band below, paper foam on crests
+  const ph = Math.floor(t * 12 + 1e-4) / 12;
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); HILL.forEach(([a, b], i) => i ? ctx.lineTo(a - cam, b) : ctx.moveTo(a - cam, b)); ctx.closePath(); ctx.clip('evenodd');   // not over the headland
+  [[700, 70, 7, .6], [752, 92, 9, .8], [818, 118, 12, 1], [900, 150, 15, 1.2], [992, 190, 19, 1.4]].forEach(([y, sp, amp, sc], r) => {
+    const off = (ph * 14 * sc + r * 53) % sp, x0 = Math.floor((cam - 300) / sp) * sp - off, x1 = cam + W + sp, crest = [];
+    ctx.beginPath(); ctx.moveTo(x0 - cam, y + amp);
+    for (let X = x0; X < x1; X += sp) { ctx.quadraticCurveTo(X + sp * .25 - cam, y - amp * 1.4, X + sp * .5 - cam, y - amp * .2); ctx.quadraticCurveTo(X + sp * .7 - cam, y + amp * .9, X + sp - cam, y + amp); crest.push(X + sp * .42 - cam); }
+    ctx.save(); ctx.lineTo(x1 - cam, y + amp * 3.2); ctx.lineTo(x0 - cam, y + amp * 3.2); ctx.closePath();
+    const g = ctx.createLinearGradient(0, y - amp, 0, y + amp * 3.2); g.addColorStop(0, 'rgba(29,58,102,.32)'); g.addColorStop(1, 'rgba(29,58,102,0)');
+    ctx.fillStyle = g; ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.moveTo(x0 - cam, y + amp);
+    for (let X = x0; X < x1; X += sp) { ctx.quadraticCurveTo(X + sp * .25 - cam, y - amp * 1.4, X + sp * .5 - cam, y - amp * .2); ctx.quadraticCurveTo(X + sp * .7 - cam, y + amp * .9, X + sp - cam, y + amp); }
+    ctx.strokeStyle = PAL.sumi; ctx.lineWidth = 2.4; ctx.stroke();
+    ctx.fillStyle = PAL.paper; for (const x of crest) { ctx.beginPath(); ctx.arc(x, y - amp * .75, amp * .3, 0, 7); ctx.arc(x + amp * .9, y - amp * .45, amp * .2, 0, 7); ctx.fill(); }
+  });
+  ctx.restore();
+}
+function boat(cam, t) {
+  const st = Math.floor(t * 8 + 1e-4) / 8, a = .05 * Math.sin(st * 2.6);
+  ctx.save(); ctx.translate(1500 - cam, 800 + 4 * Math.sin(st * 2.6 + 1)); ctx.rotate(a);
+  ctx.fillStyle = PAL.wood; ctx.strokeStyle = PAL.sumi; ctx.lineWidth = 2.6;
+  path(ctx, [[-130, -10], [140, -18], [110, 18], [-100, 18]]); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = PAL.prus; path(ctx, [[-14, -10], [14, -10], [10, -62], [-10, -62]]); ctx.closePath(); ctx.fill(); ctx.stroke();       // boatman, indigo coat
+  ctx.fillStyle = PAL.skin; ctx.beginPath(); ctx.arc(0, -72, 10, 0, 7); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = PAL.ochre; path(ctx, [[-24, -76], [0, -96], [24, -76]]); ctx.closePath(); ctx.fill(); ctx.stroke();                     // straw hat
+  const pole = Math.sin(st * 2.6) * 12; ctx.beginPath(); ctx.moveTo(-60 + pole, 40); ctx.lineTo(40 + pole * .3, -130); ctx.stroke();
+  ctx.restore();
+}
+function traveller(cam, t) {
+  const st = Math.floor(t * 8 + 1e-4) / 8, x = 2600 - 36 * st - cam, y = 790 - 26 * (st / 8), leg = Math.floor(st * 8) % 2 ? 9 : -9;
+  ctx.save(); ctx.translate(x, y); ctx.strokeStyle = PAL.sumi; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-3, -30); ctx.lineTo(-3 - leg, 0); ctx.moveTo(3, -30); ctx.lineTo(3 + leg, 0); ctx.stroke();
+  ctx.fillStyle = PAL.beni; path(ctx, [[-12, -30], [12, -30], [8, -68], [-8, -68]]); ctx.closePath(); ctx.fill(); ctx.stroke();           // the one red garment
+  ctx.fillStyle = PAL.ochre; path(ctx, [[-22, -72], [0, -90], [22, -72]]); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-16, -60); ctx.lineTo(-24, 2); ctx.stroke();                                                                 // staff
+  ctx.restore();
+}
+
+// ---------- cartouches and seal ----------
+let SEAL;
+function buildSeal() { const s = 64, c = mk(s + 12, s + 12), x = c.getContext('2d'), R = mulberry(9);
+  x.fillStyle = PAL.beni; x.fillRect(6, 6, s, s); x.globalCompositeOperation = 'destination-out';
+  x.font = `${s * .5}px "Yuji Syuku", serif`; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('凪', 6 + s / 2, 6 + s * .3); x.fillText('浦', 6 + s / 2, 6 + s * .74);
+  for (let i = 0; i < 120; i++) { x.globalAlpha = .2 + R() * .6; x.beginPath(); x.arc(6 + R() * s, 6 + (R() < .5 ? R() * 4 : s - R() * 4), .5 + R() * 1.8, 0, 7); x.fill(); }
+  SEAL = c; }
+function subtitle(str, t0, t1, t) {                                 // horizontal cartouche: prints in, fades out
+  if (t < t0 || t > t1) return;
+  ctx.save(); ctx.globalAlpha = 1 - span(t, t1 - .3, .3); ctx.clip(sweepClip(span(t, t0, .35) * 1.2, 4));
+  ctx.font = '500 38px "Shippori Mincho", serif'; const w = ctx.measureText(str).width + 130, x0 = 960 - w / 2, y0 = 935;
+  ctx.fillStyle = PAL.cream; ctx.fillRect(x0, y0, w, 72); ctx.strokeStyle = PAL.sumi; ctx.lineWidth = 3; ctx.strokeRect(x0, y0, w, 72); ctx.lineWidth = 1.2; ctx.strokeRect(x0 + 6, y0 + 6, w - 12, 60);
+  ctx.drawImage(SEAL, x0 + 18, y0 + 17, 38, 38); ctx.fillStyle = PAL.sumi; ctx.textBaseline = 'middle'; ctx.fillText(str, x0 + 76, y0 + 38);
+  ctx.restore(); window.heliosDrawnText?.add(str);
+}
+function viewCartouche(t) {                                         // vertical title slip drops in; the seal stamps beside it
+  const p = span(t, 4.9, .45); if (p <= 0) return;
+  const x0 = 1748, y0 = 80 - 24 * (1 - ss(p)), w = 86;
+  ctx.save(); ctx.globalAlpha = ss(p);
+  ctx.fillStyle = PAL.cream; ctx.fillRect(x0, y0, w, 330); ctx.fillStyle = '#e3a08a'; ctx.fillRect(x0, y0, w, 120);
+  ctx.strokeStyle = PAL.sumi; ctx.lineWidth = 3; ctx.strokeRect(x0, y0, w, 330); ctx.lineWidth = 1.2; ctx.strokeRect(x0 + 5, y0 + 5, w - 10, 320); ctx.beginPath(); ctx.moveTo(x0 + 5, y0 + 120); ctx.lineTo(x0 + w - 5, y0 + 120); ctx.stroke();
+  ctx.fillStyle = PAL.sumi; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = '26px "Yuji Syuku", serif'; [...'東海五景'].forEach((ch, i) => ctx.fillText(ch, x0 + w / 2, y0 + 22 + i * 26));
+  ctx.font = '52px "Yuji Syuku", serif'; [...'凪の浦'].forEach((ch, i) => ctx.fillText(ch, x0 + w / 2, y0 + 165 + i * 60));
+  ctx.restore();
+  const q = span(t, 5.4, .2); if (q <= 0) return;                  // seal: 1.35 → 1 in 0.2 s
+  const s = 1.35 - .35 * ss(q); ctx.save(); ctx.globalAlpha = .93 * clamp(q / .35); ctx.globalCompositeOperation = 'multiply';
+  ctx.translate(x0 + w / 2, y0 + 400); ctx.rotate(-.03); ctx.scale(s, s); ctx.drawImage(SEAL, -38, -38, 76, 76); ctx.restore();
+}
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('500 38px "Shippori Mincho"', 'A traveller leaves the pine shore. The boat waits for the tide.'), document.fonts.load('52px "Yuji Syuku"', '東海五景凪の浦')]);
+  await document.fonts.ready;
+  buildTextures(); buildBlocks(); buildSeal();
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  const cam = 960 * (1 - ss(span(t, 1.4, 3.6)));                   // handscroll: slides right → left on ones, then holds
+  ctx.drawImage(TX.paper, -cam, 0);
+  const IMG = new Path2D(); IMG.rect(0, 45, W, 990);               // colour prints inside the border only
+  for (const [id, reg, shift, t0] of BLOCKS) {                     // printing reveal, block by block, then fixed registration
+    const p = span(t, t0, .35); if (p <= 0) continue;
+    const e = 1 - ss(clamp(p * 1.6)); ctx.save(); if (id !== 'key') ctx.clip(IMG); if (p < 1) ctx.clip(sweepClip(p, t0 * 10));
+    ctx.drawImage(B[id], -cam + reg[0] + shift[0] * e, reg[1] + shift[1] * e);
+    ctx.restore();
+  }
+  ctx.save(); ctx.clip(IMG);
+  if (t > 1.1) { ctx.save(); ctx.globalAlpha = span(t, 1.1, .2); waves(cam, t); boat(cam, t); traveller(cam, t); ctx.restore(); }
+  ctx.drawImage(B.mist, -cam, 0, WW, H);                            // mist bands sit over the blocks (paper is the white)
+  ctx.restore();
+  ctx.drawImage(TX.fiber, -cam, 0);
+  subtitle('A traveller leaves the pine shore.', 1.3, 3.5, t);
+  subtitle('Far out, the boat waits for the tide.', 3.7, 5.9, t);
+  subtitle('Halcyon Bay, a view of the eastern sea.', 6.1, 8.2, t);
+  viewCartouche(t);
+};
+</script>
+</body>
+</html>

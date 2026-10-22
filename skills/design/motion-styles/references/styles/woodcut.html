@@ -1,0 +1,207 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render woodcut.html -o woodcut.mp4 --duration 8 --fps 24 --mode canvas -->
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#EFE8D8;overflow:hidden}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<script>
+// WOODCUT: a MASK canvas where white = wood carved away, black = wood left to take ink.
+// Strokes carve themselves in over time; a WebGL pass prints the mask in #111 on #EFE8D8 paper,
+// with one colour plate that only shows where wood was carved.
+const W = 1920, H = 1080, BLOCK = [60, 46, 1800, 820];          // printed image area; captions live in the margin below
+const SUN = [1220, 600];
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, a, d) => clamp((t - a) / d);
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+const maskC = mk(), M = maskC.getContext('2d', { willReadFrequently: true });
+const plateC = mk(), P = plateC.getContext('2d', { willReadFrequently: true });
+
+// ---------- the world ----------
+const ridge = x => 600 - 190 * Math.exp(-(((x - 300) / 230) ** 2));          // hill on the left, lit from the right
+const inHill = (x, y) => x < 820 && y > ridge(x) - 4 && y < 640;
+const tone = (x, y) => clamp(1.18 - Math.hypot(x - SUN[0], (y - SUN[1]) * 1.35) / 760);   // brightness from the low sun
+const HOUSE = [[478, 530], [478, 478], [520, 444], [562, 478], [562, 530]];
+
+// ---------- strokes: {p:[[x,y]..], w:[..], t0, dur, kind} — every cut is its own stroke ----------
+const S = [];
+function cut(pts, wf, t0, speed = 1400, kind = 'v') {
+  if (pts.length < 3) return;
+  let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  S.push({ p: pts, w: pts.map(wf), t0, dur: clamp(L / speed, .08, .35), kind, seed: S.length });
+}
+// walk a line, keep the stretches where width is large enough, break them into 30–160 px cuts with gaps
+function hatchLine(pts, wAt, t0f, R, seg = [40, 150], speed) {
+  let cur = [], acc = 0, target = seg[0] + R() * (seg[1] - seg[0]), skip = 0;
+  const flush = () => { if (cur.length > 2) cut(cur, q => wAt(q[0], q[1]), t0f(cur[0]), speed); cur = []; acc = 0; target = seg[0] + R() * (seg[1] - seg[0]); };
+  for (let i = 0; i < pts.length; i++) {
+    const [x, y] = pts[i];
+    if (skip > 0) { skip -= 4; continue; }
+    if (wAt(x, y) < 1.1) { flush(); continue; }
+    if (cur.length) acc += Math.hypot(x - cur[cur.length - 1][0], y - cur[cur.length - 1][1]);
+    cur.push([x, y]);
+    if (acc > target) { flush(); skip = 4 + R() * 16; }
+  }
+  flush();
+}
+function buildStrokes() {
+  const R = mulberry(11);
+  const line = (x0, y0, x1, y1, n) => Array.from({ length: n + 1 }, (_, i) => [x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n]);
+  // 1. the first cut: the horizon, one long knife line (the hook)
+  cut(line(BLOCK[0] + 10, 600, BLOCK[0] + BLOCK[2] - 10, 600, 360).filter(([x]) => !inHill(x, 598)), () => 5, 0.05, 3600, 'k');
+  // 2. furrows converge on the sun; near = coarse and wide, far = fine; brighter toward the light
+  for (let k = -22; k <= 22; k++) {
+    const xb = SUN[0] + k * 150, pts = line(SUN[0] + (xb - SUN[0]) * .04, 612, xb, 880, 120).filter(([x]) => x > 64 && x < 1856);
+    hatchLine(pts, (x, y) => (1.2 + 10 * (y - 600) / 280) * (.3 + .9 * tone(x, y * .5 + 300)), ([x, y]) => .6 + 1.6 * hash(k + 40) + (y - 600) / 900, R, [60, 170], 1100);
+  }
+  // 3. hill: contour hatching follows the ridge, only on the lit (right) slope, thinning with depth
+  for (let k = 1; k <= 15; k++) {
+    const pts = []; for (let x = 300; x < 800; x += 4) { const y = ridge(x) + k * 11; if (y < 618) pts.push([x, y]); }
+    hatchLine(pts, (x) => 6.5 * Math.pow(1 - k / 16, 1.2) * clamp((x - 300) / 260), () => 2.0 + k * .05 + R() * .3, R, [50, 130], 900);
+  }
+  // knife halo along the ridge: separates black hill from black sky
+  const rpts = []; for (let x = BLOCK[0] + 4; x < 820; x += 4) rpts.push([x, ridge(x) - 3]);
+  cut(rpts, () => 2.2, 1.7, 2600, 'k');
+  // 4. sky: horizontal U-gouge sweeps, width from tone so the sky brightens toward the sun
+  for (let y = 70; y < 592; y += 15) {
+    const pts = []; for (let x = BLOCK[0] + 6; x < BLOCK[0] + BLOCK[2] - 6; x += 4) pts.push([x, y + 3 * Math.sin(x * .004 + y)]);
+    hatchLine(pts.filter(([x, yy]) => !inHill(x, yy + 8)), (x, yy) => 12 * Math.pow(tone(x, yy), 1.4), ([x, yy]) => 3.2 + .9 * (1 - tone(x, yy)) * 0 + .6 * R() + (592 - yy) / 1400, R, [80, 220], 2000);
+  }
+  // 5. the sun: a carved disc + ring, then rays burst radially (the hero)
+  for (let i = 0; i < 46; i++) {
+    const a = Math.PI + (i + .5) / 46 * Math.PI, long = i % 2 === 0, r1 = long ? 1400 : 520 + 260 * hash(i), pts = [];
+    for (let r = 118; r < r1; r += 6) { const x = SUN[0] + Math.cos(a) * r, y = SUN[1] + Math.sin(a) * r; if (y < 60 || x < 64 || x > 1856 || inHill(x, y)) break; pts.push([x, y]); }
+    if (pts.length > 3) cut(pts, q => { const r = Math.hypot(q[0] - SUN[0], q[1] - SUN[1]); return (long ? 30 : 18) * Math.max(.12, 1 - r / (long ? 1100 : 640)); }, 4.6 + .25 * hash(i * 3), 3000, 'u');
+  }
+}
+
+// ---------- carving one stroke into the mask ----------
+function carve(s, pr) {
+  const p = s.p, n = p.length; let L = 0; const C = [0];
+  for (let i = 1; i < n; i++) { L += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); C.push(L); }
+  const Lv = L * pr, left = [], right = [];
+  for (let i = 0; i < n && C[i] <= Lv; i++) {
+    const a = p[Math.max(0, i - 1)], b = p[Math.min(n - 1, i + 1)]; let dx = b[0] - a[0], dy = b[1] - a[1]; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+    const w = s.w[i], entry = clamp(C[i] / (.9 * w + 1)), exit = clamp((L - C[i]) / (2.6 * w + 2)), tip = clamp((Lv - C[i]) / 6 + .3);
+    const prof = (s.kind === 'k' ? .6 + .4 * entry : .35 + .65 * entry * (2 - entry)) * Math.pow(exit, .75) * (pr < 1 ? tip : 1);
+    const hw = w * .5 * prof * (1 + .16 * (hash(s.seed * 7 + Math.floor(C[i] / 9)) - .5));   // chipped edge
+    left.push([p[i][0] - dy * hw, p[i][1] + dx * hw]); right.push([p[i][0] + dy * hw, p[i][1] - dx * hw]);
+  }
+  if (left.length < 2) return;
+  M.beginPath(); M.moveTo(left[0][0], left[0][1]); for (const q of left) M.lineTo(q[0], q[1]);
+  for (let i = right.length - 1; i >= 0; i--) M.lineTo(right[i][0], right[i][1]); M.closePath(); M.fill();   // one fill per cut: no winding cancellation
+}
+
+function drawMask(t) {
+  M.setTransform(1, 0, 0, 1, 0, 0); M.globalAlpha = 1; M.globalCompositeOperation = 'source-over';
+  M.fillStyle = '#fff'; M.fillRect(0, 0, W, H);
+  // the block: black with a ragged, hand-cut edge
+  const [bx, by, bw, bh] = BLOCK, edge = (i) => (hash(i * 1.7) - .5) * 5;
+  M.fillStyle = '#000'; M.beginPath();
+  for (let x = bx; x <= bx + bw; x += 12) M.lineTo(x, by + edge(x));
+  for (let y = by; y <= by + bh; y += 12) M.lineTo(bx + bw + edge(y + 9), y);
+  for (let x = bx + bw; x >= bx; x -= 12) M.lineTo(x, by + bh + edge(x + 3));
+  for (let y = by + bh; y >= by; y -= 12) M.lineTo(bx + edge(y + 5), y);
+  M.fill();
+  M.fillStyle = '#fff';
+  for (const s of S) { const pr = span(t, s.t0, s.dur); if (pr > 0) carve(s, pr); }
+  // the sun: cleared to bare wood with one broad gouge, a slightly chipped edge
+  if (t > 4.4) { const r = 90 * Math.pow(span(t, 4.4, .25), .6); M.beginPath(); for (let a = Math.PI; a <= Math.PI * 2.001; a += .04) M.lineTo(SUN[0] + Math.cos(a) * r * (1 + .02 * Math.sin(a * 23)), SUN[1] + Math.sin(a) * r); M.closePath(); M.fill();
+    M.strokeStyle = '#000'; M.lineWidth = 12; M.beginPath(); M.arc(SUN[0], SUN[1], r + 12, Math.PI, Math.PI * 2); M.stroke(); }   // a ring of wood left standing
+  // house: re-ink a black silhouette inside a carved knife halo, then carve its lit window
+  if (t > 2.4) {
+    const hp = span(t, 2.4, .3);
+    M.save(); M.beginPath(); HOUSE.forEach(([x, y], i) => i ? M.lineTo(x, y) : M.moveTo(x, y)); M.closePath();
+    M.lineWidth = 9 * hp; M.strokeStyle = '#fff'; M.stroke(); M.fillStyle = '#000'; M.fill();
+    M.fillRect(538, 440, 12, 24);                                  // chimney
+    if (t > 2.8) { M.fillStyle = '#fff'; M.fillRect(532, 492, 16, 16 * span(t, 2.8, .12)); }
+    M.restore();
+    // smoke: re-cut every 2 frames (deliberate boil), white wisps against the dark sky
+    const st = Math.floor(t * 12 + 1e-4), R = mulberry(st + 7); M.fillStyle = '#fff';
+    for (let k = 0; k < 4; k++) { const y0 = 430 - k * 34 - R() * 8, x0 = 546 - k * 22 + R() * 10; carve({ p: Array.from({ length: 9 }, (_, i) => [x0 - i * 6, y0 - i * 3 + Math.sin(i + k + st * .7) * 4]), w: Array(9).fill(4.5 - k * .7), kind: 'v', seed: k + st }, clamp((t - 2.9) * 2)); }
+  }
+  // birds on twos in the hold: small carved V's drifting
+  if (t > 6.2) {
+    const st = Math.floor(t * 12 + 1e-4) / 12; M.fillStyle = '#fff';
+    for (let b = 0; b < 3; b++) { const x = 760 + b * 70 + (st - 6.2) * 40, y = 250 + b * 26 + 6 * Math.sin(b * 2), f = Math.floor(st * 8 + b) % 2 ? 8 : -3;
+      carve({ p: [[x - 22, y - f], [x - 11, y - f * .4], [x, y], [x + 11, y - f * .4], [x + 22, y - f]], w: Array(5).fill(4), kind: 'k', seed: b }, 1); }
+  }
+  // margin captions: letterpress in ink, up in 0.1 s, gone in 0.15 s; never on the image
+  M.fillStyle = '#000'; M.textBaseline = 'alphabetic';
+  const cap = (s, t0, t1, x, align, font) => { const a = Math.min(span(t, t0, .1), 1 - span(t, t1 - .15, .15)); if (a <= 0) return; M.globalAlpha = a; M.font = font; M.textAlign = align; M.fillText(s, x, 960); M.globalAlpha = 1; };
+  cap('Plate IV.  The lower field, before light.', 0.8, 4.55, 960, 'center', 'italic 42px "IM Fell English", Georgia, serif');
+  cap('Plate IV.  First light, cut by hand.', 4.8, 99, 960, 'center', 'italic 42px "IM Fell English", Georgia, serif');
+  cap('HALCYON PRESS', 0.8, 99, 1860, 'right', '28px "IM Fell English SC", Georgia, serif');
+  cap('No. 4 of 12', 0.8, 99, 60, 'left', '28px "IM Fell English SC", Georgia, serif');
+}
+// colour plate: burnt copper, a hard-edged block that spreads from the sun at the peak (only visible in carved white)
+function drawPlate(t) {
+  P.setTransform(1, 0, 0, 1, 0, 0); P.clearRect(0, 0, W, H);
+  const r = 1300 * Math.pow(span(t, 4.75, 1.1), .8); if (r <= 0) return;
+  P.save(); P.beginPath(); P.rect(BLOCK[0] + 8, BLOCK[1] + 8, BLOCK[2] - 16, 600 - BLOCK[1]); P.clip();   // inset: the plate never reaches the margin
+  P.fillStyle = '#000'; P.beginPath();
+  for (let a = 0; a <= 6.3; a += .05) { const rr = r * (1 + .05 * Math.sin(a * 7 + 1.3)); P.lineTo(SUN[0] + Math.cos(a) * rr, SUN[1] + Math.sin(a) * rr * .8); }
+  P.fill();
+  P.globalCompositeOperation = 'destination-out'; P.beginPath(); P.arc(SUN[0], SUN[1], 96, 0, 7); P.fill();   // the sun stays paper-white
+  P.restore();
+}
+
+// ---------- print pass ----------
+const out = document.getElementById('out');
+const gl = out.getContext('webgl2', { preserveDrawingBuffer: true, antialias: false, alpha: false });
+const FS = `#version 300 es
+precision highp float;
+uniform sampler2D uM, uC; uniform float uInk; uniform vec2 uReg; out vec4 o;
+const vec2 R = vec2(1920., 1080.);
+const vec3 PAPER = vec3(.937, .910, .847), INK = vec3(.067), PLATE = vec3(.784, .314, .165);
+float h(vec2 p){ vec3 q = fract(vec3(p.xyx) * .1031); q += dot(q, q.yzx + 33.33); return fract((q.x + q.y) * q.z); }
+float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.-2.*f); return mix(mix(h(i), h(i+vec2(1,0)), f.x), mix(h(i+vec2(0,1)), h(i+vec2(1,1)), f.x), f.y); }
+float fbm(vec2 p){ float s = 0., a = .5; for (int i = 0; i < 4; i++){ s += a * vn(p); p = p * 2.03 + 17.1; a *= .5; } return s; }
+void main(){
+  vec2 px = vec2(gl_FragCoord.x, R.y - gl_FragCoord.y), ip = px + uInk * 131.;
+  vec2 d = (vec2(vn(ip * .33), vn(ip * .33 + 19.7)) - .5) * 2.6 + (vec2(vn(ip * 1.3 + 5.), vn(ip * 1.3 + 9.)) - .5) * 1.1;   // knife burr
+  float m = texture(uM, (px + d) / R).r, th = .5 + (vn(ip * .7 + 3.) - .5) * .34;
+  float ink = 1. - smoothstep(th - .1, th + .1, m);
+  vec3 paper = PAPER * (1. + .05 * (fbm(px * .0035) - .5) + .025 * (vn(px * vec2(.9, .035)) - .5) + .018 * (h(px) - .5));
+  float c = texture(uC, (px - uReg) / R).a * (.78 + .3 * fbm(ip * .02 + 4.));                // misregistered, mottled plate
+  vec3 base = mix(paper, paper * PLATE / PAPER, clamp(c, 0., 1.));
+  float dens = .965 + .035 * (fbm(ip * .004) - .5) * 2.;
+  dens -= .05 * smoothstep(.62, .9, vn(px * vec2(.0035, .7)));                                // wood-grain streaks
+  dens -= .5 * smoothstep(.85, .93, vn(ip * .5)) * smoothstep(.4, .8, fbm(ip * .007));        // specks that didn't take
+  o = vec4(mix(base, INK, ink * clamp(dens, 0., 1.)), 1.);
+}`;
+const sh = (ty, src) => { const s = gl.createShader(ty); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+const pr = gl.createProgram();
+gl.attachShader(pr, sh(gl.VERTEX_SHADER, '#version 300 es\nin vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }'));
+gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+const tex = (u) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + u); gl.bindTexture(gl.TEXTURE_2D, t); for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v); return t; };
+const tM = tex(0), tC = tex(1);
+gl.uniform1i(gl.getUniformLocation(pr, 'uM'), 0); gl.uniform1i(gl.getUniformLocation(pr, 'uC'), 1);
+gl.uniform2f(gl.getUniformLocation(pr, 'uReg'), 3, 2); gl.viewport(0, 0, W, H);
+const uInk = gl.getUniformLocation(pr, 'uInk');
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('italic 42px "IM Fell English"', 'Plate IV. The lower field, before light. First cut by hand'), document.fonts.load('28px "IM Fell English SC"', 'HALCYON PRESS No. 4 of 12')]);
+  await document.fonts.ready;
+  buildStrokes();
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  drawMask(t); drawPlate(t);
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tM); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, maskC);
+  gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tC); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, plateC);
+  gl.uniform1f(uInk, Math.floor(t * 12 + 1e-4) % 3);              // impression noise steps on twos, small cycle so edges breathe gently
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+};
+</script>
+</body>
+</html>
