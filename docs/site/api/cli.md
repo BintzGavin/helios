@@ -160,7 +160,8 @@ helios sheet <input> [--at <times> | --every <seconds> | --strip <start:end>] [o
 - `--duration <seconds>`: The duration used by `--every` and by the default sheet (default: the composition's). With no frame selection, the sheet shows 12 frames spread across the duration.
 - `--cols <n>`, `--cell-width <px>`: Grid layout (default: up to 4 columns of 480px).
 - `--crop <x,y,w,h>`: Show only this region of each frame.
-- `-o, --output <path>`: Output PNG (default: `sheet.png`).
+- `--onion`: Blend the selected frames into one picture instead of a grid. Later frames are stronger: frame k of n weighs k / (1 + 2 + … + n), so a moving element leaves a trail whose spacing shows its path and easing, and the brightest copy is the last frame. `--cell-width` sets the picture's width (default: 960px, or the frame width if smaller); `--cols` doesn't apply. A few close frames read best, e.g. `--strip 1:1.5 --fps 10`.
+- `-o, --output <path>`: Output PNG (default: `sheet.png`, or `onion.png` with `--onion`).
 
 ### `helios verify`
 
@@ -169,6 +170,8 @@ Checks that every frame depends only on its time. Rendering in chunks (distribut
 ```bash
 helios verify page.html --duration 12
 ```
+
+At the same sampled frames, it also checks that the page's assets load: `<img>` elements that finished loading without a picture, `@font-face` files that failed (their text silently uses a fallback font), and requests the server answered with HTTP 400 or above, including the page itself when its path is wrong. Any of these fails the command and is named relative to the page. A render doesn't fail on them: it shows an empty box or the wrong font. Requests the network refused outright, with no HTTP status, aren't reported.
 
 With `--cues`, it also checks timed text: every lyric word or caption in the file must be on screen during its time. Each cue is sampled just after it starts, in the middle and just before it ends, all in one page session. A cue passes when each of its words shows in at least one of those frames, so a line revealed word by word passes. Matching ignores case, punctuation and accents.
 
@@ -188,7 +191,7 @@ The check confirms that each word is present at its time. It doesn't check that 
 - `--duration <seconds>`: The span to sample (default: the composition's).
 - `--samples <n>`: The number of frames to compare (default: `6`).
 - `--cues <file>`: Timed text that must be on screen at its time. Accepts an `.srt` file, a `.vtt` file, or a `.json` file holding an array of `{ "text", "start", "end" }` in seconds. The JSON can also be an object whose `cues` or `words` array holds those, and `w`, `t0` and `t1` work as aliases.
-- `--json`: Print one JSON object, `{ ok, purity: { ok, samples, differing, noisy, message }, cues?: { ok, total, shown, missing: [{ text, start, end, seen }], message } }`. It exits 1 when `ok` is false. Argument and page errors go to stderr as `Verify failed: <reason>`, with no JSON.
+- `--json`: Print one JSON object, `{ ok, purity: { ok, samples, differing, noisy, message }, assets: { ok, brokenImages, failedFonts, failedRequests: [{ url, status }], message }, cues?: { ok, total, shown, missing: [{ text, start, end, seen }], message } }`. It exits 1 when `ok` is false. Argument and page errors go to stderr as `Verify failed: <reason>`, with no JSON.
 - `--width`, `--height`, `--crop`, `--gpu`/`--no-gpu`: As for `still`.
 
 ### `helios check`
@@ -202,10 +205,11 @@ helios check out.mp4 [--json]
 - **Video and audio**: the codec, size, frame rate, pixel format, and the audio stream (or none).
 - **Color**: the matrix, primaries, transfer and range tags. An untagged Y'CbCr video is a warning: players guess, and often show it washed out.
 - **Length**: the frames actually decoded against the file's duration × frame rate. A mismatch (dropped or repeated frames, or audio that runs past the picture) is a warning.
+- **Loudness** (EBU R128, with audio): integrated loudness in LUFS, true peak in dBTP and loudness range in LU, measured by FFmpeg's `ebur128` filter. These are warnings, not failures: silent audio; a true peak above -1 dBTP, which can clip when platforms re-encode the audio; or integrated loudness below -20 or above -9 LUFS, far from the roughly -14 LUFS that streaming and social platforms play at. Loudness range is reported but not judged: it needs a long programme to mean much.
 - **Flashes** (WCAG 2.3.1): more than 3 flashes, or more than 3 saturated red flashes, in any one second fails. A flash is a pair of opposing changes in relative luminance of at least 10% where the darker state is below 0.8. It counts when the area flashing together covers at least a quarter of a 10° visual field, taken as a window one third of the frame's width and height.
 
 **Options**:
-- `--json`: Print exactly one JSON object (`ok`, `file`, `video`, `audio`, `flash`, `problems`, `warnings`) for a pass or a fail. When the file can't be read, nothing goes to stdout and `Check failed: <reason>` goes to stderr.
+- `--json`: Print exactly one JSON object (`ok`, `file`, `video`, `audio`, `loudness` (`integrated`, `range`, `truePeak`, or `null` without audio), `flash`, `problems`, `warnings`) for a pass or a fail. When the file can't be read, nothing goes to stdout and `Check failed: <reason>` goes to stderr.
 
 ### `helios analyze`
 

@@ -130,10 +130,11 @@ const info = await probeComposition('file:///path/to/composition.html');
 
 ### Stills and contact sheets
 
-#### `captureFrames(url, times, options?)` / `captureContactSheet(url, times, options?)`
+#### `captureFrames(url, times, options?)` / `captureContactSheet(url, times, options?)` / `captureOnionSkin(url, times, options?)`
 These render the frames at the given times (in seconds) straight from the page, without encoding a video. They use the same seek and capture path as a DOM-mode render.
 - `captureFrames` returns one PNG `Buffer` per time.
 - `captureContactSheet` returns a single labelled grid PNG.
+- `captureOnionSkin` returns one labelled PNG with the frames blended, later frames stronger: frame k of n weighs k / (1 + 2 + … + n). A moving element leaves a trail whose spacing shows its path and easing. Its `imageWidth` option sets the width (default: 960, or the frame width if smaller).
 
 Options:
 - `width`, `height`
@@ -164,6 +165,14 @@ import { readFrameText } from '@helios-project/renderer';
 const [frame] = await readFrameText('file:///path/to/page.html', [9.8], { width: 1920, height: 1080 });
 // { text: ['LADIES AND', 'GENTLEMEN'], drawn: [] }
 ```
+
+#### `readPageAssets(url, times, options?)`
+Seeks the page to each time (in seconds) and lists what it asked for and didn't get, as `{ brokenImages, failedFonts, failedRequests }`:
+- `brokenImages`: URLs of `<img>` elements, shadow roots included, that finished loading without a picture. Lazy images still loading don't count.
+- `failedFonts`: `@font-face` families whose file failed to load. Their text renders in a fallback font.
+- `failedRequests`: `{ url, status }` for requests answered with HTTP 400 or above, the page's own included, from Navigation and Resource Timing. A request the network refused outright has no status and isn't listed.
+
+A render doesn't fail on any of these. `helios verify` uses this function at its sampled frames. Options: `width`, `height`, `browserConfig`, `stabilityTimeout`.
 
 ### Diagnostics
 

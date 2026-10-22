@@ -93,12 +93,13 @@ npx -y @helios-project/cli@latest still video.html --at 0.5,3,7.25            # 
 npx -y @helios-project/cli@latest sheet video.html --every 1 --duration 12   # one labelled grid
 npx -y @helios-project/cli@latest sheet video.html --strip 2:3 --fps 30      # every frame in 2–3s
 npx -y @helios-project/cli@latest sheet video.html --at 4 --crop 600,300,720,480  # zoom into a region
+npx -y @helios-project/cli@latest sheet video.html --strip 1:1.5 --fps 10 --onion  # one picture of a motion: its path and easing
 ```
 
 Before a long render, check that the page really is a function of `t`:
 
 ```bash
-npx -y @helios-project/cli@latest verify video.html --duration 12   # exits 1 and names the frames that depend on history
+npx -y @helios-project/cli@latest verify video.html --duration 12   # exits 1 and names frames that depend on history, and images, fonts or files that don't load
 npx -y @helios-project/cli@latest verify video.html --duration 12 --cues lyrics.srt   # also: every lyric or caption on screen at its time
 ```
 
@@ -113,7 +114,7 @@ Open the PNGs with your image-viewing tool and check:
 Fix the page, check again, and render again. Then check the file itself:
 
 ```bash
-npx -y @helios-project/cli@latest check video.mp4   # flashing above the WCAG 2.3.1 limit, colour tags, frame count
+npx -y @helios-project/cli@latest check video.mp4   # flashing above the WCAG 2.3.1 limit, colour tags, frame count, audio loudness
 ```
 
 ## 4. Music and sound
@@ -136,6 +137,8 @@ Load that file in the page and read it at `t`: cut on downbeats, punch on kicks,
 | "The page defines no window.helios, window.renderAt(t) …" | Your script never defined `renderAt`. Check the page for a load error, such as a syntax error or a failed import. |
 | Frames differ between two renders, or `verify` fails | Something isn't a function of `t`: an unseeded `Math.random()`, a counter or a timer. On a canvas, also a pixel readback without `willReadFrequently`, or context state left from the last frame. See [references/pages.md](references/pages.md#canvas-webgl-and-threejs). |
 | `verify --cues` says a cue is not on screen | Show each cue for its whole time. Text drawn on a canvas must be declared: `window.heliosDrawnText?.add(text)`. |
+| `verify` says the page is missing assets | A path is wrong or the file isn't in the project. Paths are relative to the page. A missing font falls back silently, so fix it even if the frames look fine. |
+| `check` warns about loudness | Quiet: raise the music or voice (several tracks mixed together each get quieter). Peaks above -1 dBTP: lower the loudest track. Silent: an audio file didn't load or is muted. |
 | `check` reports flashing | More than three flashes in a second can trigger seizures. Slow the strobe, shrink the flashing area, or lower its contrast. |
 | Blank WebGL frames | Draw inside `renderAt` (or a rAF loop), not once at load. |
 
