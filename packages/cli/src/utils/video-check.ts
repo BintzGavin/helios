@@ -1,5 +1,6 @@
 import { readMediaInfo, type AudioStreamInfo, type ColorTags } from './video-info.js';
 import { analyzeVideo, summarizeFlashes, MAX_FLASHES_PER_SECOND, type FlashResult, type FlashWindow } from './flash.js';
+import { measureLoudness, loudnessWarnings, MAX_TRUE_PEAK, TARGET_LUFS, type Loudness } from './loudness.js';
 
 export interface CheckReport {
   ok: boolean;
@@ -17,6 +18,8 @@ export interface CheckReport {
     color: ColorTags;
   };
   audio: AudioStreamInfo | null;
+  /** EBU R128 loudness of the first audio stream; null without audio or when it cannot be measured. */
+  loudness: Loudness | null;
   flash: FlashResult;
   problems: string[];
   warnings: string[];
@@ -28,6 +31,10 @@ export const UNTAGGED_WARNING = 'The video has no color tags: players may show i
 const AUDIO_PADDING = 0.05;
 
 const YCBCR = /^(yuv|nv\d|p\d{3})/;
+
+const LOUDNESS_UNMEASURED = 'The audio loudness could not be measured.';
+/** Warnings about the audio mix all start with these; the report shows them on the Loudness line. */
+const AUDIO_WARNING = /^The audio /;
 
 const seconds = (t: number) => `${t.toFixed(2)} s`;
 
@@ -56,6 +63,16 @@ export async function checkVideo(file: string, ffmpegPath: string): Promise<Chec
   if (flashes.red.maxPerSecond > MAX_FLASHES_PER_SECOND && flashes.red.worst) {
     problems.push(`Saturated red flashes ${span(flashes.red.worst)}, ${limit}. ` +
       `Flash red at most ${MAX_FLASHES_PER_SECOND} times a second, or use a less saturated red.`);
+  }
+
+  let loudness: Loudness | null = null;
+  if (info.audio) {
+    try {
+      loudness = await measureLoudness(file, ffmpegPath);
+      warnings.push(...loudnessWarnings(loudness));
+    } catch (err: any) {
+      warnings.push(`${LOUDNESS_UNMEASURED} ${err.message}`);
+    }
   }
 
   if (stream.pixFmt && YCBCR.test(stream.pixFmt) && !stream.color.matrix) {
@@ -91,6 +108,7 @@ export async function checkVideo(file: string, ffmpegPath: string): Promise<Chec
       color: stream.color,
     },
     audio: info.audio,
+    loudness,
     flash,
     problems,
     warnings,
@@ -112,6 +130,15 @@ export function formatCheckReport(report: CheckReport): string {
   const lengthWarning = report.warnings.find((w) => w.startsWith('The file lasts'));
   line(lengthWarning ? 'warn' : 'ok', 'Length', `${video.frames} frames${video.duration !== null ? `, ${seconds(video.duration)}` : ''}`);
   line('ok', 'Audio', audio ? `${audio.codec}${audio.channels ? `, ${audio.channels} channel${audio.channels === 1 ? '' : 's'}` : ''}${audio.sampleRate ? `, ${audio.sampleRate} Hz` : ''}` : 'none');
+  if (audio) {
+    const audioWarning = report.warnings.some((w) => AUDIO_WARNING.test(w));
+    const l = report.loudness;
+    const text = l
+      ? `${l.integrated === null ? 'silent' : `${l.integrated.toFixed(1)} LUFS`}, true peak ${l.truePeak === null ? '-inf' : l.truePeak.toFixed(1)} dBTP` +
+        `${l.range === null ? '' : `, range ${l.range.toFixed(1)} LU`}; aim for about ${TARGET_LUFS} LUFS and at most ${MAX_TRUE_PEAK} dBTP`
+      : 'not measured';
+    line(audioWarning ? 'warn' : 'ok', 'Loudness', text);
+  }
   const flashText = flash.worst
     ? `at most ${flash.maxPerSecond} in one second (${seconds(flash.worst.t0)} to ${seconds(flash.worst.t1)}); WCAG 2.3.1 allows ${MAX_FLASHES_PER_SECOND}`
     : `none; WCAG 2.3.1 allows ${MAX_FLASHES_PER_SECOND} a second`;

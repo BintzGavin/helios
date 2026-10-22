@@ -29,7 +29,8 @@ describe('helios check', () => {
     return file;
   }
   const video = (seconds: number) => ['-f', 'lavfi', '-i', `testsrc=s=160x90:r=30:d=${seconds}`];
-  const tone = (seconds: number) => ['-f', 'lavfi', '-i', `sine=frequency=440:sample_rate=48000:duration=${seconds}`];
+  // FFmpeg's default sine sits at -21.8 LUFS; +7.8 dB brings it to the -14 LUFS platforms play at.
+  const tone = (seconds: number, gain = '7.8dB') => ['-f', 'lavfi', '-i', `sine=frequency=440:sample_rate=48000:duration=${seconds},volume=${gain}`];
 
   async function run(...args: string[]) {
     await program.parseAsync(['node', 'helios', 'check', ...args]);
@@ -69,11 +70,40 @@ describe('helios check', () => {
         color: { matrix: 'bt709', primaries: 'bt709', transfer: 'bt709', range: 'tv' },
       },
       audio: { codec: 'aac', channels: 2, sampleRate: 48000 },
+      loudness: { integrated: expect.any(Number), range: expect.any(Number), truePeak: expect.any(Number) },
       flash: { ok: true, maxPerSecond: expect.any(Number), worst: null, red: false },
       problems: [],
       warnings: [],
     });
     expect(json.video.duration).toBeCloseTo(2, 1);
+    expect(json.loudness.integrated).toBeGreaterThan(-15);
+    expect(json.loudness.integrated).toBeLessThan(-13);
+    expect(json.loudness.truePeak).toBeLessThan(-1);
+  });
+
+  it('warns about quiet, clipping and silent audio without failing', async () => {
+    const quiet = await run(clip('quiet.mp4', [...video(1), ...tone(1, '0dB')], ['-c:a', 'aac', '-shortest', ...BT709]), '--json');
+    expect(quiet.code).toBe(0);
+    expect(quiet.json.warnings).toEqual([expect.stringMatching(/^The audio is quiet: -2\d\.\d LUFS, where platforms play around -14 LUFS/)]);
+
+    exitSpy.mockClear();
+    stdoutSpy.mockClear();
+    const hot = await run(clip('hot.mp4', [...video(1), ...tone(1, '18dB')], ['-c:a', 'aac', '-shortest', ...BT709]), '--json');
+    expect(hot.code).toBe(0);
+    expect(hot.json.loudness.truePeak).toBeGreaterThan(-1);
+    expect(hot.json.warnings).toContainEqual(expect.stringMatching(/^The audio peaks at -?\d+\.\d dBTP, above -1 dBTP: it can clip/));
+
+    exitSpy.mockClear();
+    stdoutSpy.mockClear();
+    const silent = await run(clip('silent.mp4', [...video(1), '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo'], ['-c:a', 'aac', '-shortest', ...BT709]), '--json');
+    expect(silent.code).toBe(0);
+    expect(silent.json.loudness).toEqual({ integrated: expect.any(Number), range: expect.any(Number), truePeak: null });
+    expect(silent.json.warnings).toEqual([expect.stringMatching(/^The audio track is silent/)]);
+
+    exitSpy.mockClear();
+    const report = await run(clip('quiet-report.mp4', [...video(1), ...tone(1, '0dB')], ['-c:a', 'aac', '-shortest', ...BT709]));
+    expect(report.log).toMatch(/^! Loudness: -2\d\.\d LUFS, true peak -\d+\.\d dBTP/m);
+    expect(report.log).toMatch(/Warning: The audio is quiet/);
   });
 
   it('warns about an untagged video and reports no audio as null', async () => {
@@ -123,6 +153,7 @@ describe('helios check', () => {
       '✓ Color: matrix bt709, primaries bt709, transfer bt709, tv range',
       expect.stringMatching(/^✓ Length: 30 frames, 1\.0\d s$/),
       '✓ Audio: aac, 1 channel, 48000 Hz',
+      expect.stringMatching(/^✓ Loudness: -1\d\.\d LUFS, true peak -\d+\.\d dBTP, range \d+\.\d LU; aim for about -14 LUFS and at most -1 dBTP$/),
       '✓ Flashes: none; WCAG 2.3.1 allows 3 a second',
     ]);
     expect(log).toMatch(/OK: /);
