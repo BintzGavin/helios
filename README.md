@@ -32,7 +32,7 @@ For project governance and roadmap, see [`docs/AGENTS.md`](./docs/AGENTS.md).
 **A programmatic video engine that runs on web standards.**  
 Stop reinventing animation in JavaScript. Use the platform.
 
-[The Thesis](#the-thesis) • [Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#architecture) • [Roadmap](#roadmap--governance)
+[Website](https://www.heliosrender.com) • [The Thesis](#the-thesis) • [Quick Start](#quick-start) • [Why Helios?](#why-helios) • [Documentation](#architecture) • [Roadmap](#roadmap--governance)
 
 </div>
 
@@ -353,7 +353,7 @@ console.log(report);
 
 ## Helios vs Remotion
 
-Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video creation. Here's an honest comparison:
+Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video creation. Here's an honest comparison. For the full version, with HyperFrames, Motion Canvas and Revideo too and a map of Remotion concepts to Helios, see [Helios as a Remotion alternative](https://www.heliosrender.com/remotion-alternative).
 
 ### Philosophical Difference
 
@@ -375,7 +375,7 @@ Both Helios and [Remotion](https://www.remotion.dev/) enable programmatic video 
 | **Animation** | CSS, WAAPI, any library | `interpolate()`, `spring()` hooks |
 | **Learning curve** | Use what you know | Learn Remotion APIs |
 | **Maturity** | 🟡 Beta | 🟢 Production-ready |
-| **Pricing** | Free (ELv2) | Free ≤3 devs, then $100+/mo |
+| **Pricing** | Free (ELv2) | Free up to 3 employees, then a Company License ($25/seat/mo, or $0.01/render with a $100/mo minimum) |
 | **Studio IDE** | 🟢 Beta | 🟢 Available |
 | **Distributed rendering** | 🟡 Beta (Local Orchestrator) | 🟢 Lambda, Cloud Run |
 | **Captions/subtitles** | 🟡 Standard (SRT) | 🟢 Built-in |
