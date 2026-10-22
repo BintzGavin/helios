@@ -1,0 +1,140 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render one-line.html -o one-line.mp4 --duration 8 --mode canvas -->
+<html><head><meta charset="utf-8"><title>One line</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Jost:wght@400&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#0A1220;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, LW = 3.4;                               // LW: line width in SCREEN px, whole film
+const ctx = document.getElementById('c').getContext('2d');
+const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return [c, c.getContext('2d')]; };
+const [lineC, lg] = mk(), [fillC, fg] = mk();
+const NAVY = [10, 18, 32], AGED = [148, 124, 82], GOLD = [233, 214, 166], HOT = [255, 247, 224];
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const smooth = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
+const outE = u => 1 - (1 - clamp(u)) ** 3;
+const mix3 = (A, B, u) => A.map((v, i) => lerp(v, B[i], u));
+function monotone(xs, ys) {                                        // Fritsch–Carlson: never overshoots, flat at repeated keys (holds)
+  const n = xs.length, d = [], m = [];
+  for (let i = 0; i < n - 1; i++) d[i] = (ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]);
+  m[0] = d[0]; m[n - 1] = 0;
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : 3 * (xs[i + 1] - xs[i - 1]) / ((2 * xs[i + 1] - xs[i] - xs[i - 1]) / d[i - 1] + (xs[i + 1] - 2 * xs[i] + xs[i - 1]) / d[i]);
+  return x => { if (x <= xs[0]) return ys[0]; if (x >= xs[n - 1]) return ys[n - 1];
+    let k = 0; while (x > xs[k + 1]) k++; const h = xs[k + 1] - xs[k], s = (x - xs[k]) / h;
+    return (2 * s ** 3 - 3 * s * s + 1) * ys[k] + (s ** 3 - 2 * s * s + s) * h * m[k] + (-2 * s ** 3 + 3 * s * s) * ys[k + 1] + (s ** 3 - s * s) * h * m[k + 1]; };
+}
+
+// ---------------------------------------------------------------- the one line (poster coordinates: the final frame at zoom 1)
+const MOON = { x: 1240, y: 330, r: 130 };
+const PIECES = [
+  ['horizon', 'L300,760'],
+  ['house', 'L300,640 L380,572 L460,640 L460,760'],
+  ['walk', 'L560,760 L560,690'],
+  ['tree', 'A46,46 0 0 1 560,598 A46,46 0 0 1 560,690 L560,760'],                 // loop, then retrace the trunk (retracing is invisible)
+  ['shore', 'L820,760'],
+  ['waves', 'Q860,724 900,760 Q940,724 980,760 Q1020,724 1060,760 Q1100,724 1140,760'],
+  ['rise', 'C1200,760 1150,470 1240,460'],
+  ['moon', `A${MOON.r},${MOON.r} 0 0 0 1240,200 A${MOON.r},${MOON.r} 0 0 0 1240,460`],
+  ['fall', 'C1330,462 1420,600 1500,760'],
+  ['run', 'L1760,760 C1840,760 1850,690 1800,690 C1760,690 1770,760 1860,760 L2080,760'],
+];
+// cue markers: [time, piece end]. A repeated piece = the pen holds there (the monotone spline eases in and out of it)
+const CUES = [[-0.45, 'start'], [0.75, 'horizon'], [1.6, 'house'], [1.9, 'walk'], [2.75, 'tree'], [3.0, 'shore'], [3.8, 'waves'], [4.3, 'rise'], [5.15, 'moon'], [5.65, 'moon'], [5.95, 'fall'], [6.75, 'run']];
+const SWELL = 5.18;                                                // hero: the closed ring floods into a gold disc
+let X = [], Y = [], S = [], TAU = [], TD = [], END = { start: 0 }, tauOf;
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('500 84px "Cormorant Garamond"', 'Evenfall'), document.fonts.load('400 26px Jost', 'a night drawn')]);
+  await document.fonts.ready;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'path'); let px = -420, py = 760, s0 = 0;
+  for (const [name, d] of PIECES) {                                // sample every piece by arc length, 2 px apart
+    svg.setAttribute('d', `M${px},${py} ${d}`); const L = svg.getTotalLength(), n = Math.max(2, Math.ceil(L / 2));
+    for (let i = X.length ? 1 : 0; i <= n; i++) { const p = svg.getPointAtLength(L * i / n); X.push(p.x); Y.push(p.y); S.push(s0 + L * i / n); }
+    s0 += L; px = X.at(-1); py = Y.at(-1); END[name] = X.length - 1;
+  }
+  // curvature-weighted arc length: the pen slows into corners
+  const n = X.length, turn = new Float32Array(n), corn = new Float32Array(n);
+  for (let i = 2; i < n - 2; i++) { let a = Math.atan2(Y[i + 2] - Y[i], X[i + 2] - X[i]) - Math.atan2(Y[i] - Y[i - 2], X[i] - X[i - 2]); a = Math.abs(Math.atan2(Math.sin(a), Math.cos(a))); turn[i] = a; }
+  for (let i = 0; i < n; i++) { let acc = 0, w = 0; for (let k = -10; k <= 10; k++) { const j = i + k; if (j < 0 || j >= n) continue; const g = Math.exp(-k * k / 30); acc += turn[j] * g; w += g; } corn[i] = acc / w; }
+  TAU[0] = 0; for (let i = 1; i < n; i++) TAU[i] = TAU[i - 1] + (S[i] - S[i - 1]) * (1 + 14 * Math.min(corn[i], .3));
+  tauOf = monotone(CUES.map(c => c[0]), CUES.map(c => TAU[END[c[1]]]));
+  let j = 0; for (let t = -0.45; t <= 6.8; t += 1 / 600) { const tau = tauOf(t); while (j < n && TAU[j] <= tau) TD[j++] = t; }   // when each point is drawn
+  for (; j < n; j++) TD[j] = 6.8;
+})();
+function headAt(t) {                                               // fractional index of the nib at time t
+  const tau = tauOf(clamp(t, -0.45, 6.75)); let lo = 0, hi = TAU.length - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (TAU[m] <= tau) lo = m; else hi = m; }
+  return lo + clamp((tau - TAU[lo]) / ((TAU[hi] - TAU[lo]) || 1));
+}
+const pt = f => { const i = Math.floor(f), u = f - i, j = Math.min(X.length - 1, i + 1); return [lerp(X[i], X[j], u), lerp(Y[i], Y[j], u)]; };
+
+// ---------------------------------------------------------------- camera: follow the nib (lag + lead), then dolly out to the poster
+function camera(t) {
+  let fx = 0, fy = 0; for (const [o, w] of [[-.45, .2], [-.25, .3], [0, .3], [.2, .2]]) { const p = pt(headAt(t + o)); fx += p[0] * w; fy += p[1] * w; }
+  const out = smooth(5.45, 6.9, t), z = Math.exp(lerp(Math.log(2.1), Math.log(1), out)) * (1 - .015 * smooth(6.9, 8, t));
+  return { z, cx: lerp(fx, 960, out), cy: lerp(lerp(fy, 540, .25) - 80 * smooth(4.4, 5.2, t), 540, out) };
+}
+const toScreen = (c, x, y) => [(x - c.cx) * c.z + W / 2, (y - c.cy) * c.z + H / 2];
+
+function drawLine(c, t, head) {
+  lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, W, H);
+  lg.setTransform(c.z, 0, 0, c.z, W / 2 - c.cx * c.z, H / 2 - c.cy * c.z);
+  lg.lineCap = lg.lineJoin = 'round'; lg.lineWidth = LW / c.z;    // divide by zoom: constant on screen
+  const ih = Math.floor(head);
+  for (let i0 = 0; i0 < ih; i0 += 8) {
+    const i1 = Math.min(ih, i0 + 8), age = t - TD[(i0 + i1) >> 1];
+    const b = .5 + .5 * (1 - smooth(.15, 1.6, age));              // fresh ink is hot, older segments dim to aged gold
+    const tail = smooth(-420, 150, X[i0]);                          // the line fades in from the left edge
+    lg.strokeStyle = `rgb(${mix3(NAVY, b > .5 ? mix3(GOLD, HOT, (b - .5) * 1.6) : mix3(AGED, GOLD, b * 2), tail).map(v => v | 0)})`;
+    lg.beginPath(); lg.moveTo(X[i0], Y[i0]); for (let i = i0 + 1; i <= i1; i++) lg.lineTo(X[i], Y[i]);
+    if (i1 === ih) { const p = pt(head); lg.lineTo(p[0], p[1]); } lg.stroke();
+  }
+}
+function drawFill(c, t) {                                          // line-to-fill swell: the ring floods inward
+  fg.setTransform(1, 0, 0, 1, 0, 0); fg.clearRect(0, 0, W, H); if (t < SWELL) return 0;
+  const u = outE((t - SWELL) / .5), ov = 1 + .035 * Math.sin(Math.PI * clamp((t - SWELL - .2) / .5));
+  const [sx, sy] = toScreen(c, MOON.x, MOON.y), R = (MOON.r + LW / 2 / c.z) * c.z * ov, ri = R * (1 - u);
+  const g = fg.createLinearGradient(sx - R, sy - R, sx + R, sy + R); g.addColorStop(0, '#F4E4B8'); g.addColorStop(.55, '#D9BF82'); g.addColorStop(1, '#A4824A');
+  fg.fillStyle = g; fg.beginPath(); fg.arc(sx, sy, R, 0, 7); if (ri > .5) { fg.moveTo(sx + ri, sy); fg.arc(sx, sy, ri, 0, 2 * Math.PI, true); } fg.fill('evenodd');
+  return Math.exp(-(((t - SWELL - .12) / .18) ** 2));              // bloom pulse right as it fills
+}
+const glow = (x, y, r, a, rgb) => { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${rgb},${a})`); g.addColorStop(1, `rgba(${rgb},0)`); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r); };
+const MOTES = Array.from({ length: 40 }, (_, i) => { const r = k => { const v = Math.sin((i + 1) * 91.7 + k * 13.3) * 43758.5; return v - Math.floor(v); }; return [r(1) * 2200 - 140, r(2) * 1200 - 60, .4 + r(3), .04 + r(4) * .1, r(5) * 6.28]; });
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; ctx.letterSpacing = '0px';
+  const c = camera(t), head = headAt(t);
+  const bg = ctx.createRadialGradient(960, 470, 80, 960, 540, 1250); bg.addColorStop(0, '#16233D'); bg.addColorStop(1, '#070D18');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+  for (const [x, y, d, a, ph] of MOTES) { const [sx, sy] = toScreen({ ...c, z: 1 + (c.z - 1) * d * .5 }, x + 8 * Math.sin(t * .4 + ph), y - 6 * t * d);
+    ctx.fillStyle = `rgba(233,214,166,${a * (.7 + .3 * Math.sin(t * 1.3 + ph))})`; ctx.beginPath(); ctx.arc(sx, sy, 1.6 * d, 0, 7); ctx.fill(); }
+
+  drawLine(c, t, head); const bloom = drawFill(c, t);
+  ctx.drawImage(fillC, 0, 0); ctx.drawImage(lineC, 0, 0);
+  ctx.globalCompositeOperation = 'screen';                          // screen-blended blur glow, the line lights its own air
+  ctx.filter = 'blur(7px)'; ctx.globalAlpha = .7; ctx.drawImage(lineC, 0, 0);
+  ctx.filter = 'blur(26px)'; ctx.globalAlpha = .45 + .25 * Math.sin(Math.PI * smooth(6.9, 8.4, t)); ctx.drawImage(fillC, 0, 0);
+  if (bloom > .01) { ctx.filter = 'blur(70px)'; ctx.globalAlpha = .5 * bloom; ctx.drawImage(fillC, 0, 0); }
+  ctx.filter = 'none'; ctx.globalAlpha = 1;
+
+  const vis = 1 - smooth(6.5, 6.75, t);                              // the glowing nib
+  if (vis > 0) { ctx.globalCompositeOperation = 'lighter'; const [sx, sy] = toScreen(c, ...pt(head)), fl = 1 + .06 * Math.sin(t * 31) + .3 * Math.exp(-(((t - SWELL) / .07) ** 2));
+    glow(sx, sy, 70 * fl, .1 * vis, '214,178,112'); glow(sx, sy, 18 * fl, .45 * vis, '238,210,150'); glow(sx, sy, 4.5, .95 * vis, '255,250,236'); }
+  ctx.globalCompositeOperation = 'source-over';
+
+  // title, wiped on left to right like the line, once the camera has settled on the poster
+  const tw = smooth(6.45, 7.25, t);
+  if (tw > 0) {
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, 560 + 820 * tw, H); ctx.clip(); ctx.textAlign = 'center';
+    ctx.fillStyle = '#E9D6A6'; ctx.font = '500 84px "Cormorant Garamond"'; ctx.letterSpacing = '22px'; ctx.fillText('EVENFALL', 971, 890);
+    ctx.fillStyle = 'rgba(233,214,166,.62)'; ctx.font = '400 24px Jost'; ctx.letterSpacing = '9px'; ctx.fillText('A NIGHT DRAWN IN ONE LINE', 964, 950);
+    ctx.restore(); window.heliosDrawnText?.add('EVENFALL'); window.heliosDrawnText?.add('A NIGHT DRAWN IN ONE LINE');
+  }
+  const v = ctx.createRadialGradient(960, 540, 500, 960, 540, 1150); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.45)'); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+};
+</script>
+</body></html>

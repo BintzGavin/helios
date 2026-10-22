@@ -1,0 +1,177 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render flat-vector.html -o flat-vector.mp4 --duration 8 --mode canvas -->
+<html><head><meta charset="utf-8"><title>Flat vector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#FFF3E0;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, F = n => n / 30;                       // F(): frames at 30 fps -> seconds
+const ctx = document.getElementById('c').getContext('2d');
+// four hues + cream, each with a tone-on-tone shade; coral is reserved for the hero dot
+const C = { cream: '#FFF3E0', creamD: '#F3E2C4', ultra: '#2E2BFF', ultraD: '#2020C9', ultraL: '#4B48FF', ultraP: '#BDBBFF',
+  coral: '#FF5B4F', coralD: '#E2443A', sun: '#FFC22E', sunD: '#EDA514', mint: '#34E0A8', mintD: '#20BD8B', ink: '#17163A' };
+
+// ---------------------------------------------------------------- motion kit (all closed-form)
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const inv = (a, b, x) => clamp((x - a) / (b - a));
+const ioQ = u => u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+const ioC = u => u < .5 ? 4 * u ** 3 : 1 - (-2 * u + 2) ** 3 / 2;
+const outC = u => 1 - (1 - u) ** 3;
+const hump = u => 4 * u * (1 - u);
+function bezier(x1, y1, x2, y2) {                                 // CSS cubic-bezier, Newton solve
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx, cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  return u => { if (u <= 0) return 0; if (u >= 1) return 1; let s = u;
+    for (let i = 0; i < 8; i++) { const d = (3 * ax * s + 2 * bx) * s + cx; s -= (((ax * s + bx) * s + cx) * s - u) / (d || 1e-6); }
+    return ((ay * s + by) * s + cy) * s; };
+}
+const over = bezier(0.34, 1.56, 0.64, 1);                         // the overshoot curve
+function spring(t, f, z) { if (t <= 0) return 0; const w = 2 * Math.PI * f, a = z * w, b = w * Math.sqrt(1 - z * z); return 1 - Math.exp(-a * t) * (Math.cos(b * t) + a / b * Math.sin(b * t)); }
+function springV(t, f, z) { if (t <= 0) return 0; const w = 2 * Math.PI * f, a = z * w, b = w * Math.sqrt(1 - z * z); return Math.exp(-a * t) * (w * w / b) * Math.sin(b * t); }
+const kick = (t, t0, f = 3.2, z = .38) => t <= t0 ? 0 : Math.exp(-z * 2 * Math.PI * f * (t - t0)) * Math.sin(2 * Math.PI * f * Math.sqrt(1 - z * z) * (t - t0));
+// spring pop: scale s and squash k from the spring's velocity; the residual is pinned to exactly 1 after `pin` s
+function pop(t, t0, f = 2.4, z = .42, amt = .14, pin = .9) {
+  const tt = t - t0; if (tt <= 0) return [0, 0];
+  let s = spring(tt, f, z), k = clamp(springV(tt, f, z) / (2 * Math.PI * f) * amt * 2, -.3, .3);
+  const w = ioQ(inv(pin * .7, pin, tt)); return [lerp(s, 1, w), lerp(k, 0, w)];
+}
+
+// ---------------------------------------------------------------- world layout (screen px at zoom 1)
+const FLOOR = 800, R = 60;
+const BARS = [[760, 200], [900, 300], [1040, 400], [1180, 520]].map(([x, h], i) => ({ x, h, w: 104, t0: F(24 + 3 * i) }));
+const barTop = i => FLOOR - 12 - BARS[i].h;
+const DECOR = [
+  { k: 'ring', x: 330, y: 300, t0: F(36), c: C.sun, d: C.sunD, rs: 8 },
+  { k: 'pill', x: 1590, y: 330, t0: F(39), c: C.mint, d: C.mintD, rs: -5, r0: -24 },
+  { k: 'plus', x: 1610, y: 660, t0: F(42), c: C.ultra, d: C.ultraD, rs: 12 },
+  { k: 'half', x: 300, y: 690, t0: F(45), c: C.mint, d: C.mintD, rs: -4, r0: 16 },
+  { k: 'dots', x: 1360, y: 170, t0: F(48), c: C.sun, d: C.sunD, rs: 0 },
+];
+// hero dot: fall, two hops (anticipation squash, stretch along velocity, landing squash)
+const HOPS = [{ a: 2.05, o: 2.2, l: 2.55, x0: 560, y0: FLOOR - 12, x1: 900, y1: barTop(1), H: 230 },
+              { a: 2.78, o: 2.92, l: 3.36, x0: 900, y0: barTop(1), x1: 1180, y1: barTop(3), H: 150 }];
+function dotPos(t) {
+  if (t < 0.5) return [560, FLOOR - 12 - R - 0.5 * 3400 * (0.5 - t) ** 2];
+  for (const h of HOPS) if (t >= h.o && t < h.l) { const u = inv(h.o, h.l, t); return [lerp(h.x0, h.x1, u), lerp(h.y0, h.y1, u) - R - h.H * hump(u)]; }
+  const h = [...HOPS].reverse().find(h => t >= h.l); return h ? [h.x1, h.y1 - R] : [560, FLOOR - 12 - R];
+}
+function dot(t) {
+  const [x, y] = dotPos(t), air = t < 0.5 || HOPS.some(h => t >= h.o && t < h.l);
+  if (air) {                                                      // stretch proportional to speed, along the velocity
+    const a = dotPos(t - 1 / 120), b = dotPos(t + 1 / 120), vx = (b[0] - a[0]) * 60, vy = (b[1] - a[1]) * 60, v = Math.hypot(vx, vy);
+    const k = Math.min(.34, v / 2400 * .3); return { x, y, sx: 1 + k, sy: 1 / (1 + k), rot: Math.atan2(vy, vx), base: false };
+  }
+  let sq = .55 * kick(t, .5) + HOPS.reduce((s, h) => s + .55 * kick(t, h.l) + .22 * ioQ(inv(h.a, h.o, t)) * (t < h.o), 0);
+  return { x, y: y + R, sx: 1 + sq * .9, sy: 1 - sq, rot: 0, base: true };   // y = contact point
+}
+
+// ---------------------------------------------------------------- camera: log-space zoom, speed peaks on the beat (4.0 s)
+const ZA = 3.45, ZB = 4.55, ZS = 21;
+function camera(t) {
+  const e = ioC(inv(0.7, 2.1, t)), s0 = lerp(1.3, 1.08, e), f0x = lerp(640, 960, e), f0y = lerp(640, 560, e);   // opening settle
+  const p = ioC(inv(ZA, ZB, t)), d = [1180, barTop(3) - R];
+  const s = Math.exp(lerp(Math.log(s0), Math.log(ZS), p));       // interpolate log(scale): constant perceived zoom rate
+  const sx0 = (d[0] - f0x) * s0 + 960, sy0 = (d[1] - f0y) * s0 + 540;   // the dot's screen position under the base camera
+  return { s, fx: d[0], fy: d[1], px: lerp(sx0, 960, p), py: lerp(sy0, 540, p) };
+}
+
+// ---------------------------------------------------------------- drawing helpers
+const rr = (x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); };
+function shaded(path, c, d, sx0) {                                // flat fill + one tone-on-tone shade on the right
+  ctx.fillStyle = c; path(); ctx.fill(); ctx.save(); path(); ctx.clip(); ctx.fillStyle = d; ctx.fillRect(sx0, -2000, 4000, 4000); ctx.restore();
+}
+function drawDecor(o, t) {
+  const [s, k] = pop(t, o.t0); if (s <= 0.001) return;
+  ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(((o.r0 || 0) + o.rs * (t - o.t0)) * Math.PI / 180); ctx.scale(s * (1 - k), s * (1 + k));
+  if (o.k === 'ring') { ctx.lineWidth = 34; ctx.strokeStyle = o.c; ctx.beginPath(); ctx.arc(0, 0, 86, 0, 7); ctx.stroke(); ctx.strokeStyle = o.d; ctx.beginPath(); ctx.arc(0, 0, 86, -.6, 1.2); ctx.stroke(); }
+  if (o.k === 'pill') shaded(() => rr(-130, -42, 260, 84, 42), o.c, o.d, 80);
+  if (o.k === 'plus') { ctx.lineCap = 'round'; ctx.lineWidth = 30; ctx.strokeStyle = o.c; ctx.beginPath(); ctx.moveTo(-46, 0); ctx.lineTo(46, 0); ctx.moveTo(0, -46); ctx.lineTo(0, 46); ctx.stroke(); }
+  if (o.k === 'half') shaded(() => { ctx.beginPath(); ctx.arc(0, 30, 100, Math.PI, 0); ctx.closePath(); }, o.c, o.d, 45);
+  if (o.k === 'dots') [-48, 0, 48].forEach((x, i) => { const [q] = pop(t, o.t0 + F(2 * i)); ctx.fillStyle = i === 1 ? o.d : o.c; ctx.beginPath(); ctx.arc(x, 0, 16 * q, 0, 7); ctx.fill(); });
+  ctx.restore();
+}
+function drawBar(b, t) {
+  const [s, k] = pop(t, b.t0, 2.2, .4, .16); if (s <= 0.001) return;
+  const h = b.h * s, w = b.w * (1 - k * .6);
+  ctx.save(); ctx.translate(b.x, FLOOR - 12);
+  shaded(() => { ctx.beginPath(); ctx.roundRect(-w / 2, -h, w, h + 6, [28, 28, 0, 0]); }, C.ultraL, C.ultra, w / 2 - w * .26);
+  ctx.restore();
+}
+function drawDot(d, r = R, col = C.coral) {
+  ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.rot); ctx.scale(d.sx, d.sy);
+  ctx.fillStyle = col; ctx.beginPath(); ctx.arc(0, d.base ? -r : 0, r, 0, 7); ctx.fill(); ctx.restore();
+}
+function ripple(x, y, t, t0, rx, col) {
+  const u = inv(t0, t0 + F(12), t); if (t < t0 || u >= 1) return;
+  ctx.strokeStyle = col; ctx.lineWidth = 16 * (1 - u) ** 1.2; ctx.beginPath(); ctx.ellipse(x, y, rx * outC(u), rx * .22 * outC(u), 0, 0, 7); ctx.stroke();
+}
+function rays(x, y, t, t0, r0, r1, angs, col) {                    // burst lines: head shoots out, tail follows
+  const h = outC(inv(t0, t0 + F(7), t)), tl = outC(inv(t0 + F(3), t0 + F(10), t)); if (t < t0 || tl >= 1) return;
+  ctx.strokeStyle = col; ctx.lineWidth = 14; ctx.lineCap = 'round';
+  for (const a of angs) { const c = Math.cos(a * Math.PI / 180), s = Math.sin(a * Math.PI / 180), ra = lerp(r0, r1, tl), rb = lerp(r0, r1, h);
+    ctx.beginPath(); ctx.moveTo(x + c * ra, y + s * ra); ctx.lineTo(x + c * rb, y + s * rb); ctx.stroke(); }
+}
+
+// ---------------------------------------------------------------- lockup (screen space)
+const WORD = 'tılt', WF = 420, WB = 650, TAG = 'small moves, every day';
+let LET = [], TIT = null;
+const ready = (async () => {
+  await Promise.all([document.fonts.load(`700 ${WF}px Fredoka`, WORD), document.fonts.load('600 48px Fredoka', TAG)]);
+  await document.fonts.ready;
+  ctx.font = `700 ${WF}px Fredoka`; const tot = ctx.measureText(WORD).width, x0 = 960 - tot / 2;
+  LET = [...WORD].map((ch, i) => { const pre = ctx.measureText(WORD.slice(0, i)).width, w = ctx.measureText(ch).width; return { ch, cx: x0 + pre + w / 2, w, t0: 4.92 + F(3 * i) }; });
+  const m = ctx.measureText('ı'); TIT = { x: LET[1].cx, y: WB - m.actualBoundingBoxAscent - WF * .07 - WF * .14, r: WF * .14 };
+})();
+function lockup(t) {
+  // two-tone shape wipe: sunflower circle leads, ultramarine follows 3 frames behind
+  const wipe = (t0, col) => { const u = inv(t0, t0 + F(12), t); if (u <= 0) return; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(960, 540, 1160 * outC(u), 0, 7); ctx.fill(); };
+  wipe(4.42, C.sun); wipe(4.42 + F(3), C.ultra); if (t < 4.42 + F(3)) return;
+  for (const o of [{ x: 190, y: 190, r0: 0, rs: 5, t0: 5.6 }, { x: 1740, y: 900, r0: -28, rs: -4, t0: 5.68 }]) {   // tone-on-tone corner decor
+    const [s] = pop(t, o.t0); if (s <= 0) continue; ctx.save(); ctx.translate(o.x, o.y); ctx.rotate((o.r0 + o.rs * (t - o.t0)) * Math.PI / 180); ctx.scale(s, s);
+    if (o.x < 960) { ctx.strokeStyle = C.ultraL; ctx.lineWidth = 38; ctx.beginPath(); ctx.arc(0, 0, 140, 0, 7); ctx.stroke(); } else { ctx.fillStyle = C.ultraL; rr(-150, -48, 300, 96, 48); ctx.fill(); }
+    ctx.restore();
+  }
+  ctx.font = `700 ${WF}px Fredoka`; ctx.textAlign = 'center'; ctx.fillStyle = C.cream;
+  for (const L of LET) {                                           // letters pop from the baseline, 3-frame stagger
+    const [s, k] = pop(t, L.t0, 2.6, .4, .18); if (s <= 0.001) continue;
+    ctx.save(); ctx.translate(L.cx, WB); ctx.scale(s * (1 - k), s * (1 + k)); ctx.fillText(L.ch, 0, 0); ctx.restore();
+    window.heliosDrawnText?.add(L.ch);
+  }
+  const tl = 5.36;                                                  // HERO: the coral dot drops in as the tittle
+  if (t >= tl - .2) {
+    const fall = t < tl, y = fall ? TIT.y - 900 * inv(tl, tl - .2, t) ** 2 : TIT.y, k = fall ? .3 * inv(tl - .2, tl, t) : 0;
+    const sq = .7 * kick(t, tl, 3) + .1 * kick(t, 6.4, 3.4) + .1 * kick(t, 7.2, 3.4);   // landing squash + two small beat bobs in the end hold
+    drawDot(fall ? { x: TIT.x, y, sx: 1 / (1 + k), sy: 1 + k, rot: 0 } : { x: TIT.x, y: TIT.y + TIT.r, sx: 1 + sq * .9, sy: 1 - sq, rot: 0, base: true }, TIT.r);
+    rays(TIT.x, TIT.y, t, tl, TIT.r + 18, TIT.r + 120, [-165, -130, -100, -80, -50, -15], C.sun);
+  }
+  ctx.font = '600 48px Fredoka'; ctx.letterSpacing = '7px';
+  const u = outC(inv(5.8, 6.3, t)); ctx.globalAlpha = u; ctx.fillStyle = C.ultraP; ctx.fillText(TAG, 960, 812 + 24 * (1 - u)); ctx.globalAlpha = 1; ctx.letterSpacing = '0px';
+  if (u > 0) window.heliosDrawnText?.add(TAG);
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  ctx.textAlign = 'left'; ctx.letterSpacing = '0px';
+  if (t < 4.42 + F(15)) {                                           // the world, under one camera transform
+    const c = camera(t); ctx.fillStyle = C.cream; ctx.fillRect(0, 0, W, H);
+    ctx.setTransform(c.s, 0, 0, c.s, c.px - c.fx * c.s, c.py - c.fy * c.s);
+    ctx.fillStyle = C.creamD; ctx.fillRect(-2000, FLOOR, 6000, 2000);
+    const bs = outC(inv(F(6), F(20), t)); ctx.fillStyle = C.ultra; rr(560 - 80 * bs, FLOOR - 12, 80 * bs + 720 * bs, 24, 12); ctx.fill();
+    DECOR.forEach(o => drawDecor(o, t)); BARS.forEach(b => drawBar(b, t));
+    ripple(560, FLOOR, t, .5, 150, C.sun); ripple(900, barTop(1), t, HOPS[0].l, 110, C.sunD); ripple(1180, barTop(3), t, HOPS[1].l, 120, C.sunD);
+    const d = dot(t), h2 = HOPS[1];
+    if (t > h2.o + F(2) && t < h2.l - F(1)) {                     // two speed lines trail the big hop, against the velocity
+      const a = dotPos(t - .02), vx = d.x - a[0], vy = d.y - a[1], l = Math.hypot(vx, vy) || 1, ux = vx / l, uy = vy / l;
+      ctx.strokeStyle = C.ultraP; ctx.lineWidth = 11; ctx.lineCap = 'round';
+      for (const [o, len] of [[-28, 90], [26, 130]]) { const bx = d.x - ux * (R + 26) - uy * o, by = d.y - uy * (R + 26) + ux * o;
+        ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - ux * len, by - uy * len); ctx.stroke(); }
+    }
+    drawDot(d);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+  lockup(t);
+};
+</script>
+</body></html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render cel-boil.html -o cel-boil.mp4 --duration 8 --fps 24 --mode canvas -->
+<html><head><meta charset="utf-8"><title>Cel boil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#F2E6CC;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, FPS = 24;
+const ctx = document.getElementById('c').getContext('2d');
+const P = { paper: '#F2E6CC', ink: '#1C1613', red: '#E5402B', yel: '#FFC425', cream: '#FFF6E2', shade: '#DDCBA6' };
+const REG = [-6, 5];                                               // colour sits off the line, like hand-painted cels
+
+// ---------------------------------------------------------------- exposure sheet: [from frame, to frame, exposure]
+const SHEET = [[0, 10, 1], [10, 24, 2], [24, 48, 2], [48, 60, 3], [60, 72, 1], [72, 108, 2], [108, 132, 1], [132, 156, 2], [156, 192, 3]];
+function drawing(f) {                                              // -> frame the drawing was made on, drawing index, exposure
+  let id = 0;
+  for (const [a, b, s] of SHEET) { if (f >= b) { id += Math.ceil((b - a) / s); continue; } const k = Math.floor((f - a) / s); return { fq: a + k * s, id: id + k, step: s }; }
+  return { fq: 191, id, step: 3 };
+}
+
+// ---------------------------------------------------------------- hash, value noise, easing
+const hash = (...a) => { let h = 2166136261 >>> 0; for (const v of a) { h = Math.imul(h ^ ((Math.round(v * 997) | 0) >>> 0), 16777619) >>> 0; h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995) >>> 0; h ^= h >>> 15; } return (h >>> 0) / 4294967296; };
+function vn(x, y, s) {                                             // 2D value noise in [-1,1], one field per seed
+  const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+  const h = (i, j) => hash(xi + i, yi + j, s);
+  return 2 * ((h(0, 0) * (1 - u) + h(1, 0) * u) * (1 - v) + (h(0, 1) * (1 - u) + h(1, 1) * u) * v) - 1;
+}
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const inv = (a, b, x) => clamp((x - a) / (b - a));
+const hump = u => 4 * u * (1 - u);
+function K(t, keys) { if (t <= keys[0][0]) return keys[0][1]; for (let i = 1; i < keys.length; i++) if (t <= keys[i][0]) { const [t0, v0] = keys[i - 1], [t1, v1] = keys[i]; return lerp(v0, v1, (t - t0) / (t1 - t0)); } return keys.at(-1)[1]; }
+
+// ---------------------------------------------------------------- the inking engine
+function resample(pts, step, closed) {
+  const src = closed ? [...pts, pts[0]] : pts, L = [0];
+  for (let i = 1; i < src.length; i++) L.push(L[i - 1] + Math.hypot(src[i][0] - src[i - 1][0], src[i][1] - src[i - 1][1]));
+  const tot = L.at(-1), n = Math.max(2, Math.round(tot / step)), out = []; let j = 1;
+  for (let i = 0; i < (closed ? n : n + 1); i++) { const s = tot * i / n; while (j < L.length - 1 && L[j] < s) j++; const u = (s - L[j - 1]) / ((L[j] - L[j - 1]) || 1); out.push([lerp(src[j - 1][0], src[j][0], u), lerp(src[j - 1][1], src[j][1], u)]); }
+  return out;
+}
+const boil = (pts, seed, amp = 2.4, sc = 70) => pts.map(([x, y]) => [x + amp * vn(x / sc, y / sc, seed), y + amp * vn(x / sc + 41, y / sc - 17, seed + 500)]);
+function fillPoly(poly, col) { ctx.fillStyle = col; ctx.beginPath(); poly.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill(); }
+// variable-width brush: an outline polygon around the path, width = base x taper x pressure noise
+function ink(pts, { w = 7, seed = 1, closed = false, amp = 2.4, col = P.ink, t0 = 22, t1 = 30 } = {}) {
+  let q = boil(resample(pts, 4, closed), seed, amp);
+  if (closed) { const s0 = Math.floor(hash(seed, 3) * q.length), ext = Math.ceil(q.length * .07); q = Array.from({ length: q.length + ext }, (_, i) => q[(s0 + i) % q.length]); }
+  const L = [0]; for (let i = 1; i < q.length; i++) L.push(L[i - 1] + Math.hypot(q[i][0] - q[i - 1][0], q[i][1] - q[i - 1][1]));
+  const tot = L.at(-1), left = [], right = [];
+  q.forEach((p, i) => {
+    const a = q[Math.max(0, i - 1)], b = q[Math.min(q.length - 1, i + 1)], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, nx = -(b[1] - a[1]) / l, ny = (b[0] - a[0]) / l;
+    const taper = .15 + .85 * Math.min(1, L[i] / t0, (tot - L[i]) / t1) ** .7, r = w / 2 * taper * (1 + .38 * vn(L[i] / 55, 3, seed + 9));
+    left.push([p[0] + nx * r, p[1] + ny * r]); right.push([p[0] - nx * r, p[1] - ny * r]);
+  });
+  fillPoly([...left, ...right.reverse()], col);
+}
+function cel(pts, fill, seed, w = 8) {                             // painted fill (off-register, its own boil) + inked line
+  fillPoly(boil(pts, seed + 77, 2.6).map(p => [p[0] + REG[0], p[1] + REG[1]]), fill); ink(pts, { w, seed, closed: true });
+}
+const ellipse = (cx, cy, rx, ry, rot = 0, n = 64) => Array.from({ length: n }, (_, i) => { const a = i / n * 2 * Math.PI, x = rx * Math.cos(a), y = ry * Math.sin(a); return [cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]; });
+const burstPts = (cx, cy, ro, ri, n, sx = 1, sy = 1) => Array.from({ length: 2 * n }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / n, r = i % 2 ? ri : ro; return [cx + r * Math.cos(a) * sx, cy + r * Math.sin(a) * sy]; });
+
+// ---------------------------------------------------------------- cel FX
+function puffs(x, y, tq, t0, v, dirs = [-1, 1]) {                  // dust clouds: grow for 2 drawings, shrink away over 3
+  const age = tq - t0; if (age < 0 || age > .5) return;
+  const g = age < .1 ? .55 + age / .1 * .45 : 1 - (age - .1) / .4;
+  dirs.forEach(d => [0, 1, 2].forEach(k => { const r = (58 - k * 13) * g * (1 + .25 * hash(k, d)); if (r < 4) return;
+    cel(ellipse(x + d * (90 + k * 72 + age * 240), y - 24 - k * 16 - age * 80, r, r * .9), P.cream, 300 + k * 7 + d * 3 + v * 31, 6); }));
+}
+function speedLines(x, y, dx, dy, n, len, v, spread = 26) {        // tapered ink dashes trailing a move
+  const l = Math.hypot(dx, dy), ux = dx / l, uy = dy / l;
+  for (let i = 0; i < n; i++) { const o = (i - (n - 1) / 2) * spread, ln = len * (.6 + .5 * hash(i, v, 2)), bx = x - uy * o - ux * 30 * hash(i, v), by = y + ux * o - uy * 30 * hash(i, v);
+    ink([[bx, by], [bx - ux * ln, by - uy * ln]], { w: 6, seed: 900 + i * 13 + v, t0: 4, t1: ln * .8, amp: 1.2 }); }
+}
+function spark(x, y, s, v, rot = 0) {                              // four-point twinkle
+  if (s < .05) return; const pts = []; for (let i = 0; i < 8; i++) { const a = rot + i * Math.PI / 4, r = (i % 2 ? 15 : 58) * s; pts.push([x + r * Math.cos(a), y + r * Math.sin(a)]); }
+  cel(pts, P.yel, 700 + v, Math.max(3, 6 * s));
+}
+
+// ---------------------------------------------------------------- the action (every pose evaluated at the drawing's own time tq)
+const GY = 830, R = 104, BADGE = { x: 960, y: 450, r: 375 };
+function ball(tq) {                                                // -> {x, y (centre), sx, sy, smear: [dx,dy] | null}
+  const base = GY - R, fr = Math.round(tq * 24);                 // smear drawings are single frames
+  if (tq < 10 / 24) return { x: 520, y: lerp(30, base, (tq * 24 / 10) ** 2), sx: .9, sy: 1.15, smear: fr === 8 ? [0, 1] : null };
+  if (tq < 1.0) { const sq = K(tq, [[10 / 24, .62], [12 / 24, .8], [14 / 24, 1.1], [16 / 24, 1]]); return { x: 520, y: GY - R * sq, sx: 1 / sq, sy: sq }; }
+  for (const [a, b, x0, x1, h] of [[1.0, 1.5, 520, 800, 210], [1.58, 2.0, 800, 1060, 150]]) {
+    if (tq >= a && tq < b) { const u = inv(a, b, tq); return { x: lerp(x0, x1, u), y: base - h * hump(u), sx: .92, sy: 1.1 }; }
+    if (tq >= b && tq < b + .08) return { x: x1, y: GY - R * .75, sx: 1.3, sy: .75 };
+  }
+  if (tq < 2.5) { const sq = 1 - .3 * inv(2.0, 2.5, tq); return { x: 1060, y: GY - R * sq, sx: 1 / sq, sy: sq }; }   // anticipation, on 3s
+  if (tq < 2.8) { const u = inv(2.5, 2.8, tq); return { x: 1060 - 60 * u, y: lerp(base, -260, u * u), sx: .82, sy: 1.25, smear: fr === 62 ? [0, -1] : null }; }
+  if (tq >= 4.5 && tq < 4.75) { const u = inv(4.5, 4.75, tq); return { x: lerp(1500, BADGE.x, u), y: lerp(-200, BADGE.y - 250, u * u), sx: .85, sy: 1.2, smear: fr === 112 ? [-.45, 1] : null }; }
+  if (tq >= 4.75 && tq < 4.84) return { x: BADGE.x, y: BADGE.y - 225, sx: 1.45, sy: .6 };
+  if (tq >= 4.84 && tq < 5.1) { const u = inv(4.84, 5.1, tq); return { x: lerp(BADGE.x, 2150, u), y: lerp(BADGE.y - 250, -260, Math.sqrt(u)), sx: 1.1, sy: .9, smear: fr === 117 ? [.9, -.45] : null }; }
+  return null;
+}
+function drawBall(b, v) {
+  if (b.smear) {                                                   // smear drawing: the ball stretched to ~250 % along its path for one frame
+    const [dx, dy] = b.smear, l = Math.hypot(dx, dy), ux = dx / l, uy = dy / l, back = R * 3.2, pts = [];
+    for (let i = 0; i <= 16; i++) { const a = Math.atan2(uy, ux) - Math.PI / 2 + i * Math.PI / 16; pts.push([b.x + R * .8 * Math.cos(a), b.y + R * .8 * Math.sin(a)]); }
+    pts.push([b.x - ux * back - uy * R * .15, b.y - uy * back + ux * R * .15]);
+    cel(pts, P.red, 40 + v, 7); speedLines(b.x - ux * back * .5, b.y - uy * back * .5, ux, uy, 3, 160, v, 40); return;
+  }
+  cel(ellipse(b.x, b.y, R * b.sx, R * b.sy), P.red, 20 + v, 8);   // squash/stretch on the points, so the line weight stays
+  fillPoly(boil(ellipse(b.x - R * .38 * b.sx, b.y - R * .42 * b.sy, R * .2 * b.sx, R * .11 * b.sy, -.7, 20), 60 + v, 1.5), P.cream);
+}
+
+// ---------------------------------------------------------------- paper (one base sheet + four tooth variants, seeded)
+let PAPER, TOOTH = [];
+const ready = (async () => {
+  await document.fonts.load('100px "Titan One"', 'FRESH INK'); await document.fonts.ready;
+  const lo = document.createElement('canvas'); lo.width = 240; lo.height = 135; const lx = lo.getContext('2d'), li = lx.createImageData(240, 135);
+  for (let i = 0; i < 240 * 135; i++) { const n = .5 * vn((i % 240) / 9, Math.floor(i / 240) / 9, 5) + .5 * vn((i % 240) / 3, Math.floor(i / 240) / 3, 6);
+    li.data.set([242 + 8 * n, 230 + 9 * n, 204 + 10 * n, 255], i * 4); }
+  lx.putImageData(li, 0, 0); PAPER = document.createElement('canvas'); PAPER.width = W; PAPER.height = H;
+  const px = PAPER.getContext('2d'); px.imageSmoothingQuality = 'high'; px.drawImage(lo, 0, 0, W, H);
+  for (let v = 0; v < 4; v++) {
+    const c = document.createElement('canvas'); c.width = c.height = 384; const x = c.getContext('2d'), im = x.createImageData(384, 384);
+    for (let i = 0; i < 384 * 384; i++) { const r = hash(i, v, 11), k = r > .93 ? 175 + 60 * hash(i, v) : 255 - 22 * hash(i, v, 12); im.data.set([k, k * .98, k * .94, 255], i * 4); }
+    x.putImageData(im, 0, 0); TOOTH.push(c);
+  }
+})();
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none';
+  const D = drawing(Math.floor(t * FPS + 1e-4)), tq = D.fq / FPS, v = D.step === 3 ? D.id % 3 : D.id % 4;   // boil: ~4 drawings cycle (3 on holds)
+  ctx.drawImage(PAPER, 0, 0);
+  const shake = tq >= 4.75 && tq < 4.9 ? 9 * (hash(D.id, 1) - .5) : 0; ctx.translate(shake, -shake * .6);
+
+  ink([[70, GY + 4], [1850, GY - 2]], { w: 7, seed: 10 + v, t0: 60, t1: 80 });         // the ground line, boiling
+
+  const b = ball(tq);
+  if (b && !b.smear && b.y > GY - R - 260) { const k = 1 - (GY - R - b.y) / 300; fillPoly(boil(ellipse(b.x, GY + 8, R * 1.1 * k * b.sx, 14 * k), 80 + v, 1.5), P.shade); }
+  if (tq >= 4 / 24 && tq < 10 / 24) speedLines(520, b.y - R - 30, 0, 1, 3, 120, v);
+
+  // the badge: pops on 2s (scale drawings ~0.35 / 1.2 / 0.93 / 1.0), squashes on the crash
+  if (tq >= 3.0) {
+    const s = K(tq, [[3.0, .35], [3.083, 1.2], [3.167, .93], [3.25, 1.03], [3.333, 1]]), cr = tq >= 4.75 && tq < 4.92 ? [1.12, .84] : [1, 1];
+    const bp = burstPts(BADGE.x, BADGE.y, BADGE.r * s, BADGE.r * .82 * s, 14, cr[0], cr[1]);
+    cel(bp, P.yel, 200 + v, 9);
+    if (tq < 4.75) ink(ellipse(BADGE.x, BADGE.y, 250 * s, 250 * s), { w: 5, seed: 220 + v, closed: true });
+    if (tq >= 4.75 && tq < 5.0) for (let i = 0; i < 16; i++) {                         // crash: radial burst lines, on 1s
+      const a = i / 16 * 2 * Math.PI + .1, u = inv(4.75, 5.0, tq), r0 = 410 + 160 * u, r1 = r0 + 150 * (1 - u);
+      ink([[BADGE.x + r0 * Math.cos(a), BADGE.y + r0 * Math.sin(a)], [BADGE.x + r1 * Math.cos(a), BADGE.y + r1 * Math.sin(a)]], { w: 9, seed: 400 + i + v * 17, t0: 10, t1: 60 });
+    }
+    // title: letters pop one per drawing on 1s, each letter re-drawn (jittered) per drawing, fill off-register
+    [['FRESH', 168, BADGE.y - 18, 4.83], ['INK', 236, BADGE.y + 190, 5.08]].forEach(([word, size, y, t0]) => {
+      ctx.font = `${size}px "Titan One", sans-serif`; ctx.textAlign = 'center'; ctx.lineJoin = 'round';
+      const tw = ctx.measureText(word).width; let x = BADGE.x - tw / 2;
+      [...word].forEach((ch, i) => { const w = ctx.measureText(ch).width, lt = t0 + i / 24, cx = x + w / 2; x += w; if (tq < lt) return;
+        const pop = K(tq - lt, [[0, 1.35], [1 / 24, .9], [2 / 24, 1.05], [3 / 24, 1]]), j = k => (hash(i, word.length, v, k) - .5);
+        ctx.save(); ctx.translate(cx + 3 * j(1), y + 3 * j(2)); ctx.rotate(.035 * j(3)); ctx.scale(pop, pop);
+        ctx.fillStyle = P.red; ctx.fillText(ch, REG[0], REG[1]); ctx.lineWidth = 9 + 3 * j(4); ctx.strokeStyle = P.ink; ctx.strokeText(ch, 0, 0); ctx.restore();
+        window.heliosDrawnText?.add(ch); });
+    });
+  }
+  if (b) drawBall(b, v);
+  puffs(520, GY, tq, 10 / 24, v); puffs(800, GY, tq, 1.5, v); puffs(1060, GY, tq, 2.0, v, [1]); puffs(1060, GY, tq, 2.5, v);
+  if (tq >= 4.75 && tq < 5.1) for (let i = 0; i < 9; i++) {                            // sparks fly out of the crash
+    const a = -Math.PI / 2 + (i - 4) * .42 + .2 * hash(i, 5), u = inv(4.75, 5.1, tq), r = 200 + 420 * Math.sqrt(u);
+    spark(BADGE.x + r * Math.cos(a), BADGE.y - 60 + r * Math.sin(a) + 300 * u * u, 1.1 * (1 - u * .8), i * 5 + v, u * 2);
+  }
+  if (tq >= 5.5) [[560, 300, 0], [1390, 210, 1], [1420, 720, 2], [500, 690, 3]].forEach(([x, y, k]) => {   // end-hold twinkles, popping on 3s
+    const ph = ((D.id + k * 2) % 5) / 4; spark(x, y, ph < .75 ? .35 + ph : 0, k * 3 + v, .3 * k);
+  });
+  ctx.setTransform(1, 0, 0, 1, 0, 0);                               // paper tooth over everything: a new sheet each drawing
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .55; const tp = ctx.createPattern(TOOTH[v % 4], 'repeat');
+  tp.setTransform(new DOMMatrix().translate(Math.floor(hash(D.id, 51) * 384), Math.floor(hash(D.id, 52) * 384))); ctx.fillStyle = tp; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+};
+</script>
+</body></html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<!-- npx -y @helios-project/cli@latest render shape-morph.html -o shape-morph.mp4 --duration 8 --mode canvas -->
+<html><head><meta charset="utf-8"><title>Shape morph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=DM+Mono:wght@500&display=block" rel="stylesheet">
+<style>html,body{margin:0;background:#F3EDE2;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, N = 240;                                // every shape is resampled to N points
+const ctx = document.getElementById('c').getContext('2d');
+const C = { paper: '#F3EDE2', ink: '#1B1A22', saffron: '#F7B32B', tomato: '#EF4B2D', cobalt: '#2A45D8' };
+
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const inv = (a, b, x) => clamp((x - a) / (b - a));
+function bez(x1, y1, x2, y2) {
+  const cx = 3 * x1, bx = 3 * (x2 - x1) - cx, ax = 1 - cx - bx, cy = 3 * y1, by = 3 * (y2 - y1) - cy, ay = 1 - cy - by;
+  return u => { if (u <= 0) return 0; if (u >= 1) return 1; let s = u;
+    for (let i = 0; i < 8; i++) { const d = (3 * ax * s + 2 * bx) * s + cx; s -= (((ax * s + bx) * s + cx) * s - u) / (d || 1e-6); }
+    return ((ay * s + by) * s + cy) * s; };
+}
+const EM = bez(.7, 0, .3, 1), EO = bez(.16, 1, .3, 1);           // morph curve; expo-out for field blooms
+const kick = (t, t0, f = 3, z = .35) => t <= t0 ? 0 : Math.exp(-z * 2 * Math.PI * f * (t - t0)) * Math.sin(2 * Math.PI * f * (t - t0));
+
+// ---------------------------------------------------------------- OKLab colour mixing (no muddy midpoints)
+const toLin = c => c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4, toSrgb = c => c <= .0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - .055;
+function oklab(h) { const [r, g, b] = [1, 3, 5].map(i => toLin(parseInt(h.slice(i, i + 2), 16) / 255));
+  const l = Math.cbrt(.4122214708 * r + .5363325363 * g + .0514459929 * b), m = Math.cbrt(.2119034982 * r + .6806995451 * g + .1073969566 * b), s = Math.cbrt(.0883024619 * r + .2817188376 * g + .6299787005 * b);
+  return [.2104542553 * l + .793617785 * m - .0040720468 * s, 1.9779984951 * l - 2.428592205 * m + .4505937099 * s, .0259040371 * l + .7827717662 * m - .808675766 * s]; }
+function fromOklab([L, a, b]) {
+  const l = (L + .3963377774 * a + .2158037573 * b) ** 3, m = (L - .1055613458 * a - .0638541728 * b) ** 3, s = (L - .0894841775 * a - 1.291485548 * b) ** 3;
+  return `rgb(${[4.0767416621 * l - 3.3077115913 * m + .2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - .3413193965 * s, -.0041960863 * l - .7034186147 * m + 1.707614701 * s]
+    .map(c => Math.round(clamp(toSrgb(clamp(c))) * 255)).join(',')})`; }
+const mixOK = (a, b, u) => fromOklab(oklab(a).map((v, i) => lerp(v, oklab(b)[i], u)));
+
+// ---------------------------------------------------------------- shapes: sample by arc length, orient, align start index
+const D = {
+  drop: 'M0,-240 C70,-150 175,-40 175,62 A175,175 0 0 1 -175,62 C-175,-40 -70,-150 0,-240 Z',
+  flame: 'M10,-250 C80,-170 170,-100 170,40 C170,150 95,215 0,215 C-95,215 -170,150 -170,45 C-170,-50 -110,-100 -80,-170 C-50,-100 -30,-80 -10,-70 C10,-130 -20,-190 10,-250 Z',
+  heart: 'M0,205 C-130,115 -235,25 -235,-65 C-235,-150 -175,-205 -110,-205 C-60,-205 -20,-175 0,-130 C20,-175 60,-205 110,-205 C175,-205 235,-150 235,-65 C235,25 130,115 0,205 Z',
+};
+D.star = (() => { const v = Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 108 : 245; return [r * Math.cos(a), r * Math.sin(a) + 18]; });
+  return v.map((p, i) => { const a = v[(i + 9) % 10], b = v[(i + 1) % 10], k = i % 2 ? .12 : .22;   // rounded corners: quadratic at each vertex
+    return `${i ? 'L' : 'M'}${lerp(p[0], a[0], k)},${lerp(p[1], a[1], k)} Q${p[0]},${p[1]} ${lerp(p[0], b[0], k)},${lerp(p[1], b[1], k)}`; }).join(' ') + 'Z'; })();
+const circle = r => Array.from({ length: N }, (_, i) => { const a = -Math.PI / 2 + 2 * Math.PI * i / N; return [r * Math.cos(a), r * Math.sin(a)]; });
+function sample(d) {                                               // N points evenly spaced along the outline
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d);
+  const L = p.getTotalLength(); return Array.from({ length: N }, (_, i) => { const q = p.getPointAtLength(L * i / N); return [q.x, q.y]; });
+}
+const area = P => P.reduce((a, p, i) => { const q = P[(i + 1) % P.length]; return a + p[0] * q[1] - q[0] * p[1]; }, 0) / 2;
+const orient = P => area(P) < 0 ? P.slice().reverse() : P;
+function bestShift(A, B) {                                         // rotate B's start index to minimise total travel
+  let best = Infinity, bs = 0;
+  for (let s = 0; s < N; s++) { let e = 0; for (let i = 0; i < N; i += 2) { const b = B[(i + s) % N]; e += (A[i][0] - b[0]) ** 2 + (A[i][1] - b[1]) ** 2; if (e >= best) break; } if (e < best) { best = e; bs = s; } }
+  return B.map((_, i) => B[(i + bs) % N]);
+}
+const lerpP = (A, B, u) => A.map((a, i) => [lerp(a[0], B[i][0], u), lerp(a[1], B[i][1], u)]);
+
+// chapters (one morph per beat; the complex star -> heart goes via a circle)
+const CH = [{ c: C.saffron, w: 'sun' }, { c: C.cobalt, w: 'drop' }, { c: C.tomato, w: 'flame' }, { c: C.saffron, w: 'star' }, { c: C.tomato, w: 'heart' }, { c: C.ink, w: '' }];
+const MORPH = [[.9, 1.5], [1.8, 2.4], [2.7, 3.3], [3.6, 4.6, true], [5.3, 5.95]];
+const WIPES = [[1.8, C.ink], [4.42, C.saffron], [5.45, C.paper]];  // colour fields bloom out of the hero
+const O = [960, 500], DOT_R = 25;
+let S = [], VIA = null, WM = null, GRAIN = null;
+
+const ready = (async () => {
+  await Promise.all([document.fonts.load('700 210px "Space Grotesk"', 'Tidepool'), document.fonts.load('500 28px "DM Mono"', '01 sun one shape')]);
+  await document.fonts.ready;
+  const raw = [circle(210), sample(D.drop), sample(D.flame), sample(D.star), sample(D.heart), circle(210)].map(orient);
+  S[0] = raw[0]; for (let i = 1; i < 4; i++) S[i] = bestShift(S[i - 1], raw[i]);
+  VIA = bestShift(S[3], circle(190)); S[4] = bestShift(VIA, raw[4]); S[5] = bestShift(S[4], raw[5]);
+  ctx.font = '700 210px "Space Grotesk"'; ctx.letterSpacing = '-6px';
+  const w = ctx.measureText('Tidepool').width, x0 = 960 - (w + 70) / 2;
+  WM = { x0, base: 690, letters: [...'Tidepool'].map((ch, i) => ({ ch, x: x0 + ctx.measureText('Tidepool'.slice(0, i)).width })), dot: [x0 + w + 34, 690 - DOT_R] };
+  GRAIN = document.createElement('canvas'); GRAIN.width = GRAIN.height = 256;      // seeded paper grain tile
+  const g = GRAIN.getContext('2d'), im = g.createImageData(256, 256); let s = 7;
+  for (let i = 0; i < im.data.length; i += 4) { s = (s * 16807) % 2147483647; const v = 110 + (s % 90); im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  g.putImageData(im, 0, 0);
+})();
+
+// ---------------------------------------------------------------- the hero at time t
+function hero(t) {
+  let pts = S[0], col = C.saffron, k = 0, q = 0;
+  for (let m = 0; m < MORPH.length; m++) {
+    const [a, b, via] = MORPH[m]; if (t < a) break;
+    const u = inv(a, b, t); k = m;
+    if (via) pts = u < .5 ? lerpP(S[m], VIA, EM(u * 2)) : lerpP(VIA, S[m + 1], EM(u * 2 - 1));
+    else pts = lerpP(S[m], S[m + 1], EM(u));
+    col = mixOK(CH[m].c, CH[m + 1].c, EM(u));
+    q += .12 * Math.sin(Math.PI * u) * (via ? .6 : 1) - .13 * kick(t, b);   // stretch through the morph, squash on arrival
+  }
+  q -= .14 * (kick(t, 4.75, 4, .3) + kick(t, 5.05, 4, .3));          // HERO: the heart beats twice
+  let x = O[0], y = O[1], sc = 1, sx = 1 + q, sy = 1 - q;
+  if (t < .32) { x = lerp(-80, O[0], 1 - (1 - t / .32) ** 3); }      // hook: enters fast from the left
+  const hk = .15 * kick(t, .32, 3.4);  sx -= hk; sy += hk;
+  sc = lerp(1, DOT_R / 210, EM(inv(5.3, 5.95, t)));
+  const fl = inv(6.02, 6.26, t) ** 2; x = lerp(x, WM.dot[0], fl); y = lerp(y, WM.dot[1], fl) - 120 * Math.sin(Math.PI * fl) * (fl < 1);
+  const land = .3 * kick(t, 6.26, 3.2); sx += land; sy -= land;
+  return { pts, col, x, y, sc, sx, sy, k: t < MORPH[0][0] ? 0 : MORPH.findLastIndex(m => t >= (m[0] + m[1]) / 2) + 1 };
+}
+const posAt = t => { const h = hero(t); return [h.x, h.y]; };
+
+// analytic shutter smear for a fast disc: a capsule from its start to end position with linear alpha ramps
+const rgba = (col, a) => { const v = col[0] === '#' ? [1, 3, 5].map(i => parseInt(col.slice(i, i + 2), 16)) : col.match(/\d+/g); return `rgba(${v[0]},${v[1]},${v[2]},${a})`; };
+function smearDisc(pA, pB, r, col) {
+  const dx = pB[0] - pA[0], dy = pB[1] - pA[1], L = Math.hypot(dx, dy);
+  if (L < 2) { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(pB[0], pB[1], r, 0, 7); ctx.fill(); return; }
+  const ux = dx / L, uy = dy / L, T = L + 2 * r, peak = Math.min(1, 2 * r / L), e = Math.min(2 * r, L) / T, an = Math.atan2(dy, dx);
+  const g = ctx.createLinearGradient(pA[0] - ux * r, pA[1] - uy * r, pB[0] + ux * r, pB[1] + uy * r);
+  [[0, 0], [e, peak], [1 - e, peak], [1, 0]].forEach(([o, a]) => g.addColorStop(o, rgba(col, a)));   // box-shutter coverage profile
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pA[0], pA[1], r, an + Math.PI / 2, an + 3 * Math.PI / 2); ctx.arc(pB[0], pB[1], r, an - Math.PI / 2, an + Math.PI / 2); ctx.closePath(); ctx.fill();
+}
+function fieldAt(px, py, t) {                                      // which colour field covers a point
+  let c = C.paper; for (const [t0, col] of WIPES) if (Math.hypot(px - O[0], py - O[1]) < 2300 * EO(inv(t0, t0 + .6, t))) c = col; return c;
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; ctx.letterSpacing = '0px';
+  ctx.fillStyle = C.paper; ctx.fillRect(0, 0, W, H);
+  for (const [t0, col] of WIPES) { const r = 2300 * EO(inv(t0, t0 + .6, t)); if (r <= 0) continue; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(O[0], O[1], r, 0, 7); ctx.fill(); }
+
+  // wordmark: letters rise out of a baseline mask, 2-frame stagger
+  ctx.font = '700 210px "Space Grotesk"'; ctx.letterSpacing = '-6px'; ctx.fillStyle = C.ink;
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, WM.base + 50); ctx.clip();
+  WM.letters.forEach((L, i) => { const u = EO(inv(5.7 + i * 2 / 30, 6.15 + i * 2 / 30, t)); if (u <= 0) return; ctx.fillText(L.ch, L.x, WM.base + 220 * (1 - u)); });
+  ctx.restore(); if (t > 5.7) window.heliosDrawnText?.add('Tidepool');
+  ctx.letterSpacing = '8px'; ctx.font = '500 28px "DM Mono"'; ctx.textAlign = 'center';
+  const tg = EO(inv(6.5, 7.1, t)); ctx.globalAlpha = tg; ctx.fillStyle = mixOK(C.paper, C.ink, .7); ctx.fillText('ONE SHAPE AT A TIME', 960, WM.base + 92); ctx.globalAlpha = 1; ctx.textAlign = 'left';
+  if (tg > 0) window.heliosDrawnText?.add('ONE SHAPE AT A TIME');
+
+  // the hero
+  const h = hero(t), shutter = .5 / 30;
+  const fast = t < .3 || (t > 6.02 && t < 6.28);
+  if (fast) {                                                      // fast disc -> analytic capsule smear
+    const a = posAt(t - shutter / 2), b = posAt(t + shutter / 2); smearDisc(a, b, 210 * h.sc * (h.sx + h.sy) / 2, h.col);
+  } else {
+    const breathe = t > 6.5 ? 1 + .05 * Math.sin(2 * Math.PI * (t - 6.5) / 1.2) ** 2 : 1;
+    ctx.save(); ctx.translate(h.x, h.y); ctx.scale(h.sc * h.sx * breathe, h.sc * h.sy * breathe); ctx.fillStyle = h.col; ctx.beginPath();
+    h.pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+  const ru = inv(6.26, 6.85, t); if (ru > 0 && ru < 1) { ctx.strokeStyle = C.ink; ctx.globalAlpha = 1 - ru; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(WM.dot[0], WM.dot[1], DOT_R + 90 * EO(ru), 0, 7); ctx.stroke(); ctx.globalAlpha = 1; }
+
+  // chapter label, bottom-left, in whatever colour reads on the field beneath it
+  const lab = 1 - inv(5.3, 5.6, t);
+  if (lab > 0 && h.k < 5) {
+    const bg = fieldAt(120, 980, t), fg = bg === C.ink ? C.paper : C.ink;
+    ctx.globalAlpha = lab * .85; ctx.fillStyle = fg; ctx.letterSpacing = '4px'; ctx.font = '500 28px "DM Mono"';
+    const s = `0${h.k + 1} / 05   ${CH[h.k].w.toUpperCase()}`; ctx.fillText(s, 110, 990); window.heliosDrawnText?.add(s); ctx.globalAlpha = 1;
+  }
+  // paper grain over everything (static, low contrast)
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .07; ctx.fillStyle = ctx.createPattern(GRAIN, 'repeat'); ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+};
+</script>
+</body></html>
