@@ -341,6 +341,7 @@ $entry
   - **Plan ID:** PERF-885
 
 ## Open Questions
+- **PERF-1123**: Created experiment plan to hoist `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing and potential evaluation overhead inside the tight multi-worker/single-worker loops.
 - PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
