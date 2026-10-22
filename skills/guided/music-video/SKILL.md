@@ -64,6 +64,7 @@ Run `helios analyze song.wav` first, then storyboard against its `sections` and 
 - **Intensity follows the song:** roughly 40 % in the intro, 70 % in verses, 100 % in choruses.
 - **Rotate shot types on the beat;** never the same pose or framing on adjacent cuts.
 - **The Out column names a motivated transition** (a zoom through an eye, a shape that becomes the next scene, a cut on action). Keep brush wipes or plain cuts for section breaks.
+- **When the beat map is noisy.** On synthesized or sparse tracks `analyze` can read bass as kicks, find few snares, give coarse `sections` and miss crashes. Keep only kicks that sit on a beat, and when `sections` is coarse, anchor the structure on lyric content (`lyric('every window')`) instead.
 - **No fake singing.** A mouth that flaps to the lyric reads as jitter. Characters react to the song; they don't lip-sync it.
 
 See [references/treatment.md](references/treatment.md) for the full templates, scene reuse with parameters, and a brief for splitting scenes across several agents.
@@ -84,6 +85,15 @@ const SCENES = [
   { start: cut('every window'),     draw: chorus, params: { n: 1 } },
   { start: cut('every window', 1),  draw: chorus, params: { n: 2 } },   // same scene, escalated
 ];
+```
+
+A hard cut swallows a held note that is still sounding on that beat. Where the previous word crosses the beat, cut at the word boundary instead, or carry the camera through the beat with no cut:
+
+```js
+const seam = (phrase, nth = 0) => {
+  const b = cut(phrase, nth), w = lyric(phrase, nth).words[0], prev = L.words[L.words.indexOf(w) - 1];
+  return prev && prev.end > b ? Math.min(prev.end, w.start) : b;
+};
 ```
 
 `lastAt` and the beat map come from the make-video music reference. One scene function serves every chorus through `params`, and each pass adds something.

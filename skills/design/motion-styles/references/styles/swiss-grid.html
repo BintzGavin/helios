@@ -135,11 +135,12 @@ window.renderAt = async (t) => {
     ctx.fillStyle = C.sig;
     ctx.fillRect(ex.x, ex.y, ex.s, ex.s * ein);
     ctx.restore();
-    // coordinate readout, bottom-left technical note: "on grid" until it moves, then red and non-integer
+    // coordinate readout, bottom-left technical note: "on grid" until it moves, then non-integer. Ink, not red:
+    // the square is the only red thing.
     font(500, 19);
     const off = ex.u > 0.001;
     const cc = ((ex.x - PX) / MW).toFixed(2), rr = ((ex.y - PY) / MH).toFixed(2);
-    ctx.fillStyle = off ? C.sig : C.ink;
+    ctx.fillStyle = C.ink;
     clipWord(`signal  col ${cc}  row ${rr}  · ${off ? 'off grid' : 'on grid'}`, MX, 984, 19, ein);
   }
 

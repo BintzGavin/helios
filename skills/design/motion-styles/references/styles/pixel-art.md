@@ -10,7 +10,7 @@ Demo: [pixel-art.html](pixel-art.html) — `npx -y @helios-project/cli@latest re
 
 ## Look
 - **Palette:** one fixed 32-colour master palette (the demo's: inks `#0b0a14 #1b1a2e #2a2c4f #3d4775`, skies `#566aa6 #7fa3d9 #b5d8f2`, white `#f4f1e6`, warm ramp `#4d2d45 #7a3e5c #b8576a #e8826a #f5b56b #fbe39a`, greens `#173126 #23502f #3a7a3c #6aa84f #a6d06a`, earth `#3b2a22 #5e3f2c #8a5f3c #c08f5a`, stone `#4a4f5e #757c8c #a9b0bd`, water `#1f6f8b #2fa4c4 #7ee3e8`, red `#e04a3f`, skin `#f0d0b0`).
-- **Colour rules:** the picture is drawn in **semantic slots** (SKY0, GR1, CL0, SCARF…), never in colours. Each time-of-day stage is a LUT slot → master index; stages change on a cut, never by blending. 2–3 **protected** slots (the hero's scarf, the crystal, UI text) ignore every stage and every light. Light is a second LUT (slot → one step brighter/warmer or cooler), applied through a mask; air and distant layers are never lit. Gradients exist only as 4×4 Bayer dither between two neighbouring slots.
+- **Colour rules:** the picture is drawn in **semantic slots** (SKY0, GR1, CL0, SCARF…), never in colours. Each time-of-day stage is a LUT slot → master index; stages change on a cut, never by blending. 2–3 **protected** slots (the hero's scarf, the crystal, UI text) ignore every stage and every light. Light is a second LUT (slot → one step brighter/warmer or cooler), applied through a mask; air and distant layers are never lit. A warm light relights each slot's **base (day) colour** with a warm tint, not the stage colour: warming a night-tinted skin gives pale blue. Gradients exist only as 4×4 Bayer dither between two neighbouring slots.
 - **Type:** a pixel font at its native size inside the framebuffer — Press Start 2P at 8 px for dialog (≈ 0.044 H on screen) and 16 px for the title (≈ 0.09 H), 1 px ink outline (8-neighbour) and a 1 px drop shadow, title coloured by rows (cream / amber / coral). Captions are a **dialog box**: ink + white border, dark dithered fill, typed at 24 chars/s, ▼ blinking at 1 Hz when done. The floor line stays above the box.
 - **Materials & texture:** everything is flat slots plus dither: sky in three dithered bands, dirt with sparse seeded specks, pines as stepped triangles, a shrine of stone blocks with a 1-px lit edge. Sprites are string art with a legend (`k` ink, `h` hair, `r` scarf…), 12×18 px, outlined in ink, lit from the upper left. No textures are loaded.
 
@@ -23,11 +23,11 @@ Demo: [pixel-art.html](pixel-art.html) — `npx -y @helios-project/cli@latest re
 ## Signature checklist
 1. Logical resolution 320×180, displayed at an integer scale (×6 = 1920×1080); every edge in a still lands on a 6-px grid.
 2. ≤ 32 distinct colours in any frame, all from the master palette.
-3. Day → night happens in ≥ 4 discrete palette stages, with the same pixels (stars present all day, invisible until the night LUT maps them to white).
+3. Time or mood changes in ≥ 4 discrete palette stages over the same pixels, and something appears only because its slot remaps (the demo's stars sit in the sky all day until the night LUT maps them to white).
 4. At least one palette-cycled element (water stripes, firefly blink, crystal facets) rotating at 6–8 fps with no pixel redrawn.
 5. Sprite animation changes pose ≤ 10 times per second; idle has a 1-px breath.
 6. Light pools: solid inner 60 % of the radius, Bayer-dithered rim to 100 %; the sky gets only a sparse (≤ 55 %) dithered halo.
-7. Zoom changes in whole-number steps (6/7/8), each held ≥ 0.15 s.
+7. Zoom changes in whole-number steps (e.g. 6/7/8; ~×12 for an 18–24 px hero to fill a third of the frame), each held ≥ 0.15 s.
 
 ## Native moves
 - **Night by table.** The world doesn't move; its LUT steps from day to night in five cuts, the sun sinks behind the hills, stars "appear" because their slot finally maps to white. *Fits:* time passing; a mood turning; a before/after with nothing redrawn.
@@ -56,6 +56,7 @@ Drawing slots instead of colours is what makes palette shifts, cycling and light
 - Smooth camera or sprite motion → shimmering half-pixels; `Math.round` every layer offset, quantise poses with `floor(t*fps + 1e-4)/fps`.
 - Non-integer scale (`drawImage(low, 0, 0, 1920, 1080)` from 274 px wide) → uneven pixel widths; zoom with an integer `setTransform` and crop.
 - A light LUT that brightens everything → the sky turns grey and hills turn into brown discs; exempt air and far layers, and let a small lantern light only the near ground.
+- Lantern LUT built from the night-tinted colours → lit skin turns pale blue-grey; relight from the day colour (`MASTER[SLOT_DEF[s][1]]`) with a warm tint, as the demo's `LIT_W` does.
 - Night LUT so dark the hero vanishes → keep an ink outline, give the hero a contrasting cloth, and carry a light.
 - Fine 1-px dither everywhere at ×6 is fine for encoding (6-px cells), but per-frame random dither is not → dither is a fixed Bayer pattern in world or screen space, never re-rolled.
 - Pixel font rendered at a non-native size → blurry glyph edges; render masks at the font's own size in `ready` (threshold alpha) and blit them as slots.

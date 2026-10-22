@@ -14,13 +14,15 @@ character(x, groundY, u, opts)
 
 | Group | Fields |
 |---|---|
-| Pose | `dx, dy` (in `u`), `sq` (squash: + squashes, − stretches), `rot` (radians, pivots at the feet), `flip`, `aL, aR` (arm angles: 0 = out, + = up), `walk` (leg phase), `noShadow` |
+| Pose | `dx, dy` (in `u`), `sq` (squash: + squashes, − stretches), `rot` (radians, pivots at the feet), `flip`, `aL, aR` (arm angles: 0 = out, + = up), `armLen` (stretch, 1 = rest), `handL, handR` (optional `[x, y]` targets in body space, in `u`), `walk` (leg phase), `noShadow` |
 | View | `view` (`front`, `q`, `side`, `qback`, `back`), `smear`, `smearDir` |
 | Face | `eyes` (a drawer name, or `[left, right]`), `mouth`, `brows` (if the character has them), `lookX, lookY` (−1..1), `squint` (0..1), `blush` |
 | Colour | `tint`, or explicit `col / lt / dk` |
 | Extras | `emote`, `emoteK` (0..1 pop), `emoteAge`, props |
 | Hooks | `draw(u, sw)` paints in body space; `armL(u, sw)` / `armR(u, sw)` paint at the arm tip in arm space, so a held prop follows the hand |
 | Boil | `boilKey`: the seed prefix. Set it per character so two characters never share a stream |
+
+**Big props need both hands.** Fixed-length arms can't reach around a crate or a pole. When `handL/handR` are set, aim each arm from its pivot at the target and stretch it to reach (cartoon arms take up to ~1.5× before it reads as rubber); draw the prop once in body space through the `draw` hook, between the two targets, so it moves with the body.
 
 **Squash keeps volume:** `scale(1 + sq * .6, 1 - sq)`. Clamp `sq` to about ±.35 or the character turns into a pancake.
 
@@ -81,6 +83,8 @@ function turn(t, t0, t1, a0, a1) {                  // a quick turn: 0.12–0.25
 }
 ```
 
+The ring assumes you drew the back views. With only `front`, `q` and `side`, keep headings within −.25 to .25 (negative turns left through `flip`), or draw the back views before planning a full spin.
+
 ## Model sheet
 
 Before animating, render the character in every emotion and every view on one page and look at it:
@@ -90,7 +94,7 @@ Before animating, render the character in every emotion and every view on one pa
 const names = Object.keys(EMO);
 window.renderAt = async (t) => {
   await ready; BN = 0;
-  names.forEach((n, i) => character(160 + (i % 8) * 220, 260 + Math.floor(i / 8) * 260, 14, { ...feel(n, 1.0), boilKey: 'm' + i }));
+  names.forEach((n, i) => character(160 + (i % 8) * 220, 260 + Math.floor(i / 8) * 260, 14, { ...feel(n, 1.0), squint: 0, emoteK: 1, boilKey: 'm' + i }));
 };
 ```
 
@@ -98,7 +102,7 @@ window.renderAt = async (t) => {
 npx -y @helios-project/cli@latest still sheet.html --at 0
 ```
 
-Check that each emotion reads with no label, that the views line up (same height, same ground), and that the colours hold on every background. Keep every character on model within one video: same `u` ratios, same colours, same line weight at the same shot size.
+`feel()` returns the face and pose but not `squint` or `emoteK` (those come from `emotions()`), so set them by hand: `emoteK: 1` shows each emote at full size. Check that each emotion reads with no label, that the views line up (same height, same ground), and that the colours hold on every background. Keep every character on model within one video: same `u` ratios, same colours, same line weight at the same shot size.
 
 ## Lip sync
 

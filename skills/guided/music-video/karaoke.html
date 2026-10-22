@@ -27,7 +27,21 @@ const ready = (async () => {
   L = await (await fetch('lyrics.example.json')).json();
   await document.fonts.load(FONT, L.lines.map((l) => l.text).join(' '));
   await document.fonts.ready;
+  L.lines.forEach((line) => { line.spans = wordSpans(line); });
 })();
+
+// Where each word sits in line.text, as [start, end) character indexes. Display text can carry punctuation
+// ("night," "(one") or differ from the cue word, so map tokens to words instead of assuming single spaces.
+// One word per display token; punctuation-only tokens ("—") go to line.gaps and are drawn plain.
+function wordSpans(line) {
+  const all = [...line.text.matchAll(/\S+/g)], isWord = (m) => /[\p{L}\p{N}]/u.test(m[0]);
+  const toks = all.filter(isWord);
+  line.gaps = all.filter((m) => !isWord(m)).map((m) => [m.index, m[0], line.first + toks.filter((w) => w.index < m.index).length - 1]);
+  return Array.from({ length: line.last - line.first + 1 }, (_, k) => {
+    const m = toks[Math.min(k, toks.length - 1)];
+    return [m.index, m.index + m[0].length];
+  });
+}
 
 // Look lyrics up by content, never by hard-coded time: lyric('carried it').words[0].start
 function lyric(phrase, nth = 0) {
@@ -36,9 +50,9 @@ function lyric(phrase, nth = 0) {
     const i = line.text.indexOf(phrase);
     if (i < 0) continue;
     if (n++ < nth) continue;
-    const before = line.text.slice(0, i).split(' ').filter(Boolean).length;
-    const count = phrase.split(' ').filter(Boolean).length;
-    return { line, words: L.words.slice(line.first + before, line.first + before + count) };
+    const a = line.spans.findIndex(([, e]) => e > i);
+    const b = line.spans.findIndex(([s]) => s >= i + phrase.length);
+    return { line, words: L.words.slice(line.first + a, line.first + (b < 0 ? line.spans.length : b)) };
   }
   throw new Error(`lyric "${phrase}" not found`);   // fail loudly: a missing phrase is a bug
 }
@@ -65,13 +79,17 @@ const pulse = (t, t0, d) => (t < t0 || t > t0 + d * 6) ? 0 : Math.exp(-(t - t0) 
 function drawLine(line, t, cx, cy, alpha) {
   ctx.font = FONT; ctx.textBaseline = 'alphabetic';
   const width = ctx.measureText(line.text).width, x0 = cx - width / 2;
-  let ci = 0;                                          // character index into line.text
+  for (const [i, s, wi] of line.gaps) {                 // punctuation between words: done once the word before it is
+    ctx.globalAlpha = alpha; ctx.fillStyle = wi >= line.first && t >= L.words[wi].end ? C.sung : C.unsung;
+    ctx.fillText(s, x0 + ctx.measureText(line.text.slice(0, i)).width, cy); ctx.globalAlpha = 1;
+  }
   for (let wi = line.first; wi <= line.last; wi++) {
-    const w = L.words[wi], p = wordProgress(w, t), n = w.w.length;
+    const [ci, ce] = line.spans[wi - line.first];       // this word's glyphs in line.text, punctuation included
+    const w = L.words[wi], p = wordProgress(w, t), n = ce - ci;
     const pop = 1 + 0.06 * pulse(t, w.start, 0.07);   // a small kick as each word starts
     const held = w.end - w.start > 0.9 ? 0.05 * seg(t, w.start, w.end) : 0;   // held notes lift a little
     const wordX = x0 + ctx.measureText(line.text.slice(0, ci)).width;
-    const wordW = ctx.measureText(w.w).width;
+    const wordW = ctx.measureText(line.text.slice(ci, ce)).width;
     ctx.save(); ctx.globalAlpha = alpha;
     ctx.translate(wordX + wordW / 2, cy - held * 80); ctx.scale(pop, pop); ctx.translate(-(wordX + wordW / 2), 0);
     for (let k = 0; k < n; k++) {
@@ -88,7 +106,6 @@ function drawLine(line, t, cx, cy, alpha) {
     }
     ctx.restore();
     if (alpha > 0.05) window.heliosDrawnText?.add(w.w);       // canvas text must be declared for verify --cues
-    ci += n + 1;                                               // the word plus its following space
   }
 }
 

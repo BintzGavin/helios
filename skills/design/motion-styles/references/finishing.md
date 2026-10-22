@@ -8,6 +8,10 @@ Rules that apply to the whole stack:
 - **Keep type off the finished layer** unless the style says the type lives in the medium (VHS captions get the tape, print titles get the ink). Otherwise draw text on top after the finish so it stays crisp.
 - **Encode cost is real.** Noise that changes on every pixel in every frame can't be compressed, so heavy fresh grain can make a file several times larger. Step the grain at 12 fps, keep the amount low, and render the final file with `--preset medium`.
 - **Fine detail dies in the encode.** x264 with 4:2:0 chroma keeps colour at half resolution and averages away detail of 1–3 px. Halftone periods, scanline pitch and mask stripes need ≥ 3 px (luma) and ≥ 7 px for coloured dots.
+- **Budget the encode.** Full-frame grain, VHS noise and dense detail need a higher CRF to stay small: at 720p, about `--quality 26–29` for H.264 (≈ 28 for risograph-style grain) and about 46 for VP9 kept short films near 1.5–3 MB. Check the file size, then the grain in a `still`.
+- **Flash traps.** `helios check` measures luminance flips in blocks of about 20 × 20 px, so motion across fine high-contrast texture counts as flashing even when it is slow:
+  - A zoom or pull-out across dense repeating texture (a wall of tiles, sand grains, a magnified halftone) fails at ~7.5–9.5 flashes/s, because each block crosses many edges. Lower the texture's contrast while the camera moves fast and restore it as the move settles, cut between fixed zoom levels instead of zooming through, or keep a wall empty during the move and fill it ring by ring afterwards.
+  - A giant numeral that slides out and back in on every beat flips each pixel twice per beat (4 flashes/s at 120 BPM). Swap digits with a static wipe instead.
 - **Run `helios verify` after adding any pass**, especially WebGL ones (see the skeleton below).
 
 Shared helpers used by the snippets:
@@ -219,7 +223,7 @@ Drive it from `t`: `const sheet = Math.floor(t * 12 + 1e-4)`, then offsets such 
 
 ## 8. Halftone dots
 
-The dot radius comes from tone. Grow area, not radius, so that 50 % tone covers about 50 %: `r ∝ sqrt(k)`. **Period ≥ 7 px** (8–12 px is safe at 1080p): smaller coloured dots lose their colour in 4:2:0 and turn to mush or moiré in x264. Keep the screen fixed in paper space and move the content under it, as a press does. A dot grid that slides at sub-pixel speed shimmers. In WebGL, use `screen()` from the press shader. In 2D, with an analytic tone field:
+The dot radius comes from tone. Grow area, not radius, so that 50 % tone covers about 50 %: `r ∝ sqrt(k)`. **Period ≥ 7 px** (8–12 px is safe at 1080p): smaller coloured dots lose their colour in 4:2:0 and turn to mush or moiré in x264. Keep the screen fixed in paper space and move the content under it, as a press does. A dot grid that slides at sub-pixel speed shimmers. Don't zoom continuously through magnified dots: it strobes and fails `helios check` (~9.5 flashes/s). Cut between fixed zoom levels, or drop the dot contrast during the move. In WebGL, use `screen()` from the press shader. In 2D, with an analytic tone field:
 
 ```js
 function halftone(ctx, tone, x0, y0, w, h, period = 10, angle = 0.26, ink = '#1b3fa0') {

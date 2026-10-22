@@ -58,6 +58,7 @@ const sprung = (t, changes, step = springStep) =>
 - Outgoing text leaves before incoming text takes the space.
 - Text being read never moves decoratively until its reading hold ends.
 - Measure element positions at runtime for match cuts (`getBoundingClientRect()` inside `renderAt`, or `ctx.measureText`), so a carried object lands on identical pixels on both sides of a cut.
+- **Cues for `verify --cues`.** Matching ignores case and punctuation, so `time.` matches `time` even with the full stop drawn apart. DOM letters count as one word only when they sit side by side on one line; a word drawn as a rotated group of letter spans, letters flying in, or a canvas word drawn in two passes needs `window.heliosDrawnText?.add(word)` with the whole word, once per frame (it's a set, so a second add is harmless).
 - Load fonts in `ready` with the actual text as the sample: `document.fonts.load('800 120px "Font"', allTheTextInThePage)`. That forces unicode-range subsets (CJK, accents) to load.
 
 ## Loops
@@ -81,8 +82,9 @@ const sprung = (t, changes, step = springStep) =>
 
 - In-page motion blur averages several sub-frame renders (see the motion-styles skill's [time-tricks reference](../../../design/motion-styles/references/time-tricks.md)). Four sub-frames ghost on fast whips; use eight there.
 - Counters, digits and readable text read the frame's own time, not the sub-frame's, or they smear. Blur only the trailing geometry.
-- A counter that freezes mid-shot looks like a broken render. Counters run on the global clock and keep moving through cutaways.
+- In a shot that has a counter, a counter that freezes mid-shot looks like a broken render: it runs on the global clock and keeps moving through cutaways. This doesn't apply inside deliberate stillness (kinetic type's holds where nothing moves).
 - A helper that sets `globalAlpha` or a transform must restore it, or the next element inherits it.
+- Batching ellipses or arcs into one `Path2D` (or one `beginPath`) needs a `moveTo(x + rx, y)` before each `ellipse`, or the subpaths join into streaks.
 
 ## Footage, images and masks
 
@@ -123,3 +125,7 @@ Beyond `helios verify` and `helios check`, these are worth a quick script over a
 ffmpeg -i video.mp4 -vf "select='gt(scene,0.35)',showinfo" -f null - 2>&1 | grep pts_time   # big jumps
 ffmpeg -i video.mp4 -vf "freezedetect=n=0.001:d=0.6" -f null - 2>&1 | grep freeze          # still stretches
 ```
+
+`freezedetect` at `n=0.001` also flags dark scenes where only a cursor or a small counter moves. Treat its output as a hint: lower `n` (e.g. `0.0002`, so small changes count as motion) or check each flagged span by eye in a `sheet --strip`.
+
+**Flash traps** (`helios check`): a zoom or pull-out across dense high-contrast texture (tiles, grains, magnified halftone) fails at ~7.5 flashes/s however slowly it moves, and a big numeral that slides out and back in on every beat gives 4 flashes/s at 120 BPM. Lower the texture's contrast during fast camera moves, cut between fixed zoom levels, fill a wall after the move, and swap digits with a static wipe. See the motion-styles [finishing reference](../../../design/motion-styles/references/finishing.md).

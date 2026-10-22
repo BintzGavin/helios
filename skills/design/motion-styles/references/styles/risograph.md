@@ -19,7 +19,7 @@ Demo: [risograph.html](risograph.html) — `npx -y @helios-project/cli@latest re
 - Grain partly re-rolls once per print (12 fps, ~35 % boil); streaks and blotches only change at cuts.
 - Plates **arrive** with a roller sweep (~0.55 s, ease-in-out, a heavier ink band on the front edge). Prints don't fade: things appear by sweep, wipe or cut and leave on a cut.
 - Allowed transitions: roller sweep, overprint growth, shape match cut, hard cut on a beat. Banned: cross-dissolves, soft digital wipes, opacity fades.
-- Camera: locked wide compositions (horizon, disc, small figure), slow lateral tracks, a push into the halftone until dots become shapes. No stepped camera, no shake.
+- Camera: locked wide compositions (horizon, disc, small figure), slow lateral tracks, hard cuts between fixed zoom levels into the halftone until dots become shapes. A continuous push through magnified dots strobes and fails `helios check` (~9.5 flashes/s); if you must push, keep the dot contrast very low during the move. No stepped camera, no shake.
 
 ## Signature checklist
 - Halftone period 7–9 px at 1080p, each plate at its own angle ≥ 15° apart (demo: 15° / 75° / 0°); densities ≥ 0.9 print solid.

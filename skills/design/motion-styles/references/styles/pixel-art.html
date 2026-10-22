@@ -61,7 +61,8 @@ const ready = (async () => {
   const far = n => /^(SKY|STAR|MOON|SUN|MTN|T\d|WHITE|BOX)/.test(n);                     // air and distance are never lit
   const relight = (L, mul, add, skip = far) => L.map((i, s) => skip(SLOT_DEF[s][0]) ? i : nearest(MASTER[i].map((v, k) => v * mul + add[k])));
   FAR = Uint8Array.from(SLOT_DEF, ([n]) => /^(SKY|STAR|MOON|SUN|MTN)/.test(n));
-  LIT_W = LUTS.map(L => relight(L, 1.35, [80, 45, 0], n => far(n) || n.startsWith('HILL')));   // a lantern only reaches the near ground                                    // lantern: warm step up
+  const warm = (L, tint, skip) => L.map((i, s) => skip(SLOT_DEF[s][0]) ? i : nearest(MASTER[SLOT_DEF[s][1]].map((v, k) => v * tint[k])));
+  LIT_W = LUTS.map(L => warm(L, [1.12, .96, .78], n => far(n) || n.startsWith('HILL')));    // lantern: warm tint on each slot's DAY colour (a night-tinted skin turns pale blue); only the near ground
   LIT_C = LUTS.map(L => relight(L, 1.2, [0, 50, 70]));                                     // crystal: cool step up
   const mask = (txt, font, w, h, base) => { const c = document.createElement('canvas'); c.width = w; c.height = h;
     const x = c.getContext('2d', { willReadFrequently: true }); x.font = font; x.fillStyle = '#fff'; x.fillText(txt, 0, base);

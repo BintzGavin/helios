@@ -78,7 +78,7 @@ Check the storyboard: an event in every shot, time for every read, a transition 
 4. **Nothing is ever still.** Every emotion has an idle; cameras drift or push; grass sways; lines boil. A frozen frame reads as a bug.
 5. **The character is big.** In `u` for a 10u-wide character: wide shot 10–16, medium 20–28, close-up 40–70. Tiny is only for establishing shots.
 6. **One pulse.** Idles, bounces and hits share one beat (`BPM` in the starter, or real beats from `helios analyze`), even with no music.
-7. **Transitions at every seam:** in, between every pair of shots, and out. Pick one that belongs to the story: iris or shaped iris, brush wipe, whip pan with a smear, match cut, cut on action, camera carry. Props arrive and leave on arcs; they never pop.
+7. **Transitions at every seam:** in, between every pair of shots, and out. Pick one that belongs to the story: iris or shaped iris, brush wipe, whip pan with a smear, match cut, cut on action, camera carry. A cut on action changes shot size or angle across the cut (wide → close, front → side), or it reads as a jump cut. Props arrive and leave on arcs; they never pop.
 
 ## 3. Build
 
@@ -108,14 +108,14 @@ You can't see motion by reading code. Use the Helios review tools at three zoom 
 npx -y @helios-project/cli@latest sheet short.html --at 0.2,1.9,2.4,3.6,4.1,5.8 --duration 6   # every shot's first, key and last frames
 npx -y @helios-project/cli@latest sheet short.html --strip 1.8:2.6 --fps 24                    # every frame of a take, jump or transition
 npx -y @helios-project/cli@latest sheet short.html --at 2.2 --crop 700,250,520,420              # a face that carries the story
-npx -y @helios-project/cli@latest verify short.html --duration 6                               # catches boil seeded from a shared stream
+npx -y @helios-project/cli@latest verify short.html --duration 6                               # catches frames that depend on render order
 ```
 
 Check:
 - **Read:** is each shot's event clear from its sheet alone? Is the character big, and separate from the background?
 - **Timing:** render a sheet at a fixed 0.1–0.15 s step and read it in order. At each frame, where is the viewer looking, and do they understand it yet? Count the frames each read gets (24 = 1 s).
 - **Motion:** in strips, does every move have anticipation and follow-through? Any pops or snaps? Are both arms or two characters moving in unison (twinning)? Are poses pushed far enough?
-- **Boil:** in a 24 fps strip, each pair of frames should match except where something moves. Anything still that changes every frame needs its own seed.
+- **Boil:** in a 24 fps strip (`sheet --strip … --fps 24`; `verify` has no fps option and doesn't check holds), each pair of frames should match except where something moves. Anything still that changes every frame needs its own seed.
 - **Contacts:** feet on the ground, held props touching the hand, thrown things leaving from the hand.
 - **Seams:** the first and last 0.5 s of every shot.
 - **Rules:** any text, 3D, dead stretch, pure black or white?

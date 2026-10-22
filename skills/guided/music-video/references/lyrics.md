@@ -119,8 +119,9 @@ A word whose box starts before the energy rises, or long after it, is wrong. Run
 Helpers (all in [karaoke.html](../karaoke.html)):
 
 - `lyric(phrase, nth)` finds a phrase by content and returns `{ line, words }`. It throws if the phrase is missing, so a lyric edit can't silently break a cue.
+- `wordSpans(line)` maps each word to its glyphs in `line.text`, so display punctuation (`night,`, `“every`) and punctuation-only tokens (`—`) don't shift the wipe. It assumes one display token per word; never step through `line.text` by `w.length + 1`.
 - `wordProgress(w, t)` returns 0→1 through a word, moving piecewise across its syllables.
-- Characters sung in a word: `wordProgress(w, t) * w.w.length`. Glyph `k` is lit by `clamp(progress * n - k)`.
+- Characters sung in a word: `wordProgress(w, t) * n`, where `n` is the length of the word's span in `line.text` (punctuation included). Glyph `k` is lit by `clamp(progress * n - k)`.
 
 ## Karaoke recipes
 
@@ -130,7 +131,7 @@ Helpers (all in [karaoke.html](../karaoke.html)):
 
 **A pop on each word start:** scale 1.06 decaying over about 0.1 s. Keep it small; type wants to be read.
 
-**Held notes** (longer than ~0.9 s): stretch the word on a variable font's width axis, add letter-spacing, or lift it slightly across the hold. Canvas can't set variation axes directly; use DOM text with `font-variation-settings`, or load two static instances and switch at a threshold.
+**Held notes** (longer than ~0.9 s): stretch the word on a variable font's width axis, add letter-spacing, or lift it slightly across the hold. Canvas can't set variation axes directly; use DOM text with `font-variation-settings`, or load two static instances and switch at a threshold. Spread rightward from the word's left edge, and only on a row's last word, or it runs into its neighbours.
 
 **Layout.**
 - Two rows alternating is the classic layout: a line appears dim on its row 0.4 s early, stays until fully sung, and leaves when the line after next needs the row.
@@ -140,6 +141,8 @@ Helpers (all in [karaoke.html](../karaoke.html)):
 - No outlined or haloed type as a crutch for contrast: put a quiet area behind the line instead.
 
 **Every scene integrates the lyric differently.** Words ride a curve, are typed as tokens, stamped on a form, revealed from `[MASK]` blocks, engraved, written by a pen. Plain subtitles all the way through waste the format. Deliberate rule-breaking moments (a highlight running right to left on a line about going backwards) land because the rest is strict.
+
+**Lyric as pixels or cells** (a grid of windows that spells the word): draw the word once to an offscreen canvas made with `getContext('2d', { willReadFrequently: true })` in `ready`, read the mask with `getImageData`, and light each cell from its sample and its glyph's sung time. Per-glyph kerning positions don't apply here; the grid sets the spacing. Still declare the word with `heliosDrawnText`.
 
 **A counter tied to the lyric.** A number that steps up each time a word is sung (`L.words.filter(w => w.w === 'one' && w.start <= t).length`), with a 0.9 s ease-out roll, is a cheap and strong narrative device.
 

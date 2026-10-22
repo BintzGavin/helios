@@ -1,6 +1,6 @@
 # The ink-and-paint look
 
-The look has seven layers, all deterministic. [starter.html](../starter.html) implements the first six in Canvas 2D with no libraries.
+The look has seven layers, all deterministic, plus a camera (section 8). [starter.html](../starter.html) implements the first six in Canvas 2D with no libraries.
 
 ## 1. Boil: one seed per element per drawing
 
@@ -60,10 +60,39 @@ Paint mixes like pigment. A yellow glow painted over blue turns green. Draw lamp
 ## 7. Smears and transitions
 
 - **Smear frames** for very fast moves: on the in-between frames, stretch the character along the motion (`scale(1 + smear, 1 - smear * .4)`) and draw 3–5 dry streaks behind it. Never more than 2–3 frames.
-- **Iris:** fill the frame with ink except a circle, with `ctx.arc(..., true)` inside a full-frame `rect` and `fill('evenodd')`. Centre it on the character's screen position. Ease the radius in with `easeIn` so it closes fast at the end. A shaped iris (star, heart, keyhole) uses the same trick with a path.
+- **Iris:** fill the frame with ink except a circle, with `ctx.arc(..., true)` inside a full-frame `rect` and `fill('evenodd')`. Centre it on the character's screen position. Ease the radius in with `easeIn` so it closes fast at the end.
+- **Shaped iris** (star, heart, keyhole, leaf): the same trick with a path, so the shape must join the rect's path. The starter's `smooth(P, closed, begin)` takes `begin = false` for that:
+
+  ```js
+  function shapedIris(P, cx, cy, s) {          // P: shape points around 0,0, wobbled by a fixed ±3 px, not scaled by s
+    ctx.save(); ctx.fillStyle = PAL.ink; ctx.beginPath(); ctx.rect(-50, -50, W + 100, H + 100);
+    if (s > .01) smooth(P.map(([x, y]) => [cx + x * s, cy + y * s]), true, false);
+    ctx.fill('evenodd'); ctx.restore();
+  }
+  ```
+
+  Wobble that grows with the shape turns it into a blob. Open it until the shape's inscribed circle clears the farthest frame corner: a narrow shape (a leaf) needs several times a circle's scale. Close to the face, hold ~0.4 s, then close.
 - **Brush wipe:** a few thick wobbly strokes sweeping across, staggered by 0.05 s, covering the frame by the seam; the next shot starts under the second half of the same wipe.
 - **Whip pan:** 4–6 frames of horizontal smear streaks at the seam, with motion continuing in the same direction in the next shot.
 - **Match cut:** same shape or motion on both sides of the cut, landing on the same pixels.
+
+## 8. Camera, parallax and screen positions
+
+One camera per shot, set from `t`. Layers draw in world space; far layers get `par < 1`, so they pan and zoom less:
+
+```js
+let cam = { x: W / 2, y: H / 2, z: 1 };                           // set at the top of each shot
+function layer(par, draw) {
+  const z = 1 + (cam.z - 1) * par;
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z);
+  ctx.translate(-W / 2 - (cam.x - W / 2) * par, -H / 2 - (cam.y - H / 2) * par);
+  draw(z); ctx.restore();
+}
+const toScreen = (x, y) => [(x - cam.x) * cam.z + W / 2, (y - cam.y) * cam.z + H / 2];   // for par = 1
+```
+
+- Centre an iris, emote or reticle on `toScreen(charX, groundY - 6 * u)` so it stays on a moving character.
+- Ink weight is in world units, so a push-in thickens it. Inside a zoomed layer, draw with `w / Math.sqrt(z)` (or `w / z` to hold it constant on screen).
 
 ## Palette rules
 

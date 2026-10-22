@@ -24,16 +24,17 @@ Demo: [synthwave-vhs.html](synthwave-vhs.html) — `npx -y @helios-project/cli@l
 
 ## Signature checklist
 1. Horizon line at ≈ 0.59 H with a 2–3 px hot line (`#ffe2f6`) and a pink haze band ≈ 110 px tall.
-2. Grid: longitudinal lines converge to one vanishing point at the horizon; transverse lines scroll toward camera and fade out by ≈ 35 grid units of depth (no moiré mush at the horizon).
+2. Grid: longitudinal lines converge to one vanishing point at the horizon; transverse lines scroll toward camera and fade out by ≈ 35 grid units of depth, and longitudinal lines fade with depth too (no moiré mush at the horizon).
 3. Sun: ≥ 5 horizontal slats in its lower half, gap width growing from ≈ 1 % to ≈ 8 % of the diameter toward the bottom, scrolling down.
 4. Chrome face: hard colour break at exactly 50 % of the cap height (light blue-white above, near-black seam, orange below), with an extrusion depth of ≈ 14 offset copies (≈ 16 px down-right).
-5. Tape clock: frames 0–29 change only on even frames (15 fps); at the rewind cue, two consecutive frames step *back* in scene time.
+5. The world runs on a tape clock with deck grammar, not on `t`: at least one of a 15 fps lock-in, FF cue-search bars, SLOW, a PAUSE freeze with a jittering field, or a short rewind (in the demo, frames 0–29 change only on even frames and two frames step *back* at the rewind cue).
 6. VHS pass: scanline period 3 px at ≤ 14 % darkening; chroma blur ≈ 7 px, red offset 2 px; tracking band only when the OSD says the deck is busy (PLAY lock-in, REW).
 7. One neon "strike" on the hero beat: lit → one dim frame-pair → lit, then steady (≤ 2 flashes, small area).
 
 ## Native moves
 - **Rewind into the slam.** OSD flips to `◀◀ REW`, the world steps two frames backwards and drags at 15 fps, then everything snaps to 30 fps as the chrome flashes and a glint sweeps the face. *Fits:* the drop of a track; the reveal of a product name; the emotional peak of the piece.
 - **Neon strike.** The script is visible first as unlit glass (a 35 %-alpha stroke), then the tube fires with one stutter. *Fits:* a subtitle or sub-brand arriving after the headline; "Live", "Tonight", a date.
+- **Deck grammar.** `▶▶ FF` with horizontal noise bars and the world at 4–8× speed (cue search), `SLOW` at ¼ speed, `❚❚ PAUSE` holding one field with a 1–2 px vertical jitter, a short `◀◀ REW`. All are `sceneTime(t)` remaps plus an OSD label. *Fits:* skipping ahead in a story, dwelling on one moment, a freeze-frame reveal.
 - **Deck OSD as the narrator.** `PLAY ▶`, `◀◀ REW`, `SP 0:00:12` are the only UI, drawn crisp on top of the tape (the deck generates them, so the VHS pass never touches them). *Fits:* countdowns, chapter markers, timestamps that carry meaning.
 
 ## Core technique
@@ -65,7 +66,8 @@ function sceneTime(t) {
 The chrome is all layering of one `fillText`: the extrusion is just offset copies, and the "metal" is a gradient with a hard seam that mirrors the horizon behind it. The world is driven by `sceneTime(t)`, so stutter and rewind cost nothing and stay deterministic; the camera reads a precomputed integral of a speed curve so it can accelerate and brake without drift. See `buildChrome`, `floor` and the shader in the demo.
 
 ## Pitfalls
-- Grid lines bunching into a solid pink band at the horizon → fade transverse lines by depth (`alpha = 1.15 − d/34`) and let the haze gradient cover the last few px.
+- Grid lines bunching into a solid pink band at the horizon → fade transverse lines by depth (`alpha = 1.15 − d/34`) and let the haze gradient cover the last few px. Fade longitudinal lines with depth as well (draw each in depth segments, or stroke with a gradient toward the horizon); with a high camera or a curved floor they otherwise pile into a band.
+- Slats only in the sun's lower half → a setting sun loses them behind the horizon; start them higher (from ≈ 0.3 R above the centre) or place them relative to the horizon line instead of the disc.
 - Camera as `z = speed * t` after a speed change → jumps; integrate the speed curve once in `ready` and look positions up.
 - `sceneTime` built from accumulated state ("if we rewound last frame…") → breaks `verify`; it must only read `t`.
 - Heavy per-pixel tape noise all the time → huge files and smeared encodes; keep grain off, scanlines ≥ 3 px period, and the noisy tracking band only for ~1 s total.

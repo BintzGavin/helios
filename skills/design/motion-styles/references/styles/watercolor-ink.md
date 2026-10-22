@@ -25,7 +25,7 @@ Demo: [watercolor-ink.html](watercolor-ink.html) — `npx -y @helios-project/cli
 - Annotations follow the painting. The pen leader line grows in 0.6 s (ease-out cubic), then the note writes on over 0.9 s. A seal "thumps" from 1.25 to 1.0 in ~4 frames.
 - **Sway only after an object is finished**, as a skew about its root: `k·(sin 1.15t + 0.4 sin(2.7t + φ))`, with k ≈ .006–.012 for trees and .01–.03 for grass. The end hold lives on sway, mist drift (0.35 rad/s) and slowly gliding birds.
 - 24–60 fps on ones for watercolour. In ink wash, figures step **on twos** (`Math.floor(t*12+ 1e-4)/12`) while the camera, blooms and ripples stay on ones.
-- Camera: a locked sheet, a slow lateral handscroll pan, a vertical tilt, or a slow push into a detail. Transitions are mist washes, ink blooms or page turns. **Banned:** hard cuts between unrelated pictures, cross-dissolves, spins and zooms with overshoot.
+- Camera: a locked sheet, a slow lateral handscroll pan, a vertical tilt, or a slow push into a detail. When the camera pans or tilts, the paper and every layer canvas must be world-sized (the whole scroll, not 1920 × 1080), or the paper slides with the camera and layers clip at the old frame edge. Transitions are mist washes, ink blooms or page turns. **Banned:** hard cuts between unrelated pictures, cross-dissolves, spins and zooms with overshoot.
 
 ## Signature checklist
 1. Every mark is a stroke: a ribbon with a **width profile plus ±22 % noise**, body at **~0.6 opacity** when bristles are present, plus **3–9 bristle tracks** at 30–85 % that break into dashes and stop early (at 72–100 % of the length).

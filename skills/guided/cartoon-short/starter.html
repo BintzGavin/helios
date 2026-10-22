@@ -36,9 +36,9 @@ function rng(key) {                    // FNV-1a of (key, drawing) -> mulberry32
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
 }
 const wob = (P, r, j) => P.map(([x, y]) => [x + (r() * 2 - 1) * j, y + (r() * 2 - 1) * j]);
-function smooth(P, closed = true) {    // quadratic curve through midpoints: soft, brushy outlines
+function smooth(P, closed = true, begin = true) { // quadratic curve through midpoints; begin = false adds to the current path (shaped iris)
   const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-  ctx.beginPath();
+  if (begin) ctx.beginPath();
   if (!closed) { ctx.moveTo(...P[0]); for (let i = 1; i < P.length - 1; i++) ctx.quadraticCurveTo(...P[i], ...mid(P[i], P[i + 1])); ctx.lineTo(...P.at(-1)); return; }
   ctx.moveTo(...mid(P.at(-1), P[0]));
   P.forEach((p, i) => ctx.quadraticCurveTo(p[0], p[1], ...mid(p, P[(i + 1) % P.length])));
@@ -151,7 +151,7 @@ function emotions(t, keys) {
 // ---------- the character: designed for this video, not borrowed ----------
 const BEAN = { col: '#7fc8a9', lt: '#c9f0dc', dk: '#4f9a80' };
 function bean(x, gy, u, o, key = 'bean') {
-  const col = o.tint ? o.tint : (o.tintFrom ? mixCol(o.tintFrom, BEAN.col, o.tintK) : BEAN.col);
+  const col = mixCol(o.tintFrom || BEAN.col, o.tint || BEAN.col, o.tintK ?? 1); // fades into and out of a tint
   ctx.save(); ctx.translate(x, gy);
   // shadow shrinks as the body rises
   const lift = clamp(-o.dy / 4, 0, 1);

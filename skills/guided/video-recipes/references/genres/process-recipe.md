@@ -53,6 +53,9 @@ The stream is closed-form too. Its head falls from the spout with `½·g·τ²` 
 - **The stream starts or stops instantly.** Use a falling head and tail, and a width from the flow rate (thin at both ends).
 - **The tool covers the panel.** Bring tools in from above or from the hero side, and pour about the spout (rotate about the pivot that stays over the vessel).
 - **Wrong quantities or conversions.** Keep the recipe in a facts block (demo: classic 1 : 1 : 4 lemonade, 45 / 45 / 180 ml over 5 cubes; 1 oz = 29.57 ml). If the dish is invented, say so on screen.
+- **A process longer than the film** (dough rising, paint drying, a 20-minute steep) → use an honest compressed clock: show the real elapsed time and the speed-up ("40 min · ×600"), and keep the quantity function in real time so the numbers stay true.
+- **An opaque vessel hides the story** (a pot, a mixer, an oven) → cut it away: a section view or a cutaway window that shows the level, from the first step.
+- **Weighing steps** → a "tare" pattern: the scale reads the vessel, zeroes with a click, then counts up only what is added. The tare value comes from the same function as everything else.
 - **Floating garnish.** Draw the submerged part of a straw or spoon under the liquid (tinted) and the part above the surface on top.
 
 ## Stills to check

@@ -24,7 +24,7 @@ Demo: [swiss-grid.html](swiss-grid.html) — `npx -y @helios-project/cli@latest 
 
 ## Motion
 - **Two curves only.** The precise ease `cubic-bezier(.7,0,.2,1)` for every snap; linear for lines being drawn, playheads and the exception. No overshoot, spring, bounce or fade.
-- **Durations are note values.** At 120 BPM, a beat is 0.5 s, 1/8 is 0.25 s and 1/16 is 0.125 s. A snap **starts one note value early and lands on the beat**: `snap(t, tArrive, d)`.
+- **Durations are note values.** At 120 BPM, a beat is 0.5 s, 1/8 is 0.25 s and 1/16 is 0.125 s. A snap **starts one note value early and lands on the beat grid** (a beat, or one of its 1/8 and 1/16 subdivisions): `snap(t, tArrive, d)`.
 - **Entrances are wipes and clip-reveals.** A word rises out of a clip rect from below its baseline in a 1/16 and leaves upward in a 1/8. Bars grow along their length. Paper wipes in. A giant numeral climbs in 4 eased steps, "one module at a time".
 - **Deletions are knife cuts.** A 2 px line crosses the element in a 1/16 (linear), then the element collapses to its midline in a 1/8.
 - **Ripples are ordered by distance** from their cause, two units per 1/16. After any change, the rest re-flow nearest first.
@@ -34,9 +34,9 @@ Demo: [swiss-grid.html](swiss-grid.html) — `npx -y @helios-project/cli@latest 
 ## Signature checklist
 - [ ] Every left edge sits on one of the 12 column starts (96 + n·146 px) and every baseline on a multiple of 24 px.
 - [ ] Exactly one element uses the signal colour, and it is ≥ 1 module large when it matters.
-- [ ] Every snap ends on a beat (multiple of 0.5 s at 120 BPM) and lasts one note value (0.125 / 0.25 s). No eased move ends between beats.
+- [ ] Every snap ends on the beat grid, subdivisions included (a multiple of 0.125 s at 120 BPM: the demo's knife collapse lands at 3.875 s, ripples step by 1/16) and lasts one note value (0.125 / 0.25 s). No eased move ends off the grid.
 - [ ] No frame shows a partially transparent element: entrances are clipped, not faded.
-- [ ] Scale contrast ≥ 25:1 between the largest and smallest type on screen (demo: 600 px numeral vs 19 px notes).
+- [ ] Scale contrast ≥ 25:1 between the largest and smallest type on screen at the peak (demo: 600 px numeral vs 19 px notes). A caption or end frame can be calmer.
 - [ ] At least one knife cut (line in 1/16, collapse in 1/8) and one ripple ordered by distance.
 - [ ] Only the exception moves linearly and unsnapped. Its readout changes from integer "on grid" values to non-integer "off grid" values.
 
@@ -76,6 +76,7 @@ Every animated value comes from `snap` on an arrival time on the beat grid. The 
 - Onsets between frames flicker or land a frame late → put arrivals on whole frames: at 24 fps, multiples of 0.125 s are exact.
 - Animating labels while something rotates reads as noise → rotate, hold a beat, then reveal labels.
 - Fine 1 px guides shimmer in the H.264 encode when they move → keep guides static, whole-pixel and light grey, and animate only their length.
+- Flashing (`helios check`): a giant numeral that slides out and back in on every beat flips each pixel twice per beat, 4 flashes/s at 120 BPM → swap digits with a static clip-wipe. A pull-out across a wall of high-contrast artifacts fails at ~7.5 flashes/s however slowly it moves → lower the wall's contrast while the camera moves and restore it as the move settles, or keep the wall empty during the move and fill it ring by ring after.
 - Determinism: fonts loaded in `ready` and the headline size measured there. `renderAt` resets the transform, alpha and composite mode every frame.
 
 ## Check on stills

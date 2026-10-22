@@ -19,7 +19,7 @@ Demo: [blueprint.html](blueprint.html) — `npx -y @helios-project/cli@latest re
   - Hand lettering (Architects Daughter, uppercase) for the header (~0.06 H at the wide), labels and notes.
   - B612 for dimension values, the title-block fields and NOTE cells. Allura for the signature only.
   - Text letters itself on left to right behind the nib, like any other line.
-  - **Captions are drawing notes:** a translucent box with double white rules, a "NOTE / n" cell, and text lettered on in ~0.35 s, placed in empty sky for the shot, never at the bottom. Each note is also lettered into the sheet's GENERAL NOTES column, so the final wide reads as the whole script.
+  - **Captions are drawing notes:** a translucent box with double white rules, a "NOTE / n" cell, and text lettered on in ~0.35 s, placed in empty sky for the shot, never at the bottom. Each note is also lettered into the sheet's GENERAL NOTES column, so the final wide reads as the whole script. In a short film, a NOTE box can stay on the sheet once lettered, as part of the drawing, so the caption-hold rule doesn't force long holds on each shot.
 - **Materials & texture:** cyanotype on paper.
   - Build the sheet once in `ready`, in **sheet coordinates** (2400 × 1350 units): 3-octave value-noise fbm between the two blues, faint coating streaks, bleached edges, two fold creases (whitened band + bright edge + dark edge), irregular water stains with pale tide lines, sparse light specks.
   - Lines carry a 2 px soft bleed (`shadowBlur`).
@@ -66,6 +66,16 @@ for (const it of ITEMS) {
 // drafting order is just the schedule:
 // centre lines 0.0-0.9 · outlines 0.95-2.7 · hatching 2.55-3.3 · dimensions 3.0-3.9 · balloons 3.75-4.4 · labels 4.1-4.8
 ```
+**Moving parts.** In an explainer, give each item an optional `part`, and drive every part from one state function of `t`, so the mechanism moves as one:
+
+```js
+const phase = (t) => io(prog(t, 5.0, 5.4));                         // the click: 0 → 1
+const rotAbout = (x, y, a) => { const c = Math.cos(a), s = Math.sin(a); return [c, s, -s, c, x - c * x + s * y, y - s * x - c * y]; };
+const PARTS = { lever: (k) => rotAbout(120, 640, -0.4 * k), pin: (k) => [1, 0, 0, 1, 0, 30 * k] };
+const m = it.part && PARTS[it.part](phase(t));
+ctx.save(); if (m) ctx.transform(...m); strokePolyline(seg); ctx.restore();   // its dimensions and balloons use the same part
+```
+
 Every mark is a polyline in sheet space with a start time and duration, so drafting order, staggering and the camera are all data. The sheet texture lives in the same coordinates, so paper and ink move together. See `dim()` and `balloon()` for the annotation builders, and `buildSheet()` for the cyanotype.
 
 ## Pitfalls

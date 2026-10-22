@@ -178,8 +178,9 @@ function build() {
   S.pads = pads; S.pine = pine; S.pineSpr = sprite(pine, S.padWash);
   S.sun = [];                                       // the accent: horizontal strokes clipped by a disc
   for (let k = 0; k < 7; k++) { const y = 196 + k * 17; S.sun.push(mk([[1462, y + (R() - .5) * 4], [1530, y + (R() - .5) * 6], [1600, y + (R() - .5) * 4]], 22, 'sun', { prof: 'brush', nb: 4 })); }
-  S.birds = [[1220, 230, 1], [1270, 262, .8], [1180, 276, .7]].map(([x, y, k]) => sprite([
-    mk(qcurve(x - 22 * k, y - 6 * k, x, y, -6 * k, 6), 5 * k, 'bird', { prof: 'tip', nb: 0 }), mk(qcurve(x, y, x + 20 * k, y - 9 * k, -5 * k, 6), 5 * k, 'bird', { prof: 'tip', nb: 0 })]));
+  S.birdStrokes = [[1220, 230, 1], [1270, 262, .8], [1180, 276, .7]].map(([x, y, k]) => [
+    mk(qcurve(x - 22 * k, y - 6 * k, x, y, -6 * k, 6), 5 * k, 'bird', { prof: 'tip', nb: 0 }), mk(qcurve(x, y, x + 20 * k, y - 9 * k, -5 * k, 6), 5 * k, 'bird', { prof: 'tip', nb: 0 })]);
+  S.birds = S.birdStrokes.map((L) => sprite(L));
   // the vermilion seal: irregular square, lines knocked out, paste speckles
   const sc = S.seal = document.createElement('canvas'); sc.width = sc.height = 84; const c = sc.getContext('2d');
   c.translate(6, 6); c.beginPath(); for (let i = 0; i < 24; i++) { const u = i / 24 * 4, sd = Math.floor(u), f = u - sd, P = [[f, 0], [1, f], [1 - f, 1], [0, 1 - f]][sd];
@@ -244,8 +245,9 @@ window.renderAt = async (t) => {
     if (sp > 0) { const br = eo(span(t, 5.7, 1.2)), g = c.createRadialGradient(1530, 248, 40, 1530, 248, 70 + 60 * br);
       g.addColorStop(0, rgba(PAL.sun[0], .22 * PAL.sun[1] * br)); g.addColorStop(1, rgba(PAL.sun[0], 0)); c.fillStyle = g; c.fillRect(1380, 100, 300, 300);
       c.save(); c.beginPath(); c.arc(1530, 248, 64, 0, 7); c.clip(); drawList(c, S.sun, sp); c.restore(); }
-    S.birds.forEach((b, i) => { const a = ss(span(t, 6.3 + i * .12, .4)); if (a <= 0) return;
-      c.globalAlpha = a; c.drawImage(b, -14 * (t - 6.3) - i * 6 * Math.sin(t * 1.3 + i), 3 * Math.sin(t * 1.7 + i * 2)); c.globalAlpha = 1; });
+    S.birds.forEach((b, i) => { const p = span(t, 6.3 + i * .12, .4); if (p <= 0) return;   // painted in two strokes, never faded
+      const dx = -14 * (t - 6.3) - i * 6 * Math.sin(t * 1.3 + i), dy = 3 * Math.sin(t * 1.7 + i * 2);
+      if (p < 1) { c.save(); c.translate(dx, dy); drawList(c, S.birdStrokes[i], p); c.restore(); } else c.drawImage(b, dx, dy); });
   });
 
   // annotations

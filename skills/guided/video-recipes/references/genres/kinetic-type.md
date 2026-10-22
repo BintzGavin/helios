@@ -10,7 +10,7 @@ A short line of text is read one phrase at a time, and each word ends up as an o
 
 The copy is short (two to four phrases, 6–15 words) and locked. Each phrase gets one slot, and each slot has the same internal order: **enter → reading hold → travel into its role**. Nothing travels while it is being read.
 
-Write the timeline in **story time** (reveal → phrases → held composition → reset), then **rotate the loop phase** so the seam sits inside the held composition: video time `v` shows story time `(v + PHASE) mod T`. Frame 0 is then the finished poster (the "frame 1 is a finished picture" rule), and the occluder reset happens mid-video, where nobody judges a thumbnail. Demo: `PHASE = 13`, so video time = story time − 13 (+18).
+Write the timeline in **story time** (reveal → phrases → held composition → reset), then **rotate the loop phase** so the seam sits inside the held composition: video time `v` shows story time `(v + PHASE) mod T`. Frame 0 is then the finished poster (the "frame 1 is a finished picture" rule), and the occluder reset happens mid-video, where nobody judges a thumbnail. Demo: `T = 18`, `PHASE = 13`, so video time = (story time + 5) mod 18.
 
 | Beat (story time) | Share | Video time in demo | What happens |
 |---|---|---|---|
@@ -60,7 +60,7 @@ word(w, lerp(540, colX, p), lerp(rowY, footY - PILLAR / 2, p), lerp(150, pillarP
 
 **4. Camera = three named operations in a table**, each a single eased segment with a stated purpose (PUSH to lean into phrase 1, CRANE to rise to the hero word and ride it down, PULL to reveal). Between operations the camera is exactly still. See `camera()` in the demo.
 
-**5. Loop under occlusion, with the seam on a composed frame.** Write the reset into story time (the occluder enters over the end of the held composition, the scene resets beneath it, and it leaves over the reveal). Then render `t = (v + PHASE) mod T`, with `PHASE` placing video frame 0 inside the held composition. Frame T equals frame 0 exactly, frame 0 is a finished picture, and the reset is never visible. Cue times are video times, so shift them by the same phase (`v = s − PHASE`, wrapped).
+**5. Loop under occlusion, with the seam on a composed frame.** Write the reset into story time (the occluder enters over the end of the held composition, the scene resets beneath it, and it leaves over the reveal). Then render `t = (v + PHASE) mod T`, with `PHASE` placing video frame 0 inside the held composition. Frame T equals frame 0 exactly, frame 0 is a finished picture, and the reset is never visible. Cue times are video times, so shift them by the same phase (`v = (s − PHASE) mod T`, which is story time + 5 in the demo).
 
 Springs, stagger and the reading-time formula are in [../techniques.md](../techniques.md) and [../brief.md](../brief.md).
 

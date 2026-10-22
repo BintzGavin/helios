@@ -29,7 +29,7 @@ The hook is the first morph (b2), half a second after the first hover. The hero 
 
 ## Look
 
-- **One shape, one shadow, one camera.** The shape stays centred. The camera zoom keeps each state's long side at about 50 % of the frame (`540 / max(w, h)`, clamped), so a 140 px loader and a 600 px search bar both read. A world-space dot grid moves with the zoom, so the zoom reads as a camera and not as the shape growing.
+- **One shape, one shadow, one camera.** The shape stays centred. The camera zoom keeps each state's long side at about 50 % of the frame (`540 / max(w, h)`, clamped), so a 140 px loader and a 600 px search bar both read. That formula assumes a square frame; at 16:9 give width and height their own targets (`min(1000 / w, 620 / h)` at 1920 × 1080). A world-space dot grid moves with the zoom, so the zoom reads as a camera and not as the shape growing.
 - **Palette with roles:** warm grey ground `#E8E5DF`, ink shell `#17171C`, paper shell `#FBFAF7`, one accent `#FF5A36` (cursor ripples, the slider fill, the highlighted bar) and one success colour `#22A45D`. The shell's fill changes per state, and it is the only large colour field.
 - **Type:** Inter 700/500 inside the shape (30–34 world px, so ~40–55 px on screen), and JetBrains Mono 16 px for a quiet HUD: the title, the state counter, and 32 beat ticks with the current beat lit.
 - **The cursor is drawn in screen space**, so it is the same size at every zoom, with a press dip and an accent ripple on every click. It is always on screen.
@@ -38,7 +38,7 @@ The hook is the first morph (b2), half a second after the first hover. The hero 
 
 **State table keyed by beat.** Every state's size, radius and fill sits in one array, with in-state changes (hover, toggle on) in a second one. Retiming the film is one edit to a `b:` value. Tracks for w, h, r, R, G, B and zoom are built from the table once, in `ready`.
 
-**Closed-form springs, summed per target.** A value with several targets is the first value plus one spring per change, each starting at its key time. Adding the previous loop's springs (`t + T`) makes value and velocity continuous across the loop point, as long as the last key returns to the first value.
+**Closed-form springs, summed per target.** A value with several targets is the first value plus one spring per change, each starting at its key time. Adding the previous loop's springs (`t + T`) makes value and velocity continuous across the loop point, as long as the last key returns to the first value. If a value drifts by `Δ = last − first` per loop (a spinner that ends n turns on), the previous loop's springs already add Δ, so start from `keys[0][1] − Δ`; the value then jumps by exactly Δ at the wrap, which is invisible only if the drawing repeats every Δ.
 
 ```js
 function spring(tau, w0 = 15, z = 0.62) {               // step response 0 → 1
@@ -73,7 +73,9 @@ const knob = t < tPress ? x0 : t < tRelease ? rubber(cursor(t).x)
 - **Old and new content overlap into mush** → outgoing content leaves first (≤ 120 ms), then the incoming content takes the space. Never crossfade them at the same moment.
 - **Loop hitch**: the last frame doesn't match the first, or the cursor changes speed at the wrap → the last state equals the first, every track returns to its first value with the `t + T` springs included, the cursor path is periodic Hermite, and the HUD doesn't colour beats as "past" (it would jump at the wrap). Export `[0, T)`, so frame T is not rendered twice.
 - **A morph happens with no cause** → the cursor drives every change. Put a click waypoint (with `stop`) on the beat of each morph, a press/release pair for the drag, and type letters on 16ths.
-- **A tiny state is unreadable, or a wide one is cropped** → zoom from the state's own size, clamped (the demo uses 0.85–3), as a softer spring than the shape so the camera trails the morph.
+- **A tiny state is unreadable, or a wide one is cropped** → zoom from the state's own size, clamped (the demo uses 0.85–3), as a softer spring than the shape so the camera trails the morph. A trailing camera can still crop the widest state while it catches up: also clamp the zoom to what fits the shell's current size, `min(zoom, fit(w, h))`.
+- **Fill changes look muddy** → a paper ↔ ink colour lerp passes through grey. Change the fill with a flood from the click point instead (see [../techniques.md](../techniques.md#morphs-floods-and-transitions)); lerp only between close colours.
+- **The cursor looks too fast at high zoom** → the speed cap (~65 px per frame at 1080p) applies on screen. If waypoints sit on world-space targets, check the speed after the camera transform.
 - **Retiming means editing twenty numbers** → keep times in beats in one table; derive seconds with `b * B`.
 - **History-dependent frames** from `will-change`, a leftover filter or shadow → reset `filter`, `shadowColor` and the transform at the top of `renderAt`, and use no `will-change`.
 - **Rubber band without stretch looks broken** → while the knob is past its end, stretch the shell toward the drag (the demo's `over`), and let both spring back together on release.

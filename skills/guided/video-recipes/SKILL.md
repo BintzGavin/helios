@@ -28,6 +28,8 @@ Other genres already have Helios skills:
 - Promo, explainer, product demo, testimonial, launch and social clip: the other [guided skills](../).
 - Animated charts: [visualize-data](../../workflows/visualize-data/SKILL.md).
 
+**Shorter than the table says?** Keep the beat proportions and cut content, not reading time: fewer levels or steps (a 10 s scale dive is 3 levels, not 6 rushed ones), and every text hold still at `letters / 15 + 1.5` s.
+
 A recipe says *what happens*; it doesn't say what it looks like. Design the look from the user's subject and the seed. The "best styles" named in each recipe point to the opt-in [motion-styles](../../design/motion-styles/SKILL.md) library: use one only if the user asks for it or accepts your one-line offer.
 
 ## Workflow
@@ -47,6 +49,7 @@ A recipe says *what happens*; it doesn't say what it looks like. Design the look
    npx -y @helios-project/cli@latest render video.html -o video.mp4 --duration 20 --preset medium
    npx -y @helios-project/cli@latest check video.mp4
    ```
+   A page that draws everything on one `<canvas>` (all the demos do) renders faster with `--mode canvas`; keep the default `dom` mode when text or elements sit outside the canvas.
 7. **Self-score and revise** on the seven axes in [brief.md](references/brief.md#self-score-and-revise). Fix the lowest first. If you can, have a fresh reviewer (a second agent) look at a contact sheet every 0.2–0.5 s and return ranked, timestamped problems.
 
 ## Rules that apply to every recipe
