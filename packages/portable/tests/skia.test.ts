@@ -6,7 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { digest } from '../src/storage.js';
 import { Resvg } from '@resvg/resvg-js';
-import { createCanvas, Path2D } from '../src/skia-binding.js';
+import { createCanvas, loadImage, Path2D } from '../src/skia-binding.js';
 
 it('preserves exact source pixels for an unscaled image at integer coordinates', async () => {
   const image = new Resvg('<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="#ffffff"/><rect width="1" height="1" fill="#00ffff"/></svg>').render().asPng();
@@ -16,6 +16,27 @@ it('preserves exact source pixels for an unscaled image at integer coordinates',
   const expected = (await renderFrame(plan, 0, new Map(), { prepared })).pixels;
   expect(renderer.render(0).pixels).toEqual(expected);
   expect(renderer.render(1).pixels).toEqual(expected);
+});
+
+it.each([
+  ['enlarged image with bilinear sampling', 8, 64, 'low'],
+  ['shrunk image with cubic sampling', 64, 16, 'high'],
+] as const)('draws an %s', async (_name, source, size, quality) => {
+  const cells = Array.from({ length: 4 }, (_, i) => `<rect x="${(i % 2) * source / 2}" y="${Math.floor(i / 2) * source / 2}" width="${source / 2}" height="${source / 2}" fill="${['#ff0000', '#00ff00', '#0000ff', '#ffffff'][i]}"/>`).join('');
+  const image = new Resvg(`<svg xmlns="http://www.w3.org/2000/svg" width="${source}" height="${source}">${cells}<circle cx="${source / 2}" cy="${source / 2}" r="${source / 3}" fill="#000000"/></svg>`).render().asPng();
+  const plan = parsePlan({ version: 'portable-v1', width: size, height: size, fps: { num: 30, den: 1 }, frameCount: 1, background: '#808080', assets: { image: { sha256: digest(image), bytes: image.length, type: 'image' } }, nodes: [{ id: 'picture', type: 'image', asset: 'image', width: size, height: size, fit: 'fill' }] });
+  const prepared = { fonts: new Map(), text: new Map(), images: new Map([['image', image]]), videos: new Map(), frames: new Map() };
+  const renderer = new SkiaRasterizer(plan, prepared); await renderer.prepare();
+  const direct = async (smoothing: 'low' | 'high') => {
+    const canvas = createCanvas(size, size), ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#808080'; ctx.fillRect(0, 0, size, size);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = smoothing;
+    ctx.drawImage(await loadImage(image), 0, 0, size, size);
+    return Buffer.from(ctx.getImageData(0, 0, size, size).data.buffer);
+  };
+  const actual = renderer.render(0).pixels, expected = await direct(quality), other = await direct(quality === 'low' ? 'high' : 'low');
+  expect(expected.equals(other)).toBe(false);
+  expect(actual.equals(expected)).toBe(true);
 });
 
 it('keeps disconnected glyph contours disconnected when retaining shaped text', async () => {

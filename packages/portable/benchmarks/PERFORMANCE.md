@@ -21,6 +21,22 @@ The Chromium comparator runs the same drawing interpreter with browser Canvas2D 
 
 Profiling found rasterization dominated the media fixtures. The candidate caches decoded still images and glyph paths, streams raw RGBA video instead of PNG round trips, and prerenders an unchanged initial layer sequence. Group opacity is applied after composing children. Different rasterizers can differ at antialiased edges and byte-alpha rounding; fidelity must be measured alongside speed, and resvg remains available.
 
+### Bilinear enlargement (2026-10-22)
+
+The Skia backend used cubic sampling with mipmaps for every scaled image. Upscaling a 640x360 video layer to 1080p that way cost more than the rest of the frame, and the video scenes were render-bound (encoder wait 5-9 ms/frame against 84-126 ms of Skia time). fframes samples images bilinearly without mipmaps. Images and video drawn at a scale of at least 1 now use bilinear sampling; smaller draws keep cubic sampling, where mipmaps prevent aliasing.
+
+Measured on a 4-core x86_64 Linux VM with `profile.ts --rasterizer skia --frames 300 --encode`, five alternating runs per side. Timings cover rendering and encoding, without preparation or verification:
+
+| Scene | Cubic median (range) | Bilinear median (range) | Paired speedup, median (range) | Skia ms/frame |
+|---|---:|---:|---:|---:|
+| B04 portrait video and captions | 31.6 s (30.6-32.2) | 18.1 s (17.0-20.8) | 1.69x (1.52-1.89) | 91.5 → 40.6 |
+| B05 two video layers | 37.1 s (34.5-39.1) | 21.9 s (20.7-23.8) | 1.70x (1.52-1.82) | 104.0 → 44.7 |
+| B08 combined envelope | 44.7 s (41.6-46.5) | 27.1 s (25.1-27.3) | 1.68x (1.62-1.77) | 125.1 → 64.6 |
+
+One full durable B05 job (1800 frames, including chunk and final verification) took 303 s before and 200 s after, with similar peak process-tree memory (826 and 845 MiB) and passing shuffled-frame determinism. That is a single run per side.
+
+Fidelity on frames 0, 37, 150 and 299 of each scene: bilinear against cubic Skia output stays at luma SSIM >= 0.9987 and luma PSNR >= 51.9 dB, inside the codec-loss gate below. Against the resvg oracle, cubic Skia measured 52.5-67.7 dB and bilinear 50.6-54.5 dB luma PSNR. Graphics-only scenes are unaffected; they are encoder-bound on this host.
+
 ## Results and reproduction
 
 The [local performance evidence](../../../docs/rfcs/2026-09-09-portable-rendering-performance.md) records the 45-run comparison, the shape regression, all-frame quality and full-length follow-up. `profile.ts` separates frame-generation stages; `compare.ts` runs the original source snapshot, Skia and installed Chromium sequentially; `quality.ts` compares every encoded frame against regenerated uncompressed Skia after the same pinned color conversion and records cross-renderer SSIM/PSNR plus PNG sample differences.

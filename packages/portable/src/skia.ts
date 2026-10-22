@@ -142,8 +142,13 @@ export class SkiaRasterizer {
         case 'image': case 'video': {
           const image = n.type === 'image' ? this.images.get(n.asset!) : this.video.get(n.id);
           if (!image) throw new RenderError('MISSING_ASSET', `Node ${n.id}: image pixels are unavailable`);
+          // Enlarging gains nothing from mipmaps, and cubic sampling of an upscaled video frame
+          // cost more than the rest of the frame. Bilinear, as fframes uses, stayed within
+          // SSIM-Y 0.998 of cubic on the benchmark video scenes; shrinking keeps cubic.
+          const m = surface.getTransform(), device = Math.min(Math.hypot(m.a, m.b), Math.hypot(m.c, m.d));
+          const fit = n.fit === 'fill' || n.fit === 'contain' ? Math.min(width / image.width, height / image.height) : Math.max(width / image.width, height / image.height);
+          if (device * fit >= 1) surface.imageSmoothingQuality = 'low';
           if (width === image.width && height === image.height) {
-            const m = surface.getTransform();
             // Cubic filtering blurs even an identity copy in this native binding.
             if (m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && Number.isInteger(m.e) && Number.isInteger(m.f)) surface.imageSmoothingEnabled = false;
           }
