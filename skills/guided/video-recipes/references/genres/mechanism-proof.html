@@ -1,0 +1,158 @@
+<!doctype html>
+<!--
+  Mechanism / proof demo — a marble adder computes 1011₂ + 0110₂ (11 + 6). One motion = one logical step:
+  "two marbles in a tray become one marble in the tray to the left". Every number on screen is read from the
+  baked marble state (positions, tray membership, worth), never computed separately.
+  Render: npx -y @helios-project/cli@latest render mechanism-proof.html -o mechanism-proof.mp4 --duration 18 --mode canvas
+-->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@500;700&display=block" rel="stylesheet">
+<style>html,body{margin:0;overflow:hidden;background:#f3f2ee}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const W = 1920, H = 1080, ctx = document.getElementById('c').getContext('2d');
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const span = (t, s, d) => clamp((t - s) / d);
+const smooth = u => { u = clamp(u); return u * u * (3 - 2 * u); };
+const inOut = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const ease = u => 1 - Math.pow(1 - clamp(u), 3);
+const SANS = 'Inter, "Helvetica Neue", Arial, sans-serif', MONO = '"JetBrains Mono", Menlo, Consolas, monospace';
+const BG = '#f3f2ee', INK = '#16171a', MUTE = 'rgba(22,23,26,.62)', A_COL = '#ff5a1f', B_COL = '#2f6fdb';
+
+// ---- Facts: the worked example. A and B as bits, least significant first. ------------------------------------------
+const A = [1, 1, 0, 1, 0], B = [0, 1, 1, 0, 0], NC = 5;                       // 11 and 6; tray 4 catches the last carry
+const X = c => 960 - c * 170, SEAT = 27, TRAY_Y = 600, RAD = 24, BIN_Y = 852;
+const seatX = (c, s) => X(c) + (s ? SEAT : -SEAT);
+const T_A = 2.2, T_B = 3.4, T_C = 5.0, CARRY = 1.8, ROLL = 1.0;              // timeline (s)
+
+// ---- Bake: run the machine once with a fixed schedule; every marble gets motion segments and tray intervals. ---------
+const marbles = [], trays = Array.from({ length: NC }, () => [null, null]);
+const fallTime = dy => Math.sqrt(2 * dy / 4200);
+function drop(m, c, seat, t0) {                                            // gate opens → falls into its seat
+  const y0 = m.at[1], tf = fallTime(TRAY_Y - y0);
+  m.seg.push({ t0, t1: t0 + tf, type: 'fall', a: [...m.at], b: [seatX(c, seat), TRAY_Y] });
+  m.at = [seatX(c, seat), TRAY_Y]; m.cnt.push({ c, tin: t0 + tf, tout: 1e9 }); m.worth.push({ c, tin: t0 + tf, tout: 1e9 });
+  trays[c][seat] = m;
+}
+let tc = T_C; const carries = [];
+const ready = (async () => {
+  [[A, 0, 260, A_COL, T_A], [B, 1, 360, B_COL, T_B]].forEach(([bits, seat, y, col, t0]) => bits.forEach((b, c) => {
+    if (!b) return; const m = { at: [seatX(c, seat), y], col, seg: [], cnt: [], worth: [], home: [seatX(c, seat), y] }; marbles.push(m);
+    drop(m, c, seat, t0 + (NC - 1 - c) * 0.12);
+  }));
+  for (let c = 0; c < NC - 1; c++) {                                          // the ONE operation, applied right to left
+    const [l, r] = trays[c]; if (!(l && r)) continue;
+    const free = trays[c + 1][1] ? 0 : 1, t0 = tc, tArr = t0 + ROLL;           // left marble rolls to the next tray's free seat
+    l.seg.push({ t0, t1: tArr, type: 'arc', a: [...l.at], b: [seatX(c + 1, free), TRAY_Y] }); l.at = [seatX(c + 1, free), TRAY_Y];
+    l.cnt.at(-1).tout = t0; l.cnt.push({ c: c + 1, tin: tArr, tout: 1e9 });
+    l.worth.at(-1).tout = tArr; l.worth.push({ c: c + 1, tin: tArr, tout: 1e9 });   // worth doubles exactly when…
+    r.seg.push({ t0: tArr, t1: tArr + fallTime(BIN_Y - TRAY_Y), type: 'fall', a: [...r.at], b: [r.at[0] + 8, BIN_Y] });
+    r.cnt.at(-1).tout = tArr; r.worth.at(-1).tout = tArr;                    // …its partner drops out of play
+    trays[c] = [null, null]; trays[c + 1][free] = l; carries.push({ c, t0, tArr }); tc += CARRY;
+  }
+  const sample = 'Adding with marbles 0123456789 ₂ → × Σ — = + ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz:().,';   // forces every unicode-range subset
+  await Promise.all([`800 60px ${SANS}`, `500 30px ${SANS}`, `700 30px ${SANS}`, `700 60px ${MONO}`, `500 30px ${MONO}`].map(f => document.fonts.load(f, sample)));
+})();
+const T_DONE = () => tc - CARRY + ROLL + 0.5;
+
+// ---- reading the state -----------------------------------------------------------------------------------------------
+const rise = (t, t0) => smooth((t - t0) / 0.24);                            // digits roll for 0.24 s after a change
+const live = (iv, t) => rise(t, iv.tin) - rise(t, iv.tout);
+const count = (c, t) => marbles.reduce((a, m) => a + m.cnt.filter(iv => iv.c === c).reduce((s, iv) => s + live(iv, t), 0), 0);
+const value = t => marbles.reduce((a, m) => a + m.worth.reduce((s, iv) => s + live(iv, t) * 2 ** iv.c, 0), 0);
+function pos(m, t) {
+  let p = m.home;
+  for (const s of m.seg) {
+    if (t < s.t0) break;
+    if (t >= s.t1) { p = s.b; if (s.type === 'fall') { const b = t - s.t1; p = [s.b[0], s.b[1] - 16 * Math.exp(-9 * b) * Math.abs(Math.sin(15 * b))]; } continue; }
+    const u = (t - s.t0) / (s.t1 - s.t0);
+    if (s.type === 'fall') return [s.a[0] + (s.b[0] - s.a[0]) * u, s.a[1] + (s.b[1] - s.a[1]) * u * u];
+    const e = inOut(u); return [s.a[0] + (s.b[0] - s.a[0]) * e, s.a[1] + (s.b[1] - s.a[1]) * e - 120 * Math.sin(Math.PI * e)];
+  }
+  return p;
+}
+function odometer(v, x, y, digits, size, col) {                            // rolls only while v is between integers
+  const cw = size * 0.62; ctx.save(); ctx.beginPath(); ctx.rect(x - 4, y - size * 0.8, cw * digits + 8, size * 0.9); ctx.clip();
+  ctx.fillStyle = col; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.font = `700 ${size}px ${MONO}`;
+  for (let k = 0; k < digits; k++) {
+    const p = 10 ** (digits - 1 - k), base = Math.floor(v / p + 1e-4), rem = v / p - base;
+    const f = p === 1 ? rem : (v % p) > p - 1 ? (v % 1) : 0, d = base % 10, dx = x + k * cw;
+    if (k < digits - 1 && v < p - 1e-6 && f === 0) continue;                 // no leading zeros
+    ctx.fillText(String(d), dx, y - f * size); if (f > 0.001) ctx.fillText(String((d + 1) % 10), dx, y + (1 - f) * size);
+  }
+  ctx.restore();
+}
+
+function machine(t) {
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (let c = 0; c < NC; c++) {                                             // hoppers, gates, trays, weights
+    const x = X(c), ga = clamp((t - T_A - (NC - 1 - c) * 0.12) / 0.15), gb = clamp((t - T_B - (NC - 1 - c) * 0.12) / 0.15);
+    ctx.strokeStyle = INK; ctx.lineWidth = 3;
+    [[260, -1, ga, A[c] || c === NC - 1 ? 1 : 0.3], [360, 1, gb, B[c] || c === NC - 1 ? 1 : 0.3]].forEach(([y, s, g, a]) => {
+      if (c === NC - 1) return; ctx.globalAlpha = a * (1 - 0.7 * span(t, T_B + 0.9, 0.6)); const sx = x + s * SEAT;   // used hoppers recede
+      ctx.beginPath(); ctx.moveTo(sx - 32, y - 40); ctx.lineTo(sx - 32, y + 26); ctx.moveTo(sx + 32, y - 40); ctx.lineTo(sx + 32, y + 26); ctx.stroke();
+      ctx.save(); ctx.translate(sx - 32, y + 27); ctx.rotate(1.35 * g); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(64, 0); ctx.lineWidth = 5; ctx.stroke(); ctx.restore();
+      ctx.globalAlpha = 1;
+    });
+    const cr = carries.find(k => k.c === c), tilt = cr ? -0.16 * Math.sin(Math.PI * span(t, cr.t0 - 0.1, ROLL + 0.2)) : 0;
+    const door = cr ? smooth((t - cr.tArr) / 0.12) * (1 - smooth((t - cr.tArr - 0.6) / 0.25)) : 0;
+    ctx.save(); ctx.translate(x, TRAY_Y + RAD + 4); ctx.rotate(tilt);
+    ctx.strokeStyle = INK; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-70, -64); ctx.lineTo(-62, 0); ctx.moveTo(62, 0); ctx.lineTo(70, -64); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-62, 0); ctx.lineTo(0, 0); ctx.stroke();
+    ctx.save(); ctx.translate(62, 0); ctx.rotate(-1.4 * door); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-62, 0); ctx.stroke(); ctx.restore();
+    ctx.restore();
+    ctx.fillStyle = INK; ctx.font = `700 30px ${MONO}`; ctx.textAlign = 'center'; ctx.fillText(`×${2 ** c}`, x, TRAY_Y + 84);
+    const n = count(c, t), active = cr && t > cr.t0 - 0.5 && t < cr.tArr + 0.6;      // the column's own digit, read from the tray
+    ctx.fillStyle = Math.round(n) >= 2 ? A_COL : INK;
+    odometer(n, x - 18, TRAY_Y + 156, 1, 58, ctx.fillStyle);
+    if (active) { ctx.strokeStyle = A_COL; ctx.lineWidth = 3; ctx.setLineDash([8, 8]); ctx.strokeRect(x - 84, TRAY_Y - 96, 168, 270); ctx.setLineDash([]); }
+  }
+  ctx.strokeStyle = INK; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(X(4) - 90, BIN_Y - 40); ctx.lineTo(X(4) - 90, BIN_Y + RAD + 4); ctx.lineTo(X(0) + 90, BIN_Y + RAD + 4); ctx.lineTo(X(0) + 90, BIN_Y - 40); ctx.stroke();
+  ctx.fillStyle = MUTE; ctx.font = `500 24px ${SANS}`; ctx.textAlign = 'left'; ctx.fillText('out of play', X(0) + 104, BIN_Y + 20);
+  ctx.fillStyle = INK; ctx.font = `700 28px ${MONO}`; ctx.textAlign = 'right';
+  ctx.fillText('A', X(3) - 100, 270); ctx.fillText('B', X(3) - 100, 370);
+  marbles.forEach(m => {
+    const [x, y] = pos(m, t); ctx.fillStyle = m.col; ctx.beginPath(); ctx.arc(x, y, RAD, 0, 7); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.beginPath(); ctx.arc(x - 8, y - 8, 7, 0, 7); ctx.fill();
+  });
+}
+
+function panel(t) {
+  const X0 = 1240, done = T_DONE(), v = value(t);
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = INK;
+  ctx.font = `800 64px ${SANS}`; ctx.fillText('Adding with marbles', 120, 130);
+  ctx.font = `500 30px ${SANS}`; ctx.fillStyle = MUTE; ctx.fillText('Rule: two marbles in a tray → one marble in the tray to its left.', 120, 182);
+  ctx.fillStyle = INK; ctx.font = `700 30px ${MONO}`;
+  ctx.fillText('A  1011₂  = 11', X0, 300); ctx.fillText('B  0110₂  =  6', X0, 350);
+  ctx.fillRect(X0, 378, 520, 3);
+  ctx.font = `500 26px ${SANS}`; ctx.fillStyle = MUTE; ctx.fillText('VALUE IN THE TRAYS  (Σ marbles × weight)', X0, 440);
+  const settled = t > done; odometer(v, X0, 600, 2, 170, settled ? A_COL : INK);
+  const eq = ease(span(t, done, 0.5)); ctx.globalAlpha = eq; ctx.fillStyle = INK; ctx.font = `700 48px ${MONO}`; ctx.fillText('= 11 + 6', X0 + 240, 590); ctx.globalAlpha = 1;
+  ctx.font = `500 26px ${SANS}`; ctx.fillStyle = MUTE; ctx.fillText('TRAY DIGITS', X0, 690);
+  const bits = Array.from({ length: NC }, (_, k) => count(NC - 1 - k, t));
+  bits.forEach((n, k) => { odometer(n, X0 + k * 52, 760, 1, 64, Math.round(n) >= 2 ? A_COL : INK); });
+  ctx.fillStyle = INK; ctx.font = `700 30px ${MONO}`; ctx.fillText('₂', X0 + NC * 52 + 4, 760);
+  const steps = [[0, 'Load A and B'], [T_A, 'Drop A'], [T_B, 'Drop B'], ...carries.map(k => [k.t0 - 0.3, `Carry: two ×${2 ** k.c} → one ×${2 ** (k.c + 1)}`]), [done - 0.3, 'Read the trays: 10001₂ = 16 + 1']];
+  const cur = steps.filter(s => t >= s[0]).at(-1), ci = steps.indexOf(cur), sq = cur[0] === 0 ? 1 : ease(span(t, cur[0], 0.35));
+  ctx.globalAlpha = sq; ctx.font = `700 34px ${SANS}`; ctx.fillStyle = INK; ctx.fillText(cur[1], X0, 860 + 16 * (1 - sq));
+  ctx.font = `500 24px ${MONO}`; ctx.fillStyle = MUTE; ctx.fillText(`STEP ${ci + 1} / ${steps.length}`, X0, 820); ctx.globalAlpha = 1;
+  const g = ease(span(t, done + 1.6, 0.6)), nq = ease(span(t, done + 4.2, 0.6));
+  if (g > 0) {                                                              // the general statement, then its limit
+    ctx.globalAlpha = g; ctx.fillStyle = INK; ctx.fillRect(120, 930, 1680, 2);
+    ctx.font = `700 34px ${SANS}`; ctx.fillText('For any two binary numbers: drop both, carry every pair one tray left — the trays then read the sum.', 120, 985);
+    ctx.globalAlpha = nq; ctx.font = `500 30px ${SANS}`; ctx.fillStyle = MUTE;
+    ctx.fillText('Not shown: overflow. With only four trays, the ×16 marble would have nowhere to go.', 120, 1035); ctx.globalAlpha = 1;
+  }
+}
+
+window.renderAt = async (t) => {
+  await ready;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.setLineDash([]);
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(22,23,26,.06)';                                    // quiet grid
+  for (let x = 0; x <= W; x += 60) ctx.fillRect(x, 0, 1, H);
+  for (let y = 0; y <= H; y += 60) ctx.fillRect(0, y, W, 1);
+  machine(t);
+  panel(t);
+};
+</script></body></html>
