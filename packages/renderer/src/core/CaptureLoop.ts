@@ -231,9 +231,10 @@ export class CaptureLoop {
         }
 
         let i = 1;
+        const loopEnd = totalFrames - 1;
         if (isDomStrategy) {
-          while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = Math.min(nextProgress, totalFrames - 1);
+          while (i < loopEnd && !aborted) {
+            const chunkEnd = Math.min(nextProgress, loopEnd);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -270,8 +271,8 @@ export class CaptureLoop {
             }
           }
         } else {
-          while (i < totalFrames - 1 && !aborted) {
-            const chunkEnd = Math.min(nextProgress, totalFrames - 1);
+          while (i < loopEnd && !aborted) {
+            const chunkEnd = Math.min(nextProgress, loopEnd);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;

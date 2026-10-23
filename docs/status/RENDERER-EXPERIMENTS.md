@@ -9,6 +9,7 @@ Last updated by: PERF-1118
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **Hoisting totalFrames in single-worker loops:** explicitly assigning `const loopEnd = totalFrames - 1;` before the chunk `while` loops forces V8 to treat the limit as an immutable constant instead of re-evaluating the subtraction on closure scope property. (PERF-1126, ~0.6% faster)
 - **PERF-1123**: Hoisted the `16777216` (16MB) `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing overhead.
   - **Improvement:** Removed redundant numeric literal parsing and simplified V8 AST node generation in tight single and multi-worker capture loops, yielding marginal theoretical speedup.
   - **Plan ID:** PERF-1123

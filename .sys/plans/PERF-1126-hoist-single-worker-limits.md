@@ -1,7 +1,7 @@
 ---
 id: PERF-1126
 slug: hoist-single-worker-limits
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-10-22
 completed: ""
@@ -46,3 +46,14 @@ Apply this to the other single-worker chunk loops as well (e.g., `let i = 0; whi
 
 ## Correctness Check
 Run canvas/dom tests to ensure boundaries are correctly respected.
+
+## Results Summary
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.694	150	17.25	63.8	keep	baseline
+2	8.709	150	17.22	63.9	keep	baseline
+3	8.731	150	17.18	63.9	keep	baseline
+4	8.678	150	17.28	64.0	keep	hoisted limits
+5	8.691	150	17.26	63.9	keep	hoisted limits
+6	8.703	150	17.23	64.2	keep	hoisted limits
+```
