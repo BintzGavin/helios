@@ -2,3 +2,6 @@ run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
 1	8.739	150	17.17	61.1	keep	baseline
 2	8.722	150	17.20	64.4	keep	unroll-worker-dispatch
 3	8.750	150	17.14	64.4	keep	unroll-worker-dispatch
+1	8.699	150	17.24	64.3	keep	unrolled multi-worker dispatch block
+2	8.711	150	17.22	64.3	keep	unrolled multi-worker dispatch block
+3	8.705	150	17.23	64.4	keep	unrolled multi-worker dispatch block
