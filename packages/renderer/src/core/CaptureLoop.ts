@@ -2,6 +2,8 @@ import { WorkerInfo } from "./BrowserPool.js";
 import { FFmpegManager } from "./FFmpegManager.js";
 import { RendererOptions, RenderJobOptions } from "../types.js";
 
+const MAX_PENDING_BYTES = 16777216;
+
 class ReusableThenable {
   public resolveCb: (() => void) | null = null;
   public rejectCb: ((err: Error) => void) | null = null;
@@ -195,7 +197,7 @@ export class CaptureLoop {
           const buf = Buffer.from(rawResult as string, "base64");
 
           pendingBytes += buf.length;
-          if (!stream.write(buf) && pendingBytes >= 16777216) {
+          if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
             await this.drainPromise;
             pendingBytes = 0;
           }
@@ -222,7 +224,7 @@ export class CaptureLoop {
           }
 
           pendingBytes += rawResult.length;
-          if (!stream.write(rawResult) && pendingBytes >= 16777216) {
+          if (!stream.write(rawResult) && pendingBytes >= MAX_PENDING_BYTES) {
             await this.drainPromise;
             pendingBytes = 0;
           }
@@ -249,7 +251,7 @@ export class CaptureLoop {
               const buf = Buffer.from(rawResult as string, "base64");
 
               pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= 16777216) {
+              if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -287,7 +289,7 @@ export class CaptureLoop {
               const buf = rawResult;
 
               pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= 16777216) {
+              if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -315,7 +317,7 @@ export class CaptureLoop {
               const buf = Buffer.from(rawResult as string, "base64");
 
               pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= 16777216) {
+              if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -338,7 +340,7 @@ export class CaptureLoop {
               const rawResult = await nextCapturePromise;
 
               pendingBytes += rawResult.length;
-              if (!stream.write(rawResult) && pendingBytes >= 16777216) {
+              if (!stream.write(rawResult) && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -528,7 +530,7 @@ export class CaptureLoop {
               const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
               frameBufferRing[ringIndex] = null;
               pendingBytes += buffer.length;
-              if (!stream.write(buffer) && pendingBytes >= 16777216) {
+              if (!stream.write(buffer) && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }

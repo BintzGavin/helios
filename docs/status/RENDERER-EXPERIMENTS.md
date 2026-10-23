@@ -9,6 +9,9 @@ Last updated by: PERF-1118
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **PERF-1123**: Hoisted the `16777216` (16MB) `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing overhead.
+  - **Improvement:** Removed redundant numeric literal parsing and simplified V8 AST node generation in tight single and multi-worker capture loops, yielding marginal theoretical speedup.
+  - **Plan ID:** PERF-1123
 - **PERF-1135**: Removed `domLastFrameBuffer` unused caching variable in single-worker and multi-worker paths in `CaptureLoop.ts`.
   - **Improvement:** Reduced AST logic and minor GC overhead by allocating the base64 Buffer locally instead of mutating a module-level variable that is no longer used for next-frame logic.
   - **Plan ID:** PERF-1135
@@ -345,7 +348,6 @@ $entry
   - **Plan ID:** PERF-885
 
 ## Open Questions
-- **PERF-1123**: Created experiment plan to hoist `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing and potential evaluation overhead inside the tight multi-worker/single-worker loops.
 - PERF-877: Fix Progress Spam in Multi-Worker Chunked Loops planned
 - Would chunked loops benefit multi-worker paths as well? (PERF-856) -> Yes, PERF-859 planned.
 - PERF-860: Single-worker chunked loops planned.
@@ -514,4 +516,3 @@ $entry
 - **PERF-1130**: Hoisted `totalFrames > 0` validation to an early-return at the top of `CaptureLoop.ts` `run()` function.
   - **Improvement:** Removed redundant nested branching inside the fast single-worker loop to shrink V8 AST complexity and simplify parsing.
   - **Plan ID:** PERF-1130
-- **PERF-1123**: Created experiment plan to hoist the `16777216` (16MB) `MAX_PENDING_BYTES` constant in `CaptureLoop.ts` to reduce literal parsing overhead.

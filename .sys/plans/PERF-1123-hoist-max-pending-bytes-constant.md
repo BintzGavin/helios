@@ -1,11 +1,11 @@
 ---
 id: PERF-1123
 slug: hoist-max-pending-bytes-constant
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-10-22
-completed: ""
-result: ""
+completed: "2026-10-23"
+result: "improved"
 ---
 # PERF-1123: Hoist `MAX_PENDING_BYTES` constant in `CaptureLoop.ts`
 
