@@ -163,7 +163,7 @@ export class CaptureLoop {
       const domBeginFrame = isDomStrategy
         ? (frameTime: number) => strategy.capture(page, frameTime)
         : null;
-      let domLastFrameBuffer: Buffer | null = null;
+
 
       try {
 
@@ -192,10 +192,10 @@ export class CaptureLoop {
             onProgress(0 / totalFrames);
           }
 
-          domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
+          const buf = Buffer.from(rawResult as string, "base64");
 
-          pendingBytes += domLastFrameBuffer!.length;
-          if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
+          pendingBytes += buf.length;
+          if (!stream.write(buf) && pendingBytes >= 16777216) {
             await this.drainPromise;
             pendingBytes = 0;
           }
@@ -246,8 +246,7 @@ export class CaptureLoop {
                 nextCapturePromise = domBeginFrame!((i + 1) * timeStep);
               }
 
-              domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
-              const buf = domLastFrameBuffer!;
+              const buf = Buffer.from(rawResult as string, "base64");
 
               pendingBytes += buf.length;
               if (!stream.write(buf) && pendingBytes >= 16777216) {
@@ -313,10 +312,10 @@ export class CaptureLoop {
             try {
               const rawResult = await nextCapturePromise;
 
-              domLastFrameBuffer = Buffer.from(rawResult as string, "base64");
+              const buf = Buffer.from(rawResult as string, "base64");
 
-              pendingBytes += domLastFrameBuffer!.length;
-              if (!stream.write(domLastFrameBuffer!) && pendingBytes >= 16777216) {
+              pendingBytes += buf.length;
+              if (!stream.write(buf) && pendingBytes >= 16777216) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -456,8 +455,6 @@ export class CaptureLoop {
         const { timeDriver, strategy, page } = worker;
         const isDomStrategy = !!(strategy as any).beginFrameParams;
 
-        let domLastFrameBuffer: Buffer | null = null;
-
         while (nextFrameToSubmit !== totalFrames && !aborted) {
           let i: number;
           if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
@@ -478,7 +475,6 @@ export class CaptureLoop {
             if (isDomStrategy) {
               const rawResult = await strategy.capture(page, i * timeStep);
               let buf: Buffer = Buffer.from(rawResult as string, "base64");
-              domLastFrameBuffer = buf;
               frameBufferRing[i & ringMask] = buf;
             } else {
               frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);

@@ -9,6 +9,10 @@ Last updated by: PERF-1118
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **PERF-1135**: Removed `domLastFrameBuffer` unused caching variable in single-worker and multi-worker paths in `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST logic and minor GC overhead by allocating the base64 Buffer locally instead of mutating a module-level variable that is no longer used for next-frame logic.
+  - **Plan ID:** PERF-1135
+
 - Simplify `DomStrategy.capture()` return type to avoid object mutation and hidden class deoptimization (~0.8% faster) - PERF-1118
 - **PERF-1116**: Inlined redundant `buf` variables in single-worker capture loops of `CaptureLoop.ts`.
   - **Improvement:** Minor AST simplifications in hot loop paths with negligible wall-clock difference (~8.685s). Structurally sound and preserved functional correctness.
