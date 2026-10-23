@@ -1,7 +1,7 @@
 ---
 id: PERF-1127
 slug: precalculate-single-worker-limits
-status: unclaimed
+status: discarded
 claimed_by: ""
 created: 2024-10-22
 completed: ""
