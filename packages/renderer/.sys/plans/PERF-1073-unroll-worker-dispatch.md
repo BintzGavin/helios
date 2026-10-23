@@ -64,29 +64,20 @@ In the `checkState()` function, locate the dispatch block:
 ```typescript
         // See if we can assign tasks to waiting workers
         if (freeWorkersHead !== 0) {
-                  const limit = nextFrameToWrite + maxPipelineDepth;
-                  let dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
-                  if (dispatches > 0) {
-                    dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
-                    let h = freeWorkersHead;
-                    let n = nextFrameToSubmit;
-                    for (let d = 0; d < dispatches; d++) {
-                      h--;
-                      const w = freeWorkers[h];
-                      frameBufferRing[n & ringMask] = null;
-                      workerThenables[w].resolve(n);
-                      n++;
-                    }
-                    freeWorkersHead = h;
-                    nextFrameToSubmit = n;
+                  let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+                  let h = freeWorkersHead;
+                  let n = nextFrameToSubmit;
+                  for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
+                    h--;
+                    workerThenables[freeWorkers[h]].resolve(n);
+                    n++;
                   }
 ```
 Replace it with:
 ```typescript
         // See if we can assign tasks to waiting workers
         if (freeWorkersHead !== 0) {
-                  const limit = nextFrameToWrite + maxPipelineDepth;
-                  const dispatches = (limit < totalFrames ? limit : totalFrames) - nextFrameToSubmit;
+                  let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
                   if (dispatches > 0) {
                     let h = freeWorkersHead;
                     let n = nextFrameToSubmit;
@@ -94,55 +85,46 @@ Replace it with:
                     do {
                       h--;
                       workerThenables[freeWorkers[h]].resolve(n);
-                      frameBufferRing[n & ringMask] = null;
                       n++;
                     } while (h !== targetH);
                     freeWorkersHead = targetH;
                     nextFrameToSubmit = n;
                   }
 ```
-**Why**: Reduces register allocation and loop termination parsing overhead in V8.
-**Risk**: Minimal. `dispatches > 0` and `freeWorkersHead !== 0` guarantee the `do-while` executes at least once and halts safely.
 
 ### Step 2: Optimize worker dispatch loops in multi-worker writer chunk loops
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-Apply the same `do-while` replacement to the two identical instances of this dispatch loop in the multi-worker paths further down the file (inside the `if (isDomStrategyWriter)` block and the `else` block).
+Apply the same `do-while` replacement to the single instance of this dispatch loop in the multi-worker paths further down the file.
 Locate the block:
 ```typescript
-                if (dispatches > 0) {
-                  dispatches = dispatches < freeWorkersHead ? dispatches : freeWorkersHead;
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  for (let d = 0; d < dispatches; d++) {
+            if (freeWorkersHead !== 0) {
+              let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+                let h = freeWorkersHead;
+                let n = nextFrameToSubmit;
+                for (let d = 0, bound = dispatches < h ? dispatches : h; d < bound; d++) {
                     h--;
-                    const w = freeWorkers[h];
-                    frameBufferRing[n & ringMask] = null;
-                    workerThenables[w].resolve(n);
+                    workerThenables[freeWorkers[h]].resolve(n);
                     n++;
                   }
-                  freeWorkersHead = h;
-                  nextFrameToSubmit = n;
-                }
 ```
 And replace it with:
 ```typescript
-                if (dispatches > 0) {
-                  let h = freeWorkersHead;
-                  let n = nextFrameToSubmit;
-                  const targetH = h - (dispatches < h ? dispatches : h);
-                  do {
-                    h--;
-                    workerThenables[freeWorkers[h]].resolve(n);
-                    frameBufferRing[n & ringMask] = null;
-                    n++;
-                  } while (h !== targetH);
-                  freeWorkersHead = targetH;
-                  nextFrameToSubmit = n;
-                }
+            if (freeWorkersHead !== 0) {
+              let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+              if (dispatches > 0) {
+                let h = freeWorkersHead;
+                let n = nextFrameToSubmit;
+                const targetH = h - (dispatches < h ? dispatches : h);
+                do {
+                  h--;
+                  workerThenables[freeWorkers[h]].resolve(n);
+                  n++;
+                } while (h !== targetH);
+                freeWorkersHead = targetH;
+                nextFrameToSubmit = n;
+              }
 ```
-*Note: Also modify `let dispatches` to `const dispatches` where it's declared on the line before the `if` block in both locations.*
-**Why**: Ensures consistency and optimizations across both rendering modes (dom and canvas).
 
 ## Canvas Smoke Test
 Run `npm run test -w packages/renderer` or locally generate a video via canvas to verify frame progression correctly manages dispatches to completion.
@@ -150,5 +132,3 @@ Run `npm run test -w packages/renderer` or locally generate a video via canvas t
 ## Correctness Check
 Check that generated DOM output videos render the complete timeline to the end. Since the bounds computation `(dispatches < h ? dispatches : h)` precisely matches `Math.min(dispatches, h)`, logic is functionally equivalent.
 
-## Prior Art
-PERF-931 hoisted the free worker limit checks, PERF-929 hoisted loop induction variables, and PERF-1064 eliminated mutating limits. This plan optimizes the raw execution branch structures for V8 based on those successes.

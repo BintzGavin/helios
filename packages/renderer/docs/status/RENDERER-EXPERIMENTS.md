@@ -3,6 +3,10 @@ Current best: 2.573s (baseline was 13.003s, -80.2%)
 Last updated by: PERF-823
 
 ## What Works
+- [PERF-1073] Unrolled worker dispatch loops into a do-while and avoided explicit array reassignment with w in CaptureLoop.ts checkState and multi-worker loops.
+  - **Improvement:** Decreased benchmark runtimes marginally due to V8 TurboFan branch elimination.
+  - **Plan ID:** PERF-1073
+
 - [PERF-936] Replaced inline conditional `chunkEnd` boundary calculations with `Math.min()` in `CaptureLoop.ts` single and multi-worker fast paths.
   - **Improvement:** ~59% reduction in loop boundary evaluation time (from ~65.96ms to ~26.86ms for 10M iterations). V8 converts `Math.min` into a branchless conditional move, eliminating branch prediction penalties for chunk boundary logic.
   - **Plan ID:** PERF-936
