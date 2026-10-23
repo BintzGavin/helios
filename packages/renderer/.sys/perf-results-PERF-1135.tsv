@@ -1,0 +1,4 @@
+run\trender_time_s\tframes\tfps_effective\tpeak_mem_mb\tstatus\tdescription
+1	8.692	150	17.26	64.4	keep	Removed domLastFrameBuffer
+2	8.687	150	17.27	64.2	keep	Removed domLastFrameBuffer
+3	8.678	150	17.28	64.4	keep	Removed domLastFrameBuffer
