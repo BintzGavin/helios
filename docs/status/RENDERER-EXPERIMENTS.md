@@ -284,6 +284,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1131**: Removed redundant `if (!aborted)` check around `strategy.capture` in single-worker chunk loops.
+  - **WHY it didn't work**: While microbenchmarks showed speedup for pure loop execution, macro benchmarks in Node 22 showed effectively equivalent performance metrics on average because V8 is already optimizing the block efficiently. As there was no significant improvement, the experiment was discarded to avoid churn.
+  - **Plan ID**: PERF-1131
 - **PERF-1114**: Replaced `captureScreenshot` with `startScreencast`.
   - **WHY it didn't work**: While much faster on paper, it breaks the core renderer contract of frame-accurate deterministic rendering. Screencasts only emit frames when the compositor registers damage, meaning static scenes or paused animations will hang the `capture()` queue indefinitely. Furthermore, the push-based nature breaks timeline synchronization. Reverted to request-response model.
   - **Plan ID**: PERF-1114

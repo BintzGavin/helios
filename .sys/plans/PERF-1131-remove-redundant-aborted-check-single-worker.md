@@ -1,11 +1,11 @@
 ---
 id: PERF-1131
 slug: single-worker-remove-aborted-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-24
-completed: ""
-result: ""
+completed: "2024-10-24"
+result: "no-improvement"
 ---
 
 # PERF-1131: Remove redundant `if (!aborted)` check around `nextCapturePromise = strategy.capture(...)` inside single-worker chunk loops
