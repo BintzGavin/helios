@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "formats": ["promo", "explainer", "demo", "testimonial", "launch", "social"],
   "note": "Staging choices rolled after the format is locked. They work with an original look or, when the user asked for one, a motion-styles card: if the card bans a pick, re-roll that axis with --lock to an option the card allows.",
   "axes": [
@@ -24,7 +24,7 @@
       "options": [
         { "id": "cold-detail", "label": "Cold open on a detail", "brief": "First frame is an extreme close-up whose meaning arrives later." },
         { "id": "flash-forward", "label": "Flash-forward", "brief": "Open on a glimpse of the final result, then rewind." },
-        { "id": "title-first", "label": "Title first", "brief": "The headline is the first image, built in the style's own way." },
+        { "id": "title-first", "label": "Title first", "brief": "The headline is the first image, built in the look's own way." },
         { "id": "mid-motion", "label": "Mid-motion", "brief": "Frame zero is already moving, as if we cut in late." },
         { "id": "on-screen-question", "label": "Question on screen", "brief": "A short question or provocation in the first beat." },
         { "id": "in-use", "label": "Product in use", "brief": "The product is already doing its job in the first frame." }
@@ -39,14 +39,14 @@
         { "id": "hold-cta", "label": "Hold on the CTA", "brief": "Settle and hold still on the CTA for a full beat." },
         { "id": "echo", "label": "Echo the opening", "brief": "Repeat the opening composition with one telling change." },
         { "id": "hit-cut", "label": "Cut on the final hit", "brief": "Hard cut to the brand mark on the last hit of the music, or on the last beat of the timing grid without music." },
-        { "id": "becomes-logo", "label": "Becomes the logo", "brief": "A recurring element turns into the logo." }
+        { "id": "becomes-logo", "label": "Becomes the logo", "brief": "A recurring element turns into the logo (or the wordmark, if there's no logo)." }
       ]
     },
     {
       "id": "peak",
       "label": "Peak position",
       "options": [
-        { "id": "p60", "label": "60%", "brief": "Peak (the card's native move) at about 60% of the runtime." },
+        { "id": "p60", "label": "60%", "brief": "The peak moment at about 60% of the runtime (a style card's native move, if you use a card)." },
         { "id": "p75", "label": "75%", "brief": "Peak at about 75%." },
         { "id": "p90", "label": "90%", "brief": "Peak late, at about 90%, straight into the ending." },
         { "id": "double", "label": "Double peak", "brief": "A smaller peak near 40% and the main one near 80%." }
@@ -58,9 +58,29 @@
       "options": [
         { "id": "brand-literal", "label": "Brand literal", "brief": "Brand colours as specified, primary dominant." },
         { "id": "restraint", "label": "Restraint", "brief": "Neutrals plus one brand colour; the accent appears only at the peak." },
-        { "id": "tonal", "label": "Tonal", "brief": "One brand hue across many lightness steps; contrast from value, not hue." },
-        { "id": "inverted", "label": "Inverted ground", "brief": "Swap the brand's usual ground: light brands go dark, dark brands go light." },
+        { "id": "tonal", "label": "Tonal", "brief": "One brand hue across many lightness steps fills most of the frame; other brand colours appear only as small accents." },
         { "id": "color-fields", "label": "Colour fields", "brief": "Each scene owns one flat brand colour; scenes change by swapping fields. A field in the accent colour is that scene's accent use." }
+      ]
+    },
+    {
+      "id": "ground",
+      "label": "Ground",
+      "options": [
+        { "id": "light", "label": "Light", "brief": "The brand's lightest colour (or white or paper) as the ground.", "conflicts": ["palette:color-fields"] },
+        { "id": "dark", "label": "Dark", "brief": "The brand's darkest colour as the ground; not black unless the brand is.", "conflicts": ["palette:color-fields"] },
+        { "id": "brand-colour", "label": "Brand colour", "brief": "A saturated brand colour floods the frame as the ground.", "conflicts": ["palette:color-fields"] },
+        { "id": "per-scene", "label": "Changes per scene", "brief": "The ground changes between light, dark and colour as the story moves." }
+      ]
+    },
+    {
+      "id": "scale",
+      "label": "Scale",
+      "options": [
+        { "id": "huge", "label": "Huge", "brief": "Few elements, each enormous; type and objects crop at the frame edge." },
+        { "id": "dense", "label": "Dense", "brief": "Packed with detail; many small parts that reward a pause." },
+        { "id": "one-object", "label": "One object", "brief": "One object fills the frame; the camera stays close to it." },
+        { "id": "small-in-space", "label": "Small in space", "brief": "Small elements in a large empty frame; the emptiness is the point." },
+        { "id": "mixed", "label": "Mixed", "brief": "Cuts between extreme close-ups and very wide views." }
       ]
     },
     {
@@ -107,7 +127,7 @@
         { "id": "per-line", "label": "Per line", "brief": "Whole lines arrive together." },
         { "id": "mask", "label": "Mask reveal", "brief": "Elements rise from behind a mask or baseline." },
         { "id": "draw-on", "label": "Draw on", "brief": "Strokes draw before fills appear." },
-        { "id": "scale", "label": "Scale from a point", "brief": "Elements grow from a point in the style's easing." },
+        { "id": "scale", "label": "Scale from a point", "brief": "Elements grow from a point in the video's easing." },
         { "id": "edge-slide", "label": "From the edge", "brief": "Elements enter from the nearest frame edge." },
         { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style, 30–60 ms apart; keep these strings short." },
         { "id": "scatter", "label": "Seeded scatter", "brief": "Pieces arrive in a seeded order and settle into place." }
@@ -117,7 +137,7 @@
       "id": "accent",
       "label": "Accent device",
       "options": [
-        { "id": "annotations", "label": "Annotations", "brief": "Circles, arrows and notes drawn in the style's hand." },
+        { "id": "annotations", "label": "Annotations", "brief": "Circles, arrows and notes drawn in the look's own hand." },
         { "id": "numbered", "label": "Numbered markers", "brief": "Indices such as 01/04 track progress." },
         { "id": "crop-marks", "label": "Crop marks", "brief": "Brackets or registration marks frame the hero." },
         { "id": "cursor", "label": "Cursor", "brief": "A pointer acts as the narrator." },
