@@ -78,6 +78,7 @@ npx skills add BintzGavin/helios/skills/studio
 - [**skills/workflows/create-composition**](./workflows/create-composition) - Workflow for creating a new Helios composition.
 - [**skills/workflows/render-video**](./workflows/render-video) - Workflow for rendering compositions to video.
 - [**skills/workflows/visualize-data**](./workflows/visualize-data) - Workflow for data visualization animations.
+- [**skills/workflows/archive-broll**](./workflows/archive-broll) - Find, preview, cut and credit public-domain and Creative Commons B-roll from the Internet Archive.
 
 ### Design
 
@@ -87,15 +88,10 @@ npx skills add BintzGavin/helios/skills/studio
 
 ### Guided Video Creation
 
-End-to-end guided workflows for creating specific video types. Each skill extracts brand identity from your repo, generates beat-synced music, and produces a rendered video.
+**brand-video** extracts brand identity from your repo or site, picks a motion style that fits, randomizes the rest, adds optional beat-synced music and archive B-roll, and produces a rendered video.
 
-- [**skills/guided/motion-design-rules**](./guided/motion-design-rules) - Motion design framework: anti-slideshow architecture, visual layering, physics-based easing, choreography, and quality validation.
-- [**skills/guided/promo-video**](./guided/promo-video) - Promotional / hype video. High energy, beat-synced, CTA-driven.
-- [**skills/guided/explainer-video**](./guided/explainer-video) - Explainer / walkthrough video. Narrative arc, section headers, measured pacing.
-- [**skills/guided/product-demo**](./guided/product-demo) - Product demo / showcase. Feature callouts, UI zoom-ins, progressive reveals.
-- [**skills/guided/testimonial-video**](./guided/testimonial-video) - Social proof / testimonial video. Quote typography, customer branding, trust signals.
-- [**skills/guided/launch-announcement**](./guided/launch-announcement) - Product launch / release announcement. Countdown motifs, dramatic reveal.
-- [**skills/guided/social-clip**](./guided/social-clip) - Short-form social clip (Reels/TikTok/Shorts). Vertical 9:16, punchy, loop-friendly.
+- [**skills/guided/motion-design-rules**](./guided/motion-design-rules) - Motion design framework that holds in any style: anti-slideshow architecture, depth, one easing personality, choreography, transitions, timing to sound, and scripted checks. Style cards override it.
+- [**skills/guided/brand-video**](./guided/brand-video) - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, picks the best-fitting motion style, then randomizes everything they leave open so videos don't repeat. Optional beat-synced music and Internet Archive B-roll.
 
 These guided skills use the `renderAt(t)` page contract from **make-video** and need no brand extraction or API keys. Each draws a random seed before making creative choices (using an **apply-randomness** skill if one is installed), so repeated requests don't converge on the same film:
 

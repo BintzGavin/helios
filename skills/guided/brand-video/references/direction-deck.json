@@ -1,0 +1,154 @@
+{
+  "version": 2,
+  "formats": ["promo", "explainer", "demo", "testimonial", "launch", "social"],
+  "note": "Rolled after the format and the motion style are locked. Every pick works inside the style card: if the card bans a pick, re-roll that axis with --lock to an option the card allows.",
+  "axes": [
+    {
+      "id": "structure",
+      "label": "Story structure",
+      "options": [
+        { "id": "problem-solution", "label": "Problem to solution", "brief": "Show the pain, then the product removing it." },
+        { "id": "before-after", "label": "Before and after", "brief": "The same frame or place shown twice, changed by the product." },
+        { "id": "countdown", "label": "Countdown or list", "brief": "Numbered beats build to the last, biggest one." },
+        { "id": "one-shot", "label": "One continuous shot", "brief": "No cuts: one camera path visits every idea." },
+        { "id": "question-answer", "label": "Question and answer", "brief": "Open on a question; every scene is part of the answer." },
+        { "id": "zoom-out", "label": "Detail to whole", "brief": "Start on a tiny detail and pull back until the whole product or world is visible." },
+        { "id": "zoom-in", "label": "Whole to detail", "brief": "Start wide and dive into the one detail that matters." },
+        { "id": "journey", "label": "Journey", "brief": "Follow one user, object or data point from start to finish." },
+        { "id": "aba", "label": "A-B-A return", "brief": "The opening image returns at the end, transformed." }
+      ]
+    },
+    {
+      "id": "opening",
+      "label": "Opening",
+      "options": [
+        { "id": "cold-detail", "label": "Cold open on a detail", "brief": "First frame is an extreme close-up whose meaning arrives later." },
+        { "id": "flash-forward", "label": "Flash-forward", "brief": "Open on a glimpse of the final result, then rewind." },
+        { "id": "title-first", "label": "Title first", "brief": "The headline is the first image, built in the style's own way." },
+        { "id": "mid-motion", "label": "Mid-motion", "brief": "Frame zero is already moving, as if we cut in late." },
+        { "id": "on-screen-question", "label": "Question on screen", "brief": "A short question or provocation in the first beat." },
+        { "id": "in-use", "label": "Product in use", "brief": "The product is already doing its job in the first frame." }
+      ]
+    },
+    {
+      "id": "ending",
+      "label": "Ending",
+      "options": [
+        { "id": "loop", "label": "Loop", "brief": "The last frame matches the first so the video loops." },
+        { "id": "pull-back", "label": "Pull back", "brief": "Pull back to reveal everything at once, CTA inside the wide shot." },
+        { "id": "hold-cta", "label": "Hold on the CTA", "brief": "Settle and hold still on the CTA for a full beat." },
+        { "id": "echo", "label": "Echo the opening", "brief": "Repeat the opening composition with one telling change." },
+        { "id": "hit-cut", "label": "Cut on the final hit", "brief": "Hard cut to the brand mark on the last hit of the music." },
+        { "id": "becomes-logo", "label": "Becomes the logo", "brief": "A recurring element turns into the logo." }
+      ]
+    },
+    {
+      "id": "peak",
+      "label": "Peak position",
+      "options": [
+        { "id": "p60", "label": "60%", "brief": "Peak (the card's native move) at about 60% of the runtime." },
+        { "id": "p75", "label": "75%", "brief": "Peak at about 75%." },
+        { "id": "p90", "label": "90%", "brief": "Peak late, at about 90%, straight into the ending." },
+        { "id": "double", "label": "Double peak", "brief": "A smaller peak near 40% and the main one near 80%." }
+      ]
+    },
+    {
+      "id": "palette",
+      "label": "Palette variant",
+      "options": [
+        { "id": "card-base", "label": "Card base set", "brief": "The card's primary colour set, with brand colour only on the reserved accent." },
+        { "id": "card-alt", "label": "Card alternative set", "brief": "The card's alternative colour set, or a sibling set that obeys the same rules." },
+        { "id": "brand-mapped", "label": "Brand mapped", "brief": "Brand colours mapped onto the card's colour roles, keeping its count and rules." },
+        { "id": "restraint", "label": "Restraint", "brief": "The fewest colours the card allows; the accent appears once, at the peak." }
+      ]
+    },
+    {
+      "id": "camera",
+      "label": "Camera path",
+      "options": [
+        { "id": "locked", "label": "Locked off", "brief": "The camera never moves; only elements move." },
+        { "id": "push-in", "label": "Slow push-in", "brief": "One slow push across the whole video." },
+        { "id": "track", "label": "Lateral track", "brief": "The camera travels sideways across a wide world." },
+        { "id": "zoom-through", "label": "Zoom through", "brief": "Each scene ends by entering an element that becomes the next scene." },
+        { "id": "fixed-framings", "label": "Cuts between fixed framings", "brief": "Wide, medium and close framings, changed by cuts on beats." },
+        { "id": "tilt", "label": "Tilt or orbit", "brief": "Perspective tilt or a slight orbit on flat layers." }
+      ]
+    },
+    {
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "id": "centered", "label": "Centered", "brief": "Symmetric compositions." },
+        { "id": "thirds", "label": "Asymmetric thirds", "brief": "Hero on a third line, counterweight opposite." },
+        { "id": "split", "label": "Split", "brief": "The frame is divided; halves compare or trade content." },
+        { "id": "cells", "label": "Modular cells", "brief": "Cells that open, merge and re-tile between scenes." },
+        { "id": "edge-anchored", "label": "Edge anchored", "brief": "Content pinned to edges and corners; the centre stays open." },
+        { "id": "long-canvas", "label": "One long canvas", "brief": "All scenes live on one big canvas the camera visits." },
+        { "id": "frame-in-frame", "label": "Frame within frame", "brief": "Everything happens inside a device, window, page or card that itself moves." }
+      ]
+    },
+    {
+      "id": "rhythm",
+      "label": "Pacing",
+      "options": [
+        { "id": "even", "label": "Even", "brief": "Equal scene lengths on the beat grid." },
+        { "id": "accelerating", "label": "Accelerating", "brief": "Scenes get shorter toward the peak." },
+        { "id": "decelerating", "label": "Decelerating", "brief": "Fast start, then longer and longer holds." },
+        { "id": "hold-burst", "label": "Hold then burst", "brief": "A long held moment, then a quick run of shots." },
+        { "id": "call-response", "label": "Call and response", "brief": "Two alternating framings or voices trade scenes." }
+      ]
+    },
+    {
+      "id": "entrance",
+      "label": "Entrance emphasis",
+      "options": [
+        { "id": "per-letter", "label": "Per letter", "brief": "Letters arrive one at a time." },
+        { "id": "per-line", "label": "Per line", "brief": "Whole lines arrive together." },
+        { "id": "mask", "label": "Mask reveal", "brief": "Elements rise from behind a mask or baseline." },
+        { "id": "draw-on", "label": "Draw on", "brief": "Strokes draw before fills appear." },
+        { "id": "scale", "label": "Scale from a point", "brief": "Elements grow from a point in the style's easing." },
+        { "id": "edge-slide", "label": "From the edge", "brief": "Elements enter from the nearest frame edge." },
+        { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style." },
+        { "id": "scatter", "label": "Seeded scatter", "brief": "Pieces arrive in a seeded order and settle into place." }
+      ]
+    },
+    {
+      "id": "accent",
+      "label": "Accent device",
+      "options": [
+        { "id": "annotations", "label": "Annotations", "brief": "Circles, arrows and notes drawn in the style's hand." },
+        { "id": "numbered", "label": "Numbered markers", "brief": "Indices such as 01/04 track progress." },
+        { "id": "crop-marks", "label": "Crop marks", "brief": "Brackets or registration marks frame the hero." },
+        { "id": "cursor", "label": "Cursor", "brief": "A pointer acts as the narrator." },
+        { "id": "redaction", "label": "Redaction", "brief": "Bars cover words and pull away to reveal them." },
+        { "id": "timecode", "label": "Timecode", "brief": "A running counter sits in a corner." },
+        { "id": "none", "label": "None", "brief": "No accent device; restraint is the voice." }
+      ]
+    },
+    {
+      "id": "broll",
+      "label": "Footage role",
+      "options": [
+        { "id": "none", "label": "None", "brief": "No footage." },
+        { "id": "plate", "label": "Background plate", "brief": "Footage graded into the style behind the content.", "needs": "broll" },
+        { "id": "cutaways", "label": "Cutaways", "brief": "Short footage shots between beats.", "needs": "broll" },
+        { "id": "masked", "label": "Masked", "brief": "Footage plays inside type, shapes or cells.", "needs": "broll" },
+        { "id": "contrast", "label": "Old versus new", "brief": "Archival footage of the old way set against the product.", "needs": "broll" },
+        { "id": "texture", "label": "Texture", "brief": "Footage at low opacity as a living texture.", "needs": "broll" }
+      ]
+    },
+    {
+      "id": "wildcard",
+      "label": "Rule to break",
+      "options": [
+        { "id": "still-scene", "label": "Still scene", "brief": "One scene holds completely still for a full beat." },
+        { "id": "no-ambient", "label": "No ambient motion", "brief": "Remove background drift; negative space only." },
+        { "id": "logo-last", "label": "Logo last", "brief": "The logo appears only in the final frame." },
+        { "id": "one-edge", "label": "One edge", "brief": "Every element enters from the same edge." },
+        { "id": "traveling-shape", "label": "Traveling shape", "brief": "One shape travels through every scene and becomes the CTA." },
+        { "id": "break-grid", "label": "Break the grid once", "brief": "Exactly one scene breaks the layout on purpose." },
+        { "id": "none", "label": "None", "brief": "No rule broken." }
+      ]
+    }
+  ]
+}

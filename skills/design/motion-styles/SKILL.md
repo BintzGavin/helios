@@ -1,6 +1,6 @@
 ---
 name: motion-styles
-description: "Opt-in library of established visual styles for code-drawn Helios videos: style cards (colour rules, type, motion grammar, a checkable signature list, the core rendering trick) with tested renderAt(t) demo pages, plus finishing passes and time tricks. Load it only when the user names a specific established style or medium they want reproduced (a print process, a retro screen look, a design movement), or asks to see Helios's style options. Do not load it to choose a look for a video request that names no style: design an original look instead, and at most offer this library."
+description: "Opt-in library of established visual styles for code-drawn Helios videos: style cards (colour rules, type, motion grammar, a checkable signature list, the core rendering trick) with tested renderAt(t) demo pages, plus finishing passes and time tricks. Load it when the user names a specific established style or medium they want reproduced (a print process, a retro screen look, a design movement), asks to see Helios's style options, or when guided/brand-video sends you here to pick a style. Otherwise do not load it to choose a look for a request that names no style: design an original look instead, and at most offer this library."
 ---
 
 # Motion styles
@@ -19,6 +19,7 @@ This library is a set of known answers, and known answers pull everything toward
 | Asks for style options, or says "surprise me with a known look" | Read [references/catalog.md](references/catalog.md) and offer at most three styles chosen with a seed, plus one original direction. Build only what they pick. |
 | Names no style | Don't use this library. Design an original look from the brief and a random seed (the make-video skill describes how). You may offer once, in one line, that a known style from this library is available. Load it only if they say yes. |
 | Gives a brand or design system | Follow the brand. A card can lend a technique (a halftone, a grain, a draw-on) only if the user asks for that treatment. |
+| Comes through [guided/brand-video](../../guided/brand-video/SKILL.md) | That skill shortlists the styles that fit the format, subject and brand, lets a seed pick one while skipping the styles recent videos used, maps the brand's colours into the card's colour rules, and then randomizes what the card leaves free. Follow it; this table's other rows don't apply. |
 
 Never copy a demo's composition. Demos show how a technique is built; the video should come from the user's subject.
 

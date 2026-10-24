@@ -28,6 +28,7 @@ npx skills add BintzGavin/helios/skills/studio
 npx skills add BintzGavin/helios/skills/workflows/create-composition
 npx skills add BintzGavin/helios/skills/workflows/render-video
 npx skills add BintzGavin/helios/skills/workflows/visualize-data
+npx skills add BintzGavin/helios/skills/workflows/archive-broll
 
 # Design / motion
 npx skills add BintzGavin/helios/skills/design/animated-video-philosophy
@@ -36,12 +37,7 @@ npx skills add BintzGavin/helios/skills/design/motion-styles
 
 # Guided video creation
 npx skills add BintzGavin/helios/skills/guided/motion-design-rules
-npx skills add BintzGavin/helios/skills/guided/promo-video
-npx skills add BintzGavin/helios/skills/guided/explainer-video
-npx skills add BintzGavin/helios/skills/guided/product-demo
-npx skills add BintzGavin/helios/skills/guided/testimonial-video
-npx skills add BintzGavin/helios/skills/guided/launch-announcement
-npx skills add BintzGavin/helios/skills/guided/social-clip
+npx skills add BintzGavin/helios/skills/guided/brand-video
 npx skills add BintzGavin/helios/skills/guided/cartoon-short
 npx skills add BintzGavin/helios/skills/guided/music-video
 npx skills add BintzGavin/helios/skills/guided/video-recipes
@@ -79,6 +75,7 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 - **skills/workflows/create-composition** - Workflow for creating a new Helios composition.
 - **skills/workflows/render-video** - Workflow for rendering compositions to video.
 - **skills/workflows/visualize-data** - Workflow for data visualization animations.
+- **skills/workflows/archive-broll** - Find, preview, cut and credit public-domain and Creative Commons B-roll from the Internet Archive.
 
 ### Design Skills
 
@@ -88,13 +85,8 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 
 ### Guided Video Creation Skills
 
-- **skills/guided/motion-design-rules** - Motion design framework: anti-slideshow architecture, visual layering, physics-based easing, choreography, and quality validation. Referenced by all guided video skills.
-- **skills/guided/promo-video** - End-to-end promotional / hype video. High energy, beat-synced, CTA-driven.
-- **skills/guided/explainer-video** - Explainer / walkthrough video. Narrative arc, section headers, measured pacing.
-- **skills/guided/product-demo** - Product demo / showcase. Feature callouts, UI zoom-ins, progressive reveals.
-- **skills/guided/testimonial-video** - Social proof / testimonial video. Quote typography, customer branding, trust signals.
-- **skills/guided/launch-announcement** - Product launch / release announcement. Countdown motifs, dramatic reveal.
-- **skills/guided/social-clip** - Short-form social clip (Reels/TikTok/Shorts). Vertical 9:16, punchy, loop-friendly.
+- **skills/guided/motion-design-rules** - Motion design framework that holds in any style: anti-slideshow architecture, depth, one easing personality, choreography, transitions, timing to sound, and scripted checks. Style cards override it. Referenced by all guided video skills.
+- **skills/guided/brand-video** - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, picks the best-fitting motion style, then randomizes everything they leave open so videos don't repeat. Optional beat-synced music and Internet Archive B-roll.
 - **skills/guided/cartoon-short** - Hand-drawn cartoon short: a character rig you design, acted emotion changes, boiling ink-and-paint linework, storyboarding by reads. Includes a tested starter page.
 - **skills/guided/music-video** - Lyric and karaoke music video: word timings by forced alignment, treatment and section storyboard, a timeline derived from lyrics and beats, karaoke recipes. Includes a tested karaoke page.
 - **skills/guided/video-recipes** - Opt-in genre recipes with tested demos (scale dive, process explainer, era timeline, mechanism/proof, kinetic type, UI morph loop, pixel sprite), plus the video brief template and a gotcha list. Load only when the request is one of these genres.
