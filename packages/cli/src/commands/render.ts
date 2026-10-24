@@ -6,6 +6,7 @@ import { RenderOrchestrator, DistributedRenderOptions, RendererOptions, probeCom
 import type { CompositionInfo } from '@helios-project/renderer';
 import { JobSpec, RenderJobChunk } from '../types/job.js';
 import { DEFAULT_FPS, DEFAULT_HEIGHT, DEFAULT_WIDTH, isUrl, parsePositive, withCompositionUrl } from '../utils/render-options.js';
+import { detectPortableInput, rejectPortableOnlyFlags, renderPortable } from '../utils/portable-render.js';
 
 const X264_PRESETS = ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow', 'slower', 'veryslow', 'placebo'];
 
@@ -51,7 +52,16 @@ function rendererOptionsToFlags(options: RendererOptions): string {
 export function registerRenderCommand(program: Command) {
   program
     .command('render <input>')
-    .description('Render a composition to video')
+    .description('Render a composition to video. HTML pages and URLs render in Chromium; Canvas modules (.mjs) and portable-v1 plans (.json) render without a browser')
+    .addHelpText('after', `
+Rendering without a browser:
+  A Canvas module is an ES module whose default export is
+  { width, height, fps: { num, den }, frameCount, draw(ctx, frame) }. Name it .mjs, or .js
+  (a .js file renders this way only when its default export has draw()). It draws on native
+  CPU Skia. A .json file whose "version" is "portable-v1" renders as a portable plan.
+  Neither needs Chromium. They take -o, --start-frame, --frame-count and, for Canvas modules,
+  --concurrency, --quality and --preset; plans also take --rasterizer and --assets.
+  Browser-only flags (--mode, --gpu, --width, --audio, --emit-job, ...) are rejected.`)
     .option('-o, --output <path>', 'Output file path', 'output.mp4')
     .option('--width <number>', `Viewport width (default: the composition's, else ${DEFAULT_WIDTH})`)
     .option('--height <number>', `Viewport height (default: the composition's, else ${DEFAULT_HEIGHT})`)
@@ -73,8 +83,17 @@ export function registerRenderCommand(program: Command) {
     .option('--audio-codec <codec>', 'Audio codec (e.g., aac, pcm_s16le)')
     .option('--video-codec <codec>', 'Video codec (e.g., libx264, libvpx)')
     .option('--no-serve', 'Load a local page from file:// instead of serving it over http')
-    .action(async (input, options) => {
+    .option('--rasterizer <name>', 'portable-v1 plans only: resvg (default), skia or wasm')
+    .option('--assets <dir>', "portable-v1 plans only: folder of asset files named by SHA-256 (default: the plan's folder)")
+    .action(async (input, options, command: Command) => {
       try {
+        const portable = await detectPortableInput(input);
+        if (portable) {
+          await renderPortable(portable, options, command, (value) => parsePreset(value, undefined));
+          return;
+        }
+        rejectPortableOnlyFlags(command);
+
         // Local pages are served over http so they can fetch() files next to them. A job
         // spec only plans the render, so it keeps the file path.
         await withCompositionUrl(input, options.serve !== false && !options.emitJob, async (url) => {
