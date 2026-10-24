@@ -166,12 +166,13 @@ Lessons from a production that drew its motion layer with a renderer shaped like
 ## Packaging
 *Three npm packages at one version: `cli`, `core`, `infrastructure`. Design and slices: [`docs/rfcs/2026-10-24-npm-packaging.md`](rfcs/2026-10-24-npm-packaging.md).*
 
-- [ ] **INFRASTRUCTURE**: Root `build` includes `packages/infrastructure`, which the CLI imports.
-- [ ] **CLI**: Read the CLI version from its `package.json` instead of a hardcoded string.
-- [ ] **INFRASTRUCTURE**: `scripts/release.mjs` sets versions and exact internal pins, does a clean build, checks every tarball's entry points, and publishes only with `--publish`.
-- [ ] **CLI**: Load `@helios-project/infrastructure` only in `helios job`; make it an optional peer dependency.
-- [ ] **STUDIO**: List only runtime imports as dependencies; UI frameworks and internal packages become dev dependencies.
-- [ ] **CLI**: Bundle the renderer into the CLI and export it at `@helios-project/cli/renderer` with types.
+- [x] **INFRASTRUCTURE**: Root `build` includes `packages/infrastructure`, which the CLI imports.
+- [x] **CLI**: Read the CLI version from its `package.json` instead of a hardcoded string.
+- [x] **INFRASTRUCTURE**: `scripts/release.mjs` sets versions and exact internal pins, does a clean build, checks every tarball's entry points, and publishes only with `--publish`.
+- [x] **CLI**: Load `@helios-project/infrastructure` only in `helios job`; make it an optional peer dependency.
+- [x] **STUDIO**: List only runtime imports as dependencies; UI frameworks and internal packages become dev dependencies.
+- [x] **CLI**: Bundle the renderer into the CLI and export it at `@helios-project/cli/renderer` with types.
+- [ ] **STUDIO**: Use the CLI's embedded renderer instead of inlining a second copy in Studio's server bundle.
 - [ ] **CLI**: Ship Studio's UI and server inside the CLI; `helios studio` resolves them relative to itself.
 - [ ] **PLAYER**: Export the player from `@helios-project/core/player`.
 - [ ] **DOCS**: Move skills, plugin, docs site, examples and README to the new import paths.

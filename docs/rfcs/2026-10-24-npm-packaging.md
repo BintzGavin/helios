@@ -1,6 +1,6 @@
 # RFC: Three npm packages, one version
 
-**Status: Slices 1–2 implemented on `claude/wonderful-newton-rspy2w` · 24 October 2026**
+**Status: Slices 1–3 implemented on `claude/wonderful-newton-rspy2w` · 24 October 2026**
 
 **Decision:** Publish three packages instead of six, all at one version, released by one script.
 
@@ -49,15 +49,19 @@ Each slice is a thin path that works end to end and is verified on its own befor
    - `tests/release-contract.test.mjs` checks that every internal dependency names the sibling's exact workspace version.
    - Proves: one command produces a release that builds from a fresh checkout and can't ship a package missing its entry point.
    - Verification: `node scripts/release.mjs --set renderer@1.80.0,cli@0.47.0` on a fresh clone, then the packed CLI renders, verifies, makes a sheet, checks and analyzes in an empty folder.
+   - Result: the release diff is the changed versions, their pins and the lock file. `--publish --dry-run` on the release commit picked renderer 1.80.0, then CLI 0.47.0, and skipped the four versions npm already has.
 2. **Slim install.** *Done on this branch.*
    - `helios job` imports `@helios-project/infrastructure` when it runs, and prints the install command if it's missing. `infrastructure` becomes an optional peer dependency of the CLI.
    - Studio lists only what its server bundle imports at runtime (`@ffmpeg-installer/ffmpeg`, `@modelcontextprotocol/sdk`, `playwright`, `zod`). React, React DOM, Vue, Svelte, Solid, core, player and renderer move to `devDependencies`; the UI is prebuilt into `dist/`.
    - Proves: a local render needs none of the cloud or UI framework packages.
    - Verification: installed size of the packed CLI before and after, and the same smoke test as slice 1, plus `helios studio` serving its UI and `helios job` naming the missing package.
-3. **Renderer inside the CLI.** *Tracer bullet; not started.*
-   - The CLI build bundles `@helios-project/renderer` into its own `dist` and exports it at `@helios-project/cli/renderer`, with types. The CLI no longer depends on the renderer package. Studio's server bundle already inlines the renderer the same way.
+   - Result: **259 MB in 345 packages → 140 MB in 124**, with no cloud SDKs or UI frameworks. Studio serves its UI and API; `helios job` runs once `@helios-project/infrastructure` is installed beside the CLI.
+3. **Renderer inside the CLI.** *Tracer bullet; done on this branch.*
+   - The CLI build copies the renderer's compiled output to `dist/renderer` (`scripts/embed-renderer.js`), points the CLI's compiled imports at it, and exports it at `@helios-project/cli/renderer` with types. CLI source and tests keep importing `@helios-project/renderer` from the workspace, so `packages/renderer` stays the renderer's only source. The CLI no longer depends on the renderer package.
    - Proves: the renderer works from inside another package: browser download, ffmpeg path, Playwright resolution.
    - Verification: the packed CLI has no `@helios-project/renderer` dependency and passes the slice 1 smoke test; a TypeScript file importing `Renderer` from `@helios-project/cli/renderer` type-checks and renders.
+   - Result: installed from the CLI and Studio tarballs alone, no renderer package exists in `node_modules`, and every smoke command passes. `helios mcp` serves the player view with the seek shim built by the embedded renderer. A strict `nodenext` TypeScript project type-checks the import with library checks on and renders through `Renderer`. Undoing the import rewrite makes the same test fail with `Cannot find package '@helios-project/renderer'`.
+   - Learned: Studio's server bundle still inlines its own copy of the renderer, so the CLI install carries two. Slice 4 should point Studio at the CLI's copy.
 4. **Studio inside the CLI.**
    - The CLI build copies Studio's prebuilt UI and server bundle into `dist/studio`, and `helios studio` resolves them relative to itself instead of through `require.resolve('@helios-project/studio/cli')`.
    - Verification: from a clean install, `helios studio` serves the UI and answers one API route.
