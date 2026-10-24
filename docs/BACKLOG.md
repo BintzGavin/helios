@@ -163,6 +163,20 @@ Lessons from a production that drew its motion layer with a renderer shaped like
 - [ ] **RENDERER**: Decide one transfer-curve policy for the main and portable renderers. Portable converts sRGB to the BT.709 transfer curve; the main renderer converts the matrix only, so the same grey encodes differently under the same tags.
 - [ ] **SKILLS**: Retire the `helios-skills` repository: replace its README with a pointer to this repo, then archive it.
 
+## Packaging
+*Three npm packages at one version: `cli`, `core`, `infrastructure`. Design and slices: [`docs/rfcs/2026-10-24-npm-packaging.md`](rfcs/2026-10-24-npm-packaging.md).*
+
+- [ ] **INFRASTRUCTURE**: Root `build` includes `packages/infrastructure`, which the CLI imports.
+- [ ] **CLI**: Read the CLI version from its `package.json` instead of a hardcoded string.
+- [ ] **INFRASTRUCTURE**: `scripts/release.mjs` sets versions and exact internal pins, does a clean build, checks every tarball's entry points, and publishes only with `--publish`.
+- [ ] **CLI**: Load `@helios-project/infrastructure` only in `helios job`; make it an optional peer dependency.
+- [ ] **STUDIO**: List only runtime imports as dependencies; UI frameworks and internal packages become dev dependencies.
+- [ ] **CLI**: Bundle the renderer into the CLI and export it at `@helios-project/cli/renderer` with types.
+- [ ] **CLI**: Ship Studio's UI and server inside the CLI; `helios studio` resolves them relative to itself.
+- [ ] **PLAYER**: Export the player from `@helios-project/core/player`.
+- [ ] **DOCS**: Move skills, plugin, docs site, examples and README to the new import paths.
+- [ ] **Release (human)**: Publish 6.0.0 with `scripts/release.mjs`, shim and deprecate `renderer`, `studio` and `player`.
+
 ## Product Surface (Studio, CLI, Examples)
 *Studio, CLI, and examples are first class product surfaces in V2.*
 
