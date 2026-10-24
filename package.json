@@ -31,7 +31,8 @@
     "build:examples": "vite build -c vite.build-example.config.js",
     "render:canvas-example": "npm run build:examples && npx tsx packages/renderer/scripts/render.ts",
     "verify:e2e": "npx tsx tests/e2e/verify-all.ts",
-    "verify:release": "node --test tests/release-contract.test.mjs"
+    "verify:release": "node --test tests/release-contract.test.mjs tests/release-script.test.mjs",
+    "release": "node scripts/release.mjs"
   },
   "devDependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

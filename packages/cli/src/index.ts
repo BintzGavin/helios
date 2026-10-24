@@ -1,12 +1,16 @@
+import { readFileSync } from 'node:fs';
 import { Command } from 'commander';
 import { registerMcpCommand } from './commands/mcp.js';
+
+// The release script sets the version in package.json; read it rather than repeating it here.
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as { version: string };
 
 const program = new Command();
 
 program
   .name('helios')
   .description('Helios CLI')
-  .version('0.46.0');
+  .version(version);
 
 // AI hosts give `helios mcp` about two seconds to answer before they drop it, and loading the
 // other commands (job, studio, render...) takes ten times longer than the MCP server itself.

@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Command } from 'commander';
+import { readFileSync } from 'node:fs';
+
+const cliPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
 
 // Mock commander
 const mockParse = vi.fn();
@@ -55,7 +58,7 @@ describe('CLI Entry Point (index.ts)', () => {
     expect(Command).toHaveBeenCalled();
     expect(mockName).toHaveBeenCalledWith('helios');
     expect(mockDescription).toHaveBeenCalledWith('Helios CLI');
-    expect(mockVersion).toHaveBeenCalledWith('0.46.0');
+    expect(mockVersion).toHaveBeenCalledWith(cliPackage.version);
 
     // Verify that all commands were registered with the program instance
     const { registerStudioCommand } = await import('../commands/studio.js');
