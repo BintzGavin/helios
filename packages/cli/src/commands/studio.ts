@@ -32,17 +32,25 @@ export function registerStudioCommand(program: Command) {
         const client = new RegistryClient(config?.registry);
         const components = await client.getComponents(config?.framework);
 
-        const require = createRequire(import.meta.url);
-
-        // Resolve the path to the studio package
-        // We resolve the CLI entry point and go up to find the package root
-        const studioCliPath = require.resolve('@helios-project/studio/cli');
-        const studioRoot = path.resolve(path.dirname(studioCliPath), '../../');
-        const studioDist = path.join(studioRoot, 'dist');
-
-        // Resolve bundled skills path relative to this CLI file
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
+
+        // The published CLI carries Studio's UI and server in dist/studio (scripts/embed-packages.js).
+        // In the workspace, Studio comes from packages/studio.
+        const embeddedStudio = path.resolve(__dirname, '../studio');
+        let studioRoot: string;
+        let studioDist: string;
+        if (fs.existsSync(path.join(embeddedStudio, 'index.html'))) {
+          studioRoot = embeddedStudio;
+          studioDist = embeddedStudio;
+        } else {
+          const require = createRequire(import.meta.url);
+          const studioCliPath = require.resolve('@helios-project/studio/cli');
+          studioRoot = path.resolve(path.dirname(studioCliPath), '../../');
+          studioDist = path.join(studioRoot, 'dist');
+        }
+
+        // Resolve bundled skills path relative to this CLI file
         const skillsRoot = path.resolve(__dirname, '../skills');
 
         console.log(`Studio Root: ${studioRoot}`);

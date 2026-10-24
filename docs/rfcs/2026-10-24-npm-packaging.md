@@ -1,6 +1,6 @@
 # RFC: Three npm packages, one version
 
-**Status: Slices 1–3 implemented on `claude/wonderful-newton-rspy2w` · 24 October 2026**
+**Status: Slices 1–4 implemented on `claude/wonderful-newton-rspy2w` · 24 October 2026. Slices 5–7 wait for the owner.**
 
 **Decision:** Publish three packages instead of six, all at one version, released by one script.
 
@@ -62,9 +62,10 @@ Each slice is a thin path that works end to end and is verified on its own befor
    - Verification: the packed CLI has no `@helios-project/renderer` dependency and passes the slice 1 smoke test; a TypeScript file importing `Renderer` from `@helios-project/cli/renderer` type-checks and renders.
    - Result: installed from the CLI and Studio tarballs alone, no renderer package exists in `node_modules`, and every smoke command passes. `helios mcp` serves the player view with the seek shim built by the embedded renderer. A strict `nodenext` TypeScript project type-checks the import with library checks on and renders through `Renderer`. Undoing the import rewrite makes the same test fail with `Cannot find package '@helios-project/renderer'`.
    - Learned: Studio's server bundle still inlines its own copy of the renderer, so the CLI install carries two. Slice 4 should point Studio at the CLI's copy.
-4. **Studio inside the CLI.**
-   - The CLI build copies Studio's prebuilt UI and server bundle into `dist/studio`, and `helios studio` resolves them relative to itself instead of through `require.resolve('@helios-project/studio/cli')`.
+4. **Studio inside the CLI.** *Done on this branch.*
+   - The CLI build copies Studio's prebuilt UI and server bundle into `dist/studio` (`scripts/embed-packages.js`, which replaced `embed-renderer.js`), and `helios studio` uses that copy when it exists, falling back to the workspace package in development.
    - Verification: from a clean install, `helios studio` serves the UI and answers one API route.
+   - Result: installed from the CLI tarball alone, `@helios-project/cli` is the only Helios package in `node_modules` (140 MB, 121 packages). `helios studio` serves the UI, its script and `/api/compositions` from `dist/studio`, and the slice 1 and 3 checks still pass.
 5. **Player inside core.**
    - `@helios-project/core/player` exports the `<helios-player>` element and controllers; the bundled `player.global.js` build moves with it.
    - Verification: one example builds importing from `@helios-project/core/player`, and a core-only bundle stays the same size.
