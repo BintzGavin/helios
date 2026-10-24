@@ -24,6 +24,10 @@
       "types": "./dist/renderer/index.d.ts",
       "default": "./dist/renderer/index.js"
     },
+    "./portable": {
+      "types": "./dist/portable/index.d.ts",
+      "default": "./dist/portable/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -46,19 +50,26 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/portable": "0.0.0",
+    "@ffprobe-installer/ffprobe": "2.1.2",
     "@modelcontextprotocol/sdk": "^1.29.0",
+    "@napi-rs/canvas": "1.0.9",
+    "@resvg/resvg-js": "2.6.2",
+    "@resvg/resvg-wasm": "2.6.2",
+    "bidi-js": "1.0.3",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "diff": "^8.0.3",
+    "fontkit": "2.0.4",
     "giget": "^3.1.2",
     "playwright": "^1.60.0",
     "prompts": "^2.4.2",
+    "svg-pathdata": "7.2.0",
     "vite": "^7.1.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@helios-project/infrastructure": "0.25.0",
+    "@helios-project/portable": "0.0.0",
     "@helios-project/renderer": "1.79.0",
     "@helios-project/studio": "0.107.3",
     "@types/diff": "^7.0.2",

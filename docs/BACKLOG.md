@@ -174,6 +174,7 @@ Lessons from a production that drew its motion layer with a renderer shaped like
 - [x] **CLI**: Bundle the renderer into the CLI and export it at `@helios-project/cli/renderer` with types.
 - [ ] **STUDIO**: Use the CLI's embedded renderer instead of inlining a second copy in Studio's server bundle.
 - [x] **CLI**: Ship Studio's UI and server inside the CLI; `helios studio` resolves them relative to itself.
+- [x] **CLI**: Embed the portable renderer in the CLI and export it at `@helios-project/cli/portable` with types; the CLI installs its render dependencies but not the S3 client or other service-only ones.
 - [ ] **PLAYER**: Export the player from `@helios-project/core/player`. *Waits on the owner: changes public import paths.*
 - [ ] **DOCS**: Move skills, plugin, docs site, examples and README to the new import paths. *Waits on the owner: changes public import paths.*
 - [ ] **Release (human)**: Publish 6.0.0 with `scripts/release.mjs`, shim and deprecate `renderer`, `studio` and `player`.

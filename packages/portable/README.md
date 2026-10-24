@@ -1,6 +1,8 @@
 # Helios portable renderer
 
-Render video without a browser. `@helios-project/portable` turns a trusted Canvas drawing module or a `portable-v1` JSON scene plan into a frame-count-verified H.264 MP4, using CPU rasterizers and bundled FFmpeg. Existing HTML/React/Canvas Helios compositions use the existing renderer; this package does not convert them automatically.
+Render video without a browser. The portable renderer turns a trusted Canvas drawing module or a `portable-v1` JSON scene plan into a frame-count-verified H.264 MP4, using CPU rasterizers and bundled FFmpeg. Existing HTML/React/Canvas Helios compositions use the existing renderer; this one does not convert them automatically.
+
+It ships inside the Helios CLI: `helios render` sends Canvas modules and plans here, and Node code imports it from `@helios-project/cli/portable`. This directory is its source workspace, `@helios-project/portable`, which is not published on its own.
 
 | Area | Status |
 |---|---|
@@ -14,20 +16,27 @@ Render video without a browser. `@helios-project/portable` turns a trusted Canva
 
 ## Install
 
+Use the CLI; there is nothing else to install:
+
 ```sh
-npm install @helios-project/portable
+npx @helios-project/cli render video.mjs -o video.mp4
 ```
 
-This works after the first npm release; the package is not published yet. Until then, build a tarball from this repository and install it:
+```js
+import { renderCanvasModule } from '@helios-project/cli/portable';
+```
+
+`@helios-project/cli/portable` exports this workspace's root entry point: the Canvas and plan APIs below. The experimental HTTP service and client, the S3 store, OIDC auth and the GPU helper are not part of it; use them from a repository checkout.
+
+The native rasterizers and the FFmpeg/ffprobe binaries arrive as prebuilt npm packages. Nothing is compiled during install and no system FFmpeg is needed.
+
+From a repository checkout, build the workspace and import it by name (`@helios-project/portable`, `@helios-project/portable/client`, ...) or run its `helios-portable` command:
 
 ```sh
 npm ci
 npm run build --workspace=@helios-project/portable
-npm pack --workspace=@helios-project/portable --pack-destination /tmp
-npm install /tmp/helios-project-portable-0.0.0.tgz
+node packages/portable/dist/cli.js render plan.json --output video.mp4
 ```
-
-The native rasterizers and the FFmpeg/ffprobe binaries arrive as prebuilt npm packages. Nothing is compiled during install and no system FFmpeg is needed.
 
 ## FFmpeg and ffprobe
 
@@ -63,13 +72,12 @@ Save this as `plan.json` in a scratch directory:
 ```
 
 ```sh
-npx helios-portable render plan.json --output video.mp4
-npx helios-portable frame plan.json --frame 45 --output frame.png
+npx @helios-project/cli render plan.json -o video.mp4
 # Opt into the retained native drawing backend:
-npx helios-portable render plan.json --rasterizer skia --output video-skia.mp4
+npx @helios-project/cli render plan.json -o video-skia.mp4 --rasterizer skia
 ```
 
-From a repository checkout, build first and run `node packages/portable/dist/cli.js` with the same arguments.
+From a repository checkout, build first and run `node packages/portable/dist/cli.js render plan.json --output video.mp4`; its `frame plan.json --frame 45 --output frame.png` writes one frame as PNG.
 
 For assets, declare `{ "sha256": "…", "bytes": 1234, "type": "font" }` under an asset ID in `plan.assets`. Put each file at `ASSET_DIRECTORY/SHA256` and pass `--assets ASSET_DIRECTORY`. The renderer verifies bytes against the declared identity. It uses no system fonts and fetches no asset URLs.
 
@@ -94,10 +102,10 @@ export default {
 };
 ```
 
-Render it from a Node script:
+Render it with `npx @helios-project/cli render composition.mjs -o video.mp4`, or from a Node script:
 
 ```js
-import { renderCanvasModule } from '@helios-project/portable';
+import { renderCanvasModule } from '@helios-project/cli/portable';
 
 await renderCanvasModule('/absolute/path/composition.mjs', '/tmp/video.mp4', {
   concurrency: 4, chunkFrames: 90,
