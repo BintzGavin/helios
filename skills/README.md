@@ -88,10 +88,10 @@ npx skills add BintzGavin/helios/skills/studio
 
 ### Guided Video Creation
 
-**brand-video** extracts brand identity from your repo or site, picks a motion style that fits, randomizes the rest, adds optional beat-synced music and archive B-roll, and produces a rendered video.
+**brand-video** extracts brand identity from your repo or site, randomizes the staging, designs an original look from a seed, adds optional beat-synced music and archive B-roll, and produces a rendered video.
 
 - [**skills/guided/motion-design-rules**](./guided/motion-design-rules) - Motion design framework that holds in any style: anti-slideshow architecture, depth, one easing personality, choreography, transitions, timing to sound, and scripted checks. Style cards override it.
-- [**skills/guided/brand-video**](./guided/brand-video) - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, picks the best-fitting motion style, then randomizes everything they leave open so videos don't repeat. Optional beat-synced music and Internet Archive B-roll.
+- [**skills/guided/brand-video**](./guided/brand-video) - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, randomizes the staging and designs an original look from a seed so videos don't repeat; known styles only on request. Optional beat-synced music and Internet Archive B-roll.
 
 These guided skills use the `renderAt(t)` page contract from **make-video** and need no brand extraction or API keys. Each draws a random seed before making creative choices (using an **apply-randomness** skill if one is installed), so repeated requests don't converge on the same film:
 

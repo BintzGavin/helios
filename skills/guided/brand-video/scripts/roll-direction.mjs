@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Roll the random part of a brand video's direction, after the format and the style shortlist are fixed.
+// Roll the staging of a brand video (structure, opening, camera...) after the format is locked.
 // Same seed + same flags = same direction. Node 18+, no dependencies, no network.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,9 +10,8 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const deck = JSON.parse(fs.readFileSync(path.join(here, '../references/direction-deck.json'), 'utf8'));
 const stylesDir = path.join(here, '../../../design/motion-styles/references/styles');
 
-const usage = `Usage: node roll-direction.mjs --format <${deck.formats.join('|')}> --styles <slug[,slug...]> [options]
-  --styles <list>         Motion styles that fit the brief, best first. One slug locks it;
-                          several let the seed pick, skipping styles the last two videos used.
+const usage = `Usage: node roll-direction.mjs --format <${deck.formats.join('|')}> [options]
+  --style <slug>          Record the motion-styles card in use (only when the user asked for one).
   --seed-file <file>      Seed string (for example from apply-randomness). Hashed to a number.
   --seed <int>            Numeric seed, to reproduce an earlier roll.
   --no-broll              Exclude footage options.
@@ -31,7 +30,7 @@ for (let i = 0; i < args.length; i++) {
     return next;
   };
   if (flag === '--format') opts.format = value();
-  else if (flag === '--styles') opts.styles = value().split(',').map(s => s.trim()).filter(Boolean);
+  else if (flag === '--style') opts.style = value();
   else if (flag === '--seed') opts.seed = Number(value());
   else if (flag === '--seed-file') opts.seedFile = value();
   else if (flag === '--no-broll') opts.broll = false;
@@ -50,12 +49,9 @@ function fail(message) {
 }
 
 if (!deck.formats.includes(opts.format)) fail(`--format must be one of: ${deck.formats.join(', ')}`);
-if (!opts.styles?.length) fail('--styles needs at least one motion-style slug');
-if (fs.existsSync(stylesDir)) {
+if (opts.style && fs.existsSync(stylesDir)) {
   const known = fs.readdirSync(stylesDir).filter(f => f.endsWith('.md')).map(f => f.slice(0, -3));
-  for (const style of opts.styles) {
-    if (!known.includes(style)) fail(`Unknown style: ${style}. Choose from: ${known.join(', ')}`);
-  }
+  if (!known.includes(opts.style)) fail(`Unknown style: ${opts.style}. Choose from: ${known.join(', ')}`);
 }
 
 let seed = opts.seed;
@@ -110,11 +106,6 @@ const history = opts.avoid.flatMap(target => findDirections(path.resolve(target)
   .slice(0, 2);
 const recent = axis => new Set(history.map(direction => direction.picks[axis]?.id ?? direction.picks[axis]).filter(Boolean));
 
-// 1. Style: from the fit shortlist, preferring ones the recent videos did not use.
-const freshStyles = opts.styles.filter(style => !recent('style').has(style));
-const style = choose(freshStyles.length ? freshStyles : opts.styles);
-
-// 2. Everything the format and style leave open.
 function pick(axis, pool) {
   if (opts.locks[axis.id]) return axis.options.find(o => o.id === opts.locks[axis.id]);
   const fresh = pool.filter(option => !recent(axis.id).has(option.id));
@@ -132,10 +123,11 @@ const direction = {
   seed_file: opts.seedFile ? path.resolve(opts.seedFile) : null,
   format: opts.format,
   rolled_on: new Date().toISOString(),
-  shortlist: opts.styles,
   flags: { broll: opts.broll, locks: opts.locks, avoided: history.length },
   picks: {
-    style: { id: style, card: `skills/design/motion-styles/references/styles/${style}.md` },
+    look: opts.style
+      ? { id: opts.style, card: `skills/design/motion-styles/references/styles/${opts.style}.md` }
+      : { id: 'original', brief: 'Designed from the brand and the seed; see the spec.' },
     ...Object.fromEntries(Object.entries(picks).map(([axis, option]) => [
       axis, { id: option.id, label: option.label, brief: option.brief },
     ])),

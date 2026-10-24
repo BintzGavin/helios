@@ -1,13 +1,13 @@
 ---
 name: guided-brand-video
-description: Guided, brand-aligned marketing videos rendered with Helios — promo or hype, explainer or walkthrough, product demo or feature showcase, testimonial or social proof, launch or release announcement, and vertical social clips (Reels, TikTok, Shorts). Extracts the brand from a repo or URL, picks the best-fitting motion style, then randomizes everything the format and style leave open so videos don't look alike. Optional beat-synced music and Internet Archive B-roll.
+description: Guided, brand-aligned marketing videos rendered with Helios — promo or hype, explainer or walkthrough, product demo or feature showcase, testimonial or social proof, launch or release announcement, and vertical social clips (Reels, TikTok, Shorts). Extracts the brand from a repo or URL, locks the format, randomizes structure and staging, and designs an original look from a seed so videos don't look alike. Optional beat-synced music and Internet Archive B-roll.
 ---
 
 # Brand video
 
-One pipeline for six formats. The format profile fixes structure and pacing ([references/formats.md](references/formats.md)). A motion style fixes the look ([motion-styles](../../design/motion-styles/SKILL.md)). Randomness, applied **after** both are locked, decides everything else. Locking first and randomizing second is the point: a good fit alone collapses every promo for every dev tool into the same video; randomness alone ignores the brief.
+One pipeline for six formats. The format profile fixes structure and pacing ([references/formats.md](references/formats.md)). A random roll decides how the story is staged. The look is designed fresh for each video from the brand and a seed, the same way [make-video](../../../plugins/helios/skills/make-video/SKILL.md) does it. Known looks from [motion-styles](../../design/motion-styles/SKILL.md) are opt-in: use one only when the user asks for it.
 
-Build the page under the [make-video](../../../plugins/helios/skills/make-video/SKILL.md) contract (one HTML page, `window.renderAt(t)`, every frame a pure function of `t`) and render, review and check as it describes. Read [motion-design-rules](../motion-design-rules/SKILL.md) before writing the spec; where it conflicts with the style card, the card wins.
+Build the page under the make-video contract (one HTML page, `window.renderAt(t)`, every frame a pure function of `t`) and render, review and check as it describes. Read [motion-design-rules](../motion-design-rules/SKILL.md) before writing the spec.
 
 Keep each video in its own folder, e.g. `videos/<slug>/`: `seed.txt`, `direction.json`, `spec.md`, `video.html`, `audio/`, `broll/`, `video.mp4`. Commit `direction.json`: the next video reads it to avoid repeating this one.
 
@@ -19,27 +19,19 @@ Keep each video in its own folder, e.g. `videos/<slug>/`: `seed.txt`, `direction
 2. "Do you want generated background music (ElevenLabs; you'll need an API key set up), or do you have a track?"
 3. "Should I pull B-roll from the Internet Archive (public-domain and Creative Commons film)?"
 
-If they name a style or a look, note it for step 4. Don't read `.env` files or check keys; trust the answers.
+If they name or describe a style, a medium or a reference look, note it for step 5. Don't read `.env` files or check keys; trust the answers.
 
 ## 2. Brand
 
 From a repo: Tailwind config or CSS variables, global styles, design tokens, logo, favicon, hero sections, marketing copy, CTAs, UI components, existing motion. From a URL: the same visible signals. Add the format's extra signals from its profile.
 
-Write a brand profile: value proposition, audience, tone, palette, type, emotional position. The brand fixes facts, logo, product UI, and the colours that must appear. It doesn't pick the visual style.
+Write a brand profile: value proposition, audience, tone, palette, type, emotional position. The brand fixes facts, logo, product UI, and the colours and fonts that must appear. It doesn't dictate a visual style.
 
 ## 3. Lock the format
 
 Pick the profile in [references/formats.md](references/formats.md) and apply its defaults: duration, aspect, arc, timing anchors, limits.
 
-## 4. Lock the style
-
-Read the [style catalog](../../design/motion-styles/references/catalog.md). Shortlist every style that fits the format, the subject and the brand's tone — usually 2–4, best first. Fit means: the "Best for" column matches, the card's colour rules can carry the brand's colours, and its type and motion suit the tone.
-
-- The user named a style: shortlist only that one.
-- A strict brand system leaves no room: shortlist styles whose colour rules accept brand colours (e.g. `swiss-grid`, `dark-keynote`, `flat-vector`), and lock `palette=brand-mapped` in step 5.
-- Never shortlist a style that fits worse just for variety; never drop one that fits because it was used last time. The script handles repetition.
-
-## 5. Roll the rest
+## 4. Roll the staging
 
 Draw the seed with the **apply-randomness** skill if it's installed (save its output as `seed.txt`); otherwise:
 
@@ -51,18 +43,27 @@ Then roll:
 
 ```bash
 node <this-skill>/scripts/roll-direction.mjs --format promo \
-  --styles dark-keynote,aurora-glass,swiss-grid \
   --seed-file videos/<slug>/seed.txt --avoid . --out videos/<slug>/direction.json
 ```
 
-It picks the style from the shortlist (skipping the last two videos' styles when another fits) and one option on every open axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette variant, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires.
+It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It skips picks the last two videos used. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
 
-Now read the chosen style's card start to finish. Then:
+Honor the picks. Up to two vetoes are allowed for a concrete brand or format conflict, re-rolled with `--lock` and written in the spec. "Something else would look better" isn't one.
 
-- **Card wins.** If the card bans a pick (Swiss bans bounce, risograph bans dissolves, a locked-camera style can't track), re-run with `--lock` set to an option the card allows, same seed. Note it in the spec.
-- **Honor the rest.** Up to two other vetoes are allowed only for a concrete brand or format conflict, written in the spec. "Something else would look better" isn't one.
-- **Read the seed string** for what no axis covers, as the card's "Vary within the style" section describes: subject framing, which native move goes at the peak, the central visual metaphor. Write a one-line pattern → choice map in the spec.
-- **Seeded texture.** Use `direction.seed` with mulberry32 (in the script) for grain, scatter, registration offsets. Never `Math.random()`.
+## 5. Design the look
+
+**Default: an original look.** Using the brand profile and the rolled picks, write three genuinely different directions for the look: what the image is made of, palette within the brand, type treatment, how things move, texture. Make them differ in kind, not in shade: if two could share a still frame, replace one. Then let verifiable patterns in the seed string (a digit run, a repeated fragment, a cluster of capitals) pick one, as make-video describes. Write a one-line pattern → choice map in the spec.
+
+Avoid the stock looks that every generated video falls into unless the brand truly is one: dark gradient with floating orbs or particles, glassmorphism cards, word-by-word fade-ups, neon glow on black.
+
+**Only when the user asks for a known look**, use the motion-styles library its own way:
+
+- They name or describe a style or medium ("make it risograph", "like an old blueprint"): open that one card, and re-run the roll with `--style <slug>` so the history records it.
+- They ask for options or "a known look": follow motion-styles to offer at most three styles plus one original direction, and build what they pick.
+
+With a card, its invariants win: if it bans a rolled pick (Swiss bans bounce, risograph bans dissolves, a locked-camera style can't track), re-roll that axis with `--lock` to an option the card allows. Map brand colours into the card's colour rules. Never copy the card's demo composition.
+
+Without being asked, you may offer once, in one line, that known styles exist.
 
 ## 6. Music (if wanted)
 
@@ -70,16 +71,17 @@ Generate an instrumental with ElevenLabs matching the brand tone, the format's m
 
 ## 7. B-roll (if wanted and `broll` isn't `none`)
 
-Use [archive-broll](../../workflows/archive-broll/SKILL.md). Grade every clip into the card's palette and materials (duotone, halftone, ink plates) so footage reads as part of the style.
+Use [archive-broll](../../workflows/archive-broll/SKILL.md). Grade every clip into the video's palette and materials so footage reads as part of the look.
 
 ## 8. Creative specification
 
 One spec in a single code block, also saved as `spec.md`. Don't restate the prompt. Include:
 
-- Duration, aspect, resolution, FPS, render mode (from the card's route)
+- Duration, aspect, resolution, FPS, render mode
 - Brand summary
-- Format, style, and every rolled pick; locks, vetoes and why; the seed pattern → choice map
-- Where the rule to break shows up, and the native move at the peak
+- Format, every rolled pick, locks, vetoes and why
+- The three look directions, the one the seed chose, and the pattern → choice map (or the style card the user asked for)
+- Where the rule to break shows up, and what happens at the peak
 - Scenes with exact timestamps, each keyed to a sound or time (W/B/H/F/T, Rule 7)
 - Voiceover and on-screen text
 - Per scene: layout, hero, layers, entrance, transition out
@@ -88,6 +90,6 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 
 ## 9. Build, review, render
 
-Build with the card's core technique and your own composition, never the demo's. Make style frames first and check them against the card's signature checklist. Then render, sheet, `verify` and `check` as make-video describes.
+Make two or three style frames first and check them: do they look like the chosen direction and like nothing in the stock list? Then build, render, sheet, `verify` and `check` as make-video describes.
 
-Before handing over, compare against the card's demo on structure, opening, signature shot, camera path, rhythm and ending: at least four must differ. Report the output path, format, style, seed, picks, locks and vetoes, B-roll credits, and anything unverified.
+Report the output path, format, seed, picks, the chosen look, locks and vetoes, B-roll credits, and anything unverified.
