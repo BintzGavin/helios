@@ -1,6 +1,6 @@
 # Style catalog
 
-Read this file only when the user has asked to see the style options, when you are offering them a short list, or when [guided/brand-video](../../../guided/brand-video/SKILL.md) is choosing a style by fit. If the request names no style, don't open it: design an original look instead (see [SKILL.md](../SKILL.md#when-to-use-this-library)).
+Read this file only when the user has asked to see the style options, or when you are offering them a short list. If the request names no style, don't open it: design an original look instead (see [SKILL.md](../SKILL.md#when-to-use-this-library)).
 
 When you offer styles, shortlist the ones that suit the topic, let a random seed pick at most three of them (so the same few don't come up every time), add one original direction of your own, and say in one line what each would feel like for *their* video.
 

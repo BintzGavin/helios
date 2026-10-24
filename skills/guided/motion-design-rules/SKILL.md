@@ -1,15 +1,15 @@
 ---
 name: motion-design-rules
-description: Motion design framework for programmatic video. Defines anti-slideshow architecture, depth, one easing personality, choreography, the squint test, transitions, timing to music and voice, and checks a script can run. Stated so it holds in any visual style; a motion-styles card overrides it where they conflict. Reference this skill from any guided video skill.
+description: Motion design framework for programmatic video. Defines anti-slideshow architecture, depth, one easing personality, choreography, the squint test, transitions, timing to music and voice, and checks a script can run. Stated so it holds in any look; a motion-styles card overrides it where they conflict. Reference this skill from any guided video skill.
 ---
 
 These rules apply to every Helios video composition.
 Read them before producing a creative specification or writing composition code.
 
 They describe how motion must behave, not what the video must look like.
-The look comes from the chosen style card (design/motion-styles) and the
-rolled direction (guided/brand-video). Where a card's invariants conflict
-with a rule here, the card wins. When the rolled "rule to break" names one
+The look comes from the video's own direction: an original one designed
+from a seed, or a design/motion-styles card when the user asked for one.
+Where a card's invariants conflict with a rule here, the card wins. When the rolled "rule to break" names one
 of these rules, break it once, on purpose, and say where in the spec.
 
 ------------------------------------------------------------
@@ -30,33 +30,33 @@ stats, scene imagery.
 Global elements never reset between scenes. They move, recolour,
 resize or change role, but never disappear and reappear. The video
 reads as one continuous world. What the global elements are comes
-from the style: paper and ink plates, a grid, a terminal, one long
-canvas. Floating orbs are not a default.
+from the look: paper and ink, a grid, a terminal, one long canvas.
+Floating orbs are not a default.
 
 ------------------------------------------------------------
 RULE 2 — Depth
 ------------------------------------------------------------
 
-A flat composition looks amateur unless flatness is the style.
+A flat composition looks amateur unless flatness is the point.
 Give every frame readable planes:
 
-• Ground — the style's base: paper, colour field, grid, footage,
+• Ground — the look's base: paper, colour field, grid, footage,
   gradient. Never pure black unless the style calls for it.
 • Context — supporting shapes, rules, labels, accents. They move
   slower than the hero (parallax).
 • Hero — the one thing to read. Highest contrast, sharpest edges.
 
 Depth can come from scale, overlap, blur, parallax, shadow or
-masking: pick what the style uses. Styles that want empty space
-(Bauhaus, pixel art) get depth from scale and placement alone.
+masking: pick what suits the look. Looks built on empty space
+get depth from scale and placement alone.
 
 ------------------------------------------------------------
 RULE 3 — Physics Engine (Global Easing)
 ------------------------------------------------------------
 
-Use ONE easing personality for the whole video: the style card's
-easing and timing. If the card leaves it open, choose one that fits
-the brand and keep it. Write it in the spec as one constant:
+Use ONE easing personality for the whole video: the one in the
+direction (or the style card's, if there is one). Choose it for the
+look and the brand, not by habit, and keep it. Write it in the spec as one constant:
 
 physics: { easing: "circOut", defaultDuration: 0.4 }
 
@@ -86,7 +86,7 @@ every scene. Use the main entrance pattern plus at most one contrasting
 pattern for emphasis.
 
 Exits overlap the next scene's entrance by at least 200ms, unless the
-cut is hard by design (the style, or a cut on a beat — Rule 7).
+cut is hard by design (the look, or a cut on a beat — Rule 7).
 
 ------------------------------------------------------------
 RULE 5 — The Squint Test
@@ -99,7 +99,7 @@ and squint:
 • Is there enough negative space? (Breathing room)
 • More than 3 competing focal points? (Clutter — delete something)
 • Does every visible element serve a purpose? (No decoration for decoration's sake)
-• Could someone name the style from this still? (If not, commit harder)
+• Could someone describe the look in a few words? (If not, commit harder)
 
 If a frame fails, simplify or commit. Space is a design element.
 
@@ -115,10 +115,10 @@ During every transition:
 • Outgoing and incoming scenes overlap, or the cut is exact and a
   persistent element carries across it
 • Audio energy (if present) bridges the change
-• Palette shifts follow the style's colour rules
+• Palette shifts are gradual unless the look swaps colour fields
 
-Use the transitions the style card allows, and vary them across the
-video rather than repeating one.
+Use transitions that belong to the look (and that a style card, if
+any, allows), and vary them rather than repeating one.
 
 Avoid: full-black gaps, simultaneous fade-out/fade-in, and a hard cut
 that nothing carries across.

@@ -86,7 +86,7 @@ npx skills add BintzGavin/helios/skills/examples/threejs
 ### Guided Video Creation Skills
 
 - **skills/guided/motion-design-rules** - Motion design framework that holds in any style: anti-slideshow architecture, depth, one easing personality, choreography, transitions, timing to sound, and scripted checks. Style cards override it. Referenced by all guided video skills.
-- **skills/guided/brand-video** - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, picks the best-fitting motion style, then randomizes everything they leave open so videos don't repeat. Optional beat-synced music and Internet Archive B-roll.
+- **skills/guided/brand-video** - Promo, explainer, product demo, testimonial, launch and vertical social videos in one guided pipeline. Locks the format, randomizes the staging and designs an original look from a seed so videos don't repeat; known styles only on request. Optional beat-synced music and Internet Archive B-roll.
 - **skills/guided/cartoon-short** - Hand-drawn cartoon short: a character rig you design, acted emotion changes, boiling ink-and-paint linework, storyboarding by reads. Includes a tested starter page.
 - **skills/guided/music-video** - Lyric and karaoke music video: word timings by forced alignment, treatment and section storyboard, a timeline derived from lyrics and beats, karaoke recipes. Includes a tested karaoke page.
 - **skills/guided/video-recipes** - Opt-in genre recipes with tested demos (scale dive, process explainer, era timeline, mechanism/proof, kinetic type, UI morph loop, pixel sprite), plus the video brief template and a gotcha list. Load only when the request is one of these genres.

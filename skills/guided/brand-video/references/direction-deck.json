@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "formats": ["promo", "explainer", "demo", "testimonial", "launch", "social"],
-  "note": "Rolled after the format and the motion style are locked. Every pick works inside the style card: if the card bans a pick, re-roll that axis with --lock to an option the card allows.",
+  "note": "Staging choices rolled after the format is locked. They work with an original look or, when the user asked for one, a motion-styles card: if the card bans a pick, re-roll that axis with --lock to an option the card allows.",
   "axes": [
     {
       "id": "structure",
@@ -54,12 +54,13 @@
     },
     {
       "id": "palette",
-      "label": "Palette variant",
+      "label": "Palette approach",
       "options": [
-        { "id": "card-base", "label": "Card base set", "brief": "The card's primary colour set, with brand colour only on the reserved accent." },
-        { "id": "card-alt", "label": "Card alternative set", "brief": "The card's alternative colour set, or a sibling set that obeys the same rules." },
-        { "id": "brand-mapped", "label": "Brand mapped", "brief": "Brand colours mapped onto the card's colour roles, keeping its count and rules." },
-        { "id": "restraint", "label": "Restraint", "brief": "The fewest colours the card allows; the accent appears once, at the peak." }
+        { "id": "brand-literal", "label": "Brand literal", "brief": "Brand colours as specified, primary dominant." },
+        { "id": "restraint", "label": "Restraint", "brief": "Neutrals plus one brand colour; the accent appears only at the peak." },
+        { "id": "tonal", "label": "Tonal", "brief": "One brand hue across many lightness steps; contrast from value, not hue." },
+        { "id": "inverted", "label": "Inverted ground", "brief": "Swap the brand's usual ground: light brands go dark, dark brands go light." },
+        { "id": "color-fields", "label": "Colour fields", "brief": "Each scene owns one flat brand colour; scenes change by swapping fields." }
       ]
     },
     {
