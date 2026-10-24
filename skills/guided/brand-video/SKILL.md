@@ -46,7 +46,7 @@ node <this-skill>/scripts/roll-direction.mjs --format promo \
   --seed-file videos/<slug>/seed.txt --avoid . --out videos/<slug>/direction.json
 ```
 
-It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It also draws three idea lenses for step 5 and lists earlier videos' looks. It skips what the last two videos used, and never pairs picks that overlap. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
+It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, ground, scale, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It also draws three idea lenses for step 5 and lists earlier videos' looks. It skips what the last two videos used, and never pairs picks that overlap. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
 
 Honor the picks. Up to two vetoes are allowed for a concrete brand or format conflict, re-rolled with `--lock` and written in the spec. "Something else would look better" isn't one.
 
@@ -95,6 +95,6 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 
 Check two or three early stills of the real page as style frames: do they look like the chosen candidate and like nothing on the obvious list? Then build, render, sheet, `verify` and `check` as make-video describes.
 
-CLI notes for 0.46.0: `still`, `sheet` and `verify` take no `--mode` (only `render` does), and `--fps` only applies to `sheet --strip`. `check`, `analyze` and `verify --cues` ship after 0.46.0; make-video's troubleshooting table has the fallbacks. Say in the report which checks didn't run.
+CLI notes for 0.46.0: `still` and `sheet` capture at 1920×1080 unless you pass `--width` and `--height`. `still`, `sheet` and `verify` take no `--mode` (only `render` does), and `--fps` only applies to `sheet --strip`. `check`, `analyze` and `verify --cues` ship after 0.46.0; make-video's troubleshooting table has the fallbacks. Say in the report which checks didn't run.
 
 Report the output path, format, seed, picks, the chosen look, locks and vetoes, B-roll credits, and anything unverified.

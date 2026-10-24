@@ -12,12 +12,12 @@ brief + brand + roll → map the obvious → 3 lens candidates + 1 gap candidate
 
 List what this brief would get by default. Write each as a few words:
 
-- The **literal name pun**: what the product's name suggests (Tidewater → tides, waves; Beacon → lighthouse; Forge → sparks and anvils).
+- The **literal name pun**: what the product's name suggests (Beacon → lighthouse; Forge → sparks and anvils; Harvest → fields and wheat).
 - The **category default**: what videos for this kind of product usually look like (dev tool → terminal, code, dark UI; finance → charts going up; AI → glowing gradient).
 - The **stock looks**: dark gradient with floating orbs or particles, glassmorphism cards, word-by-word fade-ups, neon glow on black.
 - The **recent looks**: every entry in `direction.json`'s `recent_looks`.
 
-These are off limits unless the brief explicitly asks for one ("make it about tides"). A candidate that is one of them in different words is also off limits.
+These are off limits unless the brief explicitly asks for one ("make it about lighthouses"). A candidate that is one of them in different words is also off limits.
 
 ## 2. Write four candidates
 
@@ -27,7 +27,7 @@ Read the seed string for one concrete choice inside each candidate (a digit run 
 
 **One gap candidate.** From step 1, name something the obvious answers all assume (a dark screen, a literal metaphor, showing the product's UI, a flat front-on camera) and write a candidate that drops that assumption. This keeps one option grounded in the brief rather than in chance.
 
-For each candidate write, in two or three lines: what the image is made of, palette within the brand, type treatment, how things move, and the one moment it builds to. It must still serve the format's arc and the rolled staging.
+For each candidate write, in two or three lines: what the image is made of, palette within the brand, type treatment, how things move, and the one moment it builds to. Every candidate uses the rolled `ground` and `scale`, and must still serve the format's arc and the rolled staging. Make the candidates differ in what the image is made of, not just in subject: if all four are thin lines on paper, replace two.
 
 ## 3. Compare and cut
 
@@ -42,7 +42,7 @@ If fewer than two survive, write a replacement from the gap or from a lens, then
 
 ## 4. Let the seed choose
 
-Number the survivors and run:
+Number the survivors 1 to n in any order you fix before running, then run:
 
 ```bash
 node <this-skill>/scripts/roll-direction.mjs --pick <number of survivors> --seed-file videos/<slug>/seed.txt
