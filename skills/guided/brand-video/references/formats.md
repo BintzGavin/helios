@@ -1,6 +1,6 @@
 # Format profiles
 
-Defaults apply when the user doesn't say otherwise. "Short" means at or under the profile's short threshold. Stagger ranges are for motion-design-rules Rule 4; a style card's timing overrides them.
+Defaults apply when the user doesn't say otherwise. "Short" means at or under the profile's short threshold. Stagger ranges are for motion-design-rules Rule 4 and apply per word, line or element; letters run faster (15–35 ms). A style card's timing overrides them. When a short runtime can't fit an entrance at these speeds, shorten the text rather than rushing every scene.
 
 ## promo — promotional or hype video
 
