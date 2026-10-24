@@ -1,10 +1,16 @@
 ---
 name: motion-design-rules
-description: Motion design framework for programmatic video. Defines anti-slideshow architecture, visual layering, physics-based easing, choreography, timing to music and voice, and checks a script can run. Reference this skill from any guided video skill.
+description: Motion design framework for programmatic video. Defines anti-slideshow architecture, depth, one easing personality, choreography, the squint test, transitions, timing to music and voice, and checks a script can run. Stated so it holds in any visual style; a motion-styles card overrides it where they conflict. Reference this skill from any guided video skill.
 ---
 
 These rules apply to every Helios video composition.
-Read and internalize these before producing a creative specification or writing composition code.
+Read them before producing a creative specification or writing composition code.
+
+They describe how motion must behave, not what the video must look like.
+The look comes from the chosen style card (design/motion-styles) and the
+rolled direction (guided/brand-video). Where a card's invariants conflict
+with a rule here, the card wins. When the rolled "rule to break" names one
+of these rules, break it once, on purpose, and say where in the spec.
 
 ------------------------------------------------------------
 RULE 1 — Anti-Slideshow Architecture
@@ -13,135 +19,109 @@ RULE 1 — Anti-Slideshow Architecture
 The biggest mistake in code-based video is building a PowerPoint
 (Scene A fades out → Scene B fades in).
 
-The camera never stops.
-
 Separate all elements into two categories:
 
-GLOBAL elements persist across scenes:
-• Background texture or gradient
-• Floating particles, orbs, or accent shapes
-• Logo or brand mark
-• Ambient motion (slow drift, subtle pulse)
+GLOBAL elements persist across scenes: the ground, the camera,
+a brand mark, a recurring shape or accent device, a footage plate.
 
-LOCAL elements are scene-specific:
-• Hero text for that scene
-• Supporting details, stats, or callouts
-• Scene-specific imagery
+LOCAL elements are scene-specific: hero text, supporting details,
+stats, scene imagery.
 
-Global elements must NOT reset between scenes.
-They morph, shift, or evolve — but never disappear and reappear.
-
-This creates the illusion of a single continuous world
-rather than a sequence of separate slides.
+Global elements never reset between scenes. They move, recolour,
+resize or change role, but never disappear and reappear. The video
+reads as one continuous world. What the global elements are comes
+from the style: paper and ink plates, a grid, a terminal, one long
+canvas. Floating orbs are not a default.
 
 ------------------------------------------------------------
-RULE 2 — The Visual Stack (Minimum 4 Layers)
+RULE 2 — Depth
 ------------------------------------------------------------
 
-Every frame must have at least 4 layers of depth.
-A flat composition looks amateur.
+A flat composition looks amateur unless flatness is the style.
+Give every frame readable planes:
 
-Layer 0 — The Void
-Base color or deep gradient. Never pure black unless intentional.
+• Ground — the style's base: paper, colour field, grid, footage,
+  gradient. Never pure black unless the style calls for it.
+• Context — supporting shapes, rules, labels, accents. They move
+  slower than the hero (parallax).
+• Hero — the one thing to read. Highest contrast, sharpest edges.
 
-Layer 1 — The Texture
-Subtle noise, gradient drift, grid lines, or slow-moving video.
-This layer is never static. It always breathes.
-
-Layer 2 — The Context
-Floating shapes, lines, accent UI elements, or particles.
-These sit behind the hero content but in front of the background.
-They move slower than foreground elements (parallax).
-
-Layer 3 — The Hero
-Primary content: text, images, product UI.
-Highest contrast. Sharpest edges. Draws the eye immediately.
-
-If a frame has fewer than 3 visible layers, add depth.
+Depth can come from scale, overlap, blur, parallax, shadow or
+masking: pick what the style uses. Styles that want empty space
+(Bauhaus, pixel art) get depth from scale and placement alone.
 
 ------------------------------------------------------------
 RULE 3 — Physics Engine (Global Easing)
 ------------------------------------------------------------
 
-Define ONE global easing personality for the entire video.
-Every animation must use this easing unless there is a specific
-creative reason to break the rule.
-
-Match the easing to brand identity:
-
-• Tech / Developer / Hacker → circOut (fast start, hard brake)
-• Luxury / Spa / Premium → easeInOut (slow start, slow end)
-• Playful / Consumer / Fun → spring (overshoot and wobble)
-• Corporate / Enterprise → easeOut (controlled deceleration)
-• Bold / Startup / Energy → backOut (slight overshoot, confident)
-
-Define this in the creative specification as:
+Use ONE easing personality for the whole video: the style card's
+easing and timing. If the card leaves it open, choose one that fits
+the brand and keep it. Write it in the spec as one constant:
 
 physics: { easing: "circOut", defaultDuration: 0.4 }
 
-All motion.dev / WAAPI animations must reference this constant.
+Every animation references that constant. Break it only for a named
+creative reason in the spec.
 
 ------------------------------------------------------------
 RULE 4 — Choreography and Staggering
 ------------------------------------------------------------
 
-Nothing ever appears all at once.
+Nothing appears all at once. Each scene builds in order:
 
-The entrance order for every scene:
+1. The ground or camera shifts (sets the stage)
+2. Context elements arrive
+3. The hero arrives with the rolled entrance emphasis
+4. Supporting details follow one by one
 
-1. Background shifts or evolves (sets the stage)
-2. Context elements animate in (lines, shapes, accents)
-3. Hero text staggers in (word by word or line by line)
-4. Supporting details cascade (one by one, not simultaneously)
+Stagger child elements by energy level, at the unit the entrance
+names (letters, words, lines, strokes, pieces):
 
-The stagger delay between child elements should be
-50ms–150ms depending on energy level.
+High energy (promo, social): 50–80ms
+Medium energy (demo, launch): 80–120ms
+Low energy (explainer, testimonial): 100–150ms
 
-High energy (promo, social): 50–80ms stagger
-Medium energy (demo, launch): 80–120ms stagger
-Low energy (explainer, testimonial): 100–150ms stagger
+Avoid the uniform reflex: one identical fade-up on every element in
+every scene. Use the main entrance pattern plus at most one contrasting
+pattern for emphasis.
 
-Exit animations must overlap with the next scene's entrance
-by at least 200ms. Scenes should crossfade, not swap.
+Exits overlap the next scene's entrance by at least 200ms, unless the
+cut is hard by design (the style, or a cut on a beat — Rule 7).
 
 ------------------------------------------------------------
 RULE 5 — The Squint Test
 ------------------------------------------------------------
 
-Before finalizing the composition, pause at 5 random frames
-and mentally "squint" at the layout.
-
-Check:
+Before finalizing, look at five frames spread across the video
+and squint:
 
 • Can you instantly identify the most important element? (Hierarchy)
 • Is there enough negative space? (Breathing room)
-• Are there more than 3 competing focal points? (Clutter — delete something)
+• More than 3 competing focal points? (Clutter — delete something)
 • Does every visible element serve a purpose? (No decoration for decoration's sake)
+• Could someone name the style from this still? (If not, commit harder)
 
-If any frame fails the squint test, simplify.
-Space is a design element, not just empty pixels.
+If a frame fails, simplify or commit. Space is a design element.
 
 ------------------------------------------------------------
 RULE 6 — Transition Continuity
 ------------------------------------------------------------
 
-Scene transitions must never be a hard cut followed by silence.
+A scene change never lands on silence or an empty frame.
 
 During every transition:
 
-• At least one global element must be visually continuous
-• The outgoing scene's exit and incoming scene's entrance must overlap
-• Audio energy (if present) should bridge the transition
-• Color palette shifts should be gradual, not abrupt
+• At least one global element stays visually continuous
+• Outgoing and incoming scenes overlap, or the cut is exact and a
+  persistent element carries across it
+• Audio energy (if present) bridges the change
+• Palette shifts follow the style's colour rules
 
-Preferred transition patterns:
+Use the transitions the style card allows, and vary them across the
+video rather than repeating one.
 
-• Wipe with persistent background
-• Scale-out hero → scale-in new hero (camera metaphor)
-• Directional slide (content moves as if camera is panning)
-• Morphing shapes that carry energy between scenes
-
-Avoid: hard cuts, full-black gaps, simultaneous fade-out/fade-in.
+Avoid: full-black gaps, simultaneous fade-out/fade-in, and a hard cut
+that nothing carries across.
 
 With music, a hard cut that lands on a kick or a downbeat is a
 transition in its own right: the beat carries it. See Rule 7.
