@@ -15,7 +15,7 @@ async function verify() {
 
   // Set up page with media elements using specific attributes
   // 1. Audio with offset=2.5s (2500ms)
-  // 2. Video with seek=10s and muted (should be volume 0)
+  // 2. Audible video with seek=10s, plus a muted video (excluded from mixing)
   // 3. Audio with defaults (no attributes)
   // 4. Audio with playbackRate=2.0
   await page.setContent(`
@@ -27,7 +27,9 @@ async function verify() {
         <audio src="https://example.com/offset.mp3" data-helios-offset="2.5" controls></audio>
 
         <!-- Case 2: Seek + Muted -->
-        <video src="https://example.com/seek-muted.mp4" data-helios-seek="10" muted controls></video>
+        <video src="https://example.com/seek.mp4" data-helios-seek="10" controls></video>
+
+        <video src="https://example.com/muted.mp4" muted></video>
 
         <!-- Case 3: Defaults -->
         <audio src="https://example.com/default.mp3" controls></audio>
@@ -71,20 +73,20 @@ async function verify() {
   }
 
   // Case 2: Seek 10s -> -ss 10 before input
-  const seekIndex = args.indexOf('https://example.com/seek-muted.mp4');
+  const seekIndex = args.indexOf('https://example.com/seek.mp4');
   if (seekIndex > 2 && args[seekIndex - 3] === '-ss' && args[seekIndex - 2] === '10') {
-    console.log('✅ Found -ss 10 before seek-muted.mp4');
+    console.log('✅ Found -ss 10 before seek.mp4');
   } else {
-    console.error(`❌ Failed: Expected -ss 10 before seek-muted.mp4.`);
+    console.error(`❌ Failed: Expected -ss 10 before seek.mp4.`);
     success = false;
   }
 
-  // Case 2b: Muted -> volume=0
-  if (!argsString.includes('volume=0')) {
-     console.error('❌ Failed: Expected volume=0 for muted video');
-     success = false;
+  // Muted media must not create an FFmpeg audio input.
+  if (args.includes('https://example.com/muted.mp4')) {
+    console.error('❌ Failed: muted video included in audio inputs');
+    success = false;
   } else {
-     console.log('✅ Found volume=0');
+    console.log('✅ Muted video excluded');
   }
 
   // Case 4: Playback Rate 2.0 -> atempo=2.0

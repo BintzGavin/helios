@@ -3,6 +3,7 @@ import { RenderStrategy } from './RenderStrategy.js';
 import { RendererOptions, AudioTrackConfig, FFmpegConfig } from '../types.js';
 import { FFmpegBuilder } from '../utils/FFmpegBuilder.js';
 import { scanForAudioTracks } from '../utils/dom-scanner.js';
+import { filterImplicitAudioTracks } from '../utils/implicit-audio.js';
 import { extractBlobTracks } from '../utils/blob-extractor.js';
 import { PRELOAD_SCRIPT } from '../utils/dom-preload.js';
 
@@ -68,7 +69,7 @@ export class DomStrategy implements RenderStrategy {
 
     // Extract blobs to temp files
     const extractionResult = await extractBlobTracks(page, initialTracks);
-    this.discoveredAudioTracks = extractionResult.tracks;
+    this.discoveredAudioTracks = await filterImplicitAudioTracks(extractionResult.tracks, this.options.ffmpegPath, timeout);
     this.cleanupAudio = extractionResult.cleanup;
 
     if ((page as any)._sharedCdpSession) {

@@ -29,7 +29,7 @@ async function run() {
       <audio src="once.mp3"></audio>
 
       <!-- Track 3: Looped Video (should also work) -->
-      <video src="loop-video.mp4" loop muted></video>
+      <video src="loop-video.mp4" loop></video>
 
       <!-- Track 4: Looped + Offset (Edge Case) -->
       <audio src="loop-offset.mp3" loop data-helios-offset="2"></audio>
