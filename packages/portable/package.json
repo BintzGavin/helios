@@ -3,8 +3,20 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Browser-independent rendering and durable render jobs for Helios.",
+  "description": "Browser-independent CPU rendering of Canvas modules and portable-v1 scene plans to verified MP4 for Helios, with an experimental durable render service.",
+  "author": "Gavin Bintz <me@gavinbintz.com>",
   "license": "ELv2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BintzGavin/helios.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BintzGavin/helios/issues"
+  },
+  "homepage": "https://github.com/BintzGavin/helios#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=22"
   },
@@ -28,10 +40,24 @@
     "build": "tsc -p tsconfig.json",
     "test": "tsc -p tsconfig.json && vitest run --no-file-parallelism",
     "check": "tsc -p tsconfig.json --noEmit",
-    "bench": "tsx benchmarks/run.ts"
+    "bench": "tsx benchmarks/run.ts",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "video",
+    "rendering",
+    "canvas",
+    "mp4",
+    "ffmpeg",
+    "skia",
+    "resvg",
+    "programmatic-video",
+    "helios"
+  ],
   "dependencies": {
     "@aws-sdk/client-s3": "3.1005.0",
+    "@ffmpeg-installer/ffmpeg": "1.1.0",
+    "@ffprobe-installer/ffprobe": "2.1.2",
     "@napi-rs/canvas": "1.0.9",
     "@noble/hashes": "2.4.0",
     "@resvg/resvg-js": "2.6.2",

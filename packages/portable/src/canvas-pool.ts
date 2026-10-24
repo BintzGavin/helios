@@ -7,6 +7,7 @@ import { CanvasFrameRenderer, type CanvasComposition, type CanvasRenderOptions, 
 import { RenderError, frameTime } from './plan.js';
 import { probeVideo } from './render.js';
 import { runProcess } from './process.js';
+import { ffmpegPath, ffprobePath } from './executables.js';
 
 export interface CanvasPoolOptions extends Omit<CanvasRenderOptions, 'onFrame'> {
   concurrency?: number; chunkFrames?: number;
@@ -78,7 +79,7 @@ export async function renderCanvasModule(modulePath: string | URL, output: strin
   let next = 0, completed = 0;
   const statistics: CanvasRangeStats[] = [], renderStarted = performance.now();
   try {
-    for (let index = 0; index < Math.min(concurrency, ranges.length); index++) workers.push(new CanvasWorker(module, { ffmpeg: options.ffmpeg, ffprobe: options.ffprobe, encoder: options.encoder }));
+    for (let index = 0; index < Math.min(concurrency, ranges.length); index++) workers.push(new CanvasWorker(module, { ffmpeg: ffmpegPath(options.ffmpeg), ffprobe: ffprobePath(options.ffprobe), encoder: options.encoder }));
     await Promise.all(workers.map(async worker => {
       await worker.ready;
       while (next < ranges.length) {
@@ -95,7 +96,7 @@ export async function renderCanvasModule(modulePath: string | URL, output: strin
     const manifest = join(directory, 'concat.txt'), final = join(directory, 'final.mp4');
     const escape = (path: string) => path.replace(/'/g, "'\\''");
     await writeFile(manifest, 'ffconcat version 1.0\n' + ranges.map(range => `file '${escape(range.output)}'\nduration ${frameTime(plan.fps, range.end - range.start).toFixed(9)}\n`).join(''));
-    await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', manifest, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', final], { signal: options.signal, timeoutMs: 300000 });
+    await runProcess(ffmpegPath(options.ffmpeg), ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', manifest, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', final], { signal: options.signal, timeoutMs: 300000 });
     const verifyStarted = performance.now(), info = await probeVideo(final, options), finalVerifyMs = performance.now() - verifyStarted;
     if (info.frameCount !== end - start || info.width !== plan.width || info.height !== plan.height || info.codec !== 'h264' || info.fps.num * plan.fps.den !== plan.fps.num * info.fps.den || Math.abs(info.duration - frameTime(plan.fps, end - start)) > frameTime(plan.fps, 1)) throw new RenderError('INVALID_OUTPUT', 'Stitched canvas video failed verification', 500);
     options.signal?.throwIfAborted(); await rename(final, destination);

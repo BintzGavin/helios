@@ -1,35 +1,48 @@
-# Helios portable rendering — experimental
+# Helios portable renderer
+
+Render video without a browser. `@helios-project/portable` turns a trusted Canvas drawing module or a `portable-v1` JSON scene plan into a frame-count-verified H.264 MP4, using CPU rasterizers and bundled FFmpeg. Existing HTML/React/Canvas Helios compositions use the existing renderer; this package does not convert them automatically.
+
+| Area | Status |
+|---|---|
+| Canvas modules: `renderCanvasModule`, `renderCanvasVideo` | Supported |
+| `portable-v1` plans: CLI `render`/`frame`, `renderVideo`/`renderFrame` | Supported |
+| CPU rasterizers: `native` (resvg), `skia` (`@napi-rs/canvas`), `wasm` (resvg-wasm) | Supported |
+| Platforms | macOS arm64, Linux x64, Node 22+ |
+| GPU helper (Metal/VideoToolbox), HTTP render service, VM/Vercel templates and wizards, S3 store | [Experimental](#experimental-native-gpu-rendering) |
 
 **Evidence retention (2026-10-01):** Earlier `/private/tmp` benchmark evidence is unavailable. Historical measurements below are reported records, not freshly reverified results or a current public competitor claim. The [fresh October 1 study](../../docs/rfcs/2026-10-01-cpu-benchmarks.md) links its retained source receipts; its every-frame quality and complete cadence checks remain pending.
 
-An HTTP render service and browser-independent renderer for applications that can export a `portable-v1` scene plan. It turns JSON, explicit fonts and prepared media into a verified MP4. Existing HTML/React/Canvas Helios compositions use the existing renderer; this package does not convert them automatically.
-
-```mermaid
-flowchart LR
-  A[SaaS workflow] -->|plan + immutable assets| B[Render API]
-  B <--> S[Durable object storage]
-  B --> C[Seek and lay out a frame]
-  C --> D[resvg or retained Skia pixels]
-  D --> E[FFmpeg H.264 chunks]
-  E --> F[Continuous audio + final MP4]
-  F -->|verify and persist| S
-  S -->|download + checksum| A
-```
-
-The native pipeline runs on Node 22 with FFmpeg/ffprobe. The Wasm option replaces rasterization; decode, encode, audio and filesystem access still use native Node facilities. Cloud isolates are unsupported. VM and Vercel templates are deployment candidates, not qualified deployments. See the [measured evidence and RFC gates](../../docs/rfcs/2026-09-09-portable-rendering-evidence.md).
-
-The opt-in `skia` backend keeps TypeScript for seeking, layout and jobs, and uses native C++ Skia through a pinned Rust Node-API binding for drawing. It caches decoded images and glyph paths, avoids per-frame SVG parsing, streams raw video pixels and resets native drawing history between frames. It retains explicit fontkit shaping; no browser or system font lookup is used. It is a native performance option, with different edge antialiasing from resvg. See the [controlled performance comparison and important code](../../docs/rfcs/2026-09-09-portable-rendering-performance.md).
-
-This is an unpublished workspace package. For another application, build it and use `npm pack --workspace=@helios-project/portable --pack-destination /tmp`, then install that local tarball. The deployment preparer copies the built service and declares its dependencies directly.
-
-## Run a video
-
-From the repository root, with Node 22+, FFmpeg and ffprobe installed:
+## Install
 
 ```sh
-npm run build --workspace=@helios-project/portable
-node packages/portable/dist/cli.js --help
+npm install @helios-project/portable
 ```
+
+This works after the first npm release; the package is not published yet. Until then, build a tarball from this repository and install it:
+
+```sh
+npm ci
+npm run build --workspace=@helios-project/portable
+npm pack --workspace=@helios-project/portable --pack-destination /tmp
+npm install /tmp/helios-project-portable-0.0.0.tgz
+```
+
+The native rasterizers and the FFmpeg/ffprobe binaries arrive as prebuilt npm packages. Nothing is compiled during install and no system FFmpeg is needed.
+
+## FFmpeg and ffprobe
+
+Each binary is chosen in this order:
+
+1. The `ffmpeg`/`ffprobe` render option, or the CLI `--ffmpeg PATH`/`--ffprobe PATH` flag.
+2. The `HELIOS_FFMPEG_PATH`/`HELIOS_FFPROBE_PATH` environment variable.
+3. The binary installed by `@ffmpeg-installer/ffmpeg`/`@ffprobe-installer/ffprobe` for this platform.
+4. `ffmpeg`/`ffprobe` on PATH.
+
+The engine fingerprint hashes the `-version` output of the binaries actually selected.
+
+The bundled builds are older releases: FFmpeg 4.4 and ffprobe 4.4.1 on macOS arm64; an FFmpeg git build from December 2018 and an ffprobe git build from July 2023 on Linux x64. Source-video decoding needs passthrough frame timing: the renderer probes each selected FFmpeg once and passes `-fps_mode passthrough` (FFmpeg 5.1+) or `-vsync 0` (older builds). On macOS arm64 the bundled builds pass the full portable test suite. The Linux x64 builds have not been run through the suite yet.
+
+## Run a video
 
 Save this as `plan.json` in a scratch directory:
 
@@ -50,17 +63,23 @@ Save this as `plan.json` in a scratch directory:
 ```
 
 ```sh
-node packages/portable/dist/cli.js render /tmp/plan.json --output /tmp/video.mp4
-node packages/portable/dist/cli.js frame /tmp/plan.json --frame 45 --output /tmp/frame.png
+npx helios-portable render plan.json --output video.mp4
+npx helios-portable frame plan.json --frame 45 --output frame.png
 # Opt into the retained native drawing backend:
-node packages/portable/dist/cli.js render /tmp/plan.json --rasterizer skia --output /tmp/video-skia.mp4
+npx helios-portable render plan.json --rasterizer skia --output video-skia.mp4
 ```
+
+From a repository checkout, build first and run `node packages/portable/dist/cli.js` with the same arguments.
 
 For assets, declare `{ "sha256": "…", "bytes": 1234, "type": "font" }` under an asset ID in `plan.assets`. Put each file at `ASSET_DIRECTORY/SHA256` and pass `--assets ASSET_DIRECTORY`. The renderer verifies bytes against the declared identity. It uses no system fonts and fetches no asset URLs.
 
+The Wasm option replaces rasterization; decode, encode, audio and filesystem access still use native Node facilities. Cloud isolates are unsupported. See the [measured evidence and RFC gates](../../docs/rfcs/2026-09-09-portable-rendering-evidence.md).
+
+The opt-in `skia` backend keeps TypeScript for seeking, layout and jobs, and uses native C++ Skia through a pinned Rust Node-API binding for drawing. It caches decoded images and glyph paths, avoids per-frame SVG parsing, streams raw video pixels and resets native drawing history between frames. It retains explicit fontkit shaping; no browser or system font lookup is used. It is a native performance option, with different edge antialiasing from resvg. See the [controlled performance comparison and important code](../../docs/rfcs/2026-09-09-portable-rendering-performance.md).
+
 ## Render a trusted Canvas composition on CPU
 
-The experimental Canvas API runs installed drawing code on native CPU Skia and software x264. It supports direct frame seeking and exact half-open ranges. It does not execute callbacks supplied through the JSON HTTP API. Canvas fonts are explicit byte buffers; use the family aliases passed into `draw` to avoid relying on machine fonts. A frame must depend on its index and declared assets, and drawing code must balance its `save`/`restore` calls.
+The Canvas API runs installed drawing code on native CPU Skia and software x264. It supports direct frame seeking and exact half-open ranges. It does not execute callbacks supplied through the JSON HTTP API. Canvas fonts are explicit byte buffers; use the family aliases passed into `draw` to avoid relying on machine fonts. A frame must depend on its index and declared assets, and drawing code must balance its `save`/`restore` calls.
 
 Save an installed ESM module such as `composition.mjs`:
 
@@ -90,9 +109,27 @@ Workers use separate processes and retain their canvas and fonts across assigned
 
 `encoder.colorConversion` defaults to `srgb-bt709`. The explicit `rgb-bt601` mode is for matching pipelines that convert RGB component values directly to BT.601 YUV; it does not perform the sRGB-to-BT.709 transfer conversion. These modes have different pixel semantics and must be disclosed in comparisons. Native Canvas uses Skia text rasterization, which differs at edges from SVG/fontkit paths. The Canvas API exports video only; the portable JSON service remains the complete prepared-media/audio job path. Local execution is tested; Linux and remote performance require separate qualification.
 
-## Opt into native GPU rendering
+## Implemented profile
 
-The optional GPU helper uses native Skia Metal rasterization and a required VideoToolbox H.264 or HEVC encoder on macOS arm64. Build it from this checkout with Rust/Cargo and Apple Command Line Tools:
+| Area | Accepted behavior | Boundary |
+| --- | --- | --- |
+| Timeline | Integer frame indexing; 24, 25, 30 or 30000/1001 fps; random seeking | Even dimensions through 1080p area, including portrait; ten minutes maximum |
+| Geometry | Rectangles, ellipses, validated vector paths, linear gradients, strokes | No arbitrary SVG document imports, CSS filters, mesh or 3D |
+| Composition | Groups, nested transforms, opacity, rectangular/path clips, row/column layout, percentages | Explicit sizes and layout; no DOM/CSS layout engine |
+| Motion | Numeric keyframes; linear, hold and three polynomial easings | Absolute frame coordinates; no JavaScript, springs or browser animation APIs |
+| Text | Explicit static TTF/OTF, grapheme fallback, bidi runs, shaping, wrapping and alignment | Missing glyphs reject; no system/variable/color fonts; full Unicode conformance is not claimed |
+| Images | Prepared PNG/JPEG, contain/cover/fill and clipping | Inputs use sRGB; normalize orientation/color profiles before upload |
+| Source video | Prepared MP4/H.264, 8-bit YUV420, CFR, normal-speed seek/trim/crop | Normalize rotation, cadence and SDR BT.709 color before upload; source audio is separate |
+| Audio | Prepared 48 kHz mono/stereo PCM WAV, up to four active tracks, gain and linear fades | Sample count uses rational timeline rounding; no compressed-audio ingestion |
+| Export | sRGB → limited-range BT.709 H.264; continuous stereo AAC; frame-count verification | Opaque MP4, software encoding; no HDR, alpha export or hardware-codec qualification |
+| Recovery (experimental service) | Conditional state writes, expiring leases, fencing, immutable chunks and bounded retries | One serial chunk per job; cross-job concurrency is a host capacity decision |
+| Stores (experimental service) | Local filesystem and S3 adapter | Local store requires atomic hard links/fsync; the S3 adapter is experimental, with contract tests and no live-cloud qualification |
+
+The admission envelope is 2,000 nodes, 5,000 keyframes, depth 16, 20,000 text characters, 256 declared assets, 256 MiB aggregate asset bytes, 32 MiB of font files, 16 MP per image/video frame, and 32 MP aggregate still-image pixels. Up to two video layers and four audio tracks may overlap. A scene within those input bounds is **not guaranteed to fit 512 MiB**. Render work uses one active step per service instance, a 240-second step deadline and at most three attempts by default. Hosts still need CPU/memory/disk limits and per-tenant admission/rate controls.
+
+## Experimental: native GPU rendering
+
+GPU rendering is experimental and is not part of the supported install. The optional GPU helper uses native Skia Metal rasterization and a required VideoToolbox H.264 or HEVC encoder on macOS arm64. Build it from this checkout with Rust/Cargo and Apple Command Line Tools:
 
 ```sh
 npm run build:gpu --workspace=packages/portable
@@ -136,10 +173,24 @@ Opt into encoder overlap with `gpu.encoderPool: 3`; the default `1` preserves se
 
 Profiling establishes no application-level raw-frame download in the measured hardware path. System IOSurface pointer queries and opaque driver/encoder operations remain observable limitations, so total end-to-end zero-copy is **not proved**. Metal captures snapshot resources and are excluded from timings. See [the GPU contract](GPU-SPEC.md) and [benchmark protocol](benchmarks/GPU-PROTOCOL.md) for the precise transfer boundaries and quality gates. The helper is an optional source build; a packaged native binary and remote GPU deployment are not qualified.
 
-## Run the backend
+## Experimental: HTTP render service
+
+The HTTP render service, its durable job API and the client SDK are experimental. `/health` reports that status.
+
+```mermaid
+flowchart LR
+  A[SaaS workflow] -->|plan + immutable assets| B[Render API]
+  B <--> S[Durable object storage]
+  B --> C[Seek and lay out a frame]
+  C --> D[resvg or retained Skia pixels]
+  D --> E[FFmpeg H.264 chunks]
+  E --> F[Continuous audio + final MP4]
+  F -->|verify and persist| S
+  S -->|download + checksum| A
+```
 
 ```sh
-node packages/portable/dist/cli.js serve --data /tmp/helios-render-data --port 8787
+npx helios-portable serve --data /tmp/helios-render-data --port 8787
 ```
 
 This binds to loopback and runs the durable worker automatically. The data directory must survive restarts. A non-loopback listener requires `--auth-module PATH` or an explicit `--trusted-network` boundary. An auth module exports `authorize(request)`, returning the authenticated tenant ID or `null`. `oidcAuthorizer` provides signature, expiry, issuer, audience and exact subject validation; it takes public configuration and a subject-to-tenant allowlist. A trusted private listener is one shared tenant, accessible to every allowed network client.
@@ -172,25 +223,9 @@ The SDK uploads assets in 2 MiB parts when needed and downloads with bounded ran
 | `GET /v1/renders/:id/artifact` | Completed MP4; byte ranges supported |
 | `GET /health` | Process health and experimental status; does not qualify codecs/storage |
 
-## Implemented profile
+## Experimental: service storage and operations
 
-| Area | Accepted behavior | Boundary |
-| --- | --- | --- |
-| Timeline | Integer frame indexing; 24, 25, 30 or 30000/1001 fps; random seeking | Even dimensions through 1080p area, including portrait; ten minutes maximum |
-| Geometry | Rectangles, ellipses, validated vector paths, linear gradients, strokes | No arbitrary SVG document imports, CSS filters, mesh or 3D |
-| Composition | Groups, nested transforms, opacity, rectangular/path clips, row/column layout, percentages | Explicit sizes and layout; no DOM/CSS layout engine |
-| Motion | Numeric keyframes; linear, hold and three polynomial easings | Absolute frame coordinates; no JavaScript, springs or browser animation APIs |
-| Text | Explicit static TTF/OTF, grapheme fallback, bidi runs, shaping, wrapping and alignment | Missing glyphs reject; no system/variable/color fonts; full Unicode conformance is not claimed |
-| Images | Prepared PNG/JPEG, contain/cover/fill and clipping | Inputs use sRGB; normalize orientation/color profiles before upload |
-| Source video | Prepared MP4/H.264, 8-bit YUV420, CFR, normal-speed seek/trim/crop | Normalize rotation, cadence and SDR BT.709 color before upload; source audio is separate |
-| Audio | Prepared 48 kHz mono/stereo PCM WAV, up to four active tracks, gain and linear fades | Sample count uses rational timeline rounding; no compressed-audio ingestion |
-| Export | sRGB → limited-range BT.709 H.264; continuous stereo AAC; frame-count verification | Opaque MP4, software encoding; no HDR, alpha export or hardware-codec qualification |
-| Recovery | Conditional state writes, expiring leases, fencing, immutable chunks and bounded retries | One serial chunk per job; cross-job concurrency is a host capacity decision |
-| Stores | Local filesystem and S3 adapter | Local store requires atomic hard links/fsync; S3 adapter has contract tests, not live-cloud qualification |
-
-The admission envelope is 2,000 nodes, 5,000 keyframes, depth 16, 20,000 text characters, 256 declared assets, 256 MiB aggregate asset bytes, 32 MiB of font files, 16 MP per image/video frame, and 32 MP aggregate still-image pixels. Up to two video layers and four audio tracks may overlap. A scene within those input bounds is **not guaranteed to fit 512 MiB**. Render work uses one active step per service instance, a 240-second step deadline and at most three attempts by default. Hosts still need CPU/memory/disk limits and per-tenant admission/rate controls.
-
-## Storage and operations
+These notes apply to the experimental render service. The S3 store is experimental.
 
 Each worker materializes and checks the assets it needs, produces a chunk, stores it immutably, and conditionally updates the job manifest. A replaced or canceled lease owner cannot publish its result. Finalization verifies complete ordered coverage, concatenates video without re-encoding, mixes continuous audio, encodes AAC and verifies the final file before publishing success.
 
@@ -198,9 +233,9 @@ Local state uses immutable numbered revisions committed through an exclusive har
 
 No automatic garbage collection or retention policy is installed. Old revisions and orphan uploads from terminated attempts consume storage. Use a dedicated experimental data directory/bucket, monitor capacity, and retain all live job dependencies. Do not apply a blind object-age rule to active jobs. Production qualification includes retention, backups, tenant quotas, saturation and failure-rate evidence.
 
-## Deploy with the setup wizards
+## Experimental: deployment templates and setup wizards
 
-Run from the repository root in your own terminal. The wizards open provider instructions and keep credentials with provider login/OIDC. They may create paid resources after their runtime confirmation steps.
+The VM and Vercel templates and their wizards are experimental deployment candidates, not qualified deployments. The deployment preparer copies the built service and declares its dependencies directly. Run from the repository root in your own terminal. The wizards open provider instructions and keep credentials with provider login/OIDC. They may create paid resources after their runtime confirmation steps.
 
 ```sh
 bash packages/portable/scripts/setup-private-vm.sh
@@ -208,7 +243,7 @@ bash packages/portable/scripts/setup-private-vm.sh
 bash packages/portable/scripts/setup-vercel-s3.sh
 ```
 
-The VM wizard creates a private Fly app, a persistent volume and one Machine. Its Docker build compiles a reduced FFmpeg 8.0.1 profile from checksum-pinned source; `Dockerfile.full` retains the stock-codec comparison build. Fly is an example host for the generic Docker deployment. The Vercel wizard prepares public configuration, an S3 bucket/IAM trust policy and a function deployment using workload identity. Its remote build checks pinned Linux x64 codec bytes and native graphics. Both wizards include explicit remote qualification steps. Neither was executed against an account during implementation.
+The VM wizard creates a private Fly app, a persistent volume and one Machine. Its Docker build compiles a reduced FFmpeg 8.0.1 profile from checksum-pinned source; `Dockerfile.full` retains the stock-codec comparison build. Both images set `HELIOS_FFMPEG_PATH`/`HELIOS_FFPROBE_PATH` to their own codec build, so the npm-installed binaries are not used there. Fly is an example host for the generic Docker deployment. The Vercel wizard prepares public configuration, an S3 bucket/IAM trust policy and a function deployment using workload identity. Its remote build checks pinned Linux x64 codec bytes and native graphics. Both wizards include explicit remote qualification steps. Neither was executed against an account during implementation.
 
 For another VM provider, build the generic deployment independently:
 
@@ -234,7 +269,7 @@ node packages/portable/scripts/qualify-service.mjs http://127.0.0.1:8787
 
 `bench` also accepts `--rasterizer wasm`, `--rasterizer skia`, `--ffmpeg PATH` and `--ffprobe PATH`. The reduced codec builder is `scripts/build-codecs.sh SOURCE_DIRECTORY INSTALL_DIRECTORY [BUILD_JOBS]`; it needs a C compiler, pkg-config, x264 and zlib development libraries. Its local component footprint excludes Node, graphics and system libraries. Linux packaging remains a deployment test.
 
-Tests require FFmpeg/ffprobe and permission to open a temporary loopback port. Corpus output stays in the requested scratch directory. Default benchmarks are reduced smoke fixtures. `--full` preserves the synthetic RFC dimensions/durations, including B06's ten minutes; it is still one exploratory run, not the RFC's repeated cold/warm/concurrency study. JSON records failures, stage times, engine fingerprints, frame identities and sampled process-tree memory. Missing memory measurements are `null`. Timing on a shared development machine is not a cloud price or fair Chromium comparison.
+Tests use the same FFmpeg/ffprobe resolution as the renderer and need permission to open a temporary loopback port. Test fixtures and pixel checks call `ffmpeg`/`ffprobe` from PATH directly. To test a specific build, set `HELIOS_FFMPEG_PATH` and `HELIOS_FFPROBE_PATH`. Corpus output stays in the requested scratch directory. Default benchmarks are reduced smoke fixtures. `--full` preserves the synthetic RFC dimensions/durations, including B06's ten minutes; it is still one exploratory run, not the RFC's repeated cold/warm/concurrency study. JSON records failures, stage times, engine fingerprints, frame identities and sampled process-tree memory. Missing memory measurements are `null`. Timing on a shared development machine is not a cloud price or fair Chromium comparison.
 
 HarfBuzz-generated oracles independently check four scripts. Real process-death tests exercise render/upload/commit/finalization recovery. Native/Wasm comparisons cover multilingual text and thirty shuffled schedules across three fresh preparations of a graphics fixture. The source-core regression suite and selected existing renderer checks are separate from portable qualification.
 

@@ -10,6 +10,7 @@ import { layoutText, loadFont, TextLayout } from './text.js';
 import { VideoInfo, VideoDecoder, videoInfo, wavInfo, activeVideos, muxAudio } from './media.js';
 import { Plan, Node, Paint, Fps, RenderError, LIMITS, evaluate, resolveLength, frameTime, sampleCount } from './plan.js';
 import { runProcess, startProcess } from './process.js';
+import { ffmpegPath, ffprobePath } from './executables.js';
 
 export type AssetFiles = Map<string, string>;
 export type Rasterizer = 'native' | 'wasm' | 'skia' | 'gpu';
@@ -32,7 +33,7 @@ export async function prepareScene(plan: Plan, assets: AssetFiles, options: Rend
       try { await file.read(header, 0, header.length, 0); } finally { await file.close(); }
       const png = header.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
       if (!png && !(header[0] === 255 && header[1] === 216 && header[2] === 255)) throw new RenderError('UNSUPPORTED_MEDIA', 'Images must be PNG or JPEG');
-      const info = JSON.parse((await runProcess(options.ffprobe ?? 'ffprobe', ['-v', 'error', '-protocol_whitelist', 'file,pipe', '-show_streams', '-of', 'json', path], { signal: options.signal, timeoutMs: 30000 })).toString()).streams[0];
+      const info = JSON.parse((await runProcess(ffprobePath(options.ffprobe), ['-v', 'error', '-protocol_whitelist', 'file,pipe', '-show_streams', '-of', 'json', path], { signal: options.signal, timeoutMs: 30000 })).toString()).streams[0];
       if (!info?.width || !info?.height || info.width * info.height > 16_000_000) throw new RenderError('RESOURCE_LIMIT', 'Decoded image exceeds 16 MP');
       imagePixels += info.width * info.height;
       if (imagePixels > LIMITS.decodedImagePixels) throw new RenderError('RESOURCE_LIMIT', 'Aggregate decoded images exceed 32 MP');
@@ -191,7 +192,7 @@ export async function renderVideo(plan: Plan, assets: AssetFiles, output: string
   }
   const prepared = options.prepared ?? await prepareScene(plan, assets, options);
   const decoders = new Map<string, VideoDecoder>();
-  const process = startProcess(options.ffmpeg ?? 'ffmpeg', videoEncoderArgs(plan, end - start, output), { signal: options.signal, timeoutMs: 300000 });
+  const process = startProcess(ffmpegPath(options.ffmpeg), videoEncoderArgs(plan, end - start, output), { signal: options.signal, timeoutMs: 300000 });
   process.child.stdout.resume();
   try {
     for (let index = start; index < end; index++) {
@@ -244,7 +245,7 @@ export async function probeEncodedChunk(path: string, options: Pick<RenderOption
   return probeVideoCount(path, options, true);
 }
 async function probeVideoCount(path: string, options: Pick<RenderOptions, 'ffprobe' | 'signal'>, packets: boolean) {
-  const output = await runProcess(options.ffprobe ?? 'ffprobe', ['-v', 'error', '-threads', packets ? '1' : String(Math.min(8, availableParallelism())), packets ? '-count_packets' : '-count_frames', '-show_streams', '-show_format', '-of', 'json', path], { signal: options.signal, timeoutMs: 300000 });
+  const output = await runProcess(ffprobePath(options.ffprobe), ['-v', 'error', '-threads', packets ? '1' : String(Math.min(8, availableParallelism())), packets ? '-count_packets' : '-count_frames', '-show_streams', '-show_format', '-of', 'json', path], { signal: options.signal, timeoutMs: 300000 });
   const info = JSON.parse(output.toString());
   const video = info.streams?.find((s: { codec_type: string }) => s.codec_type === 'video');
   if (!video) throw new RenderError('INVALID_OUTPUT', 'Output contains no video stream', 500);

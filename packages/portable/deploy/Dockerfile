@@ -10,6 +10,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends libx264-164 zlib1g ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=codecs /opt/codecs/bin/ffmpeg /usr/local/bin/ffmpeg
 COPY --from=codecs /opt/codecs/bin/ffprobe /usr/local/bin/ffprobe
+# Pin the codec build above; it otherwise ranks below the npm-installed binaries.
+ENV HELIOS_FFMPEG_PATH=/usr/local/bin/ffmpeg HELIOS_FFPROBE_PATH=/usr/local/bin/ffprobe
 COPY --from=codecs /build/ffmpeg-8.0.1/COPYING.GPLv2 /usr/share/doc/helios-codecs/COPYING.GPLv2
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund && npm cache clean --force

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { readFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 import { parsePlan, RenderError } from './plan.js';
 import { prepareScene, renderFrame, renderVideo, probeVideo, RenderOptions } from './render.js';
 import { writeFile } from 'node:fs/promises';
@@ -10,14 +11,17 @@ import { FileStore } from './storage.js';
 import { RenderService } from './jobs.js';
 import { createRenderServer, runWorker, HandlerOptions } from './server.js';
 
-const help = `helios-portable (experimental)
+const help = `helios-portable
   render PLAN.json --assets DIRECTORY --output VIDEO.mp4
   frame PLAN.json --assets DIRECTORY --frame 0 --output IMAGE.png
   inspect PLAN.json --assets DIRECTORY
-  serve --data DIRECTORY --host 127.0.0.1 --port 8787
+  serve --data DIRECTORY --host 127.0.0.1 --port 8787   (experimental)
 
 Assets are files named by their SHA-256 digest in DIRECTORY.
 Render flags: --rasterizer native|wasm|skia|gpu --ffmpeg PATH --ffprobe PATH
+The gpu rasterizer is experimental.
+FFmpeg/ffprobe: --ffmpeg/--ffprobe, else HELIOS_FFMPEG_PATH/HELIOS_FFPROBE_PATH,
+else the bundled installer binaries, else ffmpeg/ffprobe on PATH.
 Serve flags: --auth-module PATH | --trusted-network; --chunk-frames 60
 A public listener requires an authorization module or an explicitly trusted network.
 The Wasm option replaces rasterization only; codecs still run as native processes.`;
@@ -73,6 +77,8 @@ export async function runCli(argv: string[]): Promise<void> {
   else { await renderVideo(plan, assets, output, { ...options, prepared }); console.log(JSON.stringify(await probeVideo(output, options))); }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+// npm starts bins through symlinks (node_modules/.bin), so compare real paths.
+const invokedDirectly = () => { try { return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url)); } catch { return false; } };
+if (process.argv[1] && invokedDirectly()) {
   runCli(process.argv.slice(2)).catch(error => { console.error(error instanceof RenderError ? `${error.code}: ${error.message}` : 'Portable rendering failed; check inputs and installed tools'); process.exitCode = 1; });
 }
