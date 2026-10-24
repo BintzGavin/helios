@@ -162,9 +162,7 @@ export class CaptureLoop {
 
 
       const isDomStrategy = !!(strategy as any).cdpSession;
-      const domBeginFrame = isDomStrategy
-        ? (frameTime: number) => strategy.capture(page, frameTime)
-        : null;
+
 
 
       try {
@@ -178,7 +176,7 @@ export class CaptureLoop {
             startFrame * compTimeStep,
           );
           if (timePromise) await timePromise;
-          nextCapturePromise = domBeginFrame!(0);
+          nextCapturePromise = strategy.capture(page, 0);
 
           const rawResult = await nextCapturePromise;
           if (1 < totalFrames) {
@@ -187,7 +185,7 @@ export class CaptureLoop {
               (startFrame + 1) * compTimeStep,
             );
             if (timePromise) await timePromise;
-            nextCapturePromise = domBeginFrame!(timeStep);
+            nextCapturePromise = strategy.capture(page, timeStep);
           }
           console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
           if (onProgress) {
@@ -246,7 +244,7 @@ export class CaptureLoop {
               if (timePromise) await timePromise;
 
               if (!aborted) {
-                nextCapturePromise = domBeginFrame!((i + 1) * timeStep);
+                nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
               }
 
               const buf = Buffer.from(rawResult as string, "base64");
