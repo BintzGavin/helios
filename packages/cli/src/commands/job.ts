@@ -2,7 +2,20 @@ import { Command } from 'commander';
 import fs from 'fs';
 import path from 'path';
 import { JobSpec } from '../types/job.js';
-import { JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter, FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, DenoDeployAdapter, VercelAdapter, ModalAdapter, HetznerCloudAdapter, CloudflareSandboxAdapter, WorkerAdapter } from '@helios-project/infrastructure';
+import type { WorkerAdapter } from '@helios-project/infrastructure';
+
+// The cloud adapters carry the AWS, Google Cloud and Kubernetes clients. They are an optional
+// peer dependency, loaded only when a job runs, so other commands never install or load them.
+async function loadInfrastructure(): Promise<typeof import('@helios-project/infrastructure')> {
+  try {
+    return await import('@helios-project/infrastructure');
+  } catch (err: any) {
+    if (err?.code !== 'ERR_MODULE_NOT_FOUND' || !String(err.message).includes('@helios-project/infrastructure')) throw err;
+    const cli = JSON.parse(fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+    const pin = `@helios-project/infrastructure@${cli.peerDependencies['@helios-project/infrastructure']}`;
+    throw new Error(`helios job needs ${pin}. Install it beside the CLI (npm install ${pin}), or run: npx -p @helios-project/cli@${cli.version} -p ${pin} helios job run <file>`);
+  }
+}
 
 export async function loadJobSpec(file: string): Promise<{ jobSpec: JobSpec, jobDir: string }> {
   if (file.startsWith('http://') || file.startsWith('https://')) {
@@ -98,6 +111,12 @@ export function registerJobCommand(program: Command) {
         }
 
         const shouldMerge = options.merge && chunkId === undefined;
+
+        const {
+          JobExecutor, LocalWorkerAdapter, AwsLambdaAdapter, CloudRunAdapter, CloudflareWorkersAdapter, AzureFunctionsAdapter,
+          FlyMachinesAdapter, KubernetesAdapter, DockerAdapter, DenoDeployAdapter, VercelAdapter, ModalAdapter,
+          HetznerCloudAdapter, CloudflareSandboxAdapter,
+        } = await loadInfrastructure();
 
         let adapter: WorkerAdapter;
 
