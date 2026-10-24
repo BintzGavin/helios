@@ -31,7 +31,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js && node scripts/copy-registry.js && node scripts/embed-renderer.js",
+    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js && node scripts/copy-registry.js && node scripts/embed-packages.js",
     "dev": "tsc -w",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
@@ -46,7 +46,6 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/studio": "0.107.3",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
@@ -60,6 +59,7 @@
   "devDependencies": {
     "@helios-project/infrastructure": "0.25.0",
     "@helios-project/renderer": "1.79.0",
+    "@helios-project/studio": "0.107.3",
     "@types/diff": "^7.0.2",
     "@types/prompts": "^2.4.9",
     "ajv": "^8.20.0",
