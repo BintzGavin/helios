@@ -46,15 +46,18 @@ node <this-skill>/scripts/roll-direction.mjs --format promo \
   --seed-file videos/<slug>/seed.txt --avoid . --out videos/<slug>/direction.json
 ```
 
-It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It skips picks the last two videos used. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
+It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It also draws three idea lenses for step 5 and lists earlier videos' looks. It skips what the last two videos used, and never pairs picks that overlap. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
 
 Honor the picks. Up to two vetoes are allowed for a concrete brand or format conflict, re-rolled with `--lock` and written in the spec. "Something else would look better" isn't one.
 
 ## 5. Design the look
 
-**Default: an original look.** Using the brand profile and the rolled picks, write three genuinely different directions for the look: what the image is made of, palette within the brand, type treatment, how things move, texture. Make them differ in kind, not in shade: if two could share a still frame, replace one. Then let verifiable patterns in the seed string (a digit run, a repeated fragment, a cluster of capitals) pick one, as make-video describes. Write a one-line pattern → choice map in the spec.
+**Default: an original look,** found with [references/look-ideation.md](references/look-ideation.md):
 
-Avoid the stock looks that every generated video falls into unless the brand truly is one: dark gradient with floating orbs or particles, glassmorphism cards, word-by-word fade-ups, neon glow on black.
+1. Write down the obvious answers: the pun on the product's name, the category's usual look, the stock looks (dark gradient with floating orbs or particles, glass cards, word-by-word fade-ups, neon glow on black), and the `recent_looks` in `direction.json`. They're off limits unless the brief asks for one.
+2. Write one candidate from each of the three random `lenses` the roll drew, plus one that drops an assumption all the obvious answers share.
+3. Cut candidates that collapse into an obvious answer or into each other.
+4. Let `roll-direction.mjs --pick <n>` choose among the survivors, and record the result in `picks.look.label`.
 
 **Only when the user asks for a known look**, use the motion-styles library its own way:
 
@@ -67,7 +70,7 @@ Without being asked, you may offer once, in one line, that known styles exist.
 
 ## 6. Music (if wanted)
 
-Generate an instrumental with ElevenLabs matching the brand tone, the format's music direction, the rolled pacing and the runtime, or use the user's track. Analyse it with `helios analyze` and key timing to it as make-video's music section and motion-design-rules Rule 7 describe. Without music, build the timing grid from the rolled pacing.
+Generate an instrumental with ElevenLabs matching the brand tone, the format's music direction, the rolled pacing and the runtime, or use the user's track. Analyse it with `helios analyze` (or make-video's fallback) and key timing to it as make-video's music section and motion-design-rules Rule 7 describe. Without music, build the timing grid from the rolled pacing.
 
 ## 7. B-roll (if wanted and `broll` isn't `none`)
 
@@ -80,7 +83,7 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 - Duration, aspect, resolution, FPS, render mode
 - Brand summary
 - Format, every rolled pick, locks, vetoes and why
-- The three look directions, the one the seed chose, and the pattern → choice map (or the style card the user asked for)
+- The obvious answers, the four look candidates with their lenses, what was cut and why, the pick, and the seed pattern → choice map (or the style card the user asked for)
 - Where the rule to break shows up, and what happens at the peak
 - Scenes with exact timestamps, each keyed to a sound or time (W/B/H/F/T, Rule 7)
 - Voiceover and on-screen text
@@ -90,6 +93,8 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 
 ## 9. Build, review, render
 
-Make two or three style frames first and check them: do they look like the chosen direction and like nothing in the stock list? Then build, render, sheet, `verify` and `check` as make-video describes.
+Check two or three early stills of the real page as style frames: do they look like the chosen candidate and like nothing on the obvious list? Then build, render, sheet, `verify` and `check` as make-video describes.
+
+CLI notes for 0.46.0: `still`, `sheet` and `verify` take no `--mode` (only `render` does), and `--fps` only applies to `sheet --strip`. `check`, `analyze` and `verify --cues` ship after 0.46.0; make-video's troubleshooting table has the fallbacks. Say in the report which checks didn't run.
 
 Report the output path, format, seed, picks, the chosen look, locks and vetoes, B-roll credits, and anything unverified.

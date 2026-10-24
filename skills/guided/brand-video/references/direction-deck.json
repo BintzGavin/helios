@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "formats": ["promo", "explainer", "demo", "testimonial", "launch", "social"],
   "note": "Staging choices rolled after the format is locked. They work with an original look or, when the user asked for one, a motion-styles card: if the card bans a pick, re-roll that axis with --lock to an option the card allows.",
   "axes": [
@@ -38,7 +38,7 @@
         { "id": "pull-back", "label": "Pull back", "brief": "Pull back to reveal everything at once, CTA inside the wide shot." },
         { "id": "hold-cta", "label": "Hold on the CTA", "brief": "Settle and hold still on the CTA for a full beat." },
         { "id": "echo", "label": "Echo the opening", "brief": "Repeat the opening composition with one telling change." },
-        { "id": "hit-cut", "label": "Cut on the final hit", "brief": "Hard cut to the brand mark on the last hit of the music." },
+        { "id": "hit-cut", "label": "Cut on the final hit", "brief": "Hard cut to the brand mark on the last hit of the music, or on the last beat of the timing grid without music." },
         { "id": "becomes-logo", "label": "Becomes the logo", "brief": "A recurring element turns into the logo." }
       ]
     },
@@ -60,7 +60,7 @@
         { "id": "restraint", "label": "Restraint", "brief": "Neutrals plus one brand colour; the accent appears only at the peak." },
         { "id": "tonal", "label": "Tonal", "brief": "One brand hue across many lightness steps; contrast from value, not hue." },
         { "id": "inverted", "label": "Inverted ground", "brief": "Swap the brand's usual ground: light brands go dark, dark brands go light." },
-        { "id": "color-fields", "label": "Colour fields", "brief": "Each scene owns one flat brand colour; scenes change by swapping fields." }
+        { "id": "color-fields", "label": "Colour fields", "brief": "Each scene owns one flat brand colour; scenes change by swapping fields. A field in the accent colour is that scene's accent use." }
       ]
     },
     {
@@ -103,13 +103,13 @@
       "id": "entrance",
       "label": "Entrance emphasis",
       "options": [
-        { "id": "per-letter", "label": "Per letter", "brief": "Letters arrive one at a time." },
+        { "id": "per-letter", "label": "Per letter", "brief": "Letters arrive one at a time, 15–35 ms apart; keep these strings short." },
         { "id": "per-line", "label": "Per line", "brief": "Whole lines arrive together." },
         { "id": "mask", "label": "Mask reveal", "brief": "Elements rise from behind a mask or baseline." },
         { "id": "draw-on", "label": "Draw on", "brief": "Strokes draw before fills appear." },
         { "id": "scale", "label": "Scale from a point", "brief": "Elements grow from a point in the style's easing." },
         { "id": "edge-slide", "label": "From the edge", "brief": "Elements enter from the nearest frame edge." },
-        { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style." },
+        { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style, 30–60 ms apart; keep these strings short." },
         { "id": "scatter", "label": "Seeded scatter", "brief": "Pieces arrive in a seeded order and settle into place." }
       ]
     },
@@ -144,12 +144,54 @@
       "options": [
         { "id": "still-scene", "label": "Still scene", "brief": "One scene holds completely still for a full beat." },
         { "id": "no-ambient", "label": "No ambient motion", "brief": "Remove background drift; negative space only." },
-        { "id": "logo-last", "label": "Logo last", "brief": "The logo appears only in the final frame." },
+        { "id": "logo-last", "label": "Logo last", "brief": "The logo appears only in the final frame.", "conflicts": ["ending:becomes-logo"] },
         { "id": "one-edge", "label": "One edge", "brief": "Every element enters from the same edge." },
-        { "id": "traveling-shape", "label": "Traveling shape", "brief": "One shape travels through every scene and becomes the CTA." },
+        { "id": "traveling-shape", "label": "Traveling shape", "brief": "One shape travels through every scene and becomes the CTA.", "conflicts": ["ending:becomes-logo"] },
         { "id": "break-grid", "label": "Break the grid once", "brief": "Exactly one scene breaks the layout on purpose." },
         { "id": "none", "label": "None", "brief": "No rule broken." }
       ]
     }
+  ],
+  "lenses": [
+    { "id": "weather-map", "label": "Weather map", "brief": "Fronts, isobars, a presenter's sweep, a forecast for the data." },
+    { "id": "museum-label", "label": "Museum label", "brief": "Objects on plinths, small wall labels, a curator's hush." },
+    { "id": "sports-broadcast", "label": "Sports broadcast", "brief": "Lower-third scorebugs, replays, telestrator circles, a live clock." },
+    { "id": "recipe-card", "label": "Recipe card", "brief": "Ingredients, numbered steps, a stained card, measured quantities." },
+    { "id": "transit-signage", "label": "Transit signage", "brief": "Line colours, station dots, arrows, departure boards." },
+    { "id": "x-ray", "label": "X-ray", "brief": "See-through layers that reveal what's inside, a light box." },
+    { "id": "sewing-pattern", "label": "Sewing pattern", "brief": "Tissue sheets, dashed cut lines, notches, numbered pieces." },
+    { "id": "shipping-manifest", "label": "Shipping manifest", "brief": "Crates, stamps, stencilled codes, checked-off cargo." },
+    { "id": "picture-book", "label": "Picture book", "brief": "Big simple shapes, page turns, one sentence per spread." },
+    { "id": "field-notebook", "label": "Field notebook", "brief": "Pencil sketches, specimen labels, observations dated by hand." },
+    { "id": "departures-board", "label": "Departures board", "brief": "Split-flap letters, rows that update, times and gates." },
+    { "id": "receipt", "label": "Receipt", "brief": "A thermal printer feeding a long strip, totals, a tear." },
+    { "id": "seed-packet", "label": "Seed packet", "brief": "Planting instructions, growth stages, a packet illustration." },
+    { "id": "chess-notation", "label": "Chess notation", "brief": "A board, moves in notation, one decisive move." },
+    { "id": "knitting-chart", "label": "Knitting chart", "brief": "A grid of stitches where each cell is a symbol; rows build up." },
+    { "id": "flight-instruments", "label": "Flight instruments", "brief": "Dials, an artificial horizon, needles that settle." },
+    { "id": "film-slate", "label": "Film slate", "brief": "Takes, clapper, script supervisor notes, cut and print." },
+    { "id": "postage-stamps", "label": "Postage stamps", "brief": "Perforated tiles, cancellation marks, an envelope journey." },
+    { "id": "architectural-model", "label": "Architectural model", "brief": "White card massing, tiny people, a model on a table." },
+    { "id": "care-label", "label": "Care label", "brief": "Small symbols and instructions sewn into a seam." },
+    { "id": "music-score", "label": "Music score", "brief": "Staves, notes as data, a conductor's tempo." },
+    { "id": "shop-sign", "label": "Hand-painted shop sign", "brief": "Sign-painter lettering, gilding, a shopfront." },
+    { "id": "origami", "label": "Origami diagram", "brief": "Fold lines, arrows, one sheet becoming a form." },
+    { "id": "ticket-stub", "label": "Ticket stub", "brief": "Perforations, seat numbers, a torn admission." },
+    { "id": "stage-script", "label": "Stage script", "brief": "Character names, stage directions, a spotlight cue." },
+    { "id": "comic-panels", "label": "Comic panels", "brief": "Gutters, captions, sound effects, a page layout." },
+    { "id": "microscope", "label": "Microscope slide", "brief": "Magnification, a specimen, focus rings, scale bars." },
+    { "id": "pinball", "label": "Pinball table", "brief": "Bumpers, a ball's path, score reels, tilt." },
+    { "id": "cardboard", "label": "Cardboard and tape", "brief": "Boxes, packing tape, marker labels, a move." },
+    { "id": "library-catalog", "label": "Library card catalog", "brief": "Drawers of cards, call numbers, a date stamp." },
+    { "id": "lab-glassware", "label": "Lab glassware", "brief": "Beakers, measured pours, filtering, a clear result." },
+    { "id": "thermal-camera", "label": "Thermal camera", "brief": "Heat colours that reveal what's hidden or active." },
+    { "id": "whiteboard", "label": "Whiteboard session", "brief": "Sticky notes, arrows, a marker diagram being drawn." },
+    { "id": "elevator-panel", "label": "Elevator panel", "brief": "Floor buttons, a level indicator, going down or up." },
+    { "id": "race-timing", "label": "Race timing", "brief": "Lanes, splits, a photo finish, a stopwatch." },
+    { "id": "star-chart", "label": "Star chart", "brief": "Constellations joining points, coordinates, a dark sky." },
+    { "id": "assembly-manual", "label": "Assembly manual", "brief": "Exploded parts, numbered steps, an allen key." },
+    { "id": "board-game", "label": "Board game", "brief": "A board, tokens, dice, a path to the goal." },
+    { "id": "tailor-measure", "label": "Tape measure", "brief": "Measurements, chalk marks, fitting." },
+    { "id": "radio-dial", "label": "Radio dial", "brief": "Tuning across stations until one comes in clear." }
   ]
 }

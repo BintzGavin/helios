@@ -184,5 +184,9 @@ A check a script can run beats a judgement. Before handing over:
 • `helios check video.mp4` on the final file — flashing and
   colour tags.
 
+`check`, `analyze` and `verify --cues` ship after CLI 0.46.0. If
+yours lacks them, use the fallbacks in make-video's troubleshooting
+table and say which checks didn't run.
+
 If a reviewer can see a problem and no check catches it, add a
 check.

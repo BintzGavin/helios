@@ -18,7 +18,9 @@ const usage = `Usage: node roll-direction.mjs --format <${deck.formats.join('|')
   --lock <axis=option>    Force a pick (repeatable), e.g. --lock camera=locked when the card bans moves.
   --avoid <path>          direction.json file, or a folder to search for them (repeatable).
                           Picks used by the two most recent are skipped where possible.
-  --out <file>            Also write the direction to this file.`;
+  --out <file>            Also write the direction to this file.
+  --pick <n>              Instead of rolling, print a number from 1 to n chosen by the seed
+                          (with --seed-file or --seed). Use it to choose between candidates.`;
 
 const args = process.argv.slice(2);
 const opts = { locks: {}, avoid: [], broll: true };
@@ -39,6 +41,7 @@ for (let i = 0; i < args.length; i++) {
     opts.locks[axis] = option;
   } else if (flag === '--avoid') opts.avoid.push(value());
   else if (flag === '--out') opts.out = value();
+  else if (flag === '--pick') opts.pick = Number(value());
   else if (flag === '--help' || flag === '-h') { console.log(usage); process.exit(0); }
   else fail(`Unknown argument: ${flag}`);
 }
@@ -46,6 +49,15 @@ for (let i = 0; i < args.length; i++) {
 function fail(message) {
   console.error(`${message}\n\n${usage}`);
   process.exit(1);
+}
+
+if (opts.pick !== undefined) {
+  if (!(Number.isInteger(opts.pick) && opts.pick >= 1 && opts.pick <= 100)) fail('--pick must be an integer from 1 to 100');
+  const material = opts.seedFile ? fs.readFileSync(opts.seedFile, 'utf8').trim() : String(opts.seed ?? '');
+  if (!material) fail('--pick needs --seed-file or --seed');
+  const n = crypto.createHash('sha256').update(`${material}:pick:${opts.pick}`).digest().readUInt32BE(0);
+  console.log((n % opts.pick) + 1);
+  process.exit(0);
 }
 
 if (!deck.formats.includes(opts.format)) fail(`--format must be one of: ${deck.formats.join(', ')}`);
@@ -98,12 +110,14 @@ function findDirections(target, depth = 0, found = []) {
   return found;
 }
 const outPath = opts.out && path.resolve(opts.out);
-const history = opts.avoid.flatMap(target => findDirections(path.resolve(target)))
+const allHistory = opts.avoid.flatMap(target => findDirections(path.resolve(target)))
   .filter(file => file !== outPath)
   .map(file => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } })
   .filter(direction => direction?.picks)
-  .sort((a, b) => String(b.rolled_on).localeCompare(String(a.rolled_on)))
-  .slice(0, 2);
+  .sort((a, b) => String(b.rolled_on).localeCompare(String(a.rolled_on)));
+const history = allHistory.slice(0, 2);
+// Looks of earlier videos, as the agent recorded them, for the idea-gap map.
+const recentLooks = allHistory.slice(0, 5).map(direction => direction.picks.look?.label).filter(Boolean);
 const recent = axis => new Set(history.map(direction => direction.picks[axis]?.id ?? direction.picks[axis]).filter(Boolean));
 
 function pick(axis, pool) {
@@ -114,9 +128,19 @@ function pick(axis, pool) {
 const picks = {};
 for (const axis of deck.axes) {
   const pool = axis.options.filter(option => !(option.needs === 'broll' && !opts.broll)
-    && !(option.avoid || []).includes(opts.format));
+    && !(option.avoid || []).includes(opts.format)
+    && !(option.conflicts || []).some(rule => {
+      const [other, id] = rule.split(':');
+      return picks[other]?.id === id;
+    }));
   picks[axis.id] = pick(axis, pool);
 }
+
+// Three idea lenses, one per look candidate, skipping the last two videos' lenses.
+const usedLenses = new Set(history.flatMap(direction => (direction.lenses || []).map(lens => lens.id)));
+const lensPool = deck.lenses.filter(lens => !usedLenses.has(lens.id));
+const lenses = [];
+while (lenses.length < 3 && lensPool.length) lenses.push(lensPool.splice(Math.floor(random() * lensPool.length), 1)[0]);
 
 const direction = {
   seed,
@@ -127,11 +151,13 @@ const direction = {
   picks: {
     look: opts.style
       ? { id: opts.style, card: `skills/design/motion-styles/references/styles/${opts.style}.md` }
-      : { id: 'original', brief: 'Designed from the brand and the seed; see the spec.' },
+      : { id: 'original', label: null, brief: 'Fill in label with a few words naming the chosen look, so later videos avoid it.' },
     ...Object.fromEntries(Object.entries(picks).map(([axis, option]) => [
       axis, { id: option.id, label: option.label, brief: option.brief },
     ])),
   },
+  lenses,
+  recent_looks: recentLooks,
 };
 
 const text = `${JSON.stringify(direction, null, 2)}\n`;
