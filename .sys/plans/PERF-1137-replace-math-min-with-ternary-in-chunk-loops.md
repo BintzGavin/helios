@@ -1,11 +1,11 @@
 ---
 id: PERF-1137
 slug: replace-math-min-with-ternary-in-chunk-loops
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2024-10-25
-completed: ""
-result: ""
+completed: "2024-10-25"
+result: "improved"
 ---
 
 # PERF-1137: Replace Math.min with Ternary in Chunk Boundary Evaluations
