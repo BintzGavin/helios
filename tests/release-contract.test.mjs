@@ -80,3 +80,23 @@ test('Given public workspace packages, every package builds before npm publish',
     );
   }
 });
+
+test('Given workspace packages, every internal dependency pins its sibling exactly', async () => {
+  const { readdir } = await import('node:fs/promises');
+  const dirs = (await readdir(new URL('../packages/', import.meta.url), { withFileTypes: true }))
+    .filter(entry => entry.isDirectory()).map(entry => entry.name);
+  const manifests = [];
+  for (const dir of dirs) {
+    try { manifests.push(await readJson('packages/' + dir + '/package.json')); } catch { /* not a package */ }
+  }
+  const versions = new Map(manifests.map(m => [m.name, m.version]));
+  for (const manifest of manifests) {
+    for (const section of ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies']) {
+      for (const [dep, spec] of Object.entries(manifest[section] ?? {})) {
+        if (!versions.has(dep) || /^(file|link|workspace):/.test(spec)) continue;
+        assert.equal(spec, versions.get(dep),
+          manifest.name + ' ' + section + ' must pin ' + dep + ' to ' + versions.get(dep) + ' (run scripts/release.mjs)');
+      }
+    }
+  }
+});

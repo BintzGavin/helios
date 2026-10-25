@@ -75,6 +75,18 @@ Helios V2 must be structurally compatible with future monetization.
 - Hosted rendering for AI hosts is the natural paid tier. The free plugin must never depend on it.
 - AI hosts don't allow selling inside the conversation. Payment happens on heliosrender.com. Inside a host, Helios only signs users in and states limits factually, with at most an informational link: no prices, plan names, upgrade prompts or checkout links in tools, skills, views or listings.
 
+#### PACKAGING
+Helios publishes three npm packages, all at one version:
+- `@helios-project/cli`: the `helios` command, the renderer (`@helios-project/cli/renderer`), Studio and the MCP server. Node only.
+- `@helios-project/core`: the browser runtime, with the player at `@helios-project/core/player`. Never depends on Node-only packages.
+- `@helios-project/infrastructure`: optional cloud adapters, loaded only by the commands that use them.
+*Key constraints:*
+- A local `helios render` installs nothing it doesn't run: no cloud SDKs, no UI framework packages.
+- Internal dependencies are exact pins to the sibling's version, never ranges.
+- `packages/renderer`, `packages/studio` and `packages/player` remain source directories with their own domains, published only inside `cli` and `core`.
+- Agents never publish to npm. A human runs the release.
+*The design, slices and verification live in `docs/rfcs/2026-10-24-npm-packaging.md`.*
+
 ---
 
 ## DOMAIN POSTURE
@@ -134,7 +146,7 @@ Helios V2 must be structurally compatible with future monetization.
 ### DEPENDENCY GOVERNANCE
 Agents are prohibited from manually synchronizing internal package versions.
 - External dependency updates are handled by deterministic tooling.
-- Internal version propagation is handled by release tooling.
+- Internal version propagation is handled by release tooling: `scripts/release.mjs` is the only writer of package versions, internal pins and the release matrix.
 - Version mismatches are governance issues, not coding tasks.
 *Dependency churn must not appear as agent work.*
 

@@ -19,12 +19,19 @@
   "bin": {
     "helios": "./bin/helios.js"
   },
+  "exports": {
+    "./renderer": {
+      "types": "./dist/renderer/index.d.ts",
+      "default": "./dist/renderer/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "bin",
     "dist"
   ],
   "scripts": {
-    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js && node scripts/copy-registry.js",
+    "build": "tsc && node scripts/bundle-skills.js && node scripts/copy-view.js && node scripts/copy-registry.js && node scripts/embed-packages.js",
     "dev": "tsc -w",
     "test": "vitest run",
     "prepublishOnly": "npm run build"
@@ -39,23 +46,32 @@
   ],
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@helios-project/infrastructure": "^0.25.0",
-    "@helios-project/renderer": "^1.79.0",
-    "@helios-project/studio": "^0.107.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "diff": "^8.0.3",
     "giget": "^3.1.2",
+    "playwright": "^1.60.0",
     "prompts": "^2.4.2",
     "vite": "^7.1.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@helios-project/infrastructure": "0.25.0",
+    "@helios-project/renderer": "1.79.0",
+    "@helios-project/studio": "0.107.3",
     "@types/diff": "^7.0.2",
     "@types/prompts": "^2.4.9",
     "ajv": "^8.20.0",
     "typescript": "^5.0.0",
     "vitest": "^4.1.8"
+  },
+  "peerDependencies": {
+    "@helios-project/infrastructure": "0.25.0"
+  },
+  "peerDependenciesMeta": {
+    "@helios-project/infrastructure": {
+      "optional": true
+    }
   }
 }
