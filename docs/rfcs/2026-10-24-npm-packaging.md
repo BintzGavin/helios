@@ -36,7 +36,7 @@ Monthly npm downloads on 22 October 2026: renderer 1,188, core 1,134, cli 310, p
 - All three packages share one version. The first combined release is **6.0.0**: it is above every current version and merging is a breaking change.
 - Internal dependencies are exact pins (`"@helios-project/core": "6.0.0"`), never ranges. A published package then always runs with the sibling it was tested with.
 - `scripts/release.mjs` is the only writer of package versions, internal pins and the release matrix.
-- The release that is already prepared (renderer 1.80.0 and CLI 0.47.0, which ship `analyze`, `check`, `verify --cues` and the cursor component) can go out first with the same script: `node scripts/release.mjs --set renderer@1.80.0,cli@0.47.0`.
+- The next release is CLI 0.47.0 (set in #5159), which ships `analyze`, `check`, `verify --cues` and the cursor component. Because the CLI now carries its own renderer and Studio, it publishes alone: `node scripts/release.mjs --publish` from `main`. No renderer release is needed for it.
 
 ## Slices
 
