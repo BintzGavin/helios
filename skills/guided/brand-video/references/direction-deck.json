@@ -56,8 +56,8 @@
       "id": "palette",
       "label": "Palette approach",
       "options": [
-        { "id": "brand-literal", "label": "Brand literal", "brief": "Brand colours as specified, primary dominant." },
-        { "id": "restraint", "label": "Restraint", "brief": "Neutrals plus one brand colour; the accent appears only at the peak." },
+        { "id": "brand-literal", "label": "Brand literal", "brief": "Brand colours as specified; the primary leads across the video, not necessarily in every scene." },
+        { "id": "restraint", "label": "Restraint", "brief": "Neutrals plus one brand colour; the accent first appears at the peak and may stay on the closing CTA." },
         { "id": "tonal", "label": "Tonal", "brief": "One brand hue across many lightness steps fills most of the frame; other brand colours appear only as small accents." },
         { "id": "color-fields", "label": "Colour fields", "brief": "Each scene owns one flat brand colour; scenes change by swapping fields. A field in the accent colour is that scene's accent use." }
       ]
@@ -89,7 +89,7 @@
       "options": [
         { "id": "locked", "label": "Locked off", "brief": "The camera never moves; only elements move." },
         { "id": "push-in", "label": "Slow push-in", "brief": "One slow push across the whole video." },
-        { "id": "track", "label": "Lateral track", "brief": "The camera travels sideways across a wide world." },
+        { "id": "track", "label": "Lateral track", "brief": "The camera travels sideways across a wide world.", "conflicts": ["scale:one-object"] },
         { "id": "zoom-through", "label": "Zoom through", "brief": "Each scene ends by entering an element that becomes the next scene." },
         { "id": "fixed-framings", "label": "Cuts between fixed framings", "brief": "Wide, medium and close framings, changed by cuts on beats." },
         { "id": "tilt", "label": "Tilt or orbit", "brief": "Perspective tilt or a slight orbit on flat layers." }
@@ -123,13 +123,13 @@
       "id": "entrance",
       "label": "Entrance emphasis",
       "options": [
-        { "id": "per-letter", "label": "Per letter", "brief": "Letters arrive one at a time, 15–35 ms apart; keep these strings short." },
+        { "id": "per-letter", "label": "Per letter", "brief": "Letters arrive one at a time, 15–35 ms apart; keep these strings to about 30 characters." },
         { "id": "per-line", "label": "Per line", "brief": "Whole lines arrive together." },
         { "id": "mask", "label": "Mask reveal", "brief": "Elements rise from behind a mask or baseline." },
         { "id": "draw-on", "label": "Draw on", "brief": "Strokes draw before fills appear." },
         { "id": "scale", "label": "Scale from a point", "brief": "Elements grow from a point in the video's easing." },
         { "id": "edge-slide", "label": "From the edge", "brief": "Elements enter from the nearest frame edge." },
-        { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style, 30–60 ms apart; keep these strings short." },
+        { "id": "type-on", "label": "Type on", "brief": "Characters appear in order, typewriter style, 30–60 ms apart; keep these strings to about 30 characters." },
         { "id": "scatter", "label": "Seeded scatter", "brief": "Pieces arrive in a seeded order and settle into place." }
       ]
     },
@@ -142,7 +142,7 @@
         { "id": "crop-marks", "label": "Crop marks", "brief": "Brackets or registration marks frame the hero." },
         { "id": "cursor", "label": "Cursor", "brief": "A pointer acts as the narrator." },
         { "id": "redaction", "label": "Redaction", "brief": "Bars cover words and pull away to reveal them." },
-        { "id": "timecode", "label": "Timecode", "brief": "A running counter sits in a corner." },
+        { "id": "timecode", "label": "Running counter", "brief": "A running counter (rows copied, a clock, a timecode) sits in a corner." },
         { "id": "none", "label": "None", "brief": "No accent device; restraint is the voice." }
       ]
     },
@@ -160,7 +160,7 @@
     },
     {
       "id": "wildcard",
-      "label": "Rule to break",
+      "label": "Twist",
       "options": [
         { "id": "still-scene", "label": "Still scene", "brief": "One scene holds completely still for a full beat." },
         { "id": "no-ambient", "label": "No ambient motion", "brief": "Remove background drift; negative space only." },
@@ -168,7 +168,7 @@
         { "id": "one-edge", "label": "One edge", "brief": "Every element enters from the same edge." },
         { "id": "traveling-shape", "label": "Traveling shape", "brief": "One shape travels through every scene and becomes the CTA.", "conflicts": ["ending:becomes-logo"] },
         { "id": "break-grid", "label": "Break the grid once", "brief": "Exactly one scene breaks the layout on purpose." },
-        { "id": "none", "label": "None", "brief": "No rule broken." }
+        { "id": "none", "label": "None", "brief": "No twist." }
       ]
     }
   ],
