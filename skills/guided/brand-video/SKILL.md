@@ -95,6 +95,6 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 
 Check two or three early stills of the real page as style frames: do they look like the chosen candidate and like nothing on the obvious list? Then build, render, sheet, `verify` and `check` as make-video describes.
 
-CLI notes for 0.46.0: `still` and `sheet` capture at 1920×1080 unless you pass `--width` and `--height`. `still`, `sheet` and `verify` take no `--mode` (only `render` does), and `--fps` only applies to `sheet --strip`. `check`, `analyze` and `verify --cues` ship after 0.46.0; make-video's troubleshooting table has the fallbacks. Say in the report which checks didn't run.
+CLI notes: `still` and `sheet` capture at 1920×1080 unless you pass `--width` and `--height`. `still`, `sheet` and `verify` take no `--mode` (only `render` does), and `--fps` only applies to `sheet --strip`. `check`, `analyze` and `verify --cues` need CLI 0.47.0 or later; on an older CLI, use the fallbacks in make-video's troubleshooting table. Say in the report which checks didn't run.
 
 Report the output path, format, seed, picks, the chosen look, locks and vetoes, B-roll credits, and anything unverified.
