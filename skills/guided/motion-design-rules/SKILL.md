@@ -9,8 +9,8 @@ Read them before producing a creative specification or writing composition code.
 They describe how motion must behave, not what the video must look like.
 The look comes from the video's own direction: an original one designed
 from a seed, or a design/motion-styles card when the user asked for one.
-Where a card's invariants conflict with a rule here, the card wins. When the rolled "rule to break" names one
-of these rules, break it once, on purpose, and say where in the spec.
+Where a card's invariants conflict with a rule here, the card wins. When the rolled twist breaks one of
+these rules, break it once, on purpose, and say where in the spec.
 
 ------------------------------------------------------------
 RULE 1 — Anti-Slideshow Architecture
@@ -60,8 +60,9 @@ look and the brand, not by habit, and keep it. Write it in the spec as one const
 
 physics: { easing: "circOut", defaultDuration: 0.4 }
 
-Every animation references that constant. Break it only for a named
-creative reason in the spec.
+Every animation references that constant. Camera moves that start
+and end at rest may use the in-out form of the same curve family.
+Break it otherwise only for a named creative reason in the spec.
 
 ------------------------------------------------------------
 RULE 4 — Choreography and Staggering

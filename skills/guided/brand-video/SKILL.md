@@ -46,7 +46,7 @@ node <this-skill>/scripts/roll-direction.mjs --format promo \
   --seed-file videos/<slug>/seed.txt --avoid . --out videos/<slug>/direction.json
 ```
 
-It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, ground, scale, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one rule to break. It also draws three idea lenses for step 5 and lists earlier videos' looks. It skips what the last two videos used, and never pairs picks that overlap. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
+It picks one option on every axis in [references/direction-deck.json](references/direction-deck.json): structure, opening, ending, peak position, palette approach, ground, scale, camera path, layout, pacing, entrance emphasis, accent device, footage role, and one twist (a constraint or device; some twists break a motion-design rule on purpose). It also draws three idea lenses for step 5 and lists earlier videos' looks. It skips what the last two videos used, and never pairs picks that overlap. Add `--no-broll` if B-roll was declined; `--lock axis=option` for anything the user or brand requires; `--style <slug>` when step 5 uses a style card.
 
 Honor the picks. Up to two vetoes are allowed for a concrete brand or format conflict, re-rolled with `--lock` and written in the spec. "Something else would look better" isn't one.
 
@@ -84,7 +84,7 @@ One spec in a single code block, also saved as `spec.md`. Don't restate the prom
 - Brand summary
 - Format, every rolled pick, locks, vetoes and why
 - The obvious answers, the four look candidates with their lenses, what was cut and why, the pick, and the seed pattern → choice map (or the style card the user asked for)
-- Where the rule to break shows up, and what happens at the peak
+- How the twist shows up (and which motion-design rule it breaks, if any), and what happens at the peak
 - Scenes with exact timestamps, each keyed to a sound or time (W/B/H/F/T, Rule 7)
 - Voiceover and on-screen text
 - Per scene: layout, hero, layers, entrance, transition out

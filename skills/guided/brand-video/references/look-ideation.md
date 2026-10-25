@@ -2,7 +2,7 @@
 
 Adapted from the find-idea-gaps workflow. If a **find-idea-gaps** skill is installed, you may follow it instead; keep the inputs and outputs below.
 
-Why this exists: asked for "three different directions", agents write nearly the same three every time (for a dev tool: a terminal or ledger, a chart, cut paper), and most of them pun on the product's name. Letting the seed pick among those three still gives the same few videos. So the randomness goes in **before** the ideas are written, and the obvious answers are named and set aside first.
+Why this exists: asked for "three different directions", agents write nearly the same three every time (for a dev tool: a terminal, a chart, cut paper), and most of them pun on the product's name. Letting the seed pick among those three still gives the same few videos. So the randomness goes in **before** the ideas are written, and the obvious answers are named and set aside first.
 
 ```text
 brief + brand + roll → map the obvious → 3 lens candidates + 1 gap candidate → compare → seed picks a survivor
@@ -17,7 +17,7 @@ List what this brief would get by default. Write each as a few words:
 - The **stock looks**: dark gradient with floating orbs or particles, glassmorphism cards, word-by-word fade-ups, neon glow on black.
 - The **recent looks**: every entry in `direction.json`'s `recent_looks`.
 
-These are off limits unless the brief explicitly asks for one ("make it about lighthouses"). A candidate that is one of them in different words is also off limits.
+These are off limits unless the brief explicitly asks for one ("make it about lighthouses"). A candidate that is one of them in different words is also off limits. What's off limits is the default look, not the subject: a table of records is fine if it's made of something unexpected.
 
 ## 2. Write four candidates
 
