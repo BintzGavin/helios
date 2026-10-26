@@ -9,6 +9,9 @@ Last updated by: PERF-1118
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
 ## What Works
+- **PERF-1138**: Optimized the progress counter inside the single-worker capture loops in `CaptureLoop.ts`.
+  - **Improvement:** Replaced `nextProgress` tracking and condition checking with a pure `progressCounter` countdown and chunk calculations, avoiding per-frame logic evaluation.
+  - **Plan ID:** PERF-1138
 
 - **PERF-1137**: Replaced `Math.min()` calls with a ternary operator in `CaptureLoop.ts` chunk boundary evaluations to reduce built-in math function execution overhead.
   - **Improvement**: Replaced `Math.min(a, b)` which invokes function arguments and built in object mapping with a direct ternary `a < b ? a : b` allowing the V8 compiler to use direct branch instructions. Yields slightly faster block evaluations for boundaries without adding logic complexity.
