@@ -309,3 +309,4 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 4	8.780	150	17.08	64.4	keep	PERF-1096-math-min-chunk-end
 1	4.652	150	32.25	70.2	keep	cdp start screencast
 1	0.000	0	0.00	0.0	crash	cdp start screencast breaks deterministic frame syncing
+2	0.000	0	0.00	0.0	crash	PERF-1139 optimize progress counter multi worker (rejected by code review)

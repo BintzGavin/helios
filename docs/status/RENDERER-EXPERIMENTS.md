@@ -291,6 +291,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1139**: Replaced `nextProgress` bounds checking with a countdown in `CaptureLoop.ts` multi-worker writer loops.
+  - **WHY it didn't work**: Unlike the single-worker initialization loop where a synchronous inner batch loop exists, the multi-worker writer loop processes chunk progress dynamically across asynchronous iterations. The `chunkLen` calculation mathematically equaled the progress interval, causing the counter to decrement to 0 immediately on the first frame iteration, spamming the console on every alternating frame rather than on the correct interval. The performance was also worse due to the broken logic triggering console IO every frame.
+  - **Plan ID**: PERF-1139
 - **PERF-1131**: Removed redundant `if (!aborted)` check around `strategy.capture` in single-worker chunk loops.
   - **WHY it didn't work**: While microbenchmarks showed speedup for pure loop execution, macro benchmarks in Node 22 showed effectively equivalent performance metrics on average because V8 is already optimizing the block efficiently. As there was no significant improvement, the experiment was discarded to avoid churn.
   - **Plan ID**: PERF-1131
