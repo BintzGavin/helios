@@ -4,8 +4,8 @@ slug: optimize-progress-counter-multi-worker
 status: unclaimed
 claimed_by: ""
 created: 2024-10-26
-completed: ""
-result: ""
+completed: 2026-10-26
+result: failed
 ---
 
 # PERF-1139: Optimize Progress Counter in Multi-Worker Writer Loop
@@ -56,3 +56,9 @@ By tracking remaining frames (`progressCounter`) and `chunkLen` we can manage in
 
 ## Prior Art
 - PERF-1138 implemented this same optimization for the single-worker initialization loop bounds effectively.
+
+## Results Summary
+- **Best render time**: N/A (crash/regression)
+- **Improvement**: 0%
+- **Kept experiments**: None
+- **Discarded experiments**: Replaced `nextProgress` with `progressCounter` decrements in the multi-worker loop (incorrect logic for asynchronous loop architecture).
