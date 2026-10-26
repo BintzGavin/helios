@@ -1,11 +1,11 @@
 ---
 id: PERF-1138
 slug: optimize-progress-counter-single-worker
-status: unclaimed
+status: completed
 claimed_by: ""
 created: 2024-10-26
 completed: ""
-result: ""
+result: improved
 ---
 # PERF-1138: Optimize Progress Counter in Single-Worker Loop
 
