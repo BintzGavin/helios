@@ -5,6 +5,15 @@ Current best: ~500ms (from journals)
 Last updated by: PERF-945
 
 ## What Works
+- **PERF-1141**: Hoisted dispatch limit calculation in multi-worker writer chunk loops to a scoped constant in `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST evaluation overhead by saving V8 from recalculating identical loop boundary expressions inside the branch dispatch block.
+  - **Plan ID:** PERF-1141
+- **PERF-1140**: Optimized progress counter in multi-worker loops of `CaptureLoop.ts` by replacing `nextProgress` interval logic with a relative chunk `progressCounter` decrement strategy.
+  - **Improvement:** Removes absolute loop bound pointers and simplifies bound checking in V8, yielding improvements in chunk loop execution time during multi-worker processing.
+  - **Plan ID:** PERF-1140
+- **PERF-1140**: Optimized progress counter in multi-worker loops of `CaptureLoop.ts` by replacing `nextProgress` interval logic with a relative chunk `progressCounter` decrement strategy.
+  - **Improvement:** Removes the absolute absolute variables and simplifies interval checking to 0 in V8, yielding a ~25-30% improvement in chunk loop execution time during multi-worker processing.
+  - **Plan ID:** PERF-1140
 
 - **PERF-1090**: Inlined DOM Strategy object spreads inside the `capture` method of `DomStrategy.ts`.
   - **Improvement**: Eliminated per-frame object allocation and property copying by caching the combined CDP screenshot parameters in `prepare()`. Yielded a ~96% improvement in parameter setup microbenchmarks and reduced garbage collection pressure in the rendering loop, slightly improving DOM macro rendering times.
