@@ -8,6 +8,7 @@ import { frameTime, parsePlan, RenderError, LIMITS } from './plan.js';
 import { probeVideo, prepareScene, frameSvg, type AssetFiles, type RenderOptions } from './render.js';
 import type { Plan } from './plan.js';
 import { runProcess, startProcess } from './process.js';
+import { ffmpegPath } from './executables.js';
 import { loadFont } from './text.js';
 import { createCanvas, ImageData } from './skia-binding.js';
 import { BinaryCommands, JsonCommands, GPU_LIMITS, resourceLimit, type CommandSink, type Color } from './gpu-commands.js';
@@ -239,7 +240,7 @@ async function encodeGpuMessages(plan: Plan, fonts: Record<string, Uint8Array>, 
       if (result.frames !== end - start || result.encoder !== 'videotoolbox' || (result.codec ?? 'h264') !== codec || result.protocol !== (codec === 'hevc' ? (binary ? 7 : 6) : (binary ? 5 : 4)) || result.transport !== (binary ? 'binary' : 'json') || result.gop !== (options.gop ?? 90) || result.encoderPool !== (options.encoderPool ?? 1) || result.bitrate !== (options.bitrate ?? 20_000_000) || result.configuredBitrate !== result.bitrate || (codec === 'hevc' && (result.hardwareRequired !== true || result.hardwareUsed !== true))) throw new RenderError('INVALID_OUTPUT', 'Native GPU receipt does not match the requested range/codec/protocol/transport/GOP/pool/bitrate/hardware');
     } catch (error) { worker.kill(); await worker.done.catch(() => {}); throw error; }
     const nativeProcessMs = performance.now() - nativeStarted, muxStarted = performance.now();
-    await runProcess(options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', codec, '-i', elementary, '-c:v', 'copy', ...(codec === 'hevc' ? ['-tag:v', 'hvc1'] : []), '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
+    await runProcess(ffmpegPath(options.ffmpeg), ['-hide_banner', '-loglevel', 'error', '-y', '-r', `${plan.fps.num}/${plan.fps.den}`, '-f', codec, '-i', elementary, '-c:v', 'copy', ...(codec === 'hevc' ? ['-tag:v', 'hvc1'] : []), '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', staged], { signal: options.signal, timeoutMs: 300000 });
     const muxMs = performance.now() - muxStarted, verifyStarted = performance.now();
     const info = await probeVideo(staged, options);
     if (info.codec !== codec || info.frameCount !== end - start || info.width !== plan.width || info.height !== plan.height || info.fps.num * plan.fps.den !== plan.fps.num * info.fps.den) throw new RenderError('INVALID_OUTPUT', 'Hardware video failed codec, count, dimensions or cadence verification');

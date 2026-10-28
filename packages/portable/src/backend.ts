@@ -6,6 +6,7 @@ import { Plan, frameTime, RenderError } from './plan.js';
 import { AssetFiles, PreparedScene, RenderOptions, probeVideo, prepareScene, renderFrame, renderVideo } from './render.js';
 import { muxAudio } from './media.js';
 import { runProcess } from './process.js';
+import { ffmpegPath, ffprobePath } from './executables.js';
 
 async function renderingDependencies(): Promise<string> {
   const versions = new Set<string>();
@@ -58,7 +59,7 @@ export class NativeBackend implements RenderBackend {
         hash.update(await readFile(this.options.gpu?.executable ?? new URL('../native/target/release/helios-gpu', import.meta.url)));
         hash.update(JSON.stringify(this.options.gpu ?? {}));
       }
-      for (const executable of [this.options.ffmpeg ?? 'ffmpeg', this.options.ffprobe ?? 'ffprobe']) hash.update(await runProcess(executable, ['-version'], { timeoutMs: 10000 }));
+      for (const executable of [ffmpegPath(this.options.ffmpeg), ffprobePath(this.options.ffprobe)]) hash.update(await runProcess(executable, ['-version'], { timeoutMs: 10000 }));
       return `${this.identity}/${hash.digest('hex')}`;
     })();
   }
@@ -69,7 +70,7 @@ export class NativeBackend implements RenderBackend {
       const { preflightGpuPlan } = await import('./gpu.js');
       await preflightGpuPlan(plan, { ...this.options, signal });
     } else await renderFrame(plan, 0, assets, { ...this.options, signal, prepared });
-    await runProcess(this.options.ffmpeg ?? 'ffmpeg', ['-version'], { signal, timeoutMs: 10000 });
+    await runProcess(ffmpegPath(this.options.ffmpeg), ['-version'], { signal, timeoutMs: 10000 });
     this.cached = { key: JSON.stringify(plan), prepared };
   }
   async chunk(plan: Plan, assets: AssetFiles, output: string, start: number, end: number, signal: AbortSignal): Promise<void> {
@@ -94,7 +95,7 @@ export class NativeBackend implements RenderBackend {
     await writeFile(list, 'ffconcat version 1.0\n' + chunks.map(c => `file '${escape(c.path)}'\nduration ${frameTime(plan.fps, c.end - c.start).toFixed(9)}\n`).join(''));
     const video = `${output}.video.mp4`;
     try {
-      await runProcess(this.options.ffmpeg ?? 'ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', video], { signal, timeoutMs: 300000 });
+      await runProcess(ffmpegPath(this.options.ffmpeg), ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list, '-c:v', 'copy', '-an', '-video_track_timescale', String(plan.fps.num), '-movflags', '+faststart', video], { signal, timeoutMs: 300000 });
       await muxAudio(plan, assets, video, output, { ...this.options, signal });
     } finally { await rm(video, { force: true }); }
     const info = await probeVideo(output, { ...this.options, signal });

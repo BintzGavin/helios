@@ -7,6 +7,7 @@ import { loadFont } from './text.js';
 import { parsePlan, frameTime, RenderError, LIMITS, type Fps, type Plan } from './plan.js';
 import { videoEncoderArgs, probeVideo, probeEncodedChunk, type SoftwareEncoderOptions } from './render.js';
 import { startProcess } from './process.js';
+import { ffmpegPath } from './executables.js';
 
 export interface CanvasFrame { index: number; time: number; fonts: Readonly<Record<string, string>> }
 /** Trusted code installed with a worker. Not executable input to the JSON render service. */
@@ -115,7 +116,7 @@ export async function encodeCanvasRange(renderer: CanvasFrameRenderer, output: s
   if (options.gpu) throw new RenderError('GPU_UNSUPPORTED', 'CPU range encoding cannot accept a GPU selection; use renderCanvasVideo');
   options.signal?.throwIfAborted();
   const { start, end } = canvasRange(renderer, options);
-  const encoder = startProcess(options.ffmpeg ?? 'ffmpeg', videoEncoderArgs(renderer.plan, end - start, output, 'rgba', options.encoder), { signal: options.signal, timeoutMs: 300000 });
+  const encoder = startProcess(ffmpegPath(options.ffmpeg), videoEncoderArgs(renderer.plan, end - start, output, 'rgba', options.encoder), { signal: options.signal, timeoutMs: 300000 });
   encoder.child.stdout.resume();
   const started = performance.now(); let drawMs = 0, encoderWaitMs = 0;
   const timings: CanvasFrameTimings = { rasterizeMs: 0, pixelExtractionMs: 0 };

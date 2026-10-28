@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, symlink } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runCli } from '../src/cli.js';
@@ -16,6 +19,15 @@ describe('portable CLI', () => {
       expect((await readFile(output)).length).toBeGreaterThan(500);
     } finally { await rm(dir, { recursive: true, force: true }); }
   }, 30000);
+  it('runs when started through a symlinked bin, as npm installs it', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'helios-portable-bin-'));
+    try {
+      const bin = join(dir, 'helios-portable');
+      await symlink(fileURLToPath(new URL('../dist/cli.js', import.meta.url)), bin);
+      const { stdout } = await promisify(execFile)(process.execPath, [bin, '--help']);
+      expect(stdout).toContain('render PLAN.json');
+    } finally { await rm(dir, { recursive: true, force: true }); }
+  });
   it('rejects exposing the service without an explicit authentication boundary', async () => {
     await expect(runCli(['serve', '--host', '0.0.0.0'])).rejects.toThrow(/auth|trusted/i);
   });
