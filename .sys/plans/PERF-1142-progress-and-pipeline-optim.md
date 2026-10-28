@@ -1,11 +1,11 @@
 ---
 id: PERF-1142
 slug: progress-and-pipeline-optim
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor"
 created: 2026-10-28
-completed: ""
-result: ""
+completed: "2026-10-28"
+result: "improved"
 ---
 
 # PERF-1142: Optimize Progress Counter and Hoist Pipeline Limits in Multi-Worker Writer Loop

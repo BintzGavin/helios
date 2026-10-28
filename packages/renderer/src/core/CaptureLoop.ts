@@ -423,7 +423,8 @@ export class CaptureLoop {
 
         // See if we can assign tasks to waiting workers
         if (freeWorkersHead !== 0) {
-                  let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+                  const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
+                  let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
                   if (dispatches > 0) {
                     let h = freeWorkersHead;
                     let n = nextFrameToSubmit;
@@ -508,13 +509,16 @@ export class CaptureLoop {
 
 
       try {
-        let nextProgress = progressInterval;
+        let progressCounter = progressInterval;
         if (nextFrameToWrite < totalFrames && !aborted) {
           while (nextFrameToWrite !== totalFrames && !aborted) {
-            const chunkEnd = nextProgress < totalFrames ? nextProgress : totalFrames;
+            const boundEnd = nextFrameToWrite + progressCounter;
+            const chunkEnd = boundEnd < totalFrames ? boundEnd : totalFrames;
+            const startWrite = nextFrameToWrite;
 
             if (freeWorkersHead !== 0) {
-              let dispatches = (nextFrameToWrite + maxPipelineDepth < totalFrames ? nextFrameToWrite + maxPipelineDepth : totalFrames) - nextFrameToSubmit;
+              const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
+              let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
               if (dispatches > 0) {
                 let h = freeWorkersHead;
                 let n = nextFrameToSubmit;
@@ -557,6 +561,8 @@ export class CaptureLoop {
               nextFrameToWrite++;
             }
 
+            progressCounter -= (nextFrameToWrite - startWrite);
+
             if (aborted) break;
             if (nextFrameToWrite !== chunkEnd) {
               const awaitIndex = nextFrameToWrite & ringMask;
@@ -568,8 +574,8 @@ export class CaptureLoop {
               }
             }
 
-            if (nextFrameToWrite === nextProgress) {
-              nextProgress += progressInterval;
+            if (progressCounter === 0) {
+              progressCounter = progressInterval;
               console.log(
                 `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
               );
