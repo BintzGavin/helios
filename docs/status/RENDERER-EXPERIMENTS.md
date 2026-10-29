@@ -12,6 +12,10 @@ Last updated by: PERF-1142
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+
+- **PERF-1145**: Optimize progress decrement calculation in single-worker loop
+  - **Improvement**: Replaced `chunkLen` calculation before the single-worker writer loops with a pre-loop `startWrite` index and post-loop subtraction in `CaptureLoop.ts`. Reduced V8 AST nodes before loop execution resulting in better TurboFan optimization inside the loop. No performance regressions.
+  - **Plan ID**: PERF-1145
 - **PERF-1142**: Optimized the progress counter and hoisted pipeline limits in the multi-worker writer loop of `CaptureLoop.ts`.
   - **Improvement:** Removed redundant branch evaluations and double evaluation of pipeline bounds limits by hoisting to a local constant, preventing the JIT compiler from re-evaluating expressions inside the hot dispatch check, showing a measurable wall-clock improvement on DOM macrobenchmarks.
   - **Plan ID:** PERF-1142
