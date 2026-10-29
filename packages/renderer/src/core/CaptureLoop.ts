@@ -234,7 +234,7 @@ export class CaptureLoop {
           while (i < loopEnd && !aborted) {
             const boundEnd = i + progressCounter;
             const chunkEnd = boundEnd < loopEnd ? boundEnd : loopEnd;
-            const chunkLen = chunkEnd - i;
+            const startWrite = i;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -260,7 +260,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            progressCounter -= chunkLen;
+            progressCounter -= (i - startWrite);
             if (progressCounter === 0) {
               progressCounter = progressInterval;
               console.log(
@@ -275,7 +275,7 @@ export class CaptureLoop {
           while (i < loopEnd && !aborted) {
             const boundEnd = i + progressCounter;
             const chunkEnd = boundEnd < loopEnd ? boundEnd : loopEnd;
-            const chunkLen = chunkEnd - i;
+            const startWrite = i;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -301,7 +301,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            progressCounter -= chunkLen;
+            progressCounter -= (i - startWrite);
             if (progressCounter === 0) {
               progressCounter = progressInterval;
               console.log(
