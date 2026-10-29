@@ -8,8 +8,10 @@ Last updated by: PERF-1142
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
-## What Works
 
+- **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
+
+## What Works
 - **PERF-1142**: Optimized the progress counter and hoisted pipeline limits in the multi-worker writer loop of `CaptureLoop.ts`.
   - **Improvement:** Removed redundant branch evaluations and double evaluation of pipeline bounds limits by hoisting to a local constant, preventing the JIT compiler from re-evaluating expressions inside the hot dispatch check, showing a measurable wall-clock improvement on DOM macrobenchmarks.
   - **Plan ID:** PERF-1142
