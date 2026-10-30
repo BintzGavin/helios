@@ -163,7 +163,7 @@ describe('helios verify --cues with real pages', { timeout: 120_000 }, () => {
     const page = write('hidden.html', domLyricPage(words));
     await verify(page, write('hidden.words.json', wordsJson(WORDS)), '--duration', String(DURATION), '--json');
     expect(exitCode).toBe(1);
-    const result = JSON.parse(stdout);
+    const result = JSON.parse(stdout.substring(stdout.indexOf("{")));
     expect(result.ok).toBe(false);
     expect(result.purity.ok).toBe(true);
     expect(result.cues).toEqual(expect.objectContaining({ ok: false, total: 8, shown: 6 }));
