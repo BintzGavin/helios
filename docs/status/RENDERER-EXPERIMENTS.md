@@ -540,3 +540,4 @@ $entry
 - **PERF-1130**: Hoisted `totalFrames > 0` validation to an early-return at the top of `CaptureLoop.ts` `run()` function.
   - **Improvement:** Removed redundant nested branching inside the fast single-worker loop to shrink V8 AST complexity and simplify parsing.
   - **Plan ID:** PERF-1130
+- **PERF-1149**: Experiment plan to evaluate single-worker final frame progress unrolling.
