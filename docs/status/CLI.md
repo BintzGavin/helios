@@ -1,4 +1,4 @@
-**Version**: 0.47.2
+**Version**: 0.47.3
 
 [v0.46.61] 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
 
@@ -215,3 +215,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 [v0.47.1] 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Component Command - Plan already implemented.
 
 [v0.47.2] 🟢 IMPOSSIBLE: CREDENTIALS - CLI Publish a CLI release - Publishing NPM packages and creating GitHub releases requires credentials and gh CLI which the agent does not possess.
+
+- [x] [v0.47.3] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/

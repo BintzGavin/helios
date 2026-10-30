@@ -257,6 +257,7 @@ Lessons from a production that drew its motion layer with a renderer shaped like
 - [x] [v0.46.2] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 
 ## Blocked Items
+- [x] [v0.47.3] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] [v0.46.14] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
 - [x] STUDIO: 2026-11-14-STUDIO-Update-Keyboard-Shortcuts-Documentation is structurally obsolete.
 - [x] [v0.46.20] CLI Blocked: Waiting for a new, valid plan in /.sys/plans/
