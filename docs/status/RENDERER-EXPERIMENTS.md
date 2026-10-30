@@ -309,6 +309,10 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- **PERF-1153**: Eliminate object mutation overhead for base64 writes in single-worker DOM capture loop of `CaptureLoop.ts`.
+  - **WHY it didn't work**: We attempted to bypass the intermediate `Buffer.from(..., "base64")` allocation by piping the raw base64 string directly into FFmpeg via `stream.write(rawResult as string, "base64")`. However, benchmarking revealed that Node's native stream encoding handler is actually slower (median ~8.73s) than manual `Buffer` allocation and subsequent raw byte writing (median ~8.68s) in this environment. The GC savings were offset by the internal Node stream encoding overhead.
+  - **Plan ID**: PERF-1153
+
 - **PERF-1139**: Replaced `nextProgress` bounds checking with a countdown in `CaptureLoop.ts` multi-worker writer loops.
   - **WHY it didn't work**: Unlike the single-worker initialization loop where a synchronous inner batch loop exists, the multi-worker writer loop processes chunk progress dynamically across asynchronous iterations. The `chunkLen` calculation mathematically equaled the progress interval, causing the counter to decrement to 0 immediately on the first frame iteration, spamming the console on every alternating frame rather than on the correct interval. The performance was also worse due to the broken logic triggering console IO every frame.
   - **Plan ID**: PERF-1139
