@@ -314,8 +314,8 @@ export class CaptureLoop {
           }
         }
 
-        if (!aborted && totalFrames > 1) {
-          if (isDomStrategy) {
+        if (isDomStrategy) {
+          if (!aborted && totalFrames > 1) {
             try {
               const rawResult = await nextCapturePromise;
 
@@ -338,7 +338,9 @@ export class CaptureLoop {
             } catch (e) {
               if (!aborted) throw e;
             }
-          } else {
+          }
+        } else {
+          if (!aborted && totalFrames > 1) {
             try {
               const rawResult = await nextCapturePromise;
 
