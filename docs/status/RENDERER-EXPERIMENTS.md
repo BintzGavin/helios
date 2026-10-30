@@ -3,8 +3,8 @@
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 7.930s (baseline was 8.169s (-8.3%))
-Last updated by: PERF-1142
+Current best: 8.697s (baseline was 8.732s, ~0.4%)
+Last updated by: PERF-1149
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
@@ -12,6 +12,10 @@ Last updated by: PERF-1142
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- **PERF-1149**: Unrolled progress check condition in single-worker final frame loop blocks in CaptureLoop.ts.
+  - **Improvement:** Removed practically guaranteed branch logic evaluations to reduce parser instructions and V8 TurboFan branch evaluation logic on the single-worker path's final execution, yielding a small baseline improvement (~0.4%).
+  - **Plan ID**: PERF-1149
+
 
 - **PERF-1145**: Optimize progress decrement calculation in single-worker loop
   - **Improvement**: Replaced `chunkLen` calculation before the single-worker writer loops with a pre-loop `startWrite` index and post-loop subtraction in `CaptureLoop.ts`. Reduced V8 AST nodes before loop execution resulting in better TurboFan optimization inside the loop. No performance regressions.

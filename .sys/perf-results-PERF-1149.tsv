@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.709	150	17.22	64.0	keep	unroll final frame progress check
+2	8.698	150	17.25	63.6	keep	unroll final frame progress check
+3	8.697	150	17.25	63.7	keep	unroll final frame progress check

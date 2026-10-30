@@ -328,14 +328,12 @@ export class CaptureLoop {
               }
 
               i++;
-              if (--progressCounter === 0 || i === totalFrames) {
-                progressCounter = progressInterval;
-                console.log(
-                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                );
-                if (onProgress) {
-                  onProgress((i - 1) / totalFrames);
-                }
+              progressCounter = progressInterval;
+              console.log(
+                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+              );
+              if (onProgress) {
+                onProgress((i - 1) / totalFrames);
               }
             } catch (e) {
               if (!aborted) throw e;
@@ -351,14 +349,12 @@ export class CaptureLoop {
               }
 
               i++;
-              if (--progressCounter === 0 || i === totalFrames) {
-                progressCounter = progressInterval;
-                console.log(
-                  `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-                );
-                if (onProgress) {
-                  onProgress((i - 1) / totalFrames);
-                }
+              progressCounter = progressInterval;
+              console.log(
+                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+              );
+              if (onProgress) {
+                onProgress((i - 1) / totalFrames);
               }
             } catch (e) {
               if (!aborted) throw e;
