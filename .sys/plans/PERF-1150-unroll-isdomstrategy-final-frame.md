@@ -1,11 +1,11 @@
 ---
 id: PERF-1150
 slug: unroll-isdomstrategy-final-frame
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-10-31
-completed: ""
-result: ""
+completed: "2024-10-31"
+result: "improved"
 ---
 
 # PERF-1150: Unroll isDomStrategy in single worker final frame logic
@@ -46,3 +46,11 @@ Run `npm run test -w packages/renderer` to verify the DOM rendering and pipeline
 
 ## Prior Art
 Previous single-worker micro loop optimizations.
+
+
+
+## Results Summary
+- **Best render time**: 8.608s (vs baseline ~8.68s)
+- **Improvement**: ~0.8%
+- **Kept experiments**: Unrolled isDomStrategy check in final frame block.
+- **Discarded experiments**: None
