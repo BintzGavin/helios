@@ -57,6 +57,7 @@ helios.play();
 - `@helios-project/studio` - Browser-based development environment (Alpha)
 - `@helios-project/cli` - Command-line interface (init, add, components, list, remove, update, build, preview, job, skills, merge, diff, deploy, studio, render, still, sheet, verify, check, analyze, mcp)
 - `@helios-project/infrastructure` - Distributed rendering orchestration and cloud execution adapters
+- `@helios-project/portable` - Browser-independent CPU rendering and durable render service
 
 ## Animation Approach
 Helios uses native browser APIs, not proprietary hooks:
@@ -129,6 +130,7 @@ The entry skill ships in the Helios agent plugin (`plugins/helios/`); the rest o
 - `packages/renderer/src/index.ts` - Renderer public API
 - `packages/cli/src/index.ts` - CLI public API
 - `packages/infrastructure/src/index.ts` - Infrastructure public API
+- `packages/portable/src/index.ts` - Portable public API
 - `packages/studio/src/server/mcp.ts` - Studio MCP Server
 - `packages/studio/src/server/plugin.ts` - Studio Vite Plugin
 - `packages/studio/src/server/render-manager.ts` - Studio Render Manager
@@ -154,12 +156,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.3+ (Completed: Asset Drag and Drop, Improve Omnibar Test Coverage, AudioMixerPanel Coverage)
-- **CLI**: v0.46.0+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests)
-- **Core**: v5.13.2+ (Completed: Generic Input Props, Active Clips, Composition Schema)
+- **Studio**: v0.122.0+ (Completed: Improve Omnibar Test Coverage, Asset Drag and Drop, Refine CLI Component Removal)
+- **CLI**: v0.47.1+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests, Add Component Command)
+- **Core**: v5.13.2+
 - **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests)
-- **Renderer**: v1.79.0+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Completed: Optimize GCS Uploads, Orchestrator Test Coverage Expansion, InMemoryJobRepository Coverage)
+- **Renderer**: v1.79.0+
+- **Infrastructure**: v0.25.0+
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
