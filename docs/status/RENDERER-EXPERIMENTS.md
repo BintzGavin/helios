@@ -12,6 +12,10 @@ Last updated by: PERF-1150
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+
+- **PERF-1156**: Unroll `isDomStrategy` single worker execution logic outside the massive try...catch block in `CaptureLoop.ts`.
+  - **Improvement:** Removed V8 JIT variable constraints and redundant strategy branch parser evaluations in single worker mode by moving the `try...catch` to isolate execution loops. Code remained performant but yielded very noisy timings due to the VM.
+  - **Plan ID:** PERF-1156
 - **PERF-1154**: Unroll isDomStrategy in multi-worker runWorker loop in CaptureLoop.ts.
   - **Improvement:** Reduced redundant branch parser instructions, simplifying the hot multi-worker loop.
   - **Plan ID:** PERF-1154
