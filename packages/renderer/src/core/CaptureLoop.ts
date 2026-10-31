@@ -316,50 +316,42 @@ export class CaptureLoop {
 
         if (isDomStrategy) {
           if (!aborted && totalFrames > 1) {
-            try {
-              const rawResult = await nextCapturePromise;
+            const rawResult = await nextCapturePromise;
 
-              const buf = Buffer.from(rawResult as string, "base64");
+            const buf = Buffer.from(rawResult as string, "base64");
 
-              pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
-                await this.drainPromise;
-                pendingBytes = 0;
-              }
+            pendingBytes += buf.length;
+            if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
+              await this.drainPromise;
+              pendingBytes = 0;
+            }
 
-              i++;
-              progressCounter = progressInterval;
-              console.log(
-                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-              );
-              if (onProgress) {
-                onProgress((i - 1) / totalFrames);
-              }
-            } catch (e) {
-              if (!aborted) throw e;
+            i++;
+            progressCounter = progressInterval;
+            console.log(
+              `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+            );
+            if (onProgress) {
+              onProgress((i - 1) / totalFrames);
             }
           }
         } else {
           if (!aborted && totalFrames > 1) {
-            try {
-              const rawResult = await nextCapturePromise;
+            const rawResult = await nextCapturePromise;
 
-              pendingBytes += rawResult.length;
-              if (!stream.write(rawResult) && pendingBytes >= MAX_PENDING_BYTES) {
-                await this.drainPromise;
-                pendingBytes = 0;
-              }
+            pendingBytes += rawResult.length;
+            if (!stream.write(rawResult) && pendingBytes >= MAX_PENDING_BYTES) {
+              await this.drainPromise;
+              pendingBytes = 0;
+            }
 
-              i++;
-              progressCounter = progressInterval;
-              console.log(
-                `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
-              );
-              if (onProgress) {
-                onProgress((i - 1) / totalFrames);
-              }
-            } catch (e) {
-              if (!aborted) throw e;
+            i++;
+            progressCounter = progressInterval;
+            console.log(
+              `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
+            );
+            if (onProgress) {
+              onProgress((i - 1) / totalFrames);
             }
           }
         }

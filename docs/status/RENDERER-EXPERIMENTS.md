@@ -12,6 +12,10 @@ Last updated by: PERF-1150
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+
+- **PERF-1151**: Removed redundant try/catch blocks in the single-worker final frame logic of CaptureLoop.ts.
+  - **Improvement:** Marginally reduced AST parsing depth and exception-handling scope complexity for V8. The outer try/catch already handles identical aborted error states, so inner blocks were unnecessary.
+  - **Plan ID:** PERF-1151
 - **PERF-1150**: Unrolled isDomStrategy check in single worker final frame logic.
   - **Improvement:** Reduced logic and AST size in hot loops by unrolling the check for constant strategy variable. Showed ~0.8% baseline improvement.
   - **Plan ID**: PERF-1150
