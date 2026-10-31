@@ -1,11 +1,11 @@
 ---
 id: PERF-1156
 slug: unroll-isdomstrategy-single-worker-try-catch
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "PERF-1156"
 created: 2024-11-01
 completed: ""
-result: ""
+result: "improved"
 ---
 
 # PERF-1156: Unroll isDomStrategy in single worker try-catch blocks
