@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.689	150	17.26	63.7	keep	unroll isDomStrategy in multi-worker
