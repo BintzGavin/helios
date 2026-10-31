@@ -560,3 +560,6 @@ $entry
   - **Improvement:** Removed redundant nested branching inside the fast single-worker loop to shrink V8 AST complexity and simplify parsing.
   - **Plan ID:** PERF-1130
 - **PERF-1149**: Experiment plan to evaluate single-worker final frame progress unrolling.
+- **PERF-1155**: Hoisted `try...catch` blocks outside the `while` loop within the multi-worker `runWorker` function of `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST logic overhead inside the fast path and avoided exception context creation on every loop iteration, improving multi-worker V8 speed.
+  - **Plan ID:** PERF-1155

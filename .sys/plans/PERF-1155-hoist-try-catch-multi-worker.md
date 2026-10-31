@@ -1,11 +1,11 @@
 ---
 id: PERF-1155
 slug: hoist-try-catch-multi-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "perf-1155-hoist-try-catch-multi-worker"
 created: 2024-11-01
-completed: ""
-result: ""
+completed: "2024-11-01"
+result: "improved"
 ---
 
 # PERF-1155: Hoist try-catch outside multi-worker runWorker loops
