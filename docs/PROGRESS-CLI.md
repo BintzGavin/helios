@@ -393,3 +393,5 @@ This file tracks progress for the CLI domain (`packages/cli`).
 - 🟢 IMPOSSIBLE: DUPLICATION - CLI Registry Client Coverage Tests - Plan already implemented.
 ### CLI v0.47.0
 - ✅ Completed: CLI MCP ChatGPT Structured Settings - Implemented `read_settings` and `update_settings` tools to read and write default settings, and updated render/preview handlers to apply these defaults.
+### CLI v0.47.5
+- 🟢 IMPOSSIBLE: DUPLICATION - CLI Add Component Command - Plan already implemented.
