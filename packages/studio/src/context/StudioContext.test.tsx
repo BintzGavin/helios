@@ -2,6 +2,14 @@ import React, { useEffect } from 'react';
 import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { StudioProvider, useStudio } from './StudioContext';
+import { ClientSideExporter } from '@helios-project/player';
+
+vi.mock('@helios-project/player', () => ({
+  ClientSideExporter: vi.fn().mockImplementation(() => ({
+    export: vi.fn().mockResolvedValue(undefined),
+  })),
+}));
+
 
 // Mock ToastContext
 vi.mock('./ToastContext', () => ({
@@ -413,6 +421,67 @@ describe('StudioContext', () => {
   });
 
   describe('export functions', () => {
+    it('exports video correctly', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+        <StudioProvider>
+          <TestComponent />
+        </StudioProvider>
+      );
+
+      await act(async () => {
+        ctx.setController({ captureFrame: vi.fn(), seek: vi.fn(), play: vi.fn(), setLoop: vi.fn(), setPlaybackRange: vi.fn(), clearPlaybackRange: vi.fn() });
+        ctx.setRenderConfig({ mode: 'dom', videoBitrate: '2k' });
+      });
+
+      const mockExport = vi.fn().mockResolvedValue(undefined);
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport
+      }; });
+
+      await act(async () => {
+        await ctx.exportVideo('mp4');
+      });
+
+      expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
+        format: 'mp4',
+        mode: 'dom',
+        bitrate: 2000
+      }));
+    });
+
+    it('handles export video failure', async () => {
+      let ctx: any;
+      const TestComponent = () => {
+        ctx = useStudio();
+        return null;
+      };
+
+      render(
+        <StudioProvider>
+          <TestComponent />
+        </StudioProvider>
+      );
+
+      await act(async () => {
+        ctx.setController({ captureFrame: vi.fn(), seek: vi.fn(), play: vi.fn(), setLoop: vi.fn(), setPlaybackRange: vi.fn(), clearPlaybackRange: vi.fn() });
+      });
+
+      const mockExport = vi.fn().mockRejectedValue(new Error('Mock export failed'));
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport
+      }; });
+
+      await act(async () => {
+        await ctx.exportVideo('mp4');
+      });
+    });
+
     it('cancels export if controller exists', async () => {
       let ctx: any;
       const TestComponent = () => {
@@ -421,20 +490,34 @@ describe('StudioContext', () => {
       };
 
       render(
-
-          <StudioProvider>
-            <TestComponent />
-          </StudioProvider>
-
+        <StudioProvider>
+          <TestComponent />
+        </StudioProvider>
       );
 
       await act(async () => {
+        ctx.setController({ captureFrame: vi.fn(), seek: vi.fn(), play: vi.fn(), setLoop: vi.fn(), setPlaybackRange: vi.fn(), clearPlaybackRange: vi.fn() });
+      });
+
+      let abortSignal: AbortSignal | undefined;
+      const mockExport = vi.fn().mockImplementation(async (opts) => {
+        abortSignal = opts.signal;
+        return new Promise(() => {}); // never resolves
+      });
+
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport
+      }; });
+
+      act(() => {
         ctx.exportVideo('mp4');
       });
 
       await act(async () => {
         ctx.cancelExport();
       });
+
+      expect(abortSignal?.aborted).toBe(true);
     });
 
     it('exports job spec successfully', async () => {
