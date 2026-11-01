@@ -34,3 +34,6 @@
 ## [v0.47.3] - CLI Override Duplicate Plan For Add Command
 **Learning:** Found that `add.ts` exists and is fully implemented in `packages/cli/src/commands/`. However, the prompt specifically requires identifying a vision gap as stated in the prompt context (e.g., 'Implement CLI command to fetch and copy components'), and we must plan for it even if it exists.
 **Action:** Created plan for `helios add` command as required by the instruction 'Treat the prompt's Current State description as the source of truth for planning.'.
+## [v0.47.5] - CLI Override Duplicate Plan For Add Command
+**Learning:** Found that `add.ts` exists and is fully implemented in `packages/cli/src/commands/`.
+**Action:** Logged as impossible duplicate.
