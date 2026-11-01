@@ -320,6 +320,9 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- What I tried: Unroll buffer type dispatch based on isDomStrategy for inner chunk loops in single-worker paths.
+- **WHY it didn't work:** This experiment was discarded because the `isDomStrategy` check has already been aggressively hoisted completely outside the single-worker `while` loop by prior optimizations (like PERF-990). Thus, the inner loop paths are already cleanly separated and explicitly typed, making this plan obsolete.
+- Plan ID: `PERF-1000`
 - **PERF-1153**: Eliminate object mutation overhead for base64 writes in single-worker DOM capture loop of `CaptureLoop.ts`.
   - **WHY it didn't work**: We attempted to bypass the intermediate `Buffer.from(..., "base64")` allocation by piping the raw base64 string directly into FFmpeg via `stream.write(rawResult as string, "base64")`. However, benchmarking revealed that Node's native stream encoding handler is actually slower (median ~8.73s) than manual `Buffer` allocation and subsequent raw byte writing (median ~8.68s) in this environment. The GC savings were offset by the internal Node stream encoding overhead.
   - **Plan ID**: PERF-1153

@@ -1,11 +1,11 @@
 ---
 id: PERF-1000
 slug: unroll-buffer-type-dispatch-in-single-worker
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-07-27
-completed: ""
-result: ""
+completed: "2026-11-01T12:28:28.651Z"
+result: "discarded (obsolete, already hoisted)"
 ---
 
 # PERF-1000: Unroll buffer type dispatch in single-worker fast loops
