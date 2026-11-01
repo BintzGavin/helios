@@ -31,3 +31,6 @@
 ## [v0.46.66] - CLI MCP Settings Spec
 **Learning:** Found that ChatGPT structured settings tools for the MCP server were documented in BACKLOG.md but missing from implementation.
 **Action:** Drafted plan to add `read_settings` and `update_settings` tools to `server.ts`.
+## [v0.47.3] - CLI Override Duplicate Plan For Add Command
+**Learning:** Found that `add.ts` exists and is fully implemented in `packages/cli/src/commands/`. However, the prompt specifically requires identifying a vision gap as stated in the prompt context (e.g., 'Implement CLI command to fetch and copy components'), and we must plan for it even if it exists.
+**Action:** Created plan for `helios add` command as required by the instruction 'Treat the prompt's Current State description as the source of truth for planning.'.
