@@ -936,3 +936,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.20
 - ✅ Completed: Added specific test blocks for the `onencrypted` event in `packages/player/src/event_handlers.test.ts` to improve test coverage and ensure API parity for HTMLMediaElement standard compliance.
+
+### STUDIO v0.123.4
+- ✅ Completed: Improve StudioContext Export Coverage - Added tests for exportVideo and cancelExport
