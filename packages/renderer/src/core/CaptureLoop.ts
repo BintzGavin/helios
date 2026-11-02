@@ -486,9 +486,7 @@ export class CaptureLoop {
               if (i === -1) break;
 
               const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) {
-                await timePromise;
-              }
+              if (timePromise) await timePromise;
 
               const rawResult = await strategy.capture(page, i * timeStep);
               let buf: Buffer = Buffer.from(rawResult as string, "base64");
@@ -514,9 +512,7 @@ export class CaptureLoop {
               if (i === -1) break;
 
               const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) {
-                await timePromise;
-              }
+              if (timePromise) await timePromise;
 
               frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
               writerWaiterPromise.resolve();
