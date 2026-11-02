@@ -572,3 +572,6 @@ $entry
 - **PERF-1155**: Hoisted `try...catch` blocks outside the `while` loop within the multi-worker `runWorker` function of `CaptureLoop.ts`.
   - **Improvement:** Reduced AST logic overhead inside the fast path and avoided exception context creation on every loop iteration, improving multi-worker V8 speed.
   - **Plan ID:** PERF-1155
+- **PERF-1163**: Removed unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts`.
+  - **Improvement**: Eliminated a dead store, saving a micro-operation and simplifying the AST size in the V8 compiler for the fast path single-worker final execution block.
+  - **Plan ID**: PERF-1163
