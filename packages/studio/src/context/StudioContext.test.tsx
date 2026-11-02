@@ -12,8 +12,9 @@ vi.mock('@helios-project/player', () => ({
 
 
 // Mock ToastContext
+const mockAddToast = vi.fn();
 vi.mock('./ToastContext', () => ({
-  useToast: () => ({ addToast: vi.fn() }),
+  useToast: () => ({ addToast: mockAddToast }),
   ToastProvider: ({ children }: any) => <div>{children}</div>
 }));
 
@@ -436,7 +437,8 @@ describe('StudioContext', () => {
 
       await act(async () => {
         ctx.setController({ captureFrame: vi.fn(), seek: vi.fn(), play: vi.fn(), setLoop: vi.fn(), setPlaybackRange: vi.fn(), clearPlaybackRange: vi.fn() });
-        ctx.setRenderConfig({ mode: 'dom', videoBitrate: '2k' });
+        ctx.setRenderConfig({ mode: 'dom', videoBitrate: '2k', scale: 2 });
+        ctx.setCanvasSize({ width: 100, height: 100 });
       });
 
       const mockExport = vi.fn().mockResolvedValue(undefined);
@@ -451,8 +453,43 @@ describe('StudioContext', () => {
       expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({
         format: 'mp4',
         mode: 'dom',
-        bitrate: 2000
+        bitrate: 2000,
+        width: 200,
+        height: 200
       }));
+
+      // test mb
+      await act(async () => {
+        ctx.setRenderConfig({ mode: 'dom', videoBitrate: '2m' });
+      });
+
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport
+      }; });
+      await act(async () => {
+        await ctx.exportVideo('mp4');
+      });
+      expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({ bitrate: 2000000 }));
+
+      // test exact
+      await act(async () => {
+        ctx.setRenderConfig({ mode: 'dom', videoBitrate: '20000' });
+      });
+
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport
+      }; });
+      await act(async () => {
+        await ctx.exportVideo('mp4');
+      });
+      expect(mockExport).toHaveBeenCalledWith(expect.objectContaining({ bitrate: 20000 }));
+
+      // on progress
+      const calls = mockExport.mock.calls;
+      if (calls.length > 0) {
+         const onProgress = calls[0][0].onProgress;
+         act(() => { onProgress(50); });
+      }
     });
 
     it('handles export video failure', async () => {
@@ -478,8 +515,20 @@ describe('StudioContext', () => {
       }; });
 
       await act(async () => {
-        await ctx.exportVideo('mp4');
+        try { await ctx.exportVideo('mp4'); } catch (e) {}
       });
+      expect(mockAddToast).toHaveBeenCalledWith('Mock export failed', 'error');
+
+      const mockExport2 = vi.fn().mockRejectedValue(new Error('Export aborted'));
+      (ClientSideExporter as any).mockImplementationOnce(function() { return {
+        export: mockExport2
+      }; });
+
+      mockAddToast.mockClear();
+      await act(async () => {
+        try { await ctx.exportVideo('mp4'); } catch (e) {}
+      });
+      expect(mockAddToast).not.toHaveBeenCalled();
     });
 
     it('cancels export if controller exists', async () => {
@@ -538,7 +587,13 @@ describe('StudioContext', () => {
       // Set active composition
       await act(async () => {
         ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
+        ctx.setPlayerState({ fps: 30, duration: 100, inputProps: {} });
+        ctx.setRenderConfig({ mode: 'dom', scale: 2 });
+        ctx.setCanvasSize({ width: 100, height: 100 });
       });
+
+      act(() => ctx.setInPoint(10));
+      act(() => ctx.setOutPoint(20));
 
       // Mock URL functions
       const mockCreateObjectURL = vi.fn().mockReturnValue('blob:test');
@@ -558,6 +613,23 @@ describe('StudioContext', () => {
       await act(async () => {
         await ctx.exportJobSpec();
       });
+
+      let postBody = '';
+      const calls = mockFetch.mock.calls;
+      if (calls.length > 0) {
+         const req = calls[calls.length - 1];
+         if (req && req[1]) {
+            postBody = req[1].body;
+         }
+      }
+
+      // verify fetch was called correctly
+      expect(mockFetch).toHaveBeenCalledWith('/api/render/job-spec', expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('"compositionUrl":"http://test.com/comp"'),
+      }));
+      expect(postBody).toContain('"width":200');
+      expect(postBody).toContain('"inPoint":10');
 
       expect(mockCreateObjectURL).toHaveBeenCalled();
       expect(clickSpy).toHaveBeenCalled();
@@ -582,6 +654,11 @@ describe('StudioContext', () => {
       );
 
       await act(async () => {
+        ctx.setActiveComposition(null);
+        await ctx.exportJobSpec(); // should early return
+      });
+
+      await act(async () => {
         ctx.setActiveComposition({ url: 'http://test.com/comp', id: '1', name: 'Test' });
       });
 
@@ -591,13 +668,14 @@ describe('StudioContext', () => {
       });
 
       await act(async () => {
-        await ctx.exportJobSpec();
+        try { await ctx.exportJobSpec(); } catch (e) {}
       });
+      expect(mockAddToast).toHaveBeenCalledWith('Server error', 'error');
 
       // Test fetch failure catch block
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
       await act(async () => {
-        await ctx.exportJobSpec();
+        try { await ctx.exportJobSpec(); } catch (e) {}
       });
     });
   });

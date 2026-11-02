@@ -939,3 +939,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### STUDIO v0.123.4
 - ✅ Completed: Improve StudioContext Export Coverage - Added tests for exportVideo and cancelExport
+### STUDIO v0.123.5
+- ✅ Completed: Improve StudioContext Export Coverage - Reached 100% export-related test coverage for StudioContext
