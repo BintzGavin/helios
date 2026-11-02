@@ -26,3 +26,6 @@
 ## [v0.79.17] - Implement setMediaKeys
 **Learning:** Found that standard methods and properties like `setMediaKeys` and `mediaKeys` for EME (Encrypted Media Extensions) should be included for HTMLMediaElement parity even if the underlying feature is not explicitly supported by the core. This completes the standard API surface and passes standard compliance checkers.
 **Action:** Include standard HTMLMediaElement EME methods and properties and document them for API parity.
+## [v0.79.20] - Implement TrackEvent
+**Learning:** TrackList addtrack/removetrack events were dispatching generic `Event` instances with a custom attached `.track` property instead of using a standard `TrackEvent` interface (or polyfill), breaking HTMLMediaElement TrackEvent parity.
+**Action:** Create a custom TrackEvent polyfill/class and use it in AudioTrackList, VideoTrackList, and TextTrackList for API parity.
