@@ -1,11 +1,11 @@
 ---
 id: PERF-1165
 slug: inline-timepromise-check-in-captureloop
-status: claimed
+status: complete
 claimed_by: "executor-session"
 created: 2026-11-02
-completed: ""
-result: ""
+completed: "2026-11-02"
+result: "discarded"
 ---
 
 # PERF-1165: Inline timePromise validation check into timeDriver.setTime assignment
@@ -72,12 +72,7 @@ Run \`npm run test --workspace=packages/renderer\` to verify rendering still wor
 ## Prior Art
 AST simplification optimizations (PERF-1116, PERF-1078).
 ## Results Summary
-- **Best render time**: 8.916s (vs baseline 8.711s)
-- **Improvement**: 0%
-- **Kept experiments**: None
-- **Discarded experiments**: PERF-1165
-## Results Summary
-- **Best render time**: 8.916s (vs baseline 8.711s)
+- **Best render time**: 8.709s (vs baseline 8.695s)
 - **Improvement**: 0%
 - **Kept experiments**: None
 - **Discarded experiments**: PERF-1165

@@ -1,0 +1,5 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.695	150	17.25	63.7	discard	baseline
+2	7.452	150	20.13	63.7	discard	inline timePromise check in multi-worker
+3	8.721	150	17.20	63.8	discard	inline timePromise check in multi-worker
+4	8.709	150	17.22	63.6	discard	inline timePromise check in multi-worker

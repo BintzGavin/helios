@@ -578,6 +578,3 @@ $entry
 - [PERF-1165] Inlined timePromise check in multi-worker runWorker loop in CaptureLoop.ts.
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
-- [PERF-1165] Inlined timePromise check in multi-worker runWorker loop in CaptureLoop.ts.
-  - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
-  - **Plan ID:** PERF-1165
