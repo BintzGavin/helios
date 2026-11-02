@@ -2,6 +2,8 @@
   - **Improvement**: Avoided redundant synchronous CPU-bound string decoding during static periods.
   - **Plan ID**: PERF-969## Performance Trajectory
 - **PERF-1100**: Inlined the multi-worker `isDomStrategy` loops in `CaptureLoop.ts` to reduce AST complexity, yielding a clear architectural improvement for multi-worker writers.
+- **PERF-1163**: Created an experiment plan to remove the unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts` to eliminate a dead store.
+
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
 Current best: 8.608s (baseline was 8.697s, ~0.8%)
 Last updated by: PERF-1150
