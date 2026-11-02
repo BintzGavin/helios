@@ -311,3 +311,5 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 1	0.000	0	0.00	0.0	crash	cdp start screencast breaks deterministic frame syncing
 2	0.000	0	0.00	0.0	crash	PERF-1139 optimize progress counter multi worker (rejected by code review)
 3	8.722	150	17.20	63.5	keep	PERF-1163: Remove dead store progressCounter = progressInterval
+4	8.916	150	17.20	63.6	discard	PERF-1165: Inline timePromise check
+4	8.916	150	17.20	63.6	discard	PERF-1165: Inline timePromise check

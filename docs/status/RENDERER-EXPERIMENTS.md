@@ -575,3 +575,9 @@ $entry
 - **PERF-1163**: Removed unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts`.
   - **Improvement**: Eliminated a dead store, saving a micro-operation and simplifying the AST size in the V8 compiler for the fast path single-worker final execution block.
   - **Plan ID**: PERF-1163
+- [PERF-1165] Inlined timePromise check in multi-worker runWorker loop in CaptureLoop.ts.
+  - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
+  - **Plan ID:** PERF-1165
+- [PERF-1165] Inlined timePromise check in multi-worker runWorker loop in CaptureLoop.ts.
+  - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
+  - **Plan ID:** PERF-1165
