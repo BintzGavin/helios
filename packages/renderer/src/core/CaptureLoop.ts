@@ -253,7 +253,6 @@ export class CaptureLoop {
             }
 
             i++;
-            progressCounter = progressInterval;
             console.log(
               `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
             );
@@ -355,7 +354,6 @@ export class CaptureLoop {
             }
 
             i++;
-            progressCounter = progressInterval;
             console.log(
               `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
             );
