@@ -1,4 +1,4 @@
-**Version**: 0.123.4
+**Version**: 0.123.5
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -90,3 +90,4 @@ key or sidebar button, improving usability.
 - [v0.123.2] ✅ Completed: STUDIO-Improve-ComponentsPanel-Coverage - Created plan to test missing error branches in ComponentsPanel (2026-07-27-STUDIO-Improve-ComponentsPanel-Coverage.md).
 - [v0.123.3] ✅ Completed: STUDIO-Improve-ComponentsPanel-Coverage - Achieved 100% test coverage for ComponentsPanel by handling error states properly.
 - [v0.123.4] ✅ Completed: Improve StudioContext Export Coverage - Added tests for exportVideo and cancelExport
+- [v0.123.5] ✅ Completed: Improve StudioContext Export Coverage - Reached 100% export-related test coverage for StudioContext
