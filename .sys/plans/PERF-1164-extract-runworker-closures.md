@@ -1,11 +1,11 @@
 ---
 id: PERF-1164
 slug: extract-runworker-closures
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-11-02
-completed: ""
-result: ""
+completed: "2026-11-03"
+result: "keep"
 ---
 
 # PERF-1164: Extract runWorker closures to simplify V8 AST in multi-worker path

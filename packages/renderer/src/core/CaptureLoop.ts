@@ -464,62 +464,61 @@ export class CaptureLoop {
         signal.addEventListener("abort", abortListener);
       }
 
-      const runWorker = async (worker: WorkerInfo, workerIndex: number) => {
-        const { timeDriver, strategy, page } = worker;
-        const isDomStrategy = !!(strategy as any).beginFrameParams;
+      const runWorker = isDomStrategy
+        ? async (worker: WorkerInfo, workerIndex: number) => {
+            const { timeDriver, strategy, page } = worker;
+            try {
+              while (nextFrameToSubmit !== totalFrames && !aborted) {
+                let i: number;
+                if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
+                  i = nextFrameToSubmit++;
+                } else {
+                  freeWorkers[freeWorkersHead++] = workerIndex;
+                  i = (await workerThenables[workerIndex]) as any as number;
+                }
 
-        if (isDomStrategy) {
-          try {
-            while (nextFrameToSubmit !== totalFrames && !aborted) {
-              let i: number;
-              if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
-                i = nextFrameToSubmit++;
-              } else {
-                freeWorkers[freeWorkersHead++] = workerIndex;
-                i = (await workerThenables[workerIndex]) as any as number;
+                if (i === -1) break;
+
+                const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                if (timePromise) await timePromise;
+
+                const rawResult = await strategy.capture(page, i * timeStep);
+                let buf: Buffer = Buffer.from(rawResult as string, "base64");
+                frameBufferRing[i & ringMask] = buf;
+                writerWaiterPromise.resolve();
               }
-
-              if (i === -1) break;
-
-              const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) await timePromise;
-
-              const rawResult = await strategy.capture(page, i * timeStep);
-              let buf: Buffer = Buffer.from(rawResult as string, "base64");
-              frameBufferRing[i & ringMask] = buf;
-              writerWaiterPromise.resolve();
+            } catch (e) {
+              fatalError = e;
+              aborted = true;
+              checkState();
             }
-          } catch (e) {
-            fatalError = e;
-            aborted = true;
-            checkState();
           }
-        } else {
-          try {
-            while (nextFrameToSubmit !== totalFrames && !aborted) {
-              let i: number;
-              if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
-                i = nextFrameToSubmit++;
-              } else {
-                freeWorkers[freeWorkersHead++] = workerIndex;
-                i = (await workerThenables[workerIndex]) as any as number;
+        : async (worker: WorkerInfo, workerIndex: number) => {
+            const { timeDriver, strategy, page } = worker;
+            try {
+              while (nextFrameToSubmit !== totalFrames && !aborted) {
+                let i: number;
+                if (nextFrameToSubmit !== nextFrameToWrite + maxPipelineDepth) {
+                  i = nextFrameToSubmit++;
+                } else {
+                  freeWorkers[freeWorkersHead++] = workerIndex;
+                  i = (await workerThenables[workerIndex]) as any as number;
+                }
+
+                if (i === -1) break;
+
+                const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
+                if (timePromise) await timePromise;
+
+                frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
+                writerWaiterPromise.resolve();
               }
-
-              if (i === -1) break;
-
-              const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-              if (timePromise) await timePromise;
-
-              frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
-              writerWaiterPromise.resolve();
+            } catch (e) {
+              fatalError = e;
+              aborted = true;
+              checkState();
             }
-          } catch (e) {
-            fatalError = e;
-            aborted = true;
-            checkState();
-          }
-        }
-      };
+          };
 
       const workerPromises = this.pool.map((w, i) => runWorker(w, i));
       const stream = stdin!;

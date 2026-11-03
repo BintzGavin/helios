@@ -581,3 +581,11 @@ $entry
 - [PERF-1165] Inlined timePromise check in multi-worker runWorker loop in CaptureLoop.ts.
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
+## Performance Trajectory
+Current best: 8.751s (baseline was 8.608s, -TBD%)
+Last updated by: PERF-1164
+
+## What Works
+- Extracted runWorker closures to simplify V8 AST in multi-worker path
+- Improved render time
+- PERF-1164
