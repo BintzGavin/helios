@@ -1,120 +1,23 @@
+# Context: PLAYER Domain
+**Agent:** RENDERER
+**Domain:** `packages/player`
+**Responsibility:** The Web Component player.
 
-# Component Structure
-```html
-<helios-player>
-  #shadow-root (open)
-    <div class="player-wrapper">
-      <iframe class="sandbox-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-      <div class="status-overlay"></div>
-      <div class="controls-overlay">
-        <!-- Play/Pause, Volume, Fullscreen, PIP, Scrubber -->
-      </div>
-    </div>
-</helios-player>
-```
+## Section A: Component Structure
+- Custom Element: `<helios-player>`
+- Shadow DOM Layout: Wrapper > Iframe (Sandbox) + Controls Overlay
 
-# Events
-- `timeupdate`: Fired when current time changes.
-- `play`: Fired when playback starts.
-- `pause`: Fired when playback is paused.
-- `ended`: Fired when playback reaches the end.
-- `durationchange`: Fired when duration is updated.
-- `volumechange`: Fired when volume or muted state changes.
-- `loadedmetadata`: Fired when composition metadata is loaded.
-- `canplay`: Fired when the player has enough data to begin playback.
-- `error`: Fired when an error occurs.
-- `enterpictureinpicture`: Fired when PIP mode starts.
-- `leavepictureinpicture`: Fired when PIP mode ends.
-- `audiometering`: Fired when audio levels are metered.
-- `seeking`: Fired when seeking starts.
-- `seeked`: Fired when seeking completes.
-- `playing`: Fired when playback is ready to start after having been paused or delayed due to lack of data.
-- `waiting`: Fired when playback has stopped because of a temporary lack of data.
-- `suspend`: Fired when media data loading has been suspended.
-- `stalled`: Fired when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
-- `abort`: Fired when media data loading has been aborted.
-- `encrypted`: Fired when the media is encrypted.
-- `waitingforkey`: Fired when playback is blocked while waiting for an encryption key.
-- `emptied`: Fired when the media has become empty.
-- `progress`: Fired periodically as the user agent is downloading media data.
+## Section B: Events
+- Dispatches custom events mirroring HTMLMediaElement and HTMLVideoElement API: `playing`, `waiting`, `suspend`, `stalled`, `abort`, `emptied`, `progress`, `seeking`, `seeked`, `error`, `audiometering`, `enterpictureinpicture`, `leavepictureinpicture`, `waitingforkey`, `encrypted`
+- TextTrack, AudioTrack, VideoTrack events: `addtrack`, `removetrack`, `change`
+- Helios-specific events for composition, state, and export
 
-# Attributes
-- `src`: URL of the composition bundle.
-- `autoplay`: Starts playback automatically when loaded.
-- `loop`: Loops playback automatically.
-- `controls`: Displays native player controls.
-- `poster`: URL of an image to show before playback starts.
-- `interactive`: Enables mouse/touch interaction with the composition.
-- `muted`: Mutes audio playback.
-- `playsinline`: Indicates that the video is to be played "inline".
-- `disableremoteplayback`: Disables remote playback.
-- `mediagroup`: Links multiple media elements together.
-- `autopictureinpicture`: Automatically enters Picture-in-Picture mode.
-- `defaultmuted`: Indicates that the audio output should be muted by default.
+## Section C: Attributes
+- Observed attributes: `src`, `width`, `height`, `muted`, `playsinline`, `disableremoteplayback`, `mediagroup`, `autopictureinpicture`, `defaultmuted`, `loop`, `autoplay`, `controls`
 
-# Public Methods (HTMLMediaElement Parity)
-- `setMediaKeys(mediaKeys: MediaKeys | null): Promise<void>`
-- `play(): Promise<void>`
-- `pause(): void`
-- `load(): void`
-- `fastSeek(time: number): void`
-- `canPlayType(type: string): string`
-- `captureStream(): MediaStream`
-- `setSinkId(sinkId: string): Promise<void>`
-- `getStartDate(): Date`
-- `getVideoPlaybackQuality(): VideoPlaybackQuality`
-- `requestVideoFrameCallback(callback: VideoFrameRequestCallback): number`
-- `cancelVideoFrameCallback(handle: number): void`
+## Section D: Methods
+- Extends standard media methods: `play()`, `pause()`, `load()`, `setPlaybackRange()`, `clearPlaybackRange()`
+- Adds methods: `captureStream()`, `startAudioMetering()`, `stopAudioMetering()`, `getVideoPlaybackQuality()`, `requestVideoFrameCallback()`, `cancelVideoFrameCallback()`, `setDuration()`, `setFps()`, `setSize()`, `setMarkers()`, `getController()`, `getStartDate()`, `setMediaKeys()`
 
-# Public Properties (HTMLMediaElement Parity)
-- `onencrypted: (event: Event) => void | null`
-- `onwaitingforkey: (event: Event) => void | null`
-
-- `mediaKeys: MediaKeys | null`
-- `currentTime: number`
-- `duration: number`
-- `paused: boolean`
-- `ended: boolean`
-- `volume: number`
-- `muted: boolean`
-- `playbackRate: number`
-- `defaultPlaybackRate: number`
-- `src: string`
-- `currentSrc: string`
-- `readyState: number`
-- `networkState: number`
-- `error: MediaError | null`
-- `crossOrigin: string | null`
-- `preload: string`
-- `autoplay: boolean`
-- `loop: boolean`
-- `controls: boolean`
-- `defaultMuted: boolean`
-- `seeking: boolean`
-- `buffered: TimeRanges`
-- `seekable: TimeRanges`
-- `played: TimeRanges`
-- `audioTracks: HeliosAudioTrackList`
-- `videoTracks: HeliosVideoTrackList`
-- `textTracks: HeliosTextTrackList`
-- `disableRemotePlayback: boolean`
-- `mediaGroup: string`
-- `sinkId: string`
-- `autoPictureInPicture: boolean`
-- `remote: any`
-
-# Custom Public Properties / Methods
-- `interactive: boolean`
-- `isScrubbing: boolean`
-- `getSchema(): HeliosSchema | null`
-- `startAudioMetering(): void`
-- `stopAudioMetering(): void`
-- `mediaTitle: string`
-- `mediaArtist: string`
-- `mediaAlbum: string`
-- `mediaArtwork: string`
-- `setDuration(durationInFrames: number): void`
-- `setFps(fps: number): void`
-- `setSize(width: number, height: number): void`
-- `setMarkers(markers: Marker[]): void`
-- `getController(): HeliosController | null`
+## Section E: Track Events (TrackEvent)
+- Track Lists now dispatch `addtrack` and `removetrack` using the standard `TrackEvent` interface (via `HeliosTrackEvent`), ensuring parity with standard web APIs.

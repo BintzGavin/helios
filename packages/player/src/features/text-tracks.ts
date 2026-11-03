@@ -1,3 +1,5 @@
+import { HeliosTrackEvent } from './track-event';
+
 export type TextTrackMode = 'disabled' | 'hidden' | 'showing';
 
 export interface TrackHost {
@@ -217,8 +219,7 @@ export class HeliosTextTrackList extends EventTarget implements Iterable<HeliosT
         // Enable array-like access
         (this as any)[this.tracks.length - 1] = track;
 
-        const event = new Event('addtrack');
-        (event as any).track = track;
+        const event = new HeliosTrackEvent('addtrack', { track });
         this.dispatchEvent(event);
     }
 
@@ -237,8 +238,7 @@ export class HeliosTextTrackList extends EventTarget implements Iterable<HeliosT
             }
             delete (this as any)[this.tracks.length];
 
-            const event = new Event('removetrack');
-            (event as any).track = track;
+            const event = new HeliosTrackEvent('removetrack', { track });
             this.dispatchEvent(event);
         }
     }
