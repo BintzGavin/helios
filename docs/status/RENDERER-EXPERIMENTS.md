@@ -14,6 +14,9 @@ Last updated by: PERF-1150
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- **PERF-1169**: Inline `dispatchWorkers` logic inside `checkState` and writer loop.
+  - **Improvement**: Reduces V8 closure invocation overhead in the multi-worker paths.
+  - **Plan ID**: PERF-1169
 
 - **PERF-1156**: Unroll `isDomStrategy` single worker execution logic outside the massive try...catch block in `CaptureLoop.ts`.
   - **Improvement:** Removed V8 JIT variable constraints and redundant strategy branch parser evaluations in single worker mode by moving the `try...catch` to isolate execution loops. Code remained performant but yielded very noisy timings due to the VM.
