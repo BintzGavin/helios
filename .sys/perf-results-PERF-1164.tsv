@@ -1,0 +1,2 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.751	150	17.14	64.4	keep	Extracted runWorker closures to simplify V8 AST
