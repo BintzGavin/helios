@@ -1,3 +1,5 @@
+import { HeliosTrackEvent } from './track-event';
+
 export interface VideoTrackHost {
   handleVideoTrackSelectedChange(track: HeliosVideoTrack): void;
 }
@@ -68,8 +70,7 @@ export class HeliosVideoTrackList extends EventTarget implements Iterable<Helios
     // Enable array-like access
     (this as any)[this.tracks.length - 1] = track;
 
-    const event = new Event('addtrack');
-    (event as any).track = track;
+    const event = new HeliosTrackEvent('addtrack', { track });
     this.dispatchEvent(event);
   }
 
@@ -84,8 +85,7 @@ export class HeliosVideoTrackList extends EventTarget implements Iterable<Helios
       }
       delete (this as any)[this.tracks.length];
 
-      const event = new Event('removetrack');
-      (event as any).track = track;
+      const event = new HeliosTrackEvent('removetrack', { track });
       this.dispatchEvent(event);
     }
   }
