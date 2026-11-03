@@ -421,23 +421,21 @@ export class CaptureLoop {
 
         // See if we can assign tasks to waiting workers
         if (freeWorkersHead !== 0) {
+          let h = freeWorkersHead;
+          let n = nextFrameToSubmit;
+
           const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-          let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
+          let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
+
           if (dispatches > 0) {
-            let h = freeWorkersHead;
-            let n = nextFrameToSubmit;
             const targetH = h - (dispatches < h ? dispatches : h);
             do {
               h--;
               workerThenables[freeWorkers[h]].resolve(n);
               n++;
             } while (h !== targetH);
-            freeWorkersHead = targetH;
-            nextFrameToSubmit = n;
           }
 
-          let n = nextFrameToSubmit;
-          let h = freeWorkersHead;
           // If we still have waiting workers but are at totalFrames, tell them to stop
           if (n === totalFrames) {
             while (h !== 0) {
@@ -446,6 +444,7 @@ export class CaptureLoop {
             }
             h = 0;
           }
+
           freeWorkersHead = h;
           nextFrameToSubmit = n;
         }
@@ -534,23 +533,21 @@ export class CaptureLoop {
             const startWrite = nextFrameToWrite;
 
             if (freeWorkersHead !== 0) {
+              let h = freeWorkersHead;
+              let n = nextFrameToSubmit;
+
               const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-              let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
+              let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
+
               if (dispatches > 0) {
-                let h = freeWorkersHead;
-                let n = nextFrameToSubmit;
                 const targetH = h - (dispatches < h ? dispatches : h);
                 do {
                   h--;
                   workerThenables[freeWorkers[h]].resolve(n);
                   n++;
                 } while (h !== targetH);
-                freeWorkersHead = targetH;
-                nextFrameToSubmit = n;
               }
 
-              let n = nextFrameToSubmit;
-              let h = freeWorkersHead;
               // If we still have waiting workers but are at totalFrames, tell them to stop
               if (n === totalFrames) {
                 while (h !== 0) {
@@ -559,6 +556,7 @@ export class CaptureLoop {
                 }
                 h = 0;
               }
+
               freeWorkersHead = h;
               nextFrameToSubmit = n;
             }

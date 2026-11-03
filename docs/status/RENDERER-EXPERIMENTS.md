@@ -589,3 +589,7 @@ Last updated by: PERF-1164
 - Extracted runWorker closures to simplify V8 AST in multi-worker path
 - Improved render time
 - PERF-1164
+
+- [PERF-1170] Hoisted `freeWorkersHead` and `nextFrameToSubmit` variable reads and writes in the multi-worker dispatch block inside `CaptureLoop.ts`.
+  - **Improvement:** Reduced AST size and V8 closure write invalidations during the inner worker assignment loop, resulting in a slight performance improvement.
+  - **Plan ID:** PERF-1170

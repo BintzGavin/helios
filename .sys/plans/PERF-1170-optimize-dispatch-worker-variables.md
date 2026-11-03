@@ -1,7 +1,7 @@
 ---
 id: PERF-1170
 slug: optimize-dispatch-worker-variables
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-11-03
 completed: ""
@@ -119,3 +119,7 @@ Run `npm run test --workspace=packages/renderer` to ensure no functionality is b
 
 ## Prior Art
 - PERF-929: Hoisted loop-carried induction variables (`freeWorkersHead` and `nextFrameToSubmit`) in multi-worker dispatch loops. This takes the same concept to the newly inlined blocks.
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.685	150	17.27	63.0	keep	hoist dispatch worker variables
+2	8.687	150	17.27	63.8	keep	hoist dispatch worker variables
+3	8.691	150	17.26	63.8	keep	hoist dispatch worker variables
