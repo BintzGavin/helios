@@ -1,7 +1,7 @@
 ---
 id: PERF-1169
 slug: inline-dispatch-workers
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-11-03
 completed: ""

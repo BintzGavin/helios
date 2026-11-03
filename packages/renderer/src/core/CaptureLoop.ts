@@ -402,7 +402,24 @@ export class CaptureLoop {
       const freeWorkers = new Int32Array(poolLen);
       let freeWorkersHead = 0;
 
-      const dispatchWorkers = () => {
+      const checkState = () => {
+        if (capturedErrors.length > 0 || (signal && signal.aborted)) {
+          aborted = true;
+        }
+
+        if (aborted) {
+          let head = freeWorkersHead;
+          while (head !== 0) {
+            head--;
+            const w = freeWorkers[head];
+            workerThenables[w].resolve(-1);
+          }
+          freeWorkersHead = 0;
+          writerWaiterPromise.resolve();
+          return;
+        }
+
+        // See if we can assign tasks to waiting workers
         if (freeWorkersHead !== 0) {
           const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
           let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
@@ -432,27 +449,6 @@ export class CaptureLoop {
           freeWorkersHead = h;
           nextFrameToSubmit = n;
         }
-      };
-
-      const checkState = () => {
-        if (capturedErrors.length > 0 || (signal && signal.aborted)) {
-          aborted = true;
-        }
-
-        if (aborted) {
-          let head = freeWorkersHead;
-          while (head !== 0) {
-            head--;
-            const w = freeWorkers[head];
-            workerThenables[w].resolve(-1);
-          }
-          freeWorkersHead = 0;
-          writerWaiterPromise.resolve();
-          return;
-        }
-
-        // See if we can assign tasks to waiting workers
-        dispatchWorkers();
       };
 
       let abortListener: (() => void) | null = null;
@@ -538,7 +534,35 @@ export class CaptureLoop {
             const chunkEnd = boundEnd < totalFrames ? boundEnd : totalFrames;
             const startWrite = nextFrameToWrite;
 
-            dispatchWorkers();
+            if (freeWorkersHead !== 0) {
+              const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
+              let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - nextFrameToSubmit;
+              if (dispatches > 0) {
+                let h = freeWorkersHead;
+                let n = nextFrameToSubmit;
+                const targetH = h - (dispatches < h ? dispatches : h);
+                do {
+                  h--;
+                  workerThenables[freeWorkers[h]].resolve(n);
+                  n++;
+                } while (h !== targetH);
+                freeWorkersHead = targetH;
+                nextFrameToSubmit = n;
+              }
+
+              let n = nextFrameToSubmit;
+              let h = freeWorkersHead;
+              // If we still have waiting workers but are at totalFrames, tell them to stop
+              if (n === totalFrames) {
+                while (h !== 0) {
+                  h--;
+                  workerThenables[freeWorkers[h]].resolve(-1);
+                }
+                h = 0;
+              }
+              freeWorkersHead = h;
+              nextFrameToSubmit = n;
+            }
 
             while (nextFrameToWrite !== chunkEnd) {
               const ringIndex = nextFrameToWrite & ringMask;
