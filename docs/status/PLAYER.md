@@ -330,3 +330,4 @@
 [v0.79.22] ✅ Completed: Implement TrackEvent for HTMLMediaElement parity - Implemented `HeliosTrackEvent` and updated `addtrack` and `removetrack` dispatchers in TrackLists.
 
 [v0.79.23] ✅ Completed: Implement webkit performance properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount getters for HTMLVideoElement API parity.
+[v0.79.24] ✅ Completed: Document WebKit Performance Properties - Created plan `.sys/plans/2027-03-09-PLAYER-Document-Webkit-Performance-Properties.md` to document the recently implemented `webkitAudioDecodedByteCount`, `webkitDecodedFrameCount`, `webkitDroppedFrameCount`, and `webkitVideoDecodedByteCount` properties in the README to address a vision gap.
