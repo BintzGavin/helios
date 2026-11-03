@@ -960,6 +960,11 @@ export class HeliosPlayer extends HTMLElement implements TrackHost, AudioTrackHo
   public get NETWORK_LOADING(): number { return HeliosPlayer.NETWORK_LOADING; }
   public get NETWORK_NO_SOURCE(): number { return HeliosPlayer.NETWORK_NO_SOURCE; }
 
+  public get webkitAudioDecodedByteCount(): number { return 0; }
+  public get webkitDecodedFrameCount(): number { return 0; }
+  public get webkitDroppedFrameCount(): number { return 0; }
+  public get webkitVideoDecodedByteCount(): number { return 0; }
+
   public get readyState(): number {
     return this._readyState;
   }
