@@ -6,7 +6,7 @@ Helios is a modern engine for creating videos programmatically using standard we
 
 ## Quick Facts
 - **License**: Elastic License 2.0 (free commercial use, no SaaS resale)
-- **Status**: Beta / Self-Driving (Core: Stable v5.13.2+, Studio: Alpha v0.107.3+, Player: v0.78.1+, Renderer: v1.79.0+, CLI: Beta v0.46.0+, Infrastructure: v0.25.0+)
+- **Status**: Beta / Self-Driving (Core: Stable v5.13.2+, Studio: Alpha v0.107.3+, Player: v0.78.1+, Renderer: v1.79.0+, CLI: Beta v0.47.0+, Infrastructure: v0.25.0+, Portable: v0.0.0+)
 - **Frameworks**: React, Vue, Svelte, Solid, vanilla JS
 - **Animation**: Standard CSS, Web Animations API (WAAPI), any animation library
 
@@ -156,12 +156,13 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.122.0+ (Completed: Improve Omnibar Test Coverage, Asset Drag and Drop, Refine CLI Component Removal)
-- **CLI**: v0.47.1+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests, Add Component Command)
-- **Core**: v5.13.2+
-- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness, Regression Tests)
-- **Renderer**: v1.79.0+
-- **Infrastructure**: v0.25.0+
+- **Studio**: v0.107.3+ (Completed: Document preview command, Renders Panel Tests, Portable Job Paths)
+- **CLI**: v0.47.0+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests, Add Component Command)
+- **Core**: v5.13.2+ (Completed: Generic Input Props, Implement Active Clips, Implement Composition Schema)
+- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness)
+- **Renderer**: v1.79.0+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
+- **Infrastructure**: v0.25.0+ (Completed: Bounded Dependency Synchronizer)
+- **Portable**: v0.0.0+
 
 ### AI Integration
 - **Studio MCP Server**: Inspect, create, and render compositions via LLM tools (Done)
