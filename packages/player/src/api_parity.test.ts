@@ -23,6 +23,13 @@ describe('HeliosPlayer API Parity', () => {
     expect(player.getStartDate()).toBeNaN();
   });
 
+  it('should support webkit performance properties', () => {
+    expect(player.webkitAudioDecodedByteCount).toBe(0);
+    expect(player.webkitDecodedFrameCount).toBe(0);
+    expect(player.webkitDroppedFrameCount).toBe(0);
+    expect(player.webkitVideoDecodedByteCount).toBe(0);
+  });
+
   it('should support standard media constants on instances', () => {
     expect(player.HAVE_NOTHING).toBe(0);
     expect(player.HAVE_METADATA).toBe(1);

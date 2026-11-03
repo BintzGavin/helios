@@ -944,3 +944,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.22
 - ✅ Completed: Implement TrackEvent for HTMLMediaElement parity - Implemented `HeliosTrackEvent` and updated `addtrack` and `removetrack` dispatchers in TrackLists.
+
+### PLAYER v0.79.23
+- ✅ Completed: Implement webkit performance properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount getters for HTMLVideoElement API parity.
