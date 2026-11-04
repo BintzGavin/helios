@@ -947,3 +947,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.23
 - ✅ Completed: Implement webkit performance properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount getters for HTMLVideoElement API parity.
+
+### PLAYER v0.79.25
+- ✅ Completed: Document Webkit Performance Properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount to README.md

@@ -240,6 +240,10 @@ Both class-level and instance-level properties are provided for standard media s
 - `mediaArtist` (string): Reflected media-artist attribute.
 - `mediaAlbum` (string): Reflected media-album attribute.
 - `mediaArtwork` (string): Reflected media-artwork attribute.
+- `webkitAudioDecodedByteCount` (number, read-only): Returns 0 (API parity mock).
+- `webkitDecodedFrameCount` (number, read-only): Returns 0 (API parity mock).
+- `webkitDroppedFrameCount` (number, read-only): Returns 0 (API parity mock).
+- `webkitVideoDecodedByteCount` (number, read-only): Returns 0 (API parity mock).
 
 
 

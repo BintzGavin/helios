@@ -21,3 +21,5 @@
 
 ## Section E: Track Events (TrackEvent)
 - Track Lists now dispatch `addtrack` and `removetrack` using the standard `TrackEvent` interface (via `HeliosTrackEvent`), ensuring parity with standard web APIs.
+## Section F: Properties
+- Exposes performance parity properties: `webkitAudioDecodedByteCount`, `webkitDecodedFrameCount`, `webkitDroppedFrameCount`, `webkitVideoDecodedByteCount`
