@@ -169,20 +169,18 @@ export class CaptureLoop {
           let progressCounter = progressInterval;
 
           let nextCapturePromise: any = null;
-          const timePromise = timeDriver.setTime(
+          timeDriver.setTime(
             page,
             startFrame * compTimeStep,
           );
-          if (timePromise) await timePromise;
           nextCapturePromise = strategy.capture(page, 0);
 
           const rawResult = await nextCapturePromise;
           if (1 < totalFrames) {
-            const timePromise = timeDriver.setTime(
+            timeDriver.setTime(
               page,
               (startFrame + 1) * compTimeStep,
             );
-            if (timePromise) await timePromise;
             nextCapturePromise = strategy.capture(page, timeStep);
           }
           console.log(`Progress: Rendered 0 / ${totalFrames} frames`);
@@ -208,11 +206,10 @@ export class CaptureLoop {
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
 
-              const timePromise = timeDriver.setTime(
+              timeDriver.setTime(
                 page,
                 (startFrame + i + 1) * compTimeStep,
               );
-              if (timePromise) await timePromise;
 
               if (!aborted) {
                 nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
@@ -478,8 +475,7 @@ export class CaptureLoop {
 
                 if (i === -1) break;
 
-                const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-                if (timePromise) await timePromise;
+                timeDriver.setTime(page, (startFrame + i) * compTimeStep);
 
                 const rawResult = await strategy.capture(page, i * timeStep);
                 let buf: Buffer = Buffer.from(rawResult as string, "base64");

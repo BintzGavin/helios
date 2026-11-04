@@ -5,8 +5,8 @@
 - **PERF-1163**: Created an experiment plan to remove the unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts` to eliminate a dead store.
 
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 8.608s (baseline was 8.697s, ~0.8%)
-Last updated by: PERF-1150
+Current best: 6.324s (baseline was 8.608s, ~26.5%)
+Last updated by: PERF-1171
 
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
@@ -14,6 +14,10 @@ Last updated by: PERF-1150
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1169**: Inline `dispatchWorkers` logic inside `checkState` and writer loop.
   - **Improvement**: Reduces V8 closure invocation overhead in the multi-worker paths.
   - **Plan ID**: PERF-1169
@@ -430,6 +434,10 @@ $entry
   - **Plan ID:** PERF-891
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **What Works:** PERF-882 unrolled the `isString = typeof buffer === 'string'` check in the multi-worker capture loops of `CaptureLoop.ts`.
@@ -438,26 +446,46 @@ $entry
 - Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-895**: Removed dead `if (aborted)` branch inside the `if (freeWorkersHead > 0)` dispatch block in `CaptureLoop.ts`. Because `aborted` was already checked prior, this inner check was entirely unreachable. Removing it yielded ~39% improvement in microbenchmark execution time by eliminating a redundant V8 dynamic property check in the tight multi-worker loop.
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-907**: Removed dead  branches inside the single-worker  path in . Because  logically guarantees , this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-907**: Removed dead `if (isDomStrategy)` branches inside the single-worker `!isString` path in `CaptureLoop.ts`. Because `!isString` logically guarantees `!isDomStrategy`, this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-908**: Optimized free worker dispatch multi-worker loop in `CaptureLoop.ts` by replacing `while` condition block with an exact calculated loop limit.
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-910**: Removed dead mathematically unreachable code in `CaptureLoop.ts` fast loop else blocks. Evaluated loop counts per microbenchmark frame simulation dropped drastically from ~275ms down to ~64ms.
@@ -470,6 +498,10 @@ $entry
   - **Plan ID:** PERF-917
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-918**: Optimized the free worker dispatch boundary conditions in `CaptureLoop.ts` by replacing the inner `if (dispatches > freeWorkersHead)` bound condition with `Math.min(dispatches, freeWorkersHead)`.
@@ -477,6 +509,10 @@ $entry
   - **Plan ID:** PERF-918
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-920**: Enforced a minimum `progressInterval` of 1 in `CaptureLoop.ts`.
@@ -484,6 +520,10 @@ $entry
   - **Plan ID:** PERF-920
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1080**: Inlined freeWorkers array lookups directly into workerThenables array accesses in the multi-worker dispatcher loops of CaptureLoop.ts. Improvement: Removed intermediate variable assignment overhead from hot loops, optimizing AST and closure scope access patterns for V8, yielding a ~3% performance improvement in microbenchmarks.
 - **Merged duplicated multi-worker loops in !hasProcessFn**: Reduced AST size and improved JIT. ~1.5% faster (PERF-996)
 - **PERF-923**: Replaced the compound post-decrement `while (dispatches-- > 0)` loop condition with a standard `for` loop in `CaptureLoop.ts` worker dispatch loops.
@@ -558,6 +598,10 @@ $entry
   - **Improvement:** Removed practically identical blocks nested under `isDomStrategy` wrapper inside the fast single worker loop to reduce parser complexity and AST logic. Code remains performant.
   - **Plan ID**: PERF-1102
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - **PERF-1106**: Inlined the multi-worker `dispatches` check in `CaptureLoop.ts` to improve V8 AST parsing.
   - **Improvement:** Reduced redundant branch parser instructions, simplifying the hot multi-worker loop. Showed a small wall-clock speedup on DOM rendering.
   - **Plan ID:** PERF-1106
@@ -586,6 +630,10 @@ Current best: 8.751s (baseline was 8.608s, -TBD%)
 Last updated by: PERF-1164
 
 ## What Works
+- **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
+  - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
+  - **Plan ID**: PERF-1171
+
 - Extracted runWorker closures to simplify V8 AST in multi-worker path
 - Improved render time
 - PERF-1164

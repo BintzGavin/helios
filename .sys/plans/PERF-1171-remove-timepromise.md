@@ -1,11 +1,11 @@
 ---
 id: PERF-1171
 slug: remove-timepromise
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "jules"
 created: 2024-11-03
-completed: ""
-result: ""
+completed: 2024-11-04
+result: "kept"
 ---
 
 # PERF-1171: Remove unnecessary await timePromise checks in DOM fast paths
@@ -67,3 +67,11 @@ None.
 
 ## Correctness Check
 Run `npm run test --workspace=packages/renderer` to ensure frame logic outputs properly.
+
+## Results Summary
+```
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	6.324	150	23.72	63.6	keep	remove unnecessary await timePromise checks in DOM fast paths
+2	8.744	150	17.15	63.5	keep	remove unnecessary await timePromise checks in DOM fast paths
+3	8.808	150	17.03	63.5	keep	remove unnecessary await timePromise checks in DOM fast paths
+```

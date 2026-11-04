@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	6.324	150	23.72	63.6	keep	remove unnecessary await timePromise checks in DOM fast paths
+2	8.744	150	17.15	63.5	keep	remove unnecessary await timePromise checks in DOM fast paths
+3	8.808	150	17.03	63.5	keep	remove unnecessary await timePromise checks in DOM fast paths
