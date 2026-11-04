@@ -156,12 +156,12 @@ const report = await Helios.diagnose();
 
 ## Roadmap
 ### V1.x (Active)
-- **Studio**: v0.107.3+ (Completed: Document preview command, Renders Panel Tests, Portable Job Paths)
-- **CLI**: v0.47.0+ (Completed: CLI Command Coverage Tests V9, CLI Docker Adapter Regression Tests, CLI Registry Types Regression Tests, Add Component Command)
+- **Studio**: v0.107.3+ (Completed: Improve StudioContext Export Coverage, Improve ComponentsPanel Coverage)
+- **CLI**: v0.47.0+ (Completed: CLI MCP ChatGPT Structured Settings, CLI Utils Coverage Tests V2)
 - **Core**: v5.13.2+ (Completed: Generic Input Props, Implement Active Clips, Implement Composition Schema)
-- **Player**: v0.78.1+ (Completed: Document getSchema API Parity, Bridge Coverage Completeness)
-- **Renderer**: v1.79.0+ (Completed: Validate HW Accel, Orchestrator Plan, Refactor Media Sync Logic)
-- **Infrastructure**: v0.25.0+ (Completed: Bounded Dependency Synchronizer)
+- **Player**: v0.78.1+ (Completed: Document WebKit Performance Properties, Implement TrackEvent)
+- **Renderer**: v1.79.0+ (Completed: WebCodecs Preference, Validate HW Accel, Orchestrator Plan)
+- **Infrastructure**: v0.25.0+ (Completed: Coverage Expansion, Optimize GCS Uploads)
 - **Portable**: v0.0.0+
 
 ### AI Integration
