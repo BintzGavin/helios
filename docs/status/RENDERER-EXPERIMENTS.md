@@ -14,6 +14,14 @@ Last updated by: PERF-1171
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -434,6 +442,10 @@ $entry
   - **Plan ID:** PERF-891
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -446,6 +458,10 @@ $entry
 - Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -455,6 +471,10 @@ $entry
 - **PERF-895**: Removed dead `if (aborted)` branch inside the `if (freeWorkersHead > 0)` dispatch block in `CaptureLoop.ts`. Because `aborted` was already checked prior, this inner check was entirely unreachable. Removing it yielded ~39% improvement in microbenchmark execution time by eliminating a redundant V8 dynamic property check in the tight multi-worker loop.
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -464,6 +484,10 @@ $entry
 - **PERF-907**: Removed dead  branches inside the single-worker  path in . Because  logically guarantees , this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -473,6 +497,10 @@ $entry
 - **PERF-907**: Removed dead `if (isDomStrategy)` branches inside the single-worker `!isString` path in `CaptureLoop.ts`. Because `!isString` logically guarantees `!isDomStrategy`, this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -482,6 +510,10 @@ $entry
 - **PERF-908**: Optimized free worker dispatch multi-worker loop in `CaptureLoop.ts` by replacing `while` condition block with an exact calculated loop limit.
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -498,6 +530,10 @@ $entry
   - **Plan ID:** PERF-917
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -509,6 +545,10 @@ $entry
   - **Plan ID:** PERF-918
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -520,6 +560,10 @@ $entry
   - **Plan ID:** PERF-920
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -598,6 +642,10 @@ $entry
   - **Improvement:** Removed practically identical blocks nested under `isDomStrategy` wrapper inside the fast single worker loop to reduce parser complexity and AST logic. Code remains performant.
   - **Plan ID**: PERF-1102
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
@@ -630,6 +678,10 @@ Current best: 8.751s (baseline was 8.608s, -TBD%)
 Last updated by: PERF-1164
 
 ## What Works
+- **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
+  - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
+  - **Plan ID**: PERF-1172
+
 - **PERF-1171**: Removed unnecessary await timePromise checks in DOM fast paths in CaptureLoop.ts.
   - **Improvement**: Eliminated per-frame branch evaluation overhead and AST bloat, which sped up V8 execution in the hot path, yielding a ~26% improvement in DOM rendering time.
   - **Plan ID**: PERF-1171
