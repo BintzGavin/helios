@@ -697,3 +697,6 @@ Last updated by: PERF-1164
 - [PERF-1171] Evaluated removing `timePromise` wait checks from `CaptureLoop.ts` DOM rendering modes.
   - **Improvement:** Removed unnecessary AST branch evaluation in the DOM path since `setTime` operates synchronously.
   - **Plan ID:** PERF-1171
+- [PERF-1173] Simplified writer block check in `CaptureLoop.ts` multi-worker sync path.
+  - **Improvement:** Reduced redundant array lookups.
+  - **Plan ID:** PERF-1173
