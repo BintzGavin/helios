@@ -1,4 +1,4 @@
-**Version**: 0.79.23
+**Version**: 0.79.25
 
 [v0.79.17] ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
@@ -331,3 +331,4 @@
 
 [v0.79.23] ✅ Completed: Implement webkit performance properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount getters for HTMLVideoElement API parity.
 [v0.79.24] ✅ Completed: Document WebKit Performance Properties - Created plan `.sys/plans/2027-03-09-PLAYER-Document-Webkit-Performance-Properties.md` to document the recently implemented `webkitAudioDecodedByteCount`, `webkitDecodedFrameCount`, `webkitDroppedFrameCount`, and `webkitVideoDecodedByteCount` properties in the README to address a vision gap.
+[v0.79.25] ✅ Completed: Document Webkit Performance Properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount to README.md
