@@ -1,14 +1,14 @@
 ---
-id: PERF-1168
-slug: remove-await-timepromise-dom
+id: PERF-1171
+slug: remove-timepromise
 status: unclaimed
 claimed_by: ""
-created: 2026-11-03
+created: 2024-11-03
 completed: ""
 result: ""
 ---
 
-# PERF-1168: Remove unnecessary `await timePromise` checks in DOM fast paths
+# PERF-1171: Remove unnecessary await timePromise checks in DOM fast paths
 
 ## Focus Area
 The single-worker and multi-worker DOM fast paths (`isDomStrategy === true`) in `CaptureLoop.ts` evaluate and await `timePromise`.
@@ -43,7 +43,7 @@ to simply:
 ```typescript
 timeDriver.setTime( ... );
 ```
-Specifically around lines 172-176 and 181-185.
+Specifically around lines 172-176, 181-185, 213-217.
 
 **Why**: Avoids assignment, branching, and V8 ast nodes overhead for the DOM rendering hot path where `timePromise` is always `undefined`.
 **Risk**: If `timeDriver.setTime()` changes to return a promise for DOM mode, it would no longer be awaited.
@@ -51,12 +51,10 @@ Specifically around lines 172-176 and 181-185.
 ### Step 2: Update multi-worker paths
 **File**: `packages/renderer/src/core/CaptureLoop.ts`
 **What to change**:
-In the multi-worker `runWorker` function for `isDomStrategy === true` (lines 488-491), replace:
+In the multi-worker `runWorker` function for `isDomStrategy === true` (around lines 479-482), replace:
 ```typescript
 const timePromise = timeDriver.setTime(page, (startFrame + i) * compTimeStep);
-if (timePromise) {
-  await timePromise;
-}
+if (timePromise) await timePromise;
 ```
 with:
 ```typescript
@@ -68,5 +66,4 @@ timeDriver.setTime(page, (startFrame + i) * compTimeStep);
 None.
 
 ## Correctness Check
-Run `npx tsx packages/renderer/scripts/benchmark-perf.ts --mode=dom` to ensure no degradation.
 Run `npm run test --workspace=packages/renderer` to ensure frame logic outputs properly.
