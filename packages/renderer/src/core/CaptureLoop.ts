@@ -579,12 +579,10 @@ export class CaptureLoop {
             if (aborted) break;
             if (nextFrameToWrite !== chunkEnd) {
               const awaitIndex = nextFrameToWrite & ringMask;
-              if (frameBufferRing[awaitIndex] === null) {
-                do {
-                  await writerWaiterPromise;
-                } while (frameBufferRing[awaitIndex] === null && !aborted);
-                if (aborted) break;
+              while (frameBufferRing[awaitIndex] === null && !aborted) {
+                await writerWaiterPromise;
               }
+              if (aborted) break;
             }
 
             if (progressCounter === 0) {

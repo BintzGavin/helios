@@ -1,7 +1,8 @@
 ---
 id: PERF-1173
 slug: simplify-writer-await-checks
-status: unclaimed
+status: claimed
+claimed_by: Jules
 claimed_by: ""
 created: 2024-11-04
 completed: ""

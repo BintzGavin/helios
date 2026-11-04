@@ -14,6 +14,10 @@ Last updated by: PERF-1171
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- [PERF-1173] Simplified writer block check in `CaptureLoop.ts` multi-worker sync path.
+  - **Improvement:** Reduced redundant array lookups.
+  - **Plan ID:** PERF-1173
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
