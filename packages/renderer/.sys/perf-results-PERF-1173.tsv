@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.721	150	17.20	63.9	keep	baseline
+2	8.687	150	17.27	63.6	keep	remove redundant buffer check
