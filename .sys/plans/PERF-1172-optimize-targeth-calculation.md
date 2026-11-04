@@ -59,7 +59,7 @@ Run `npm run test --workspace=packages/renderer`
 ## Results Summary
 ```
 run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
-1	8.709	150	17.22	63.7	keep	optimize targetH calculation in worker dispatch loop
-2	8.730	150	17.18	64.5	keep	optimize targetH calculation in worker dispatch loop
-3	8.722	150	17.20	63.5	keep	optimize targetH calculation in worker dispatch loop
+1	8.680	150	17.28	64.2	keep	optimize targetH calculation in worker dispatch loop
+2	8.678	150	17.29	63.6	keep	optimize targetH calculation in worker dispatch loop
+3	8.650	150	17.34	63.5	keep	optimize targetH calculation in worker dispatch loop
 ```

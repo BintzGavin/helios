@@ -425,7 +425,7 @@ export class CaptureLoop {
           let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
 
           if (dispatches > 0) {
-            const targetH = h - (dispatches < h ? dispatches : h);
+            const targetH = dispatches < h ? h - dispatches : 0;
             do {
               h--;
               workerThenables[freeWorkers[h]].resolve(n);
@@ -536,7 +536,7 @@ export class CaptureLoop {
               let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
 
               if (dispatches > 0) {
-                const targetH = h - (dispatches < h ? dispatches : h);
+                const targetH = dispatches < h ? h - dispatches : 0;
                 do {
                   h--;
                   workerThenables[freeWorkers[h]].resolve(n);
