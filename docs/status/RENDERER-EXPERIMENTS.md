@@ -704,3 +704,4 @@ Last updated by: PERF-1164
 - [PERF-1173] Simplified writer block check in `CaptureLoop.ts` multi-worker sync path.
   - **Improvement:** Reduced redundant array lookups.
   - **Plan ID:** PERF-1173
+- [PERF-1175] IMPOSSIBLE: DUPLICATION - The plan to optimize base64 string stream writes is an exact duplicate of PERF-1174.
