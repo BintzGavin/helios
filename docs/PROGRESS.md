@@ -950,3 +950,6 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.25
 - ✅ Completed: Document Webkit Performance Properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount to README.md
+
+### STUDIO v0.124.1
+- ✅ Completed: STUDIO-Improve-Timeline-Coverage - Cleared draggingPropKey on handleMouseUp in Timeline.tsx to improve test coverage.
