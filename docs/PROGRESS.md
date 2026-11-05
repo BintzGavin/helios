@@ -3,6 +3,9 @@
 
 ## PLAYER v0.79.18
 
+### PLAYER v0.79.26
+- ✅ Completed: Test autoPictureInPicture - Added edge-case test coverage for autoPictureInPicture in api_parity.test.ts
+
 - ✅ Completed: Implement mediaKeys - Implemented mediaKeys property and setMediaKeys method for HTMLMediaElement parity.
 - ✅ Completed: Implement onwaitingforkey event handler and waitingforkey event documentation for API parity.
 

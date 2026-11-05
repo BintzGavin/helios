@@ -1,5 +1,6 @@
-**Version**: 0.79.25
+**Version**: 0.79.26
 
+[v0.79.26] ✅ Completed: Test autoPictureInPicture - Added edge-case test coverage for autoPictureInPicture in api_parity.test.ts
 [v0.79.17] ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
 [v0.78.5] ✅ Completed: Discovered missing composition setters on the public API wrapper. Created plan `.sys/plans/2027-03-05-PLAYER-Expose-Composition-Setters.md` to expose `setDuration`, `setFps`, `setSize`, and `setMarkers`.
 [v0.78.4] ✅ Completed: Discovered missing HTMLMediaElement-like parity methods (`setPlaybackRange`, `clearPlaybackRange`) in HeliosPlayer public API. Created plan `.sys/plans/2027-03-04-PLAYER-Expose-Playback-Range-Methods.md` to implement them.
