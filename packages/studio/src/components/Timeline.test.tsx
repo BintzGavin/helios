@@ -239,6 +239,15 @@ describe('Timeline', () => {
     // Should call setInputProps with new time
     // 50% of 10s = 5s
     expect(setInputPropsMock).toHaveBeenCalledWith({ myTime: 5 });
+
+    // Mouse up to clear draggingPropKey
+    act(() => {
+      const upEvent = new MouseEvent('mouseup', {
+        bubbles: true,
+        cancelable: true
+      });
+      document.dispatchEvent(upEvent);
+    });
   });
 
   it('handles asset drop correctly', () => {

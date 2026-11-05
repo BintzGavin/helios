@@ -309,6 +309,7 @@ export const Timeline: React.FC = () => {
 
     const handleMouseUp = () => {
       setIsDragging(null);
+      setDraggingPropKey(null);
     };
 
     document.addEventListener("mousemove", handleMouseMove);

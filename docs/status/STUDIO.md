@@ -1,4 +1,4 @@
-**Version**: 0.123.5
+**Version**: 0.124.1
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -92,3 +92,4 @@ key or sidebar button, improving usability.
 - [v0.123.4] ✅ Completed: Improve StudioContext Export Coverage - Added tests for exportVideo and cancelExport
 - [v0.123.5] ✅ Completed: Improve StudioContext Export Coverage - Reached 100% export-related test coverage for StudioContext
 - [v0.124.0] ✅ Completed: STUDIO-Improve-Timeline-Coverage - Created plan to fix dragging prop key not resetting in handleMouseUp on unmount.
+- [v0.124.1] ✅ Completed: STUDIO-Improve-Timeline-Coverage - Cleared draggingPropKey on handleMouseUp in Timeline.tsx to improve test coverage.
