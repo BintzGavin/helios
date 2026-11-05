@@ -91,3 +91,4 @@ key or sidebar button, improving usability.
 - [v0.123.3] ✅ Completed: STUDIO-Improve-ComponentsPanel-Coverage - Achieved 100% test coverage for ComponentsPanel by handling error states properly.
 - [v0.123.4] ✅ Completed: Improve StudioContext Export Coverage - Added tests for exportVideo and cancelExport
 - [v0.123.5] ✅ Completed: Improve StudioContext Export Coverage - Reached 100% export-related test coverage for StudioContext
+- [v0.124.0] ✅ Completed: STUDIO-Improve-Timeline-Coverage - Created plan to fix dragging prop key not resetting in handleMouseUp on unmount.
