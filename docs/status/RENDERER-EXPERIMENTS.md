@@ -678,8 +678,8 @@ $entry
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
 ## Performance Trajectory
-Current best: 8.751s (baseline was 8.608s, -TBD%)
-Last updated by: PERF-1164
+Current best: 8.716s (baseline was 8.608s, -TBD%)
+Last updated by: PERF-1176
 
 ## What Works
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
@@ -705,3 +705,7 @@ Last updated by: PERF-1164
   - **Improvement:** Reduced redundant array lookups.
   - **Plan ID:** PERF-1173
 - [PERF-1175] IMPOSSIBLE: DUPLICATION - The plan to optimize base64 string stream writes is an exact duplicate of PERF-1174.
+
+- [PERF-1176] Eliminated spurious writer wakeups in `CaptureLoop.ts` by conditionally resolving `writerWaiterPromise` only when `i === nextFrameToWrite`.
+  - **Improvement:** Reduced unnecessary V8 microtask scheduling and resolution overhead in the hot multi-worker loop, yielding a marginal speedup.
+  - **Plan ID:** PERF-1176

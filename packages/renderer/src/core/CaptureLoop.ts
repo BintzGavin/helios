@@ -479,7 +479,7 @@ export class CaptureLoop {
 
                 const rawResult = await strategy.capture(page, i * timeStep);
                 frameBufferRing[i & ringMask] = rawResult as string;
-                writerWaiterPromise.resolve();
+                if (i === nextFrameToWrite) writerWaiterPromise.resolve();
               }
             } catch (e) {
               fatalError = e;
@@ -505,7 +505,7 @@ export class CaptureLoop {
                 if (timePromise) await timePromise;
 
                 frameBufferRing[i & ringMask] = await strategy.capture(page, i * timeStep);
-                writerWaiterPromise.resolve();
+                if (i === nextFrameToWrite) writerWaiterPromise.resolve();
               }
             } catch (e) {
               fatalError = e;
