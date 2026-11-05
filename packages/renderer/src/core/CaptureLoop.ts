@@ -188,10 +188,10 @@ export class CaptureLoop {
             onProgress(0 / totalFrames);
           }
 
-          const buf = Buffer.from(rawResult as string, "base64");
-
-          pendingBytes += buf.length;
-          if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
+          const base64Str = rawResult as string;
+          const byteLength = (base64Str.length * 3) >>> 2;
+          pendingBytes += byteLength;
+          if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
             await this.drainPromise;
             pendingBytes = 0;
           }
@@ -215,10 +215,10 @@ export class CaptureLoop {
                 nextCapturePromise = strategy.capture(page, (i + 1) * timeStep);
               }
 
-              const buf = Buffer.from(rawResult as string, "base64");
-
-              pendingBytes += buf.length;
-              if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
+              const base64Str = rawResult as string;
+              const byteLength = (base64Str.length * 3) >>> 2;
+              pendingBytes += byteLength;
+              if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
               }
@@ -241,10 +241,10 @@ export class CaptureLoop {
           if (!aborted && totalFrames > 1) {
             const rawResult = await nextCapturePromise;
 
-            const buf = Buffer.from(rawResult as string, "base64");
-
-            pendingBytes += buf.length;
-            if (!stream.write(buf) && pendingBytes >= MAX_PENDING_BYTES) {
+            const base64Str = rawResult as string;
+            const byteLength = (base64Str.length * 3) >>> 2;
+            pendingBytes += byteLength;
+            if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
               await this.drainPromise;
               pendingBytes = 0;
             }
@@ -478,8 +478,7 @@ export class CaptureLoop {
                 timeDriver.setTime(page, (startFrame + i) * compTimeStep);
 
                 const rawResult = await strategy.capture(page, i * timeStep);
-                let buf: Buffer = Buffer.from(rawResult as string, "base64");
-                frameBufferRing[i & ringMask] = buf;
+                frameBufferRing[i & ringMask] = rawResult as string;
                 writerWaiterPromise.resolve();
               }
             } catch (e) {
@@ -563,12 +562,21 @@ export class CaptureLoop {
                 break;
               }
 
-              const buffer = frameBufferRing[ringIndex] as unknown as Buffer;
+              const buffer = frameBufferRing[ringIndex];
               frameBufferRing[ringIndex] = null;
-              pendingBytes += buffer.length;
-              if (!stream.write(buffer) && pendingBytes >= MAX_PENDING_BYTES) {
-                await this.drainPromise;
-                pendingBytes = 0;
+              if (typeof buffer === "string") {
+                  const byteLength = (buffer.length * 3) >>> 2;
+                  pendingBytes += byteLength;
+                  if (!stream.write(buffer, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
+                    await this.drainPromise;
+                    pendingBytes = 0;
+                  }
+              } else {
+                  pendingBytes += (buffer as Buffer).length;
+                  if (!stream.write(buffer as Buffer) && pendingBytes >= MAX_PENDING_BYTES) {
+                    await this.drainPromise;
+                    pendingBytes = 0;
+                  }
               }
 
               nextFrameToWrite++;
