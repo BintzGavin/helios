@@ -755,5 +755,16 @@ describe('HeliosPlayer API Parity', () => {
 
     player.autoPictureInPicture = false;
     expect(player.autoPictureInPicture).toBe(false);
+
+    // Test fallback when pipVideo is undefined
+    (player as any).pipVideo = undefined;
+    expect(player.autoPictureInPicture).toBe(false);
+
+    // Test setter when pipVideo is undefined (should not throw and should remain false when getting)
+    player.autoPictureInPicture = true;
+    expect(player.autoPictureInPicture).toBe(false);
+
+    // Restore mock to prevent disconnectedCallback error
+    (player as any).pipVideo = { removeEventListener: vi.fn() };
   });
 });
