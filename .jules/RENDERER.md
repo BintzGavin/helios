@@ -2,9 +2,12 @@
 I will write some context here to help guide my plan. I need to write a PERF plan.
 ## Performance Trajectory
 Current best: ~500ms (from journals)
-Last updated by: PERF-945
+Last updated by: PERF-1174
 
 ## What Works
+- **PERF-1174**: Optimize base64 String Stream Writes in `CaptureLoop.ts` when rendering in DOM mode.
+  - **Improvement:** Removed V8 heap allocation of Buffers for base64 encoded strings, passing strings directly to `stream.write(base64Str, "base64")` to delegate decoding to Node.js' internal C++ stream implementations, speeding up fast-path writes and simplifying the code loop structure.
+  - **Plan ID:** PERF-1174
 - **PERF-1141**: Hoisted dispatch limit calculation in multi-worker writer chunk loops to a scoped constant in `CaptureLoop.ts`.
   - **Improvement:** Reduced AST evaluation overhead by saving V8 from recalculating identical loop boundary expressions inside the branch dispatch block.
   - **Plan ID:** PERF-1141
