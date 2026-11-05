@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.745	150	17.15	62.7	keep	PERF-1176 baseline 1
+2	8.866	150	16.92	63.7	keep	PERF-1176 baseline 2
+3	8.716	150	17.21	63.5	keep	PERF-1176 baseline 3
