@@ -556,30 +556,41 @@ export class CaptureLoop {
               nextFrameToSubmit = n;
             }
 
-            while (nextFrameToWrite !== chunkEnd) {
-              const ringIndex = nextFrameToWrite & ringMask;
-              if (frameBufferRing[ringIndex] === null) {
-                break;
-              }
+            if (isDomStrategy) {
+              while (nextFrameToWrite !== chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameBufferRing[ringIndex] === null) {
+                  break;
+                }
 
-              const buffer = frameBufferRing[ringIndex];
-              frameBufferRing[ringIndex] = null;
-              if (typeof buffer === "string") {
-                  const byteLength = (buffer.length * 3) >>> 2;
-                  pendingBytes += byteLength;
-                  if (!stream.write(buffer, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
-                    await this.drainPromise;
-                    pendingBytes = 0;
-                  }
-              } else {
-                  pendingBytes += (buffer as Buffer).length;
-                  if (!stream.write(buffer as Buffer) && pendingBytes >= MAX_PENDING_BYTES) {
-                    await this.drainPromise;
-                    pendingBytes = 0;
-                  }
-              }
+                const buffer = frameBufferRing[ringIndex] as string;
+                frameBufferRing[ringIndex] = null;
+                const byteLength = (buffer.length * 3) >>> 2;
+                pendingBytes += byteLength;
+                if (!stream.write(buffer, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
+                  await this.drainPromise;
+                  pendingBytes = 0;
+                }
 
-              nextFrameToWrite++;
+                nextFrameToWrite++;
+              }
+            } else {
+              while (nextFrameToWrite !== chunkEnd) {
+                const ringIndex = nextFrameToWrite & ringMask;
+                if (frameBufferRing[ringIndex] === null) {
+                  break;
+                }
+
+                const buffer = frameBufferRing[ringIndex] as Buffer;
+                frameBufferRing[ringIndex] = null;
+                pendingBytes += buffer.length;
+                if (!stream.write(buffer) && pendingBytes >= MAX_PENDING_BYTES) {
+                  await this.drainPromise;
+                  pendingBytes = 0;
+                }
+
+                nextFrameToWrite++;
+              }
             }
 
             progressCounter -= (nextFrameToWrite - startWrite);
