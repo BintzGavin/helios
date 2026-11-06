@@ -752,6 +752,8 @@ Last updated by: PERF-1181
   - **Plan ID:** PERF-1173
 - [PERF-1175] IMPOSSIBLE: DUPLICATION - The plan to optimize base64 string stream writes is an exact duplicate of PERF-1174.
 
+- [PERF-1179] IMPOSSIBLE: DUPLICATION - The plan to inline byteLength in CaptureLoop.ts base64 write paths is an exact duplicate of PERF-1180.
+
 - [PERF-1176] Eliminated spurious writer wakeups in `CaptureLoop.ts` by conditionally resolving `writerWaiterPromise` only when `i === nextFrameToWrite`.
   - **Improvement:** Reduced unnecessary V8 microtask scheduling and resolution overhead in the hot multi-worker loop, yielding a marginal speedup.
   - **Plan ID:** PERF-1176

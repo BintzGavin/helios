@@ -60,5 +60,11 @@
   },
   "dependencies": {
     "playwright": "^1.60.0"
+  },
+  "allowScripts": {
+    "@ffmpeg-installer/linux-x64@4.1.0": true,
+    "@ffprobe-installer/linux-x64@5.2.0": true,
+    "esbuild@0.28.0": true,
+    "esbuild@0.27.7": true
   }
 }
