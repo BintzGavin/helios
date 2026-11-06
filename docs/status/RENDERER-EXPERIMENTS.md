@@ -678,8 +678,8 @@ $entry
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
 ## Performance Trajectory
-Current best: 8.716s (baseline was 8.608s, -TBD%)
-Last updated by: PERF-1176
+Current best: 8.727s (baseline was 8.608s, -TBD%)
+Last updated by: PERF-1177
 
 ## What Works
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
@@ -709,3 +709,5 @@ Last updated by: PERF-1176
 - [PERF-1176] Eliminated spurious writer wakeups in `CaptureLoop.ts` by conditionally resolving `writerWaiterPromise` only when `i === nextFrameToWrite`.
   - **Improvement:** Reduced unnecessary V8 microtask scheduling and resolution overhead in the hot multi-worker loop, yielding a marginal speedup.
   - **Plan ID:** PERF-1176
+
+- [PERF-1177] Generated experiment plan to simplify the chunkEnd calculation using inline Math.min to reduce AST overhead and temporary variable assignments.
