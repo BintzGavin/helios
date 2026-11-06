@@ -1,0 +1,1 @@
+2	8.708	150	17.23	63.6	keep	removed redundant dynamic progress counter math in single-worker fast paths

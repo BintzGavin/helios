@@ -166,8 +166,6 @@ export class CaptureLoop {
       if (isDomStrategy) {
         try {
 
-          let progressCounter = progressInterval;
-
           let nextCapturePromise: any = null;
           timeDriver.setTime(
             page,
@@ -198,8 +196,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const chunkEnd = Math.min(i + progressCounter, loopEnd);
-            const startWrite = i;
+            const chunkEnd = i + progressInterval < loopEnd ? i + progressInterval : loopEnd;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -223,8 +220,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            if (!(progressCounter -= i - startWrite)) {
-              progressCounter = progressInterval;
+            if (i !== loopEnd) {
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
               );
@@ -263,8 +259,6 @@ export class CaptureLoop {
       } else {
         try {
 
-          let progressCounter = progressInterval;
-
           let nextCapturePromise: any = null;
           const timePromise = timeDriver.setTime(
             page,
@@ -296,8 +290,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const chunkEnd = Math.min(i + progressCounter, loopEnd);
-            const startWrite = i;
+            const chunkEnd = i + progressInterval < loopEnd ? i + progressInterval : loopEnd;
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -323,8 +316,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            if (!(progressCounter -= i - startWrite)) {
-              progressCounter = progressInterval;
+            if (i !== loopEnd) {
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
               );
