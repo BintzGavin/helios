@@ -189,8 +189,7 @@ export class CaptureLoop {
           }
 
           const base64Str = rawResult as string;
-          const byteLength = (base64Str.length * 3) >>> 2;
-          pendingBytes += byteLength;
+          pendingBytes += (base64Str.length * 3) >>> 2;
           if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
             await this.drainPromise;
             pendingBytes = 0;
@@ -215,8 +214,7 @@ export class CaptureLoop {
               }
 
               const base64Str = rawResult as string;
-              const byteLength = (base64Str.length * 3) >>> 2;
-              pendingBytes += byteLength;
+              pendingBytes += (base64Str.length * 3) >>> 2;
               if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
                 await this.drainPromise;
                 pendingBytes = 0;
@@ -241,8 +239,7 @@ export class CaptureLoop {
             const rawResult = await nextCapturePromise;
 
             const base64Str = rawResult as string;
-            const byteLength = (base64Str.length * 3) >>> 2;
-            pendingBytes += byteLength;
+            pendingBytes += (base64Str.length * 3) >>> 2;
             if (!stream.write(base64Str, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
               await this.drainPromise;
               pendingBytes = 0;
@@ -420,7 +417,7 @@ export class CaptureLoop {
           let n = nextFrameToSubmit;
 
           const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-          let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
+          let dispatches = Math.min(pipelineLimit, totalFrames) - n;
 
           if (dispatches > 0) {
             const targetH = dispatches < h ? h - dispatches : 0;
@@ -529,7 +526,7 @@ export class CaptureLoop {
               let n = nextFrameToSubmit;
 
               const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-              let dispatches = (pipelineLimit < totalFrames ? pipelineLimit : totalFrames) - n;
+              let dispatches = Math.min(pipelineLimit, totalFrames) - n;
 
               if (dispatches > 0) {
                 const targetH = dispatches < h ? h - dispatches : 0;
@@ -562,8 +559,7 @@ export class CaptureLoop {
 
                 const buffer = frameBufferRing[ringIndex] as string;
                 frameBufferRing[ringIndex] = null;
-                const byteLength = (buffer.length * 3) >>> 2;
-                pendingBytes += byteLength;
+                pendingBytes += (buffer.length * 3) >>> 2;
                 if (!stream.write(buffer, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
                   await this.drainPromise;
                   pendingBytes = 0;
