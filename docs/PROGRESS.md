@@ -954,5 +954,8 @@ Each agent should update **their own dedicated progress file** instead of this f
 ### PLAYER v0.79.25
 - ✅ Completed: Document Webkit Performance Properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount to README.md
 
+### STUDIO v0.124.3
+- ✅ Completed: STUDIO-Improve-Timeline-Missing-Branch-Coverage - Implemented test cases for hover guide, in/out marker dragging, and bounds clamping, bringing Timeline.tsx coverage up to the required marks for these features.
+
 ### STUDIO v0.124.1
 - ✅ Completed: STUDIO-Improve-Timeline-Coverage - Cleared draggingPropKey on handleMouseUp in Timeline.tsx to improve test coverage.

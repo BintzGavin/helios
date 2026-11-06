@@ -301,6 +301,169 @@ describe('Timeline', () => {
     });
   });
 
+  it('shows hover guide when moving mouse over track area', () => {
+    const { container } = render(<Timeline />);
+    const content = container.querySelector('.timeline-content');
+
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    expect(container.querySelector('.timeline-hover-guide')).not.toBeInTheDocument();
+
+    // Mouse move to 50%
+    fireEvent.mouseMove(content!, { clientX: 500, bubbles: true });
+
+    // Hover guide should show 5s -> 00:00:05:00
+    const hoverGuide = container.querySelector('.timeline-hover-guide');
+    expect(hoverGuide).toBeInTheDocument();
+    expect(hoverGuide).toHaveTextContent('00:00:05:00');
+
+    // Mouse leave
+    fireEvent.mouseLeave(content!, { bubbles: true });
+
+    // Hover guide should disappear
+    expect(container.querySelector('.timeline-hover-guide')).not.toBeInTheDocument();
+  });
+
+  it('allows dragging In and Out markers', () => {
+    const { container } = render(<Timeline />);
+
+    const content = container.querySelector('.timeline-content');
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    const inMarker = container.querySelector('.timeline-marker.in');
+    const outMarker = container.querySelector('.timeline-marker.out');
+
+    expect(inMarker).toBeInTheDocument();
+    expect(outMarker).toBeInTheDocument();
+
+    // Mouse down on In marker
+    fireEvent.mouseDown(inMarker!, { bubbles: true });
+
+    // Drag to 50% -> frame 150
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 500 }));
+    });
+
+    expect(mockSetInPoint).toHaveBeenCalledWith(150);
+
+    // Mouse up
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+
+    // Mouse down on Out marker
+    fireEvent.mouseDown(outMarker!, { bubbles: true });
+
+    // Drag to 80% -> frame 240
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 800 }));
+    });
+
+    expect(mockSetOutPoint).toHaveBeenCalledWith(240);
+
+    // Mouse up
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+  });
+
+  it('bounds dragged markers correctly', () => {
+    // Current outPoint is 300, current inPoint is 0
+    const { container } = render(<Timeline />);
+
+    const content = container.querySelector('.timeline-content');
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    const inMarker = container.querySelector('.timeline-marker.in');
+    const outMarker = container.querySelector('.timeline-marker.out');
+
+    // Drag In past Out (current out = 300) -> should clamp to outPoint - 1 = 299
+    fireEvent.mouseDown(inMarker!, { bubbles: true });
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 1100 })); // past 100%
+    });
+    expect(mockSetInPoint).toHaveBeenCalledWith(299);
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+
+    // Drag Out before In (current in = 0) -> should clamp to inPoint + 1 = 1
+    fireEvent.mouseDown(outMarker!, { bubbles: true });
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: -100 })); // before 0%
+    });
+    expect(mockSetOutPoint).toHaveBeenCalledWith(1);
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+  });
+
+  it('seeks when dragging playhead', () => {
+    const { container } = render(<Timeline />);
+
+    const content = container.querySelector('.timeline-content');
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    // Playhead dragging is triggered by mouseDown on the content area
+    fireEvent.mouseDown(content!, { clientX: 500, bubbles: true }); // Frame 150
+    expect(mockSeek).toHaveBeenCalledWith(150);
+
+    // Move mouse
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 250 })); // 25% -> 75
+    });
+    expect(mockSeek).toHaveBeenCalledWith(75);
+
+    // Mouse up
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+  });
+
+  it('handles shift key snapping during playhead drag', () => {
+    const { container } = render(<Timeline />);
+
+    const content = container.querySelector('.timeline-content');
+    if (content) {
+      content.getBoundingClientRect = vi.fn(() => ({
+        left: 0, top: 0, width: 1000, height: 100, bottom: 100, right: 1000, x: 0, y: 0, toJSON: () => {}
+      }));
+    }
+
+    fireEvent.mouseDown(content!, { clientX: 500, bubbles: true });
+    mockSeek.mockClear();
+
+    act(() => {
+      const event = new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: 505 });
+      Object.defineProperty(event, 'shiftKey', { value: true });
+      document.dispatchEvent(event);
+    });
+
+    // 505px is 50.5%, 300 * 0.505 = 151.5.
+    // Wait, getSnapFrame logic is tested, shiftKey bypasses snapping.
+    expect(mockSeek).toHaveBeenCalledWith(152); // Math.round(151.5) = 152
+
+    act(() => {
+      document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }));
+    });
+  });
+
   it('handles audio asset drop correctly', () => {
     const setInputPropsMock = vi.fn();
     (StudioContext.useStudio as any).mockReturnValue({
