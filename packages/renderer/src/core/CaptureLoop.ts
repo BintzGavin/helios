@@ -199,8 +199,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const boundEnd = i + progressCounter;
-            const chunkEnd = boundEnd < loopEnd ? boundEnd : loopEnd;
+            const chunkEnd = Math.min(i + progressCounter, loopEnd);
             const startWrite = i;
 
             for (; i !== chunkEnd; i++) {
@@ -301,8 +300,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const boundEnd = i + progressCounter;
-            const chunkEnd = boundEnd < loopEnd ? boundEnd : loopEnd;
+            const chunkEnd = Math.min(i + progressCounter, loopEnd);
             const startWrite = i;
 
             for (; i !== chunkEnd; i++) {
@@ -523,8 +521,7 @@ export class CaptureLoop {
         let progressCounter = progressInterval;
         if (nextFrameToWrite < totalFrames && !aborted) {
           while (nextFrameToWrite !== totalFrames && !aborted) {
-            const boundEnd = nextFrameToWrite + progressCounter;
-            const chunkEnd = boundEnd < totalFrames ? boundEnd : totalFrames;
+            const chunkEnd = Math.min(nextFrameToWrite + progressCounter, totalFrames);
             const startWrite = nextFrameToWrite;
 
             if (freeWorkersHead !== 0) {
