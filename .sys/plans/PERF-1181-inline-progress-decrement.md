@@ -1,11 +1,11 @@
 ---
 id: PERF-1181
 slug: inline-progress-decrement
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-11-06
-completed: ""
-result: ""
+completed: "2026-11-06"
+result: "keep"
 ---
 
 # PERF-1181: Inline progress counter decrement in single-worker and multi-worker loops
@@ -103,3 +103,9 @@ Change to:
 ## Correctness Check
 - DOM and Canvas outputs must render correctly.
 - `console.log("Progress: Rendered X / Y frames")` must trigger at the exact same intervals.
+
+## Results Summary
+- **Best render time**: 8.727s (vs baseline 8.852s)
+- **Improvement**: 1.4%
+- **Kept experiments**: inline progress decrement
+- **Discarded experiments**: none

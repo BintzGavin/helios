@@ -223,8 +223,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            progressCounter -= (i - startWrite);
-            if (progressCounter === 0) {
+            if (!(progressCounter -= i - startWrite)) {
               progressCounter = progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
@@ -324,8 +323,7 @@ export class CaptureLoop {
 
             if (aborted) break;
 
-            progressCounter -= (i - startWrite);
-            if (progressCounter === 0) {
+            if (!(progressCounter -= i - startWrite)) {
               progressCounter = progressInterval;
               console.log(
                 `Progress: Rendered ${i - 1} / ${totalFrames} frames`,
@@ -586,7 +584,7 @@ export class CaptureLoop {
               }
             }
 
-            progressCounter -= (nextFrameToWrite - startWrite);
+            const isProgress = !(progressCounter -= nextFrameToWrite - startWrite);
 
             if (aborted) break;
             if (nextFrameToWrite !== chunkEnd) {
@@ -597,7 +595,7 @@ export class CaptureLoop {
               if (aborted) break;
             }
 
-            if (progressCounter === 0) {
+            if (isProgress) {
               progressCounter = progressInterval;
               console.log(
                 `Progress: Rendered ${nextFrameToWrite} / ${totalFrames} frames`,
