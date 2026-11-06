@@ -1,11 +1,11 @@
 ---
 id: PERF-1182
 slug: remove-redundant-progress-math
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-11-06
-completed: ""
-result: ""
+completed: "2026-11-06"
+result: "improved"
 ---
 
 # PERF-1182: Remove redundant dynamic progress counter math in single-worker fast paths
@@ -116,3 +116,10 @@ Run `npx tsx packages/renderer/scripts/benchmark-perf.ts --mode=canvas` to ensur
 
 ## Correctness Check
 Run `npm run test --workspace=packages/renderer` to confirm renderer logic continues to pass.
+
+## Results Summary
+- **Best render time**: 8.700s (vs baseline 8.720s)
+- **Improvement**: 0.23%
+- **Kept experiments**:
+  - PERF-1182: Removed redundant dynamic progress counter math in single-worker fast paths
+- **Discarded experiments**: []

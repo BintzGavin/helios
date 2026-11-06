@@ -1,0 +1,20 @@
+✨ RENDERER: Remove redundant dynamic progress counter math in single-worker fast paths
+
+💡 What:
+Removed the dynamic progress counter (`progressCounter -= ...`) logic from the single-worker capture loops (DOM and Canvas paths) in CaptureLoop.ts. It now calculates bounds using `progressInterval` directly.
+
+🎯 Why:
+To eliminate loop-carried variable mutations and conditional branch evaluations in the AST inside V8's hot path (PERF-1182).
+
+📊 Impact:
+- Best render time: 8.700s (vs baseline 8.720s)
+- Improvement: ~0.23%
+
+🔬 Verification:
+- Compilation (`npm run build`) passed
+- DOM render benchmarks completed correctly
+- Canvas smoke tests ran correctly
+- Result data logged in .sys/perf-results-PERF-1182.tsv
+
+📎 Plan:
+/.sys/plans/PERF-1182-remove-redundant-progress-math.md

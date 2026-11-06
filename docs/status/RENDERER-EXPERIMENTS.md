@@ -759,3 +759,10 @@ Last updated by: PERF-1181
   - **Plan ID:** PERF-1176
 
 - [PERF-1177] Generated experiment plan to simplify the chunkEnd calculation using inline Math.min to reduce AST overhead and temporary variable assignments.
+
+## Performance Trajectory
+Current best: 8.700s (baseline was 8.720s, -0.23%)
+Last updated by: PERF-1182
+
+## What Works
+- Removed redundant dynamic progress counter math in single-worker fast paths (`progressCounter -= i - startWrite`). It slightly improved rendering speed by avoiding loop-carried variable mutations and conditional branch evaluations in the AST inside V8's hot path (PERF-1182).
