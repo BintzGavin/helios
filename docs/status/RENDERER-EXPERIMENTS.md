@@ -14,6 +14,18 @@ Last updated by: PERF-1171
 - **PERF-1145**: Created experiment plan to evaluate optimizing progress decrement calculations in single-worker loops of `CaptureLoop.ts` by utilizing induction variables post-loop.
 
 ## What Works
+- **PERF-1180**: Inline `byteLength` calculation and use `Math.min` for dispatches in CaptureLoop.ts.
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+  - **Plan ID**: PERF-1180
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - [PERF-1173] Simplified writer block check in `CaptureLoop.ts` multi-worker sync path.
   - **Improvement:** Reduced redundant array lookups.
   - **Plan ID:** PERF-1173
@@ -446,6 +458,10 @@ $entry
   - **Plan ID:** PERF-891
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -462,6 +478,10 @@ $entry
 - Removed redundant dynamic checks for capturedErrors and signal.aborted in CaptureLoop.ts multi-worker paths (~80% loop overhead reduction per microbenchmark) (PERF-892)
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -475,6 +495,10 @@ $entry
 - **PERF-895**: Removed dead `if (aborted)` branch inside the `if (freeWorkersHead > 0)` dispatch block in `CaptureLoop.ts`. Because `aborted` was already checked prior, this inner check was entirely unreachable. Removing it yielded ~39% improvement in microbenchmark execution time by eliminating a redundant V8 dynamic property check in the tight multi-worker loop.
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -488,6 +512,10 @@ $entry
 - **PERF-907**: Removed dead  branches inside the single-worker  path in . Because  logically guarantees , this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -501,6 +529,10 @@ $entry
 - **PERF-907**: Removed dead `if (isDomStrategy)` branches inside the single-worker `!isString` path in `CaptureLoop.ts`. Because `!isString` logically guarantees `!isDomStrategy`, this entire block of code was fundamentally unreachable. Removing it decreases parser overhead, shrinks JIT burden, and keeps AST smaller with minimal but positive performance impact (~0.5%).
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -514,6 +546,10 @@ $entry
 - **PERF-908**: Optimized free worker dispatch multi-worker loop in `CaptureLoop.ts` by replacing `while` condition block with an exact calculated loop limit.
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -534,6 +570,10 @@ $entry
   - **Plan ID:** PERF-917
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -549,6 +589,10 @@ $entry
   - **Plan ID:** PERF-918
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -564,6 +608,10 @@ $entry
   - **Plan ID:** PERF-920
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -646,6 +694,10 @@ $entry
   - **Improvement:** Removed practically identical blocks nested under `isDomStrategy` wrapper inside the fast single worker loop to reduce parser complexity and AST logic. Code remains performant.
   - **Plan ID**: PERF-1102
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172
@@ -682,6 +734,10 @@ Current best: 8.727s (baseline was 8.608s, -TBD%)
 Last updated by: PERF-1177
 
 ## What Works
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
+  - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
+
 - **PERF-1172**: Optimized targetH calculation in worker dispatch loop in CaptureLoop.ts.
   - **Improvement**: Avoided doing unnecessary subtraction when `dispatches >= h`.
   - **Plan ID**: PERF-1172

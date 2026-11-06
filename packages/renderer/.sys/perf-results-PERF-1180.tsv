@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	6.245	150	24.02	63.6	keep	inline byteLength single/multi dom strategy, Math.min for dispatches
+2	8.701	150	17.24	63.7	keep	inline byteLength single/multi dom strategy, Math.min for dispatches
+3	8.721	150	17.20	63.7	keep	inline byteLength single/multi dom strategy, Math.min for dispatches
