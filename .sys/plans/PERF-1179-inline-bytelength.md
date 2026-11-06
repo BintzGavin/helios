@@ -1,11 +1,11 @@
 ---
 id: PERF-1179
 slug: inline-bytelength
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-11-06
-completed: ""
-result: ""
+completed: "2024-11-06"
+result: discarded
 ---
 
 # PERF-1179: Inlining `byteLength` in CaptureLoop.ts base64 write paths
@@ -47,3 +47,9 @@ pendingBytes += (base64Str.length * 3) >>> 2;
 
 ## Correctness Check
 Run the DOM mode microbenchmark `npx tsx packages/renderer/scripts/benchmark-perf.ts --mode=dom` to verify rendering completes correctly, as well as `npm run test --workspace=packages/renderer`.
+
+## Results Summary
+- **Best render time**: N/A
+- **Improvement**: N/A
+- **Kept experiments**: None
+- **Discarded experiments**: IMPOSSIBLE: DUPLICATION of PERF-1180

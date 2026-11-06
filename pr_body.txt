@@ -1,0 +1,8 @@
+💡 **What**: The experiment run (PERF-1179) and its outcome. The plan was discovered to be an exact duplicate of PERF-1180, so it was discarded and marked as `IMPOSSIBLE: DUPLICATION` in the `docs/status/RENDERER-EXPERIMENTS.md` log.
+🎯 **Why**: The performance bottleneck targeted was string allocations and calculations in hot loops. This was already achieved by PERF-1180.
+📊 **Impact**: N/A (Duplicate of PERF-1180)
+🔬 **Verification**: Ran `npm run test` on `packages/renderer`, `packages/player`, and `packages/core` to verify stability after plan closure.
+📎 **Plan**: `/.sys/plans/PERF-1179-inline-bytelength.md`
+
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.903	150	7.94	64.3	keep	baseline
