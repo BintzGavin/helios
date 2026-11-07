@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.729	150	17.18	63.5	keep	baseline (PERF-1185)
+2	8.752	150	17.14	63.6	keep	inline pipelineLimit
+3	8.706	150	17.23	64.4	keep	inline pipelineLimit

@@ -406,8 +406,7 @@ export class CaptureLoop {
           let h = freeWorkersHead;
           let n = nextFrameToSubmit;
 
-          const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-          let dispatches = Math.min(pipelineLimit, totalFrames) - n;
+          let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - n;
 
           if (dispatches > 0) {
             const targetH = dispatches < h ? h - dispatches : 0;
@@ -515,8 +514,7 @@ export class CaptureLoop {
               let h = freeWorkersHead;
               let n = nextFrameToSubmit;
 
-              const pipelineLimit = nextFrameToWrite + maxPipelineDepth;
-              let dispatches = Math.min(pipelineLimit, totalFrames) - n;
+              let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - n;
 
               if (dispatches > 0) {
                 const targetH = dispatches < h ? h - dispatches : 0;
