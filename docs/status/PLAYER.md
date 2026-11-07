@@ -1,4 +1,4 @@
-**Version**: 0.79.27
+**Version**: 0.79.28
 
 [v0.79.26] ✅ Completed: Test autoPictureInPicture - Added edge-case test coverage for autoPictureInPicture in api_parity.test.ts
 [v0.79.17] ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
@@ -334,3 +334,4 @@
 [v0.79.24] ✅ Completed: Document WebKit Performance Properties - Created plan `.sys/plans/2027-03-09-PLAYER-Document-Webkit-Performance-Properties.md` to document the recently implemented `webkitAudioDecodedByteCount`, `webkitDecodedFrameCount`, `webkitDroppedFrameCount`, and `webkitVideoDecodedByteCount` properties in the README to address a vision gap.
 [v0.79.25] ✅ Completed: Document Webkit Performance Properties - Added webkitAudioDecodedByteCount, webkitDecodedFrameCount, webkitDroppedFrameCount, and webkitVideoDecodedByteCount to README.md
 [v0.79.27] ✅ Completed: Discovered that .sys/plans/2024-05-24-PLAYER-Implement-waitingforkey.md is an IMPOSSIBLE: DUPLICATION plan. The onwaitingforkey property and waitingforkey event are already fully implemented and documented. Documented as impossible and discarded.
+[v0.79.28] ✅ Completed: Discovered that `.sys/plans/2026-10-19-PLAYER-Add-Missing-observedAttributes.md` is an IMPOSSIBLE: DUPLICATION plan. The `defaultmuted` attribute is already fully implemented in `observedAttributes`. Documented as impossible and discarded.
