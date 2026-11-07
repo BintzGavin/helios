@@ -1,12 +1,13 @@
 ---
 id: PERF-1185
 slug: inline-pipelinelimit
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: Jules
 created: 2024-11-07
-completed: ""
-result: ""
+completed: 2024-11-07
+result: keep
 ---
+
 # PERF-1185: Inline `pipelineLimit` directly into `dispatches` calculation in multi-worker paths
 
 ## Focus Area
@@ -33,7 +34,7 @@ Microbenchmarks over 10M iterations show a modest improvement (~2.8% reduction i
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~8.700s
+- **Current estimated render time**: ~8.729s
 - **Bottleneck analysis**: The renderer spends significant time inside `CaptureLoop.ts` managing worker dispatch logic, backpressure limits, and chunk rendering blocks. The closure overhead in `checkState` and the worker pool assignment block in the main loop are very hot paths in multi-worker operations.
 
 ## Implementation Spec
@@ -79,3 +80,10 @@ The output video should still cleanly render 150 frames with correct timing, as 
 
 ## Prior Art
 - PERF-1045, PERF-1053, PERF-1106: Similar micro-optimizations that successfully removed intermediate assignment variables in hot loops to reduce AST logic.
+
+## Results Summary
+| run | render_time_s | frames | fps_effective | peak_mem_mb | status | description |
+|-----|---------------|--------|---------------|-------------|--------|-------------|
+| 1   | 8.729         | 150    | 17.18         | 63.5        | keep   | baseline (PERF-1185) |
+| 2   | 8.752         | 150    | 17.14         | 63.6        | keep   | inline pipelineLimit |
+| 3   | 8.706         | 150    | 17.23         | 64.4        | keep   | inline pipelineLimit |

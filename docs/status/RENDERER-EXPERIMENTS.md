@@ -766,3 +766,6 @@ Last updated by: PERF-1182
 
 ## What Works
 - Removed redundant dynamic progress counter math in single-worker fast paths (`progressCounter -= i - startWrite`). It slightly improved rendering speed by avoiding loop-carried variable mutations and conditional branch evaluations in the AST inside V8's hot path (PERF-1182).
+- [PERF-1185] Inlined the `pipelineLimit` calculation (`nextFrameToWrite + maxPipelineDepth`) directly into the `Math.min()` calls for `dispatches` in the multi-worker path of `CaptureLoop.ts`.
+  - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths.
+  - **Plan ID**: PERF-1185
