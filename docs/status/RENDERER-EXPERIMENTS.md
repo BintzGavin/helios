@@ -5,10 +5,14 @@
 - **PERF-1163**: Created an experiment plan to remove the unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts` to eliminate a dead store.
 
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 8.727s (baseline was 8.608s, ~26.5%)
+Current best: 8.658s (baseline was 8.700s, -0.48%)
 Last updated by: PERF-1181
 
 ## What Works
+- **PERF-1190**: Replaced dynamic maxPipelineDepth calculation with a constant, eliminated dead h = 0 assignments, and used Math.min for chunkEnd calculation in CaptureLoop.ts.
+  - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths. Yielded a minor performance improvement in single-worker bounds checks and multi-worker loops.
+  - **Plan ID**: PERF-1190
+
 - Inlined progress decrement and check in single-worker and multi-worker loops of CaptureLoop.ts (~1.4% faster) (PERF-1181)
 - **PERF-951**: Created experiment plan to cache decoded Base64 `Buffer` objects earlier in the multi-worker loop to relieve hot writer loop CPU pressure in `CaptureLoop.ts`.
 - **PERF-1109**: Created experiment plan to unroll isDomStrategy in single-worker final frame block to simplify AST and eliminate branching overhead during final frame processing.
@@ -721,7 +725,7 @@ $entry
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
 ## Performance Trajectory
-Current best: 8.727s (baseline was 8.608s, -TBD%)
+Current best: 8.658s (baseline was 8.700s, -0.48%)
 Last updated by: PERF-1181
 
   - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
@@ -761,10 +765,14 @@ Last updated by: PERF-1181
 - [PERF-1177] Generated experiment plan to simplify the chunkEnd calculation using inline Math.min to reduce AST overhead and temporary variable assignments.
 
 ## Performance Trajectory
-Current best: 8.700s (baseline was 8.720s, -0.23%)
-Last updated by: PERF-1182
+Current best: 8.658s (baseline was 8.700s, -0.48%)
+Last updated by: PERF-1190
 
 ## What Works
+- **PERF-1190**: Replaced dynamic maxPipelineDepth calculation with a constant, eliminated dead h = 0 assignments, and used Math.min for chunkEnd calculation in CaptureLoop.ts.
+  - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths. Yielded a minor performance improvement in single-worker bounds checks and multi-worker loops.
+  - **Plan ID**: PERF-1190
+
 - Removed redundant dynamic progress counter math in single-worker fast paths (`progressCounter -= i - startWrite`). It slightly improved rendering speed by avoiding loop-carried variable mutations and conditional branch evaluations in the AST inside V8's hot path (PERF-1182).
 - [PERF-1185] Inlined the `pipelineLimit` calculation (`nextFrameToWrite + maxPipelineDepth`) directly into the `Math.min()` calls for `dispatches` in the multi-worker path of `CaptureLoop.ts`.
   - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths.
