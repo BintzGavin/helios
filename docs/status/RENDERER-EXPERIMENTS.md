@@ -358,6 +358,8 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- [PERF-1192] IMPOSSIBLE: DUPLICATION - The plan to unroll the buffer type dispatch in the single worker path of `CaptureLoop.ts` is an exact duplicate of existing code (already fully branched on `isDomStrategy` via prior optimizations).
+
 - What I tried: Unroll buffer type dispatch based on isDomStrategy for inner chunk loops in single-worker paths.
 - **WHY it didn't work:** This experiment was discarded because the `isDomStrategy` check has already been aggressively hoisted completely outside the single-worker `while` loop by prior optimizations (like PERF-990). Thus, the inner loop paths are already cleanly separated and explicitly typed, making this plan obsolete.
 - Plan ID: `PERF-1000`
