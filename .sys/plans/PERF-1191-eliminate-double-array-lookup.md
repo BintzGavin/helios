@@ -1,7 +1,7 @@
 ---
 id: PERF-1191
 slug: eliminate-double-array-lookup
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-11-08
 completed: ""
@@ -91,3 +91,8 @@ Run standard tests to verify the DOM path remains functional without frame drops
 
 ## Canvas Smoke Test
 Run canvas benchmark to verify it doesn't break canvas rendering.
+```tsv
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.432	150	8.14	61.5	keep	baseline
+2	6.732	150	22.28	61.5	keep	eliminated double array lookup in multi-worker chunk writer
+```

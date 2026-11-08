@@ -1,0 +1,3 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.432	150	8.14	61.5	keep	baseline
+2	6.732	150	22.28	61.5	keep	eliminated double array lookup in multi-worker chunk writer
