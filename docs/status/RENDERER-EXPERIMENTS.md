@@ -358,6 +358,8 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- Removed redundant dynamic progress counter math in multi-worker path (PERF-1193)
+  - **WHY it didn't work**: Slower render time by 39.40%
 - [PERF-1192] IMPOSSIBLE: DUPLICATION - The plan to unroll the buffer type dispatch in the single worker path of `CaptureLoop.ts` is an exact duplicate of existing code (already fully branched on `isDomStrategy` via prior optimizations).
 
 - What I tried: Unroll buffer type dispatch based on isDomStrategy for inner chunk loops in single-worker paths.

@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.685	150	17.27	63.6	discard	Removed redundant dynamic progress counter math in multi-worker path
+2	8.7	150	17.24	63.5	discard	Removed redundant dynamic progress counter math in multi-worker path
+3	8.825	150	17.00	63.5	discard	Removed redundant dynamic progress counter math in multi-worker path
