@@ -1,7 +1,7 @@
 ---
 id: PERF-1193
 slug: remove-progress-counter-math-multi-worker
-status: unclaimed
+status: complete
 claimed_by: ""
 created: 2024-11-08
 completed: ""
