@@ -538,11 +538,11 @@ export class CaptureLoop {
             if (isDomStrategy) {
               while (nextFrameToWrite !== chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
+                const buffer = frameBufferRing[ringIndex] as string | null;
+                if (buffer === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[ringIndex] as string;
                 frameBufferRing[ringIndex] = null;
                 pendingBytes += (buffer.length * 3) >>> 2;
                 if (!stream.write(buffer, "base64") && pendingBytes >= MAX_PENDING_BYTES) {
@@ -555,11 +555,11 @@ export class CaptureLoop {
             } else {
               while (nextFrameToWrite !== chunkEnd) {
                 const ringIndex = nextFrameToWrite & ringMask;
-                if (frameBufferRing[ringIndex] === null) {
+                const buffer = frameBufferRing[ringIndex] as Buffer | null;
+                if (buffer === null) {
                   break;
                 }
 
-                const buffer = frameBufferRing[ringIndex] as Buffer;
                 frameBufferRing[ringIndex] = null;
                 pendingBytes += buffer.length;
                 if (!stream.write(buffer) && pendingBytes >= MAX_PENDING_BYTES) {

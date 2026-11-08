@@ -777,3 +777,7 @@ Last updated by: PERF-1190
 - [PERF-1185] Inlined the `pipelineLimit` calculation (`nextFrameToWrite + maxPipelineDepth`) directly into the `Math.min()` calls for `dispatches` in the multi-worker path of `CaptureLoop.ts`.
   - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths.
   - **Plan ID**: PERF-1185
+
+- **PERF-1191**: Eliminated redundant double array lookups in the multi-worker chunk writer loops of CaptureLoop.ts by caching frameBufferRing[ringIndex] in a local variable.
+  - **Improvement**: Slightly reduced V8 array bounds checking and property lookup overhead in the multi-worker loop hot paths.
+  - **Plan ID**: PERF-1191
