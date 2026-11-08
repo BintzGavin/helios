@@ -725,8 +725,8 @@ $entry
   - **Why it didn't work:** AST size reduction did not yield measurable performance gain in this environment.
   - **Plan ID:** PERF-1165
 ## Performance Trajectory
-Current best: 8.658s (baseline was 8.700s, -0.48%)
-Last updated by: PERF-1181
+Current best: 6.241s (baseline was 8.700s, -28.26%)
+Last updated by: PERF-1190
 
   - **Improvement**: Marginally reduced V8 AST complexity by eliminating intermediate variable allocations and inline ternary evaluations in hot loops, yielding a minor performance improvement in multi-worker assignment paths and string manipulation.
 
@@ -765,7 +765,7 @@ Last updated by: PERF-1181
 - [PERF-1177] Generated experiment plan to simplify the chunkEnd calculation using inline Math.min to reduce AST overhead and temporary variable assignments.
 
 ## Performance Trajectory
-Current best: 8.658s (baseline was 8.700s, -0.48%)
+Current best: 6.241s (baseline was 8.700s, -28.26%)
 Last updated by: PERF-1190
 
 ## What Works

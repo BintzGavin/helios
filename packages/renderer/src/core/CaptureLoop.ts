@@ -196,7 +196,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const chunkEnd = i + progressInterval < loopEnd ? i + progressInterval : loopEnd;
+            const chunkEnd = Math.min(i + progressInterval, loopEnd);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -290,7 +290,7 @@ export class CaptureLoop {
           let i = 1;
           const loopEnd = totalFrames - 1;
           while (i < loopEnd && !aborted) {
-            const chunkEnd = i + progressInterval < loopEnd ? i + progressInterval : loopEnd;
+            const chunkEnd = Math.min(i + progressInterval, loopEnd);
 
             for (; i !== chunkEnd; i++) {
               const rawResult = await nextCapturePromise;
@@ -358,8 +358,7 @@ export class CaptureLoop {
       if (capturedErrors.length > 0) throw capturedErrors[0];
       if (signal && signal.aborted) throw new Error("Aborted");
     } else {
-      let maxPipelineDepth = 64;
-      maxPipelineDepth = Math.pow(2, Math.ceil(Math.log2(maxPipelineDepth)));
+      const maxPipelineDepth = 64;
       const ringMask = maxPipelineDepth - 1;
       const timeStep = 1000 / fps;
       const compTimeStep = 1 / fps;
@@ -423,7 +422,6 @@ export class CaptureLoop {
               h--;
               workerThenables[freeWorkers[h]].resolve(-1);
             }
-            h = 0;
           }
 
           freeWorkersHead = h;
@@ -531,7 +529,6 @@ export class CaptureLoop {
                   h--;
                   workerThenables[freeWorkers[h]].resolve(-1);
                 }
-                h = 0;
               }
 
               freeWorkersHead = h;
