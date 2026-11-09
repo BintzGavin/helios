@@ -770,9 +770,13 @@ Last updated by: PERF-1190
 
 ## Performance Trajectory
 Current best: 6.241s (baseline was 8.700s, -28.26%)
-Last updated by: PERF-1190
+Last updated by: PERF-1197
 
 ## What Works
+- **PERF-1197**: Extracted `dispatchWorkers` closure to deduplicate worker assignment logic in `CaptureLoop.ts`.
+  - **Improvement**: Reduced V8 AST parser overhead and async state machine size by deduplicating a ~22-line block of logic that assigns tasks to waiting workers.
+  - **Plan ID**: PERF-1197
+
 - **PERF-1190**: Replaced dynamic maxPipelineDepth calculation with a constant, eliminated dead h = 0 assignments, and used Math.min for chunkEnd calculation in CaptureLoop.ts.
   - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths. Yielded a minor performance improvement in single-worker bounds checks and multi-worker loops.
   - **Plan ID**: PERF-1190

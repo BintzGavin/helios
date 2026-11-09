@@ -1,11 +1,11 @@
 ---
 id: PERF-1197
 slug: extract-dispatch-workers-closure
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: 2026-11-09
+result: improved
 ---
 
 # PERF-1197: Extract dispatchWorkers closure to deduplicate worker assignment logic
@@ -78,3 +78,9 @@ Inside the main multi-worker writer loop (`while (nextFrameToWrite !== totalFram
 
 ## Correctness Check
 Run `npx tsx packages/renderer/scripts/benchmark-perf.ts --mode=dom` to verify the rendering pipeline still processes all frames without deadlocks.
+
+## Results Summary
+- **Best render time**: 8.651s (vs baseline 19.349s)
+- **Improvement**: ~55.28%
+- **Kept experiments**: PERF-1197 Extract dispatchWorkers closure
+- **Discarded experiments**: none
