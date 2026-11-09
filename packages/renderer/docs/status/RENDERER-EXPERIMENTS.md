@@ -3,6 +3,10 @@ Current best: 2.573s (baseline was 13.003s, -80.2%)
 Last updated by: PERF-823
 
 ## What Works
+
+- [PERF-1194] Inlined decrement operators into workerThenables loop indices in CaptureLoop.ts.
+  - **Improvement:** Minor performance improvement due to reduced V8 AST complexity inside worker job distribution and termination loops.
+  - **Plan ID:** PERF-1194
 - [PERF-1073] Unrolled worker dispatch loops into a do-while and avoided explicit array reassignment with w in CaptureLoop.ts checkState and multi-worker loops.
   - **Improvement:** Decreased benchmark runtimes marginally due to V8 TurboFan branch elimination.
   - **Plan ID:** PERF-1073
