@@ -36,7 +36,6 @@ By using the prefix decrement operator `--h` inside the array index accessor, we
 - **Minimum runs**: 3 per experiment, report median
 
 ## Baseline
-- **Current estimated render time**: ~6.241s
 - **Bottleneck analysis**: The multi-worker `checkState` and writer loop dispatch blocks contain this unoptimized sequence, causing minor overhead in job scheduling.
 
 ## Implementation Spec
@@ -89,20 +88,20 @@ In `checkState`'s worker job dispatch loop:
 And also the worker stop loop:
 ```typescript
 <<<<<<< SEARCH
-              // If we still have waiting workers but are at totalFrames, tell them to stop
-              if (n === totalFrames) {
-                while (h !== 0) {
-                  h--;
-                  workerThenables[freeWorkers[h]].resolve(-1);
-                }
-              }
+          // If we still have waiting workers but are at totalFrames, tell them to stop
+          if (n === totalFrames) {
+            while (h !== 0) {
+              h--;
+              workerThenables[freeWorkers[h]].resolve(-1);
+            }
+          }
 =======
-              // If we still have waiting workers but are at totalFrames, tell them to stop
-              if (n === totalFrames) {
-                while (h !== 0) {
-                  workerThenables[freeWorkers[--h]].resolve(-1);
-                }
-              }
+          // If we still have waiting workers but are at totalFrames, tell them to stop
+          if (n === totalFrames) {
+            while (h !== 0) {
+              workerThenables[freeWorkers[--h]].resolve(-1);
+            }
+          }
 >>>>>>> REPLACE
 ```
 
