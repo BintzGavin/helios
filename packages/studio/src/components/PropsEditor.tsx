@@ -104,13 +104,11 @@ export const PropsEditor: React.FC = () => {
   };
 
   const handleCopy = () => {
-    if (inputProps) {
-      navigator.clipboard.writeText(JSON.stringify(inputProps, null, 2));
-    }
+    navigator.clipboard.writeText(JSON.stringify(inputProps, null, 2));
   };
 
   const handleReset = () => {
-    if (!schema || !controller) return;
+    if (!schema) return;
     const defaults: Record<string, any> = {};
     Object.keys(schema).forEach(key => {
       const def = schema[key];

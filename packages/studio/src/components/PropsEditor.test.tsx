@@ -401,6 +401,36 @@ describe('PropsEditor', () => {
     expect(input).toHaveAttribute('title', 'Must match pattern: ^[a-z]+$');
   });
 
+  it('renders string inputs with invalid hex colors as normal text inputs', () => {
+    const schema: HeliosSchema = {
+      badColor: {
+        type: 'string'
+      },
+      badColor2: {
+        type: 'string'
+      }
+    };
+
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          badColor: '#12345',
+          badColor2: '#12345678'
+        },
+        schema
+      }
+    });
+
+    render(<PropsEditor />);
+
+    const input = screen.getByDisplayValue('#12345');
+    expect(input).toHaveAttribute('type', 'text');
+
+    const input2 = screen.getByDisplayValue('#12345678');
+    expect(input2).toHaveAttribute('type', 'text');
+  });
+
   it('renders array inputs with size constraints', () => {
     const schema: HeliosSchema = {
       constrainedList: {
@@ -656,6 +686,7 @@ describe('PropsEditor', () => {
           boolVal: true,
           strVal: "hello",
           colorVal: "#ff0000",
+          colorValShort: "#f00",
           objVal: { nested: true },
           nullVal: null,
           funcVal: () => {}
@@ -672,6 +703,21 @@ describe('PropsEditor', () => {
     const boolInput = screen.getByLabelText('True');
     fireEvent.click(boolInput);
     expect(mockSetInputProps).toHaveBeenCalledWith(expect.objectContaining({ boolVal: false }));
+
+    // Now test a false boolean to cover {value ? 'True' : 'False'} when value is false
+    (StudioContext.useStudio as any).mockReturnValue({
+      ...defaultContext,
+      playerState: {
+        inputProps: {
+          boolValFalse: false
+        },
+        schema: null
+      }
+    });
+    render(<PropsEditor />);
+    const boolFalseInput = screen.getByLabelText('False');
+    fireEvent.click(boolFalseInput);
+    expect(mockSetInputProps).toHaveBeenCalledWith(expect.objectContaining({ boolValFalse: true }));
 
     const strInput = screen.getByDisplayValue('hello');
     fireEvent.change(strInput, { target: { value: 'world' } });
@@ -691,12 +737,12 @@ describe('PropsEditor', () => {
     expect(mockSetInputProps).toHaveBeenCalledWith(expect.objectContaining({ strVal: 'dropped string' }));
 
     const colorPickers = container.querySelectorAll('.prop-color-picker');
-    expect(colorPickers).toHaveLength(1);
+    expect(colorPickers).toHaveLength(2);
     fireEvent.change(colorPickers[0], { target: { value: '#00ff00' } });
     expect(mockSetInputProps).toHaveBeenCalledWith(expect.objectContaining({ colorVal: '#00ff00' }));
 
     const colorTexts = container.querySelectorAll('.prop-color-text');
-    expect(colorTexts).toHaveLength(1);
+    expect(colorTexts).toHaveLength(2);
     fireEvent.change(colorTexts[0], { target: { value: '#0000ff' } });
     expect(mockSetInputProps).toHaveBeenCalledWith(expect.objectContaining({ colorVal: '#0000ff' }));
 
@@ -869,10 +915,9 @@ describe('PropsEditor', () => {
     // mockSetInputProps should not have been called again (was 0 times in this test, but since global it could be anything, just check it doesn't fail)
   });
 
-  it('handles toolbar reset without schema or controller', () => {
+  it('handles toolbar reset without schema', () => {
     (StudioContext.useStudio as any).mockReturnValue({
       ...defaultContext,
-      controller: null,
       playerState: {
         inputProps: { a: 1 },
         schema: null
