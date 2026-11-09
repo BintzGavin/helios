@@ -1,4 +1,4 @@
-**Version**: 0.124.4
+**Version**: 0.124.5
 [Output truncated for brevity]
 
 key or sidebar button, improving usability.
@@ -96,3 +96,4 @@ key or sidebar button, improving usability.
 - [v0.124.2] ✅ Completed: STUDIO-Improve-Timeline-Missing-Branch-Coverage - Created plan to test Timeline mouse tracking and In/Out markers missing coverage (2026-11-15-STUDIO-Timeline-Missing-Branch-Coverage.md).
 - [v0.124.4] ✅ Completed: STUDIO-Improve-Timeline-Missing-Branch-Coverage - Implemented test cases for hover guide, in/out marker dragging, and bounds clamping, bringing Timeline.tsx coverage up to the required marks for these features.
 - [v0.124.4] ✅ Completed: STUDIO-Improve-PropsEditor-Coverage - Created plan to test unreachable lines in PropsEditor component by cleaning up logic and adding missing test assertions (2026-06-25-STUDIO-Improve-PropsEditor-Coverage-Lines-107-113.md).
+- [v0.124.5] ✅ Completed: STUDIO-Improve-PropsEditor-Coverage - Achieved 100% test coverage for PropsEditor by addressing lines 107-113 unreachable branches.

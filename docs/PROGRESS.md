@@ -968,3 +968,5 @@ Each agent should update **their own dedicated progress file** instead of this f
 
 ### PLAYER v0.79.29
 - ✅ Completed: Discovered that .sys/plans/2027-03-08-PLAYER-Implement-TrackEvent.md is an IMPOSSIBLE: DUPLICATION plan and discarded.
+### STUDIO v0.124.5
+- ✅ Completed: STUDIO-Improve-PropsEditor-Coverage - Achieved 100% test coverage for PropsEditor by removing unreachable branches and adding test cases for invalid hex strings and false booleans.
