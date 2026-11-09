@@ -9,6 +9,10 @@ Current best: 8.658s (baseline was 8.700s, -0.48%)
 Last updated by: PERF-1181
 
 ## What Works
+- **PERF-1196**: Replaced `targetH` ternary check with `Math.max` in the multi-worker dispatch block of `CaptureLoop.ts`.
+  - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths.
+  - **Plan ID**: PERF-1196
+
 - **PERF-1190**: Replaced dynamic maxPipelineDepth calculation with a constant, eliminated dead h = 0 assignments, and used Math.min for chunkEnd calculation in CaptureLoop.ts.
   - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths. Yielded a minor performance improvement in single-worker bounds checks and multi-worker loops.
   - **Plan ID**: PERF-1190

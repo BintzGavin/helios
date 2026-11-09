@@ -410,7 +410,7 @@ export class CaptureLoop {
           let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - n;
 
           if (dispatches > 0) {
-            const targetH = dispatches < h ? h - dispatches : 0;
+            const targetH = Math.max(h - dispatches, 0);
             do {
               workerThenables[freeWorkers[--h]].resolve(n++);
             } while (h !== targetH);
