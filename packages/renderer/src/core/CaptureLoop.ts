@@ -399,6 +399,10 @@ export class CaptureLoop {
         }
 
         // See if we can assign tasks to waiting workers
+        dispatchWorkers();
+      };
+
+      const dispatchWorkers = () => {
         if (freeWorkersHead !== 0) {
           let h = freeWorkersHead;
           let n = nextFrameToSubmit;
@@ -503,29 +507,7 @@ export class CaptureLoop {
             const chunkEnd = Math.min(nextFrameToWrite + progressCounter, totalFrames);
             const startWrite = nextFrameToWrite;
 
-            if (freeWorkersHead !== 0) {
-              let h = freeWorkersHead;
-              let n = nextFrameToSubmit;
-
-              let dispatches = Math.min(nextFrameToWrite + maxPipelineDepth, totalFrames) - n;
-
-              if (dispatches > 0) {
-                const targetH = dispatches < h ? h - dispatches : 0;
-                do {
-                  workerThenables[freeWorkers[--h]].resolve(n++);
-                } while (h !== targetH);
-              }
-
-              // If we still have waiting workers but are at totalFrames, tell them to stop
-              if (n === totalFrames) {
-                while (h !== 0) {
-                  workerThenables[freeWorkers[--h]].resolve(-1);
-                }
-              }
-
-              freeWorkersHead = h;
-              nextFrameToSubmit = n;
-            }
+            dispatchWorkers();
 
             if (isDomStrategy) {
               while (nextFrameToWrite !== chunkEnd) {

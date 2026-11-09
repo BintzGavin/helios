@@ -313,3 +313,5 @@ PERF-853	CaptureLoop.ts single worker TimeSeek/Decode overlap	improved
 3	8.722	150	17.20	63.5	keep	PERF-1163: Remove dead store progressCounter = progressInterval
 4	8.916	150	17.20	63.6	discard	PERF-1165: Inline timePromise check
 4	8.916	150	17.20	63.6	discard	PERF-1165: Inline timePromise check
+2000	19.349	150	7.75	63.7	keep	baseline
+2001	8.651	150	17.34	63.7	keep	PERF-1197 extract dispatchWorkers closure
