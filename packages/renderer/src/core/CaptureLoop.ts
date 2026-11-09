@@ -391,9 +391,7 @@ export class CaptureLoop {
         if (aborted) {
           let head = freeWorkersHead;
           while (head !== 0) {
-            head--;
-            const w = freeWorkers[head];
-            workerThenables[w].resolve(-1);
+            workerThenables[freeWorkers[--head]].resolve(-1);
           }
           freeWorkersHead = 0;
           writerWaiterPromise.resolve();
@@ -410,17 +408,14 @@ export class CaptureLoop {
           if (dispatches > 0) {
             const targetH = dispatches < h ? h - dispatches : 0;
             do {
-              h--;
-              workerThenables[freeWorkers[h]].resolve(n);
-              n++;
+              workerThenables[freeWorkers[--h]].resolve(n++);
             } while (h !== targetH);
           }
 
           // If we still have waiting workers but are at totalFrames, tell them to stop
           if (n === totalFrames) {
             while (h !== 0) {
-              h--;
-              workerThenables[freeWorkers[h]].resolve(-1);
+              workerThenables[freeWorkers[--h]].resolve(-1);
             }
           }
 
@@ -517,17 +512,14 @@ export class CaptureLoop {
               if (dispatches > 0) {
                 const targetH = dispatches < h ? h - dispatches : 0;
                 do {
-                  h--;
-                  workerThenables[freeWorkers[h]].resolve(n);
-                  n++;
+                  workerThenables[freeWorkers[--h]].resolve(n++);
                 } while (h !== targetH);
               }
 
               // If we still have waiting workers but are at totalFrames, tell them to stop
               if (n === totalFrames) {
                 while (h !== 0) {
-                  h--;
-                  workerThenables[freeWorkers[h]].resolve(-1);
+                  workerThenables[freeWorkers[--h]].resolve(-1);
                 }
               }
 

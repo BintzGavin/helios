@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	6.711	150	22.35	64.1	keep	inline prefix decrement in resolve loops
+2	8.711	150	17.22	63.7	keep	inline prefix decrement in resolve loops
+3	8.706	150	17.23	63.5	keep	inline prefix decrement in resolve loops
