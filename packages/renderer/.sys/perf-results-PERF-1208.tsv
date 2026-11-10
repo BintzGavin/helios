@@ -1,0 +1,11 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	18.759	150	8.00	63.6	keep	baseline
+2	6.219	150	24.12	64.9	keep	baseline (warm)
+3	8.687	150	17.27	63.6	keep	baseline (warm)
+4	8.682	150	17.28	64.4	keep	baseline (warm)
+5	8.668	150	17.31	63.5	keep	baseline (warm)
+6	6.179	150	24.28	63.5	keep	inline awaitIndex
+7	6.187	150	24.25	63.8	keep	inline awaitIndex
+8	8.667	150	17.31	63.6	keep	inline awaitIndex
+9	6.201	150	24.19	63.5	keep	inline awaitIndex
+10	6.190	150	24.23	63.6	keep	inline awaitIndex
