@@ -5,10 +5,11 @@
 - **PERF-1163**: Created an experiment plan to remove the unused `progressCounter = progressInterval` assignment in the single-worker final frame block of `CaptureLoop.ts` to eliminate a dead store.
 
 - **PERF-967**: Created experiment plan to cache decoded Base64 Buffer objects for unchanged frames in the single-worker `!hasProcessFn` loop in `CaptureLoop.ts`.
-Current best: 8.658s (baseline was 8.700s, -0.48%)
-Last updated by: PERF-1181
+Current best: 6.179s (baseline was 8.7s, -29.0%)
+Last updated by: PERF-1208
 
 ## What Works
+- PERF-1208: Inlined `awaitIndex` calculation inside multi-worker wait block (~67% faster in benchmark)
 - **PERF-1196**: Replaced `targetH` ternary check with `Math.max` in the multi-worker dispatch block of `CaptureLoop.ts`.
   - **Improvement**: Marginally reduced AST parser overhead and intermediate variable allocations inside hot worker scheduling paths.
   - **Plan ID**: PERF-1196
