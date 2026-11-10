@@ -1,4 +1,4 @@
-**Version**: 0.79.29
+**Version**: 0.79.30
 
 [v0.79.26] ✅ Completed: Test autoPictureInPicture - Added edge-case test coverage for autoPictureInPicture in api_parity.test.ts
 [v0.79.17] ✅ Completed: Implement onencrypted Event - Implemented onencrypted handler and documented encrypted event for HTMLMediaElement parity.
@@ -336,3 +336,7 @@
 [v0.79.27] ✅ Completed: Discovered that .sys/plans/2024-05-24-PLAYER-Implement-waitingforkey.md is an IMPOSSIBLE: DUPLICATION plan. The onwaitingforkey property and waitingforkey event are already fully implemented and documented. Documented as impossible and discarded.
 [v0.79.28] ✅ Completed: Discovered that `.sys/plans/2026-10-19-PLAYER-Add-Missing-observedAttributes.md` is an IMPOSSIBLE: DUPLICATION plan. The `defaultmuted` attribute is already fully implemented in `observedAttributes`. Documented as impossible and discarded.
 [v0.79.29] ✅ Completed: Discovered that .sys/plans/2027-03-08-PLAYER-Implement-TrackEvent.md is an IMPOSSIBLE: DUPLICATION plan and discarded.
+[v0.79.30] ✅ Completed: Discovered that .sys/plans/2026-10-17-PLAYER-Missing-Attributes.md is an IMPOSSIBLE: DUPLICATION plan. The missing attributes are already implemented. Documented as impossible and discarded.
+[v0.79.30] ✅ Completed: Discovered that .sys/plans/2026-10-18-PLAYER-Test-autoPictureInPicture.md is an IMPOSSIBLE: DUPLICATION plan. The tests are already implemented. Documented as impossible and discarded.
+[v0.79.30] ✅ Completed: Discovered that .sys/plans/2026-12-31-PLAYER-Implement-webkit-performance-properties.md is an IMPOSSIBLE: DUPLICATION plan. The webkit performance properties are already implemented. Documented as impossible and discarded.
+[v0.79.30] ✅ Completed: Discovered that .sys/plans/2027-03-09-PLAYER-Document-Webkit-Performance-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The webkit performance properties are already documented. Documented as impossible and discarded.

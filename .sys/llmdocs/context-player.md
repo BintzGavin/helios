@@ -1,25 +1,13 @@
-# Context: PLAYER Domain
-**Agent:** RENDERER
-**Domain:** `packages/player`
-**Responsibility:** The Web Component player.
+# Helios Player Context
 
 ## Section A: Component Structure
-- Custom Element: `<helios-player>`
-- Shadow DOM Layout: Wrapper > Iframe (Sandbox) + Controls Overlay
+- Web Component Name: `helios-player` (Class: `HeliosPlayer`)
+- Shadow DOM Layout: Contains `.audio-btn`, `.audio-menu`, `.big-play-btn`, `.captions-container`, `.cc-btn`, `.click-layer`, `.close-debug-btn`, `.close-shortcuts-btn`, `.controls`, `.copy-debug-btn`, `.debug-content`, `.debug-overlay`, `.export-btn`, `.export-menu`, `.fullscreen-btn`, `.markers-container`, `.pip-btn`, `.pip-video`, `.play-pause-btn`, `.poster-container`, `.poster-image`, `.retry-btn`, `.scrubber`, `.scrubber-tooltip`, `.scrubber-wrapper`, `.settings-btn`, `.settings-menu`, `.shortcuts-grid`, `.shortcuts-overlay`, `.status-overlay`, `.status-text`, `.time-display`, `.volume-btn`, `.volume-slider`, `iframe`, and `slot`.
 
 ## Section B: Events
-- Dispatches custom events mirroring HTMLMediaElement and HTMLVideoElement API: `playing`, `waiting`, `suspend`, `stalled`, `abort`, `emptied`, `progress`, `seeking`, `seeked`, `error`, `audiometering`, `enterpictureinpicture`, `leavepictureinpicture`, `waitingforkey`, `encrypted`
-- TextTrack, AudioTrack, VideoTrack events: `addtrack`, `removetrack`, `change`
-- Helios-specific events for composition, state, and export
+- Custom Events Dispatched:
+  - `error`
+  - `audiometering`
 
 ## Section C: Attributes
-- Observed attributes: `src`, `width`, `height`, `muted`, `playsinline`, `disableremoteplayback`, `mediagroup`, `autopictureinpicture`, `defaultmuted`, `loop`, `autoplay`, `controls`
-
-## Section D: Methods
-- Extends standard media methods: `play()`, `pause()`, `load()`, `setPlaybackRange()`, `clearPlaybackRange()`
-- Adds methods: `captureStream()`, `startAudioMetering()`, `stopAudioMetering()`, `getVideoPlaybackQuality()`, `requestVideoFrameCallback()`, `cancelVideoFrameCallback()`, `setDuration()`, `setFps()`, `setSize()`, `setMarkers()`, `getController()`, `getStartDate()`, `setMediaKeys()`
-
-## Section E: Track Events (TrackEvent)
-- Track Lists now dispatch `addtrack` and `removetrack` using the standard `TrackEvent` interface (via `HeliosTrackEvent`), ensuring parity with standard web APIs.
-## Section F: Properties
-- Exposes performance parity properties: `webkitAudioDecodedByteCount`, `webkitDecodedFrameCount`, `webkitDroppedFrameCount`, `webkitVideoDecodedByteCount`
+- Observed Attributes: `"src", "width", "height", "autoplay", "loop", "controls", "export-format", "input-props", "poster", "muted", "interactive", "preload", "controlslist", "sandbox", "export-caption-mode", "disablepictureinpicture", "export-width", "export-height", "export-bitrate", "export-filename", "media-title", "media-artist", "media-album", "media-artwork", "export-mode", "canvas-selector", "playsinline", "crossorigin", "disableremoteplayback", "mediagroup", "autopictureinpicture", "defaultmuted"`
