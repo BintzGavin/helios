@@ -458,8 +458,7 @@ export class CaptureLoop {
 
                 timeDriver.setTime(page, (startFrame + i) * compTimeStep);
 
-                const rawResult = await strategy.capture(page, i * timeStep);
-                frameBufferRing[i & ringMask] = rawResult as string;
+                frameBufferRing[i & ringMask] = (await strategy.capture(page, i * timeStep)) as string;
                 if (i === nextFrameToWrite) writerWaiterPromise.resolve();
               }
             } catch (e) {

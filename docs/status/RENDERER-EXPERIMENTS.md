@@ -793,3 +793,9 @@ Last updated by: PERF-1197
 - **PERF-1191**: Eliminated redundant double array lookups in the multi-worker chunk writer loops of CaptureLoop.ts by caching frameBufferRing[ringIndex] in a local variable.
   - **Improvement**: Slightly reduced V8 array bounds checking and property lookup overhead in the multi-worker loop hot paths.
   - **Plan ID**: PERF-1191
+## Performance Trajectory
+Current best: 6.291s (baseline was 8.700s, -27.69%)
+Last updated by: PERF-1207
+
+## What Works
+- PERF-1207: Inlined the `rawResult` assignment into the `frameBufferRing` array lookup in the multi-worker DOM `runWorker` loop, avoiding intermediate variable allocation overhead in V8 and achieving ~6.29s render time.
