@@ -223,3 +223,5 @@ The Helios CLI is the primary user interface for component registry, project sca
 
 [v0.47.9] 🟢 IMPOSSIBLE: DUPLICATION - CLI Components Command - Plan already implemented.
 - [x] [v0.47.15] CLI Unblocked: Generated strictly new plan /.sys/plans/2024-11-15-CLI-Add-Command.md
+- [x] [v0.47.16] CLI Unblocked: Generated strictly new plan /.sys/plans/2024-12-01-CLI-Add-Command.md
+- [x] [v0.47.16] CLI Unblocked: Generated strictly new plan /.sys/plans/2024-12-01-CLI-Init-Command.md
