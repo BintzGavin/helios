@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 async function main() {
   const args = process.argv.slice(2);
   const modeArg = args.find(arg => arg.startsWith('--mode='));
+  const urlArg = args.find(arg => arg.startsWith('--url='));
   let mode: 'dom' | 'canvas' = 'canvas';
 
   if (modeArg) {
@@ -26,8 +27,10 @@ async function main() {
     intermediateImageFormat: 'png'
   });
 
-  const compositionPath = path.resolve(__dirname, '../../../examples/dom-benchmark/composition.html');
-  const compositionUrl = `file://${compositionPath}`;
+  const compositionUrl = urlArg
+    ? urlArg.split('=')[1]
+    : `file://${path.resolve(__dirname, '../../../examples/dom-benchmark/composition.html')}`;
+
   const outputPath = path.resolve(process.cwd(), 'output/dom-benchmark.mp4');
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
 
