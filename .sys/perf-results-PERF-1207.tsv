@@ -1,0 +1,6 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	19.252	150	7.79	62.7	keep	PERF-1207 inline await strategy.capture rawResult
+2	8.936	150	16.78	64.2	keep	PERF-1207 inline await strategy.capture rawResult
+3	8.836	150	16.98	64.2	keep	PERF-1207 inline await strategy.capture rawResult
+4	6.291	150	23.84	64.3	keep	PERF-1207 inline await strategy.capture rawResult
+5	6.402	150	23.43	64.3	keep	PERF-1207 inline await strategy.capture rawResult
