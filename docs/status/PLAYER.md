@@ -340,3 +340,4 @@
 [v0.79.30] ✅ Completed: Discovered that .sys/plans/2026-10-18-PLAYER-Test-autoPictureInPicture.md is an IMPOSSIBLE: DUPLICATION plan. The tests are already implemented. Documented as impossible and discarded.
 [v0.79.30] ✅ Completed: Discovered that .sys/plans/2026-12-31-PLAYER-Implement-webkit-performance-properties.md is an IMPOSSIBLE: DUPLICATION plan. The webkit performance properties are already implemented. Documented as impossible and discarded.
 [v0.79.30] ✅ Completed: Discovered that .sys/plans/2027-03-09-PLAYER-Document-Webkit-Performance-Properties.md is an IMPOSSIBLE: DUPLICATION plan. The webkit performance properties are already documented. Documented as impossible and discarded.
+[v0.79.31] ✅ Completed: Discovered missing HTMLVideoElement parity properties and methods (moz* and webkit* vendor prefixes). Created plan `.sys/plans/2027-03-09-PLAYER-Implement-moz-webkit-parity.md` to implement them.
