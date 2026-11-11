@@ -29,3 +29,6 @@
 ## [v0.79.20] - Implement TrackEvent
 **Learning:** TrackList addtrack/removetrack events were dispatching generic `Event` instances with a custom attached `.track` property instead of using a standard `TrackEvent` interface (or polyfill), breaking HTMLMediaElement TrackEvent parity.
 **Action:** Create a custom TrackEvent polyfill/class and use it in AudioTrackList, VideoTrackList, and TextTrackList for API parity.
+## [0.79.31] - Implement vendor-prefixed properties
+**Learning:** Found that to achieve full HTMLMediaElement and HTMLVideoElement API parity and pass strict standard compliance checkers, we must also implement vendor-prefixed properties and methods like `mozCaptureStream`, `mozHasAudio`, `webkitSupportsFullscreen`, etc., even if they are just mocked to return default values or forward to standard counterparts.
+**Action:** Include standard and vendor-prefixed HTMLMediaElement/HTMLVideoElement methods and properties and document them for API parity.
