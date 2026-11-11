@@ -1,0 +1,4 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.765	150	17.11	63.5	keep	baseline
+2	8.716	150	17.21	63.4	keep	baseline
+3	8.719	150	17.20	63.5	discard	inline dom pendingbytes single-worker

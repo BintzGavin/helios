@@ -1,11 +1,11 @@
 ---
 id: PERF-1217
 slug: inline-dom-pendingbytes-single-worker
-status: unclaimed
-claimed_by: ""
+status: claimed
+claimed_by: "executor-session"
 created: 2025-02-28
-completed: ""
-result: ""
+completed: "2026-11-11"
+result: "discarded"
 ---
 
 # PERF-1217: Inline DOM pending bytes calculation in single-worker loops

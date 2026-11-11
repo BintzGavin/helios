@@ -363,6 +363,8 @@ $entry
   - **Plan ID:** PERF-864
 
 ## What Doesn't Work (and Why)
+- PERF-1217: Inline `base64Str` into `pendingBytes` calculation in single-worker DOM capture loop.
+  - **WHY it didn't work**: Did not yield any performance improvement (baseline median ~8.716s, optimization median ~8.754s) which falls within margin of error. Kept simple reference for code readability instead.
 - Removed redundant `nextFrameToWrite < totalFrames` check wrapping the while loop in multi-worker `CaptureLoop.ts` (PERF-1212).
   - **WHY it didn't work**: The outer bounds check removal led to a failure in tests (specifically `verify-cancellation.ts`). This is because the outer check guards the entire block, including `dispatchWorkers()`, and when totalFrames is 0 or it's aborted, this check is necessary to prevent entering the loop at all. Removing it caused errors when trying to capture frames in aborted/cancellation conditions.
 - Removed redundant dynamic progress counter math in multi-worker path (PERF-1193)
