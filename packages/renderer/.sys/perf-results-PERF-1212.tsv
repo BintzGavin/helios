@@ -1,0 +1,7 @@
+run	render_time_s	frames	fps_effective	peak_mem_mb	status	description
+1	8.690	150	17.26	63.4	keep	baseline
+2	8.683	150	17.27	63.4	keep	baseline
+3	8.747	150	17.15	63.7	keep	removed redundant check
+4	8.707	150	17.23	63.7	keep	removed redundant check
+5	8.723	150	17.20	63.5	keep	removed redundant check
+6	0.0	0	0.0	0.0	discard	removed redundant check but tests failed
