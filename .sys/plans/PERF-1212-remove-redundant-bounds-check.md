@@ -1,11 +1,11 @@
 ---
 id: PERF-1212
 slug: remove-redundant-bounds-check
-status: unclaimed
-claimed_by: ""
+status: complete
+claimed_by: "executor-session"
 created: 2024-05-24
-completed: ""
-result: ""
+completed: "2026-11-11"
+result: "failed"
 ---
 
 # PERF-1212: Remove redundant nextFrameToWrite < totalFrames check in CaptureLoop.ts
@@ -60,3 +60,9 @@ And adjust indentation accordingly.
 
 ## Canvas Smoke Test
 Run benchmark with canvas mode to ensure it doesn't break.
+
+## Results Summary
+- **Best render time**: 0.000s (vs baseline 8.690s)
+- **Improvement**: 0%
+- **Kept experiments**:
+- **Discarded experiments**: Removed redundant bounds check (failed tests)
